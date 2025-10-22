@@ -1,0 +1,1549 @@
+openapi: 3.0.0
+info:
+  title: BlueprintClient
+  description: Azure Blueprints Client provides access to blueprint definitions, assignments,
+    and artifacts, and related blueprint operations.
+  version: 2018-11-01-preview
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  /{resourceScope}/providers/Microsoft.Blueprint/blueprintAssignments/{assignmentName}/assignmentOperations:
+    get:
+      tags:
+      - AssignmentOperations
+      operationId: AssignmentOperations_List
+      description: List operations for given blueprint assignment within a subscription
+        or a management group.
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        description: Client API Version.
+        schema:
+          type: string
+      - name: resourceScope
+        in: path
+        required: true
+        description: 'The scope of the resource. Valid scopes are: management group
+          (format: ''/providers/Microsoft.Management/managementGroups/{managementGroup}''),
+          subscription (format: ''/subscriptions/{subscriptionId}'').'
+        x-ms-parameter-location: method
+        x-ms-skip-url-encoding: true
+        schema:
+          type: string
+      - name: assignmentName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Name of the blueprint assignment.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK -- all blueprint assignment operations retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of AssignmentOperation.
+                properties:
+                  value:
+                    type: array
+                    description: List of AssignmentOperation.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: String Id used to locate any resource on Azure.
+                        type:
+                          readOnly: true
+                          type: string
+                          description: Type of this resource.
+                        name:
+                          readOnly: true
+                          type: string
+                          description: Name of this resource.
+                        properties:
+                          description: Properties for AssignmentOperation.
+                          x-ms-client-flatten: true
+                          type: object
+                          properties:
+                            blueprintVersion:
+                              type: string
+                              description: The published version of the blueprint
+                                definition used for the blueprint assignment operation.
+                            assignmentState:
+                              type: string
+                              description: State of this blueprint assignment operation.
+                            timeCreated:
+                              type: string
+                              description: Create time of this blueprint assignment
+                                operation.
+                            timeStarted:
+                              type: string
+                              description: Start time of the underlying deployment.
+                            timeFinished:
+                              type: string
+                              description: Finish time of the overall underlying deployments.
+                            deployments:
+                              type: array
+                              description: List of jobs in this blueprint assignment
+                                operation.
+                              items:
+                                type: object
+                                description: Represents individual job in given blueprint
+                                  assignment operation.
+                                properties:
+                                  kind:
+                                    type: string
+                                    description: Kind of job.
+                                  action:
+                                    type: string
+                                    description: Name of the action performed in this
+                                      job.
+                                  jobId:
+                                    type: string
+                                    description: Id of this job.
+                                  jobState:
+                                    type: string
+                                    description: State of this job.
+                                  result:
+                                    description: Deployment job result.
+                                    type: object
+                                    properties:
+                                      error:
+                                        description: Contains error details if deployment
+                                          job failed.
+                                        type: object
+                                        properties:
+                                          code:
+                                            type: string
+                                            description: Error code.
+                                          message:
+                                            type: string
+                                            description: Error message.
+                                      resources:
+                                        type: array
+                                        description: Resources created as result of
+                                          the deployment job.
+                                        items:
+                                          type: object
+                                          properties:
+                                            id:
+                                              readOnly: true
+                                              type: string
+                                              description: String Id used to locate
+                                                any resource on Azure.
+                                            type:
+                                              readOnly: true
+                                              type: string
+                                              description: Type of this resource.
+                                            name:
+                                              readOnly: true
+                                              type: string
+                                              description: Name of this resource.
+                                            properties:
+                                              type: object
+                                              description: Additional properties in
+                                                a dictionary.
+                                              additionalProperties:
+                                                type: string
+                                                description: property value
+                                          description: Common properties for all Azure
+                                            resources.
+                                          x-ms-azure-resource: true
+                                  history:
+                                    type: array
+                                    description: Result of this deployment job for
+                                      each retry.
+                                    items:
+                                      type: object
+                                      description: Result of each individual deployment
+                                        in a blueprint assignment.
+                                      properties:
+                                        error:
+                                          description: Contains error details if deployment
+                                            job failed.
+                                          type: object
+                                          properties:
+                                            code:
+                                              type: string
+                                              description: Error code.
+                                            message:
+                                              type: string
+                                              description: Error message.
+                                        resources:
+                                          type: array
+                                          description: Resources created as result
+                                            of the deployment job.
+                                          items:
+                                            type: object
+                                            properties:
+                                              id:
+                                                readOnly: true
+                                                type: string
+                                                description: String Id used to locate
+                                                  any resource on Azure.
+                                              type:
+                                                readOnly: true
+                                                type: string
+                                                description: Type of this resource.
+                                              name:
+                                                readOnly: true
+                                                type: string
+                                                description: Name of this resource.
+                                              properties:
+                                                type: object
+                                                description: Additional properties
+                                                  in a dictionary.
+                                                additionalProperties:
+                                                  type: string
+                                                  description: property value
+                                            description: Common properties for all
+                                              Azure resources.
+                                            x-ms-azure-resource: true
+                                  requestUri:
+                                    type: string
+                                    description: Reference to deployment job resource
+                                      id.
+                      description: Common properties for all Azure resources.
+                      x-ms-azure-resource: true
+                  nextLink:
+                    type: string
+                    readOnly: true
+                    description: Link to the next page of results.
+        default:
+          description: Blueprints error response.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    title: Error Response
+                    description: Common error response for all Azure Resource Manager
+                      APIs to return error details for failed operations. (This also
+                      follows the OData error response format.)
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          title: Error Response
+                          description: Common error response for all Azure Resource
+                            Manager APIs to return error details for failed operations.
+                            (This also follows the OData error response format.)
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                title: Error Response
+                                description: Common error response for all Azure Resource
+                                  Manager APIs to return error details for failed
+                                  operations. (This also follows the OData error response
+                                  format.)
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-pageable:
+        nextLinkName: nextLink
+  ? /{resourceScope}/providers/Microsoft.Blueprint/blueprintAssignments/{assignmentName}/assignmentOperations/{assignmentOperationName}
+  : get:
+      tags:
+      - AssignmentOperations
+      operationId: AssignmentOperations_Get
+      description: Get a blueprint assignment operation.
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        description: Client API Version.
+        schema:
+          type: string
+      - name: resourceScope
+        in: path
+        required: true
+        description: 'The scope of the resource. Valid scopes are: management group
+          (format: ''/providers/Microsoft.Management/managementGroups/{managementGroup}''),
+          subscription (format: ''/subscriptions/{subscriptionId}'').'
+        x-ms-parameter-location: method
+        x-ms-skip-url-encoding: true
+        schema:
+          type: string
+      - name: assignmentName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Name of the blueprint assignment.
+        schema:
+          type: string
+      - name: assignmentOperationName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Name of the blueprint assignment operation.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK -- blueprint assignment operation retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: String Id used to locate any resource on Azure.
+                  type:
+                    readOnly: true
+                    type: string
+                    description: Type of this resource.
+                  name:
+                    readOnly: true
+                    type: string
+                    description: Name of this resource.
+                  properties:
+                    description: Properties for AssignmentOperation.
+                    x-ms-client-flatten: true
+                    type: object
+                    properties:
+                      blueprintVersion:
+                        type: string
+                        description: The published version of the blueprint definition
+                          used for the blueprint assignment operation.
+                      assignmentState:
+                        type: string
+                        description: State of this blueprint assignment operation.
+                      timeCreated:
+                        type: string
+                        description: Create time of this blueprint assignment operation.
+                      timeStarted:
+                        type: string
+                        description: Start time of the underlying deployment.
+                      timeFinished:
+                        type: string
+                        description: Finish time of the overall underlying deployments.
+                      deployments:
+                        type: array
+                        description: List of jobs in this blueprint assignment operation.
+                        items:
+                          type: object
+                          description: Represents individual job in given blueprint
+                            assignment operation.
+                          properties:
+                            kind:
+                              type: string
+                              description: Kind of job.
+                            action:
+                              type: string
+                              description: Name of the action performed in this job.
+                            jobId:
+                              type: string
+                              description: Id of this job.
+                            jobState:
+                              type: string
+                              description: State of this job.
+                            result:
+                              description: Deployment job result.
+                              type: object
+                              properties:
+                                error:
+                                  description: Contains error details if deployment
+                                    job failed.
+                                  type: object
+                                  properties:
+                                    code:
+                                      type: string
+                                      description: Error code.
+                                    message:
+                                      type: string
+                                      description: Error message.
+                                resources:
+                                  type: array
+                                  description: Resources created as result of the
+                                    deployment job.
+                                  items:
+                                    type: object
+                                    properties:
+                                      id:
+                                        readOnly: true
+                                        type: string
+                                        description: String Id used to locate any
+                                          resource on Azure.
+                                      type:
+                                        readOnly: true
+                                        type: string
+                                        description: Type of this resource.
+                                      name:
+                                        readOnly: true
+                                        type: string
+                                        description: Name of this resource.
+                                      properties:
+                                        type: object
+                                        description: Additional properties in a dictionary.
+                                        additionalProperties:
+                                          type: string
+                                          description: property value
+                                    description: Common properties for all Azure resources.
+                                    x-ms-azure-resource: true
+                            history:
+                              type: array
+                              description: Result of this deployment job for each
+                                retry.
+                              items:
+                                type: object
+                                description: Result of each individual deployment
+                                  in a blueprint assignment.
+                                properties:
+                                  error:
+                                    description: Contains error details if deployment
+                                      job failed.
+                                    type: object
+                                    properties:
+                                      code:
+                                        type: string
+                                        description: Error code.
+                                      message:
+                                        type: string
+                                        description: Error message.
+                                  resources:
+                                    type: array
+                                    description: Resources created as result of the
+                                      deployment job.
+                                    items:
+                                      type: object
+                                      properties:
+                                        id:
+                                          readOnly: true
+                                          type: string
+                                          description: String Id used to locate any
+                                            resource on Azure.
+                                        type:
+                                          readOnly: true
+                                          type: string
+                                          description: Type of this resource.
+                                        name:
+                                          readOnly: true
+                                          type: string
+                                          description: Name of this resource.
+                                        properties:
+                                          type: object
+                                          description: Additional properties in a
+                                            dictionary.
+                                          additionalProperties:
+                                            type: string
+                                            description: property value
+                                      description: Common properties for all Azure
+                                        resources.
+                                      x-ms-azure-resource: true
+                            requestUri:
+                              type: string
+                              description: Reference to deployment job resource id.
+                description: Common properties for all Azure resources.
+                x-ms-azure-resource: true
+        default:
+          description: Blueprints error response.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    title: Error Response
+                    description: Common error response for all Azure Resource Manager
+                      APIs to return error details for failed operations. (This also
+                      follows the OData error response format.)
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          title: Error Response
+                          description: Common error response for all Azure Resource
+                            Manager APIs to return error details for failed operations.
+                            (This also follows the OData error response format.)
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                title: Error Response
+                                description: Common error response for all Azure Resource
+                                  Manager APIs to return error details for failed
+                                  operations. (This also follows the OData error response
+                                  format.)
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+components:
+  parameters:
+    ScopeParameter:
+      name: resourceScope
+      in: path
+      required: true
+      description: 'The scope of the resource. Valid scopes are: management group
+        (format: ''/providers/Microsoft.Management/managementGroups/{managementGroup}''),
+        subscription (format: ''/subscriptions/{subscriptionId}'').'
+      x-ms-parameter-location: method
+      x-ms-skip-url-encoding: true
+      schema:
+        type: string
+    AssignmentNameParameter:
+      name: assignmentName
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      description: Name of the blueprint assignment.
+      schema:
+        type: string
+    AssignmentOperationNameParameter:
+      name: assignmentOperationName
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      description: Name of the blueprint assignment operation.
+      schema:
+        type: string
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      x-ms-parameter-location: client
+      description: Client API Version.
+      schema:
+        type: string
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    AssignmentOperation:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: String Id used to locate any resource on Azure.
+        type:
+          readOnly: true
+          type: string
+          description: Type of this resource.
+        name:
+          readOnly: true
+          type: string
+          description: Name of this resource.
+        properties:
+          description: Properties for AssignmentOperation.
+          x-ms-client-flatten: true
+          type: object
+          properties:
+            blueprintVersion:
+              type: string
+              description: The published version of the blueprint definition used
+                for the blueprint assignment operation.
+            assignmentState:
+              type: string
+              description: State of this blueprint assignment operation.
+            timeCreated:
+              type: string
+              description: Create time of this blueprint assignment operation.
+            timeStarted:
+              type: string
+              description: Start time of the underlying deployment.
+            timeFinished:
+              type: string
+              description: Finish time of the overall underlying deployments.
+            deployments:
+              type: array
+              description: List of jobs in this blueprint assignment operation.
+              items:
+                type: object
+                description: Represents individual job in given blueprint assignment
+                  operation.
+                properties:
+                  kind:
+                    type: string
+                    description: Kind of job.
+                  action:
+                    type: string
+                    description: Name of the action performed in this job.
+                  jobId:
+                    type: string
+                    description: Id of this job.
+                  jobState:
+                    type: string
+                    description: State of this job.
+                  result:
+                    description: Deployment job result.
+                    type: object
+                    properties:
+                      error:
+                        description: Contains error details if deployment job failed.
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                            description: Error code.
+                          message:
+                            type: string
+                            description: Error message.
+                      resources:
+                        type: array
+                        description: Resources created as result of the deployment
+                          job.
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              readOnly: true
+                              type: string
+                              description: String Id used to locate any resource on
+                                Azure.
+                            type:
+                              readOnly: true
+                              type: string
+                              description: Type of this resource.
+                            name:
+                              readOnly: true
+                              type: string
+                              description: Name of this resource.
+                            properties:
+                              type: object
+                              description: Additional properties in a dictionary.
+                              additionalProperties:
+                                type: string
+                                description: property value
+                          description: Common properties for all Azure resources.
+                          x-ms-azure-resource: true
+                  history:
+                    type: array
+                    description: Result of this deployment job for each retry.
+                    items:
+                      type: object
+                      description: Result of each individual deployment in a blueprint
+                        assignment.
+                      properties:
+                        error:
+                          description: Contains error details if deployment job failed.
+                          type: object
+                          properties:
+                            code:
+                              type: string
+                              description: Error code.
+                            message:
+                              type: string
+                              description: Error message.
+                        resources:
+                          type: array
+                          description: Resources created as result of the deployment
+                            job.
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                readOnly: true
+                                type: string
+                                description: String Id used to locate any resource
+                                  on Azure.
+                              type:
+                                readOnly: true
+                                type: string
+                                description: Type of this resource.
+                              name:
+                                readOnly: true
+                                type: string
+                                description: Name of this resource.
+                              properties:
+                                type: object
+                                description: Additional properties in a dictionary.
+                                additionalProperties:
+                                  type: string
+                                  description: property value
+                            description: Common properties for all Azure resources.
+                            x-ms-azure-resource: true
+                  requestUri:
+                    type: string
+                    description: Reference to deployment job resource id.
+      description: Common properties for all Azure resources.
+      x-ms-azure-resource: true
+    AssignmentOperationList:
+      type: object
+      description: List of AssignmentOperation.
+      properties:
+        value:
+          type: array
+          description: List of AssignmentOperation.
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: String Id used to locate any resource on Azure.
+              type:
+                readOnly: true
+                type: string
+                description: Type of this resource.
+              name:
+                readOnly: true
+                type: string
+                description: Name of this resource.
+              properties:
+                description: Properties for AssignmentOperation.
+                x-ms-client-flatten: true
+                type: object
+                properties:
+                  blueprintVersion:
+                    type: string
+                    description: The published version of the blueprint definition
+                      used for the blueprint assignment operation.
+                  assignmentState:
+                    type: string
+                    description: State of this blueprint assignment operation.
+                  timeCreated:
+                    type: string
+                    description: Create time of this blueprint assignment operation.
+                  timeStarted:
+                    type: string
+                    description: Start time of the underlying deployment.
+                  timeFinished:
+                    type: string
+                    description: Finish time of the overall underlying deployments.
+                  deployments:
+                    type: array
+                    description: List of jobs in this blueprint assignment operation.
+                    items:
+                      type: object
+                      description: Represents individual job in given blueprint assignment
+                        operation.
+                      properties:
+                        kind:
+                          type: string
+                          description: Kind of job.
+                        action:
+                          type: string
+                          description: Name of the action performed in this job.
+                        jobId:
+                          type: string
+                          description: Id of this job.
+                        jobState:
+                          type: string
+                          description: State of this job.
+                        result:
+                          description: Deployment job result.
+                          type: object
+                          properties:
+                            error:
+                              description: Contains error details if deployment job
+                                failed.
+                              type: object
+                              properties:
+                                code:
+                                  type: string
+                                  description: Error code.
+                                message:
+                                  type: string
+                                  description: Error message.
+                            resources:
+                              type: array
+                              description: Resources created as result of the deployment
+                                job.
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    readOnly: true
+                                    type: string
+                                    description: String Id used to locate any resource
+                                      on Azure.
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: Type of this resource.
+                                  name:
+                                    readOnly: true
+                                    type: string
+                                    description: Name of this resource.
+                                  properties:
+                                    type: object
+                                    description: Additional properties in a dictionary.
+                                    additionalProperties:
+                                      type: string
+                                      description: property value
+                                description: Common properties for all Azure resources.
+                                x-ms-azure-resource: true
+                        history:
+                          type: array
+                          description: Result of this deployment job for each retry.
+                          items:
+                            type: object
+                            description: Result of each individual deployment in a
+                              blueprint assignment.
+                            properties:
+                              error:
+                                description: Contains error details if deployment
+                                  job failed.
+                                type: object
+                                properties:
+                                  code:
+                                    type: string
+                                    description: Error code.
+                                  message:
+                                    type: string
+                                    description: Error message.
+                              resources:
+                                type: array
+                                description: Resources created as result of the deployment
+                                  job.
+                                items:
+                                  type: object
+                                  properties:
+                                    id:
+                                      readOnly: true
+                                      type: string
+                                      description: String Id used to locate any resource
+                                        on Azure.
+                                    type:
+                                      readOnly: true
+                                      type: string
+                                      description: Type of this resource.
+                                    name:
+                                      readOnly: true
+                                      type: string
+                                      description: Name of this resource.
+                                    properties:
+                                      type: object
+                                      description: Additional properties in a dictionary.
+                                      additionalProperties:
+                                        type: string
+                                        description: property value
+                                  description: Common properties for all Azure resources.
+                                  x-ms-azure-resource: true
+                        requestUri:
+                          type: string
+                          description: Reference to deployment job resource id.
+            description: Common properties for all Azure resources.
+            x-ms-azure-resource: true
+        nextLink:
+          type: string
+          readOnly: true
+          description: Link to the next page of results.
+    AssignmentOperationProperties:
+      type: object
+      description: Properties of AssignmentOperation.
+      properties:
+        blueprintVersion:
+          type: string
+          description: The published version of the blueprint definition used for
+            the blueprint assignment operation.
+        assignmentState:
+          type: string
+          description: State of this blueprint assignment operation.
+        timeCreated:
+          type: string
+          description: Create time of this blueprint assignment operation.
+        timeStarted:
+          type: string
+          description: Start time of the underlying deployment.
+        timeFinished:
+          type: string
+          description: Finish time of the overall underlying deployments.
+        deployments:
+          type: array
+          description: List of jobs in this blueprint assignment operation.
+          items:
+            type: object
+            description: Represents individual job in given blueprint assignment operation.
+            properties:
+              kind:
+                type: string
+                description: Kind of job.
+              action:
+                type: string
+                description: Name of the action performed in this job.
+              jobId:
+                type: string
+                description: Id of this job.
+              jobState:
+                type: string
+                description: State of this job.
+              result:
+                description: Deployment job result.
+                type: object
+                properties:
+                  error:
+                    description: Contains error details if deployment job failed.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: Error code.
+                      message:
+                        type: string
+                        description: Error message.
+                  resources:
+                    type: array
+                    description: Resources created as result of the deployment job.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: String Id used to locate any resource on Azure.
+                        type:
+                          readOnly: true
+                          type: string
+                          description: Type of this resource.
+                        name:
+                          readOnly: true
+                          type: string
+                          description: Name of this resource.
+                        properties:
+                          type: object
+                          description: Additional properties in a dictionary.
+                          additionalProperties:
+                            type: string
+                            description: property value
+                      description: Common properties for all Azure resources.
+                      x-ms-azure-resource: true
+              history:
+                type: array
+                description: Result of this deployment job for each retry.
+                items:
+                  type: object
+                  description: Result of each individual deployment in a blueprint
+                    assignment.
+                  properties:
+                    error:
+                      description: Contains error details if deployment job failed.
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                          description: Error code.
+                        message:
+                          type: string
+                          description: Error message.
+                    resources:
+                      type: array
+                      description: Resources created as result of the deployment job.
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            readOnly: true
+                            type: string
+                            description: String Id used to locate any resource on
+                              Azure.
+                          type:
+                            readOnly: true
+                            type: string
+                            description: Type of this resource.
+                          name:
+                            readOnly: true
+                            type: string
+                            description: Name of this resource.
+                          properties:
+                            type: object
+                            description: Additional properties in a dictionary.
+                            additionalProperties:
+                              type: string
+                              description: property value
+                        description: Common properties for all Azure resources.
+                        x-ms-azure-resource: true
+              requestUri:
+                type: string
+                description: Reference to deployment job resource id.
+    AssignmentDeploymentJob:
+      type: object
+      description: Represents individual job in given blueprint assignment operation.
+      properties:
+        kind:
+          type: string
+          description: Kind of job.
+        action:
+          type: string
+          description: Name of the action performed in this job.
+        jobId:
+          type: string
+          description: Id of this job.
+        jobState:
+          type: string
+          description: State of this job.
+        result:
+          description: Deployment job result.
+          type: object
+          properties:
+            error:
+              description: Contains error details if deployment job failed.
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: Error code.
+                message:
+                  type: string
+                  description: Error message.
+            resources:
+              type: array
+              description: Resources created as result of the deployment job.
+              items:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: String Id used to locate any resource on Azure.
+                  type:
+                    readOnly: true
+                    type: string
+                    description: Type of this resource.
+                  name:
+                    readOnly: true
+                    type: string
+                    description: Name of this resource.
+                  properties:
+                    type: object
+                    description: Additional properties in a dictionary.
+                    additionalProperties:
+                      type: string
+                      description: property value
+                description: Common properties for all Azure resources.
+                x-ms-azure-resource: true
+        history:
+          type: array
+          description: Result of this deployment job for each retry.
+          items:
+            type: object
+            description: Result of each individual deployment in a blueprint assignment.
+            properties:
+              error:
+                description: Contains error details if deployment job failed.
+                type: object
+                properties:
+                  code:
+                    type: string
+                    description: Error code.
+                  message:
+                    type: string
+                    description: Error message.
+              resources:
+                type: array
+                description: Resources created as result of the deployment job.
+                items:
+                  type: object
+                  properties:
+                    id:
+                      readOnly: true
+                      type: string
+                      description: String Id used to locate any resource on Azure.
+                    type:
+                      readOnly: true
+                      type: string
+                      description: Type of this resource.
+                    name:
+                      readOnly: true
+                      type: string
+                      description: Name of this resource.
+                    properties:
+                      type: object
+                      description: Additional properties in a dictionary.
+                      additionalProperties:
+                        type: string
+                        description: property value
+                  description: Common properties for all Azure resources.
+                  x-ms-azure-resource: true
+        requestUri:
+          type: string
+          description: Reference to deployment job resource id.
+    AssignmentDeploymentJobResult:
+      type: object
+      description: Result of each individual deployment in a blueprint assignment.
+      properties:
+        error:
+          description: Contains error details if deployment job failed.
+          type: object
+          properties:
+            code:
+              type: string
+              description: Error code.
+            message:
+              type: string
+              description: Error message.
+        resources:
+          type: array
+          description: Resources created as result of the deployment job.
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: String Id used to locate any resource on Azure.
+              type:
+                readOnly: true
+                type: string
+                description: Type of this resource.
+              name:
+                readOnly: true
+                type: string
+                description: Name of this resource.
+              properties:
+                type: object
+                description: Additional properties in a dictionary.
+                additionalProperties:
+                  type: string
+                  description: property value
+            description: Common properties for all Azure resources.
+            x-ms-azure-resource: true
+    AssignmentJobCreatedResource:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: String Id used to locate any resource on Azure.
+        type:
+          readOnly: true
+          type: string
+          description: Type of this resource.
+        name:
+          readOnly: true
+          type: string
+          description: Name of this resource.
+        properties:
+          type: object
+          description: Additional properties in a dictionary.
+          additionalProperties:
+            type: string
+            description: property value
+      description: Common properties for all Azure resources.
+      x-ms-azure-resource: true
+    AzureResourceBase:
+      description: Common properties for all Azure resources.
+      type: object
+      x-ms-azure-resource: true
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: String Id used to locate any resource on Azure.
+        type:
+          readOnly: true
+          type: string
+          description: Type of this resource.
+        name:
+          readOnly: true
+          type: string
+          description: Name of this resource.
+    AzureResourceManagerError:
+      type: object
+      description: Error code and message
+      properties:
+        code:
+          type: string
+          description: Error code.
+        message:
+          type: string
+          description: Error message.
+    ErrorResponse:
+      title: Error Response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.)
+      type: object
+      properties:
+        code:
+          readOnly: true
+          type: string
+          description: The error code.
+        message:
+          readOnly: true
+          type: string
+          description: The error message.
+        target:
+          readOnly: true
+          type: string
+          description: The error target.
+        details:
+          readOnly: true
+          type: array
+          items:
+            title: Error Response
+            description: Common error response for all Azure Resource Manager APIs
+              to return error details for failed operations. (This also follows the
+              OData error response format.)
+            type: object
+            properties:
+              code:
+                readOnly: true
+                type: string
+                description: The error code.
+              message:
+                readOnly: true
+                type: string
+                description: The error message.
+              target:
+                readOnly: true
+                type: string
+                description: The error target.
+              details:
+                readOnly: true
+                type: array
+                items:
+                  title: Error Response
+                  description: Common error response for all Azure Resource Manager
+                    APIs to return error details for failed operations. (This also
+                    follows the OData error response format.)
+                  type: object
+                  properties:
+                    code:
+                      readOnly: true
+                      type: string
+                      description: The error code.
+                    message:
+                      readOnly: true
+                      type: string
+                      description: The error message.
+                    target:
+                      readOnly: true
+                      type: string
+                      description: The error target.
+                x-ms-identifiers:
+                - message
+                - target
+                description: The error details.
+              additionalInfo:
+                readOnly: true
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      readOnly: true
+                      type: string
+                      description: The additional info type.
+                    info:
+                      readOnly: true
+                      type: object
+                      description: The additional info.
+                  description: The resource management error additional info.
+                x-ms-identifiers: []
+                description: The error additional info.
+          x-ms-identifiers:
+          - message
+          - target
+          description: The error details.
+        additionalInfo:
+          readOnly: true
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                readOnly: true
+                type: string
+                description: The additional info type.
+              info:
+                readOnly: true
+                type: object
+                description: The additional info.
+            description: The resource management error additional info.
+          x-ms-identifiers: []
+          description: The error additional info.
+    ErrorAdditionalInfo:
+      type: object
+      properties:
+        type:
+          readOnly: true
+          type: string
+          description: The additional info type.
+        info:
+          readOnly: true
+          type: object
+          description: The additional info.
+      description: The resource management error additional info.
+    CloudError:
+      x-ms-external: true
+      properties:
+        error:
+          title: Error Response
+          description: Common error response for all Azure Resource Manager APIs to
+            return error details for failed operations. (This also follows the OData
+            error response format.)
+          type: object
+          properties:
+            code:
+              readOnly: true
+              type: string
+              description: The error code.
+            message:
+              readOnly: true
+              type: string
+              description: The error message.
+            target:
+              readOnly: true
+              type: string
+              description: The error target.
+            details:
+              readOnly: true
+              type: array
+              items:
+                title: Error Response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.)
+                type: object
+                properties:
+                  code:
+                    readOnly: true
+                    type: string
+                    description: The error code.
+                  message:
+                    readOnly: true
+                    type: string
+                    description: The error message.
+                  target:
+                    readOnly: true
+                    type: string
+                    description: The error target.
+                  details:
+                    readOnly: true
+                    type: array
+                    items:
+                      title: Error Response
+                      description: Common error response for all Azure Resource Manager
+                        APIs to return error details for failed operations. (This
+                        also follows the OData error response format.)
+                      type: object
+                      properties:
+                        code:
+                          readOnly: true
+                          type: string
+                          description: The error code.
+                        message:
+                          readOnly: true
+                          type: string
+                          description: The error message.
+                        target:
+                          readOnly: true
+                          type: string
+                          description: The error target.
+                    x-ms-identifiers:
+                    - message
+                    - target
+                    description: The error details.
+                  additionalInfo:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The additional info type.
+                        info:
+                          readOnly: true
+                          type: object
+                          description: The additional info.
+                      description: The resource management error additional info.
+                    x-ms-identifiers: []
+                    description: The error additional info.
+              x-ms-identifiers:
+              - message
+              - target
+              description: The error details.
+            additionalInfo:
+              readOnly: true
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The additional info type.
+                  info:
+                    readOnly: true
+                    type: object
+                    description: The additional info.
+                description: The resource management error additional info.
+              x-ms-identifiers: []
+              description: The error additional info.

@@ -1,0 +1,2026 @@
+openapi: 3.0.0
+info:
+  title: PostgreSQLManagementClient
+  description: The Azure Database for PostgreSQL management API provides create, read,
+    update, and delete functionality for Azure PostgreSQL resources including servers,
+    databases, firewall rules, network configuration, security alert policies, log
+    files and configurations with new business model.
+  version: 2024-08-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/flexibleServers/{serverName}/ltrPreBackup
+  : post:
+      description: Performs all checks required so that a subsequent long term retention
+        backup operation succeeds.
+      tags:
+      - LongTermRetentionBackup
+      operationId: FlexibleServer_TriggerLtrPreBackup
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serverName
+        in: path
+        required: true
+        description: The name of the server.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 63
+          pattern: ^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                backupSettings:
+                  description: Backup Settings
+                  type: object
+                  required:
+                  - backupName
+                  properties:
+                    backupName:
+                      type: string
+                      description: Backup Name for the current backup
+              required:
+              - backupSettings
+              description: BackupRequestBase is the base for all backup request.
+        description: Request body for operation
+        required: true
+      responses:
+        '200':
+          description: Ok. API finished synchronously with Success.
+          headers:
+            x-ms-request-id:
+              description: A unique ID for the current operation, service generated.
+                All the resource providers must return this value in the response
+                headers to facilitate debugging.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                description: Response for the LTR pre-backup API call
+                type: object
+                required:
+                - properties
+                properties:
+                  properties:
+                    description: Additional Properties for the pre backup response
+                    x-ms-client-flatten: true
+                    type: object
+                    required:
+                    - numberOfContainers
+                    properties:
+                      numberOfContainers:
+                        format: int32
+                        description: Number of storage containers the plugin will
+                          use during backup. More than one containers may be used
+                          for size limitations, parallelism, or redundancy etc.
+                        type: integer
+        default:
+          description: Error Scenario 4xx/5xx
+          headers:
+            x-ms-error-code:
+              description: ErrorCode string in the event of a failure.
+              schema:
+                type: string
+            x-ms-request-id:
+              description: A unique ID for the current operation, service generated.
+                All the resource providers must return this value in the response
+                headers to facilitate debugging.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      deprecated: false
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/flexibleServers/{serverName}/startLtrBackup
+  : post:
+      description: Start the Long Term Retention Backup operation
+      tags:
+      - LongTermRetentionBackup
+      operationId: FlexibleServer_StartLtrBackup
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serverName
+        in: path
+        required: true
+        description: The name of the server.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 63
+          pattern: ^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                backupSettings:
+                  description: Backup Settings
+                  type: object
+                  required:
+                  - backupName
+                  properties:
+                    backupName:
+                      type: string
+                      description: Backup Name for the current backup
+                targetDetails:
+                  description: Backup store detail for target server
+                  required:
+                  - sasUriList
+                  type: object
+                  properties:
+                    sasUriList:
+                      description: List of SAS uri of storage containers where backup
+                        data is to be streamed/copied.
+                      type: array
+                      items:
+                        type: string
+                        description: SAS URI of Azure Storage Account Container.
+                        x-ms-secret: true
+              required:
+              - backupSettings
+              - targetDetails
+              description: BackupRequestBase is the base for all backup request.
+        description: Request body for operation
+        required: true
+      responses:
+        '200':
+          description: Ok. API finished synchronously with Success.
+          headers:
+            x-ms-request-id:
+              description: A unique ID for the current operation, service generated.
+                All the resource providers must return this value in the response
+                headers to facilitate debugging.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                description: Response for the LTR backup API call
+                type: object
+                properties:
+                  properties:
+                    description: Long Term Retention Backup Operation Resource Properties
+                    x-ms-client-flatten: true
+                    type: object
+                    required:
+                    - status
+                    - startTime
+                    properties:
+                      datasourceSizeInBytes:
+                        format: int64
+                        description: Size of datasource in bytes
+                        type: integer
+                      dataTransferredInBytes:
+                        format: int64
+                        description: Data transferred in bytes
+                        type: integer
+                      backupName:
+                        description: Name of Backup operation
+                        type: string
+                      backupMetadata:
+                        description: Metadata to be stored in RP. Store everything
+                          that will be required to perform a successful restore using
+                          this Recovery point. e.g. Versions, DataFormat etc
+                        type: string
+                      status:
+                        description: Service-set extensible enum indicating the status
+                          of operation
+                        enum:
+                        - Running
+                        - Cancelled
+                        - Failed
+                        - Succeeded
+                        type: string
+                        x-ms-enum:
+                          name: ExecutionStatus
+                          modelAsString: true
+                      startTime:
+                        description: Start time of the operation.
+                        format: date-time
+                        type: string
+                      endTime:
+                        description: End time of the operation.
+                        format: date-time
+                        type: string
+                      percentComplete:
+                        description: PercentageCompleted
+                        format: double
+                        type: number
+                        minimum: 0
+                        maximum: 100
+                      errorCode:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      errorMessage:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+        '202':
+          description: Accepted.
+          headers:
+            Retry-After:
+              description: The number of seconds to wait before checking the status
+                of the asynchronous operation.
+              schema:
+                type: integer
+                format: int32
+            x-ms-request-id:
+              description: A unique ID for the current operation, service generated.
+                All the resource providers must return this value in the response
+                headers to facilitate debugging.
+              schema:
+                type: string
+            Location:
+              description: URL to retrieve the final result after operation completes.
+              schema:
+                type: string
+            Azure-AsyncOperation:
+              description: URL for checking the ongoing status of the operation.
+              schema:
+                type: string
+        default:
+          description: Error Scenario 4xx/5xx
+          headers:
+            x-ms-error-code:
+              description: ErrorCode string in the event of a failure.
+              schema:
+                type: string
+            x-ms-request-id:
+              description: A unique ID for the current operation, service generated.
+                All the resource providers must return this value in the response
+                headers to facilitate debugging.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: location
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/flexibleServers/{serverName}/ltrBackupOperations/{backupName}
+  : get:
+      tags:
+      - LongTermRetentionBackup
+      operationId: ltrBackupOperations_Get
+      description: Gets the result of the give long term retention backup operation
+        for the flexible server.
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serverName
+        in: path
+        required: true
+        description: The name of the server.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 63
+          pattern: ^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*
+      - name: backupName
+        in: path
+        required: true
+        description: The name of the backup.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: arm-id
+                    description: Fully qualified resource ID for the resource. E.g.
+                      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                    readOnly: true
+                  name:
+                    type: string
+                    description: The name of the resource
+                    readOnly: true
+                  type:
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                    readOnly: true
+                  systemData:
+                    description: Azure Resource Manager metadata containing createdBy
+                      and modifiedBy information.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    description: Long Term Retention Backup Operation Resource Properties
+                    x-ms-client-flatten: true
+                    type: object
+                    required:
+                    - status
+                    - startTime
+                    properties:
+                      datasourceSizeInBytes:
+                        format: int64
+                        description: Size of datasource in bytes
+                        type: integer
+                      dataTransferredInBytes:
+                        format: int64
+                        description: Data transferred in bytes
+                        type: integer
+                      backupName:
+                        description: Name of Backup operation
+                        type: string
+                      backupMetadata:
+                        description: Metadata to be stored in RP. Store everything
+                          that will be required to perform a successful restore using
+                          this Recovery point. e.g. Versions, DataFormat etc
+                        type: string
+                      status:
+                        description: Service-set extensible enum indicating the status
+                          of operation
+                        enum:
+                        - Running
+                        - Cancelled
+                        - Failed
+                        - Succeeded
+                        type: string
+                        x-ms-enum:
+                          name: ExecutionStatus
+                          modelAsString: true
+                      startTime:
+                        description: Start time of the operation.
+                        format: date-time
+                        type: string
+                      endTime:
+                        description: End time of the operation.
+                        format: date-time
+                        type: string
+                      percentComplete:
+                        description: PercentageCompleted
+                        format: double
+                        type: number
+                        minimum: 0
+                        maximum: 100
+                      errorCode:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      errorMessage:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - id
+                - name
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/flexibleServers/{serverName}/ltrBackupOperations
+  : get:
+      tags:
+      - LongTermRetentionBackup
+      operationId: ltrBackupOperations_ListByServer
+      description: Gets the result of the give long term retention backup operations
+        for the flexible server.
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serverName
+        in: path
+        required: true
+        description: The name of the server.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 63
+          pattern: ^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: arm-id
+                          description: Fully qualified resource ID for the resource.
+                            E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                          readOnly: true
+                        name:
+                          type: string
+                          description: The name of the resource
+                          readOnly: true
+                        type:
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                          readOnly: true
+                        systemData:
+                          description: Azure Resource Manager metadata containing
+                            createdBy and modifiedBy information.
+                          readOnly: true
+                          type: object
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource last modification
+                                (UTC)
+                        properties:
+                          description: Long Term Retention Backup Operation Resource
+                            Properties
+                          x-ms-client-flatten: true
+                          type: object
+                          required:
+                          - status
+                          - startTime
+                          properties:
+                            datasourceSizeInBytes:
+                              format: int64
+                              description: Size of datasource in bytes
+                              type: integer
+                            dataTransferredInBytes:
+                              format: int64
+                              description: Data transferred in bytes
+                              type: integer
+                            backupName:
+                              description: Name of Backup operation
+                              type: string
+                            backupMetadata:
+                              description: Metadata to be stored in RP. Store everything
+                                that will be required to perform a successful restore
+                                using this Recovery point. e.g. Versions, DataFormat
+                                etc
+                              type: string
+                            status:
+                              description: Service-set extensible enum indicating
+                                the status of operation
+                              enum:
+                              - Running
+                              - Cancelled
+                              - Failed
+                              - Succeeded
+                              type: string
+                              x-ms-enum:
+                                name: ExecutionStatus
+                                modelAsString: true
+                            startTime:
+                              description: Start time of the operation.
+                              format: date-time
+                              type: string
+                            endTime:
+                              description: End time of the operation.
+                              format: date-time
+                              type: string
+                            percentComplete:
+                              description: PercentageCompleted
+                              format: double
+                              type: number
+                              minimum: 0
+                              maximum: 100
+                            errorCode:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            errorMessage:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                      required:
+                      - id
+                      - name
+                    description: The list of long term retention server backup operations
+                  nextLink:
+                    description: The link used to get the next page of operations.
+                    type: string
+                description: A list of long term retention backup operations for server.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+components:
+  parameters:
+    BackupNameParameter:
+      name: backupName
+      in: path
+      required: true
+      description: The name of the backup.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        pattern: ^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription. The value must be an UUID.
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      description: The name of the resource group. The name is case insensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    ServerNameParameter:
+      name: serverName
+      in: path
+      required: true
+      description: The name of the server.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 63
+        pattern: ^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Microsoft Entra OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    BackupRequestBase:
+      description: BackupRequestBase is the base for all backup request.
+      required:
+      - backupSettings
+      type: object
+      properties:
+        backupSettings:
+          description: Backup Settings
+          type: object
+          required:
+          - backupName
+          properties:
+            backupName:
+              type: string
+              description: Backup Name for the current backup
+    LtrBackupRequest:
+      type: object
+      properties:
+        backupSettings:
+          description: Backup Settings
+          type: object
+          required:
+          - backupName
+          properties:
+            backupName:
+              type: string
+              description: Backup Name for the current backup
+        targetDetails:
+          description: Backup store detail for target server
+          required:
+          - sasUriList
+          type: object
+          properties:
+            sasUriList:
+              description: List of SAS uri of storage containers where backup data
+                is to be streamed/copied.
+              type: array
+              items:
+                type: string
+                description: SAS URI of Azure Storage Account Container.
+                x-ms-secret: true
+      required:
+      - backupSettings
+      - targetDetails
+      description: BackupRequestBase is the base for all backup request.
+    LtrPreBackupRequest:
+      type: object
+      properties:
+        backupSettings:
+          description: Backup Settings
+          type: object
+          required:
+          - backupName
+          properties:
+            backupName:
+              type: string
+              description: Backup Name for the current backup
+      required:
+      - backupSettings
+      description: BackupRequestBase is the base for all backup request.
+    BackupSettings:
+      description: The settings for the long term backup.
+      type: object
+      required:
+      - backupName
+      properties:
+        backupName:
+          type: string
+          description: Backup Name for the current backup
+    BackupStoreDetails:
+      description: Details about the target where the backup content will be stored.
+      required:
+      - sasUriList
+      type: object
+      properties:
+        sasUriList:
+          description: List of SAS uri of storage containers where backup data is
+            to be streamed/copied.
+          type: array
+          items:
+            type: string
+            description: SAS URI of Azure Storage Account Container.
+            x-ms-secret: true
+    LtrPreBackupResponseProperties:
+      description: Response for the pre-backup request.
+      type: object
+      required:
+      - numberOfContainers
+      properties:
+        numberOfContainers:
+          format: int32
+          description: Number of storage containers the plugin will use during backup.
+            More than one containers may be used for size limitations, parallelism,
+            or redundancy etc.
+          type: integer
+    LtrBackupOperationResponseProperties:
+      description: Response for the backup request.
+      type: object
+      required:
+      - status
+      - startTime
+      properties:
+        datasourceSizeInBytes:
+          format: int64
+          description: Size of datasource in bytes
+          type: integer
+        dataTransferredInBytes:
+          format: int64
+          description: Data transferred in bytes
+          type: integer
+        backupName:
+          description: Name of Backup operation
+          type: string
+        backupMetadata:
+          description: Metadata to be stored in RP. Store everything that will be
+            required to perform a successful restore using this Recovery point. e.g.
+            Versions, DataFormat etc
+          type: string
+        status:
+          description: Service-set extensible enum indicating the status of operation
+          enum:
+          - Running
+          - Cancelled
+          - Failed
+          - Succeeded
+          type: string
+          x-ms-enum:
+            name: ExecutionStatus
+            modelAsString: true
+        startTime:
+          description: Start time of the operation.
+          format: date-time
+          type: string
+        endTime:
+          description: End time of the operation.
+          format: date-time
+          type: string
+        percentComplete:
+          description: PercentageCompleted
+          format: double
+          type: number
+          minimum: 0
+          maximum: 100
+        errorCode:
+          readOnly: true
+          type: string
+          description: The error code.
+        errorMessage:
+          readOnly: true
+          type: string
+          description: The error message.
+    LtrBackupResponse:
+      description: Response for the LTR backup API call
+      type: object
+      properties:
+        properties:
+          description: Long Term Retention Backup Operation Resource Properties
+          x-ms-client-flatten: true
+          type: object
+          required:
+          - status
+          - startTime
+          properties:
+            datasourceSizeInBytes:
+              format: int64
+              description: Size of datasource in bytes
+              type: integer
+            dataTransferredInBytes:
+              format: int64
+              description: Data transferred in bytes
+              type: integer
+            backupName:
+              description: Name of Backup operation
+              type: string
+            backupMetadata:
+              description: Metadata to be stored in RP. Store everything that will
+                be required to perform a successful restore using this Recovery point.
+                e.g. Versions, DataFormat etc
+              type: string
+            status:
+              description: Service-set extensible enum indicating the status of operation
+              enum:
+              - Running
+              - Cancelled
+              - Failed
+              - Succeeded
+              type: string
+              x-ms-enum:
+                name: ExecutionStatus
+                modelAsString: true
+            startTime:
+              description: Start time of the operation.
+              format: date-time
+              type: string
+            endTime:
+              description: End time of the operation.
+              format: date-time
+              type: string
+            percentComplete:
+              description: PercentageCompleted
+              format: double
+              type: number
+              minimum: 0
+              maximum: 100
+            errorCode:
+              readOnly: true
+              type: string
+              description: The error code.
+            errorMessage:
+              readOnly: true
+              type: string
+              description: The error message.
+    LtrServerBackupOperation:
+      type: object
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+        properties:
+          description: Long Term Retention Backup Operation Resource Properties
+          x-ms-client-flatten: true
+          type: object
+          required:
+          - status
+          - startTime
+          properties:
+            datasourceSizeInBytes:
+              format: int64
+              description: Size of datasource in bytes
+              type: integer
+            dataTransferredInBytes:
+              format: int64
+              description: Data transferred in bytes
+              type: integer
+            backupName:
+              description: Name of Backup operation
+              type: string
+            backupMetadata:
+              description: Metadata to be stored in RP. Store everything that will
+                be required to perform a successful restore using this Recovery point.
+                e.g. Versions, DataFormat etc
+              type: string
+            status:
+              description: Service-set extensible enum indicating the status of operation
+              enum:
+              - Running
+              - Cancelled
+              - Failed
+              - Succeeded
+              type: string
+              x-ms-enum:
+                name: ExecutionStatus
+                modelAsString: true
+            startTime:
+              description: Start time of the operation.
+              format: date-time
+              type: string
+            endTime:
+              description: End time of the operation.
+              format: date-time
+              type: string
+            percentComplete:
+              description: PercentageCompleted
+              format: double
+              type: number
+              minimum: 0
+              maximum: 100
+            errorCode:
+              readOnly: true
+              type: string
+              description: The error code.
+            errorMessage:
+              readOnly: true
+              type: string
+              description: The error message.
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+      required:
+      - id
+      - name
+    LtrServerBackupOperationList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: arm-id
+                description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                readOnly: true
+              name:
+                type: string
+                description: The name of the resource
+                readOnly: true
+              type:
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+                readOnly: true
+              systemData:
+                description: Azure Resource Manager metadata containing createdBy
+                  and modifiedBy information.
+                readOnly: true
+                type: object
+                properties:
+                  createdBy:
+                    type: string
+                    description: The identity that created the resource.
+                  createdByType:
+                    type: string
+                    description: The type of identity that created the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource creation (UTC).
+                  lastModifiedBy:
+                    type: string
+                    description: The identity that last modified the resource.
+                  lastModifiedByType:
+                    type: string
+                    description: The type of identity that last modified the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  lastModifiedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource last modification (UTC)
+              properties:
+                description: Long Term Retention Backup Operation Resource Properties
+                x-ms-client-flatten: true
+                type: object
+                required:
+                - status
+                - startTime
+                properties:
+                  datasourceSizeInBytes:
+                    format: int64
+                    description: Size of datasource in bytes
+                    type: integer
+                  dataTransferredInBytes:
+                    format: int64
+                    description: Data transferred in bytes
+                    type: integer
+                  backupName:
+                    description: Name of Backup operation
+                    type: string
+                  backupMetadata:
+                    description: Metadata to be stored in RP. Store everything that
+                      will be required to perform a successful restore using this
+                      Recovery point. e.g. Versions, DataFormat etc
+                    type: string
+                  status:
+                    description: Service-set extensible enum indicating the status
+                      of operation
+                    enum:
+                    - Running
+                    - Cancelled
+                    - Failed
+                    - Succeeded
+                    type: string
+                    x-ms-enum:
+                      name: ExecutionStatus
+                      modelAsString: true
+                  startTime:
+                    description: Start time of the operation.
+                    format: date-time
+                    type: string
+                  endTime:
+                    description: End time of the operation.
+                    format: date-time
+                    type: string
+                  percentComplete:
+                    description: PercentageCompleted
+                    format: double
+                    type: number
+                    minimum: 0
+                    maximum: 100
+                  errorCode:
+                    readOnly: true
+                    type: string
+                    description: The error code.
+                  errorMessage:
+                    readOnly: true
+                    type: string
+                    description: The error message.
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+            required:
+            - id
+            - name
+          description: The list of long term retention server backup operations
+        nextLink:
+          description: The link used to get the next page of operations.
+          type: string
+      description: A list of long term retention backup operations for server.
+    LtrPreBackupResponse:
+      description: Response for the LTR pre-backup API call
+      type: object
+      required:
+      - properties
+      properties:
+        properties:
+          description: Additional Properties for the pre backup response
+          x-ms-client-flatten: true
+          type: object
+          required:
+          - numberOfContainers
+          properties:
+            numberOfContainers:
+              format: int32
+              description: Number of storage containers the plugin will use during
+                backup. More than one containers may be used for size limitations,
+                parallelism, or redundancy etc.
+              type: integer
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+    systemData:
+      type: object
+      description: Metadata pertaining to creation and last modification of the resource.
+      properties:
+        createdBy:
+          type: string
+          description: The identity that created the resource.
+        createdByType:
+          type: string
+          description: The type of identity that created the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource creation (UTC).
+        lastModifiedBy:
+          type: string
+          description: The identity that last modified the resource.
+        lastModifiedByType:
+          type: string
+          description: The type of identity that last modified the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource last modification (UTC)
+      readOnly: true
+    Resource:
+      type: object
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true

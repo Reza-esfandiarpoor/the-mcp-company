@@ -1,0 +1,5206 @@
+openapi: 3.0.0
+info:
+  title: DataFactoryManagementClient
+  version: 2017-09-01-preview
+paths: {}
+components:
+  schemas:
+    Dataset:
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      type: object
+      discriminator:
+        propertyName: type
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      additionalProperties:
+        type: object
+      required:
+      - type
+      - linkedServiceName
+    DatasetDataElement:
+      description: Columns that define the structure of the dataset.
+      type: object
+      properties:
+        name:
+          type: object
+          description: 'Name of the column. Type: string (or Expression with resultType
+            string).'
+        type:
+          type: object
+          description: 'Type of the column. Type: string (or Expression with resultType
+            string).'
+    DatasetStorageFormat:
+      discriminator:
+        propertyName: type
+      description: The format definition of a storage.
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset storage format.
+        serializer:
+          type: object
+          description: 'Serializer. Type: string (or Expression with resultType string).'
+        deserializer:
+          type: object
+          description: 'Deserializer. Type: string (or Expression with resultType
+            string).'
+      additionalProperties:
+        type: object
+      required:
+      - type
+    TextFormat:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset storage format.
+        serializer:
+          type: object
+          description: 'Serializer. Type: string (or Expression with resultType string).'
+        deserializer:
+          type: object
+          description: 'Deserializer. Type: string (or Expression with resultType
+            string).'
+        columnDelimiter:
+          type: object
+          description: 'The column delimiter. Type: string (or Expression with resultType
+            string).'
+        rowDelimiter:
+          type: object
+          description: 'The row delimiter. Type: string (or Expression with resultType
+            string).'
+        escapeChar:
+          type: object
+          description: 'The escape character. Type: string (or Expression with resultType
+            string).'
+        quoteChar:
+          type: object
+          description: 'The quote character. Type: string (or Expression with resultType
+            string).'
+        nullValue:
+          type: object
+          description: 'The null value string. Type: string (or Expression with resultType
+            string).'
+        encodingName:
+          type: object
+          description: "The code page name of the preferred encoding. If miss, the\
+            \ default value is \u0393\xC7\xA3utf-8\u0393\xC7\xA5, unless BOM denotes\
+            \ another Unicode encoding. Refer to the \u0393\xC7\xA3Name\u0393\xC7\xA5\
+            \ column of the table in the following link to set supported values: https://msdn.microsoft.com/library/system.text.encoding.aspx.\
+            \ Type: string (or Expression with resultType string)."
+        treatEmptyAsNull:
+          type: object
+          description: 'Treat empty column values in the text file as null. The default
+            value is true. Type: boolean (or Expression with resultType boolean).'
+        skipLineCount:
+          type: object
+          description: 'The number of lines/rows to be skipped when parsing text files.
+            The default value is 0. Type: integer (or Expression with resultType integer).'
+        firstRowAsHeader:
+          type: object
+          description: 'When used as input, treat the first row of data as headers.
+            When used as output,write the headers into the output as the first row
+            of data. The default value is false. Type: boolean (or Expression with
+            resultType boolean).'
+      required:
+      - type
+      additionalProperties:
+        type: object
+      description: The format definition of a storage.
+      discriminator:
+        propertyName: type
+    JsonFormat:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset storage format.
+        serializer:
+          type: object
+          description: 'Serializer. Type: string (or Expression with resultType string).'
+        deserializer:
+          type: object
+          description: 'Deserializer. Type: string (or Expression with resultType
+            string).'
+        filePattern:
+          description: File pattern of JSON. To be more specific, the way of separating
+            a collection of JSON objects. The default value is 'setOfObjects'. It
+            is case-sensitive.
+          type: string
+          enum:
+          - setOfObjects
+          - arrayOfObjects
+          x-ms-enum:
+            name: JsonFormatFilePattern
+            modelAsString: true
+        nestingSeparator:
+          type: object
+          description: 'The character used to separate nesting levels. Default value
+            is ''.'' (dot). Type: string (or Expression with resultType string).'
+        encodingName:
+          type: object
+          description: 'The code page name of the preferred encoding. If not provided,
+            the default value is ''utf-8'', unless the byte order mark (BOM) denotes
+            another Unicode encoding. The full list of supported values can be found
+            in the ''Name'' column of the table of encodings in the following reference:
+            https://go.microsoft.com/fwlink/?linkid=861078. Type: string (or Expression
+            with resultType string).'
+        jsonNodeReference:
+          type: object
+          description: 'The JSONPath of the JSON array element to be flattened. Example:
+            "$.ArrayPath". Type: string (or Expression with resultType string).'
+        jsonPathDefinition:
+          type: object
+          description: 'The JSONPath definition for each column mapping with a customized
+            column name to extract data from JSON file. For fields under root object,
+            start with "$"; for fields inside the array chosen by jsonNodeReference
+            property, start from the array element. Example: {"Column1": "$.Column1Path",
+            "Column2": "Column2PathInArray"}. Type: object (or Expression with resultType
+            object).'
+      required:
+      - type
+      additionalProperties:
+        type: object
+      description: The format definition of a storage.
+      discriminator:
+        propertyName: type
+    JsonFormatFilePattern:
+      description: JSON format file pattern. A property of JsonFormat.
+      type: string
+      enum:
+      - setOfObjects
+      - arrayOfObjects
+      x-ms-enum:
+        name: JsonFormatFilePattern
+        modelAsString: true
+    AvroFormat:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset storage format.
+        serializer:
+          type: object
+          description: 'Serializer. Type: string (or Expression with resultType string).'
+        deserializer:
+          type: object
+          description: 'Deserializer. Type: string (or Expression with resultType
+            string).'
+      required:
+      - type
+      additionalProperties:
+        type: object
+      description: The format definition of a storage.
+      discriminator:
+        propertyName: type
+    OrcFormat:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset storage format.
+        serializer:
+          type: object
+          description: 'Serializer. Type: string (or Expression with resultType string).'
+        deserializer:
+          type: object
+          description: 'Deserializer. Type: string (or Expression with resultType
+            string).'
+      required:
+      - type
+      additionalProperties:
+        type: object
+      description: The format definition of a storage.
+      discriminator:
+        propertyName: type
+    ParquetFormat:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset storage format.
+        serializer:
+          type: object
+          description: 'Serializer. Type: string (or Expression with resultType string).'
+        deserializer:
+          type: object
+          description: 'Deserializer. Type: string (or Expression with resultType
+            string).'
+      required:
+      - type
+      additionalProperties:
+        type: object
+      description: The format definition of a storage.
+      discriminator:
+        propertyName: type
+    DatasetCompression:
+      discriminator:
+        propertyName: type
+      description: The compression method used on a dataset.
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset compression.
+      additionalProperties:
+        type: object
+      required:
+      - type
+    DatasetBZip2Compression:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset compression.
+      required:
+      - type
+      additionalProperties:
+        type: object
+      description: The compression method used on a dataset.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: BZip2
+    DatasetGZipCompression:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset compression.
+        level:
+          description: The GZip compression level.
+          title: Microsoft.Azure.Management.DataFactories.Models.CompressionLevel
+          type: string
+          enum:
+          - Optimal
+          - Fastest
+          x-ms-enum:
+            name: DatasetCompressionLevel
+            modelAsString: true
+      required:
+      - type
+      additionalProperties:
+        type: object
+      description: The compression method used on a dataset.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: GZip
+    DatasetDeflateCompression:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset compression.
+        level:
+          description: The Deflate compression level.
+          title: Microsoft.Azure.Management.DataFactories.Models.CompressionLevel
+          type: string
+          enum:
+          - Optimal
+          - Fastest
+          x-ms-enum:
+            name: DatasetCompressionLevel
+            modelAsString: true
+      required:
+      - type
+      additionalProperties:
+        type: object
+      description: The compression method used on a dataset.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: Deflate
+    DatasetZipDeflateCompression:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset compression.
+        level:
+          description: The ZipDeflate compression level.
+          title: Microsoft.Azure.Management.DataFactories.Models.CompressionLevel
+          type: string
+          enum:
+          - Optimal
+          - Fastest
+          x-ms-enum:
+            name: DatasetCompressionLevel
+            modelAsString: true
+      required:
+      - type
+      additionalProperties:
+        type: object
+      description: The compression method used on a dataset.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: ZipDeflate
+    CompressionLevel:
+      title: Microsoft.Azure.Management.DataFactories.Models.CompressionLevel
+      description: All available compression levels.
+      type: string
+      enum:
+      - Optimal
+      - Fastest
+      x-ms-enum:
+        name: DatasetCompressionLevel
+        modelAsString: true
+    AmazonS3Dataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: Amazon S3 dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            bucketName:
+              type: object
+              description: 'The name of the Amazon S3 bucket. Type: string (or Expression
+                with resultType string).'
+            key:
+              type: object
+              description: 'The key of the Amazon S3 object. Type: string (or Expression
+                with resultType string).'
+            prefix:
+              type: object
+              description: 'The prefix filter for the S3 object name. Type: string
+                (or Expression with resultType string).'
+            version:
+              type: object
+              description: 'The version for the S3 object. Type: string (or Expression
+                with resultType string).'
+            format:
+              description: The format of files.
+              discriminator:
+                propertyName: type
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Type of dataset storage format.
+                serializer:
+                  type: object
+                  description: 'Serializer. Type: string (or Expression with resultType
+                    string).'
+                deserializer:
+                  type: object
+                  description: 'Deserializer. Type: string (or Expression with resultType
+                    string).'
+              additionalProperties:
+                type: object
+              required:
+              - type
+            compression:
+              description: The data compression method used for the Amazon S3 object.
+              discriminator:
+                propertyName: type
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Type of dataset compression.
+              additionalProperties:
+                type: object
+              required:
+              - type
+          required:
+          - bucketName
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: AmazonS3Object
+    AmazonS3DatasetTypeProperties:
+      description: Amazon S3 dataset properties.
+      properties:
+        bucketName:
+          type: object
+          description: 'The name of the Amazon S3 bucket. Type: string (or Expression
+            with resultType string).'
+        key:
+          type: object
+          description: 'The key of the Amazon S3 object. Type: string (or Expression
+            with resultType string).'
+        prefix:
+          type: object
+          description: 'The prefix filter for the S3 object name. Type: string (or
+            Expression with resultType string).'
+        version:
+          type: object
+          description: 'The version for the S3 object. Type: string (or Expression
+            with resultType string).'
+        format:
+          description: The format of files.
+          discriminator:
+            propertyName: type
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of dataset storage format.
+            serializer:
+              type: object
+              description: 'Serializer. Type: string (or Expression with resultType
+                string).'
+            deserializer:
+              type: object
+              description: 'Deserializer. Type: string (or Expression with resultType
+                string).'
+          additionalProperties:
+            type: object
+          required:
+          - type
+        compression:
+          description: The data compression method used for the Amazon S3 object.
+          discriminator:
+            propertyName: type
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of dataset compression.
+          additionalProperties:
+            type: object
+          required:
+          - type
+      required:
+      - bucketName
+    AzureBlobDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: Azure Blob dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            folderPath:
+              type: object
+              description: 'The path of the Azure Blob storage. Type: string (or Expression
+                with resultType string).'
+            tableRootLocation:
+              type: object
+              description: 'The root of blob path. Type: string (or Expression with
+                resultType string).'
+            fileName:
+              type: object
+              description: 'The name of the Azure Blob. Type: string (or Expression
+                with resultType string).'
+            format:
+              description: The format of the Azure Blob storage.
+              discriminator:
+                propertyName: type
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Type of dataset storage format.
+                serializer:
+                  type: object
+                  description: 'Serializer. Type: string (or Expression with resultType
+                    string).'
+                deserializer:
+                  type: object
+                  description: 'Deserializer. Type: string (or Expression with resultType
+                    string).'
+              additionalProperties:
+                type: object
+              required:
+              - type
+            compression:
+              description: The data compression method used for the blob storage.
+              discriminator:
+                propertyName: type
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Type of dataset compression.
+              additionalProperties:
+                type: object
+              required:
+              - type
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: AzureBlob
+    AzureBlobDatasetTypeProperties:
+      description: Azure Blob dataset properties.
+      properties:
+        folderPath:
+          type: object
+          description: 'The path of the Azure Blob storage. Type: string (or Expression
+            with resultType string).'
+        tableRootLocation:
+          type: object
+          description: 'The root of blob path. Type: string (or Expression with resultType
+            string).'
+        fileName:
+          type: object
+          description: 'The name of the Azure Blob. Type: string (or Expression with
+            resultType string).'
+        format:
+          description: The format of the Azure Blob storage.
+          discriminator:
+            propertyName: type
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of dataset storage format.
+            serializer:
+              type: object
+              description: 'Serializer. Type: string (or Expression with resultType
+                string).'
+            deserializer:
+              type: object
+              description: 'Deserializer. Type: string (or Expression with resultType
+                string).'
+          additionalProperties:
+            type: object
+          required:
+          - type
+        compression:
+          description: The data compression method used for the blob storage.
+          discriminator:
+            propertyName: type
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of dataset compression.
+          additionalProperties:
+            type: object
+          required:
+          - type
+    AzureTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: Azure Table dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            tableName:
+              type: object
+              description: 'The table name of the Azure Table storage. Type: string
+                (or Expression with resultType string).'
+          required:
+          - tableName
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: AzureTable
+    AzureTableDatasetTypeProperties:
+      description: Azure Table dataset properties.
+      properties:
+        tableName:
+          type: object
+          description: 'The table name of the Azure Table storage. Type: string (or
+            Expression with resultType string).'
+      required:
+      - tableName
+    AzureSqlTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: Azure SQL dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            tableName:
+              type: object
+              description: 'The table name of the Azure SQL database. Type: string
+                (or Expression with resultType string).'
+          required:
+          - tableName
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: AzureSqlTable
+    AzureSqlTableDatasetTypeProperties:
+      description: Azure SQL dataset properties.
+      properties:
+        tableName:
+          type: object
+          description: 'The table name of the Azure SQL database. Type: string (or
+            Expression with resultType string).'
+      required:
+      - tableName
+    AzureSqlDWTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: Azure SQL Data Warehouse dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            tableName:
+              type: object
+              description: 'The table name of the Azure SQL Data Warehouse. Type:
+                string (or Expression with resultType string).'
+          required:
+          - tableName
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: AzureSqlDWTable
+    AzureSqlDWTableDatasetTypeProperties:
+      description: Azure SQL Data Warehouse dataset properties.
+      properties:
+        tableName:
+          type: object
+          description: 'The table name of the Azure SQL Data Warehouse. Type: string
+            (or Expression with resultType string).'
+      required:
+      - tableName
+    CassandraTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: Cassandra dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            tableName:
+              type: object
+              description: 'The table name of the Cassandra database. Type: string
+                (or Expression with resultType string).'
+            keyspace:
+              type: object
+              description: 'The keyspace of the Cassandra database. Type: string (or
+                Expression with resultType string).'
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: CassandraTable
+    CassandraTableDatasetTypeProperties:
+      description: Cassandra dataset properties.
+      properties:
+        tableName:
+          type: object
+          description: 'The table name of the Cassandra database. Type: string (or
+            Expression with resultType string).'
+        keyspace:
+          type: object
+          description: 'The keyspace of the Cassandra database. Type: string (or Expression
+            with resultType string).'
+    CustomDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: Custom dataset properties.
+          x-ms-client-flatten: true
+          type: object
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+    DocumentDbCollectionDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: DocumentDB Collection dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            collectionName:
+              type: object
+              description: 'Document Database collection name. Type: string (or Expression
+                with resultType string).'
+          required:
+          - collectionName
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: DocumentDbCollection
+    DocumentDbCollectionDatasetTypeProperties:
+      description: DocumentDB Collection dataset properties.
+      properties:
+        collectionName:
+          type: object
+          description: 'Document Database collection name. Type: string (or Expression
+            with resultType string).'
+      required:
+      - collectionName
+    DynamicsEntityDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: Dynamics entity dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            entityName:
+              type: object
+              description: 'The logical name of the entity. Type: string (or Expression
+                with resultType string).'
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: DynamicsEntity
+    DynamicsEntityDatasetTypeProperties:
+      description: Dynamics entity dataset properties.
+      properties:
+        entityName:
+          type: object
+          description: 'The logical name of the entity. Type: string (or Expression
+            with resultType string).'
+    AzureDataLakeStoreDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: Azure Data Lake Store dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            folderPath:
+              type: object
+              description: 'Path to the folder in the Azure Data Lake Store. Type:
+                string (or Expression with resultType string).'
+            fileName:
+              type: object
+              description: 'The name of the file in the Azure Data Lake Store. Type:
+                string (or Expression with resultType string).'
+            format:
+              description: The format of the Data Lake Store.
+              discriminator:
+                propertyName: type
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Type of dataset storage format.
+                serializer:
+                  type: object
+                  description: 'Serializer. Type: string (or Expression with resultType
+                    string).'
+                deserializer:
+                  type: object
+                  description: 'Deserializer. Type: string (or Expression with resultType
+                    string).'
+              additionalProperties:
+                type: object
+              required:
+              - type
+            compression:
+              description: The data compression method used for the item(s) in the
+                Azure Data Lake Store.
+              discriminator:
+                propertyName: type
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Type of dataset compression.
+              additionalProperties:
+                type: object
+              required:
+              - type
+          required:
+          - folderPath
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: AzureDataLakeStoreFile
+    AzureDataLakeStoreDatasetTypeProperties:
+      description: Azure Data Lake Store dataset properties.
+      properties:
+        folderPath:
+          type: object
+          description: 'Path to the folder in the Azure Data Lake Store. Type: string
+            (or Expression with resultType string).'
+        fileName:
+          type: object
+          description: 'The name of the file in the Azure Data Lake Store. Type: string
+            (or Expression with resultType string).'
+        format:
+          description: The format of the Data Lake Store.
+          discriminator:
+            propertyName: type
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of dataset storage format.
+            serializer:
+              type: object
+              description: 'Serializer. Type: string (or Expression with resultType
+                string).'
+            deserializer:
+              type: object
+              description: 'Deserializer. Type: string (or Expression with resultType
+                string).'
+          additionalProperties:
+            type: object
+          required:
+          - type
+        compression:
+          description: The data compression method used for the item(s) in the Azure
+            Data Lake Store.
+          discriminator:
+            propertyName: type
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of dataset compression.
+          additionalProperties:
+            type: object
+          required:
+          - type
+      required:
+      - folderPath
+    FileShareDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: On-premises file system dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            folderPath:
+              type: object
+              description: 'The path of the on-premises file system. Type: string
+                (or Expression with resultType string).'
+            fileName:
+              type: object
+              description: 'The name of the on-premises file system. Type: string
+                (or Expression with resultType string).'
+            format:
+              description: The format of the files.
+              discriminator:
+                propertyName: type
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Type of dataset storage format.
+                serializer:
+                  type: object
+                  description: 'Serializer. Type: string (or Expression with resultType
+                    string).'
+                deserializer:
+                  type: object
+                  description: 'Deserializer. Type: string (or Expression with resultType
+                    string).'
+              additionalProperties:
+                type: object
+              required:
+              - type
+            fileFilter:
+              type: object
+              description: 'Specify a filter to be used to select a subset of files
+                in the folderPath rather than all files. Type: string (or Expression
+                with resultType string).'
+            compression:
+              description: The data compression method used for the file system.
+              discriminator:
+                propertyName: type
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Type of dataset compression.
+              additionalProperties:
+                type: object
+              required:
+              - type
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: FileShare
+    FileShareDatasetTypeProperties:
+      description: On-premises file system dataset properties.
+      properties:
+        folderPath:
+          type: object
+          description: 'The path of the on-premises file system. Type: string (or
+            Expression with resultType string).'
+        fileName:
+          type: object
+          description: 'The name of the on-premises file system. Type: string (or
+            Expression with resultType string).'
+        format:
+          description: The format of the files.
+          discriminator:
+            propertyName: type
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of dataset storage format.
+            serializer:
+              type: object
+              description: 'Serializer. Type: string (or Expression with resultType
+                string).'
+            deserializer:
+              type: object
+              description: 'Deserializer. Type: string (or Expression with resultType
+                string).'
+          additionalProperties:
+            type: object
+          required:
+          - type
+        fileFilter:
+          type: object
+          description: 'Specify a filter to be used to select a subset of files in
+            the folderPath rather than all files. Type: string (or Expression with
+            resultType string).'
+        compression:
+          description: The data compression method used for the file system.
+          discriminator:
+            propertyName: type
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of dataset compression.
+          additionalProperties:
+            type: object
+          required:
+          - type
+    MongoDbCollectionDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: MongoDB database dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            collectionName:
+              type: object
+              description: 'The table name of the MongoDB database. Type: string (or
+                Expression with resultType string).'
+          required:
+          - collectionName
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: MongoDbCollection
+    MongoDbCollectionDatasetTypeProperties:
+      description: MongoDB database dataset properties.
+      properties:
+        collectionName:
+          type: object
+          description: 'The table name of the MongoDB database. Type: string (or Expression
+            with resultType string).'
+      required:
+      - collectionName
+    ODataResourceDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: OData dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            path:
+              type: object
+              description: 'The OData resource path. Type: string (or Expression with
+                resultType string).'
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: ODataResource
+    ODataResourceDatasetTypeProperties:
+      description: OData dataset properties.
+      properties:
+        path:
+          type: object
+          description: 'The OData resource path. Type: string (or Expression with
+            resultType string).'
+    OracleTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: On-premises Oracle dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            tableName:
+              type: object
+              description: 'The table name of the on-premises Oracle database. Type:
+                string (or Expression with resultType string).'
+          required:
+          - tableName
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: OracleTable
+    OracleTableDatasetTypeProperties:
+      description: On-premises Oracle dataset properties.
+      properties:
+        tableName:
+          type: object
+          description: 'The table name of the on-premises Oracle database. Type: string
+            (or Expression with resultType string).'
+      required:
+      - tableName
+    AzureMySqlTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: Azure MySQL database dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            tableName:
+              type: object
+              description: 'The Azure MySQL database table name. Type: string (or
+                Expression with resultType string).'
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: AzureMySqlTable
+    AzureMySqlTableDatasetTypeProperties:
+      description: Azure MySQL database dataset properties.
+      properties:
+        tableName:
+          type: object
+          description: 'The Azure MySQL database table name. Type: string (or Expression
+            with resultType string).'
+    RelationalTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: Relational table dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            tableName:
+              type: object
+              description: 'The relational table name. Type: string (or Expression
+                with resultType string).'
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: RelationalTable
+    RelationalTableDatasetTypeProperties:
+      description: Relational table dataset properties.
+      properties:
+        tableName:
+          type: object
+          description: 'The relational table name. Type: string (or Expression with
+            resultType string).'
+    SalesforceObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: Salesforce object dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            objectApiName:
+              type: object
+              description: 'The Salesforce object API name. Type: string (or Expression
+                with resultType string).'
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: SalesforceObject
+    SalesforceObjectDatasetTypeProperties:
+      description: Salesforce object dataset properties.
+      properties:
+        objectApiName:
+          type: object
+          description: 'The Salesforce object API name. Type: string (or Expression
+            with resultType string).'
+    SapCloudForCustomerResourceDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: SAP Cloud For Customer OData resource dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            path:
+              type: object
+              description: 'The path of the SAP Cloud for Customer OData entity. Type:
+                string (or Expression with resultType string).'
+          required:
+          - path
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: SapCloudForCustomerResource
+    SapCloudForCustomerResourceDatasetTypeProperties:
+      description: Sap Cloud For Customer OData resource dataset properties.
+      properties:
+        path:
+          type: object
+          description: 'The path of the SAP Cloud for Customer OData entity. Type:
+            string (or Expression with resultType string).'
+      required:
+      - path
+    SapEccResourceDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: SAP ECC OData resource dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            path:
+              type: object
+              description: 'The path of the SAP ECC OData entity. Type: string (or
+                Expression with resultType string).'
+          required:
+          - path
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: SapEccResource
+    SapEccResourceDatasetTypeProperties:
+      description: Sap ECC OData resource dataset properties.
+      properties:
+        path:
+          type: object
+          description: 'The path of the SAP ECC OData entity. Type: string (or Expression
+            with resultType string).'
+      required:
+      - path
+    SqlServerTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: On-premises SQL Server dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            tableName:
+              type: object
+              description: 'The table name of the SQL Server dataset. Type: string
+                (or Expression with resultType string).'
+          required:
+          - tableName
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: SqlServerTable
+    SqlServerTableDatasetTypeProperties:
+      description: On-premises SQL Server dataset properties.
+      properties:
+        tableName:
+          type: object
+          description: 'The table name of the SQL Server dataset. Type: string (or
+            Expression with resultType string).'
+      required:
+      - tableName
+    WebTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: Web table dataset properties.
+          x-ms-client-flatten: true
+          properties:
+            index:
+              type: object
+              description: 'The zero-based index of the table in the web page. Type:
+                integer (or Expression with resultType integer), minimum: 0.'
+            path:
+              type: object
+              description: 'The relative URL to the web page from the linked service
+                URL. Type: string (or Expression with resultType string).'
+          required:
+          - index
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: WebTable
+    WebTableDatasetTypeProperties:
+      description: Web table dataset properties.
+      properties:
+        index:
+          type: object
+          description: 'The zero-based index of the table in the web page. Type: integer
+            (or Expression with resultType integer), minimum: 0.'
+        path:
+          type: object
+          description: 'The relative URL to the web page from the linked service URL.
+            Type: string (or Expression with resultType string).'
+      required:
+      - index
+    AzureSearchIndexDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: Properties specific to this dataset type.
+          x-ms-client-flatten: true
+          properties:
+            indexName:
+              type: object
+              description: 'The name of the Azure Search Index. Type: string (or Expression
+                with resultType string).'
+          required:
+          - indexName
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: AzureSearchIndex
+    AzureSearchIndexDatasetTypeProperties:
+      description: Properties specific to this dataset type.
+      properties:
+        indexName:
+          type: object
+          description: 'The name of the Azure Search Index. Type: string (or Expression
+            with resultType string).'
+      required:
+      - indexName
+    HttpDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+        typeProperties:
+          description: Properties specific to this dataset type.
+          x-ms-client-flatten: true
+          properties:
+            relativeUrl:
+              type: object
+              description: 'The relative URL based on the URL in the HttpLinkedService
+                refers to an HTTP file Type: string (or Expression with resultType
+                string).'
+            requestMethod:
+              type: object
+              description: 'The HTTP method for the HTTP request. Type: string (or
+                Expression with resultType string).'
+            requestBody:
+              type: object
+              description: 'The body for the HTTP request. Type: string (or Expression
+                with resultType string).'
+            additionalHeaders:
+              type: object
+              description: "The headers for the HTTP Request. e.g. request-header-name-1:request-header-value-1\r\
+                \n...\r\nrequest-header-name-n:request-header-value-n Type: string\
+                \ (or Expression with resultType string)."
+            format:
+              description: The format of files.
+              discriminator:
+                propertyName: type
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Type of dataset storage format.
+                serializer:
+                  type: object
+                  description: 'Serializer. Type: string (or Expression with resultType
+                    string).'
+                deserializer:
+                  type: object
+                  description: 'Deserializer. Type: string (or Expression with resultType
+                    string).'
+              additionalProperties:
+                type: object
+              required:
+              - type
+            compression:
+              description: The data compression method used on files.
+              discriminator:
+                propertyName: type
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Type of dataset compression.
+              additionalProperties:
+                type: object
+              required:
+              - type
+      required:
+      - type
+      - linkedServiceName
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: HttpFile
+    HttpDatasetTypeProperties:
+      description: Properties specific to this dataset type.
+      properties:
+        relativeUrl:
+          type: object
+          description: 'The relative URL based on the URL in the HttpLinkedService
+            refers to an HTTP file Type: string (or Expression with resultType string).'
+        requestMethod:
+          type: object
+          description: 'The HTTP method for the HTTP request. Type: string (or Expression
+            with resultType string).'
+        requestBody:
+          type: object
+          description: 'The body for the HTTP request. Type: string (or Expression
+            with resultType string).'
+        additionalHeaders:
+          type: object
+          description: "The headers for the HTTP Request. e.g. request-header-name-1:request-header-value-1\r\
+            \n...\r\nrequest-header-name-n:request-header-value-n Type: string (or\
+            \ Expression with resultType string)."
+        format:
+          description: The format of files.
+          discriminator:
+            propertyName: type
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of dataset storage format.
+            serializer:
+              type: object
+              description: 'Serializer. Type: string (or Expression with resultType
+                string).'
+            deserializer:
+              type: object
+              description: 'Deserializer. Type: string (or Expression with resultType
+                string).'
+          additionalProperties:
+            type: object
+          required:
+          - type
+        compression:
+          description: The data compression method used on files.
+          discriminator:
+            propertyName: type
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of dataset compression.
+          additionalProperties:
+            type: object
+          required:
+          - type
+    AmazonMWSObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: AmazonMWSObject
+    AzurePostgreSqlTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: AzurePostgreSqlTable
+    ConcurObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: ConcurObject
+    CouchbaseTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: CouchbaseTable
+    DrillTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: DrillTable
+    EloquaObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: EloquaObject
+    GoogleBigQueryObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: GoogleBigQueryObject
+    GreenplumTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: GreenplumTable
+    HBaseObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: HBaseObject
+    HiveObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: HiveObject
+    HubspotObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: HubspotObject
+    ImpalaObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: ImpalaObject
+    JiraObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: JiraObject
+    MagentoObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: MagentoObject
+    MariaDBTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: MariaDBTable
+    MarketoObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: MarketoObject
+    PaypalObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: PaypalObject
+    PhoenixObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: PhoenixObject
+    PrestoObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: PrestoObject
+    QuickBooksObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: QuickBooksObject
+    ServiceNowObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: ServiceNowObject
+    ShopifyObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: ShopifyObject
+    SparkObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: SparkObject
+    SquareObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: SquareObject
+    XeroObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: XeroObject
+    ZohoObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: ZohoObject
+    NetezzaTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: NetezzaTable
+    VerticaTableDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: VerticaTable
+    SalesforceMarketingCloudObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: SalesforceMarketingCloudObject
+    ResponsysObjectDataset:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of dataset.
+        description:
+          description: Dataset description.
+          type: string
+        structure:
+          type: object
+          description: 'Columns that define the structure of the dataset. Type: array
+            (or Expression with resultType array), itemType: DatasetDataElement.'
+        linkedServiceName:
+          description: Linked service reference.
+          properties:
+            type:
+              type: string
+              description: Linked service reference type.
+              enum:
+              - LinkedServiceReference
+            referenceName:
+              type: string
+              description: Reference LinkedService name.
+            parameters:
+              description: Arguments for LinkedService.
+              type: object
+              additionalProperties:
+                type: object
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Parameters for dataset.
+          type: object
+          additionalProperties:
+            description: Definition of a single parameter for an entity.
+            type: object
+            properties:
+              type:
+                type: string
+                description: Parameter type.
+                enum:
+                - Object
+                - String
+                - Int
+                - Float
+                - Bool
+                - Array
+                - SecureString
+                x-ms-enum:
+                  name: ParameterType
+                  modelAsString: true
+              defaultValue:
+                type: object
+                description: Default value of parameter.
+            required:
+            - type
+        annotations:
+          description: List of tags that can be used for describing the Dataset.
+          type: array
+          items:
+            type: object
+      required:
+      - type
+      - linkedServiceName
+      additionalProperties:
+        type: object
+      description: The Azure Data Factory nested object which identifies data within
+        different data stores, such as tables, files, folders, and documents.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: ResponsysObject
+    ParameterValueSpecification:
+      description: An object mapping parameter names to argument values.
+      type: object
+      additionalProperties:
+        type: object
+    LinkedServiceReference:
+      description: Linked service reference type.
+      properties:
+        type:
+          type: string
+          description: Linked service reference type.
+          enum:
+          - LinkedServiceReference
+        referenceName:
+          type: string
+          description: Reference LinkedService name.
+        parameters:
+          description: Arguments for LinkedService.
+          type: object
+          additionalProperties:
+            type: object
+      required:
+      - type
+      - referenceName
+    ParameterSpecification:
+      description: Definition of a single parameter for an entity.
+      type: object
+      properties:
+        type:
+          type: string
+          description: Parameter type.
+          enum:
+          - Object
+          - String
+          - Int
+          - Float
+          - Bool
+          - Array
+          - SecureString
+          x-ms-enum:
+            name: ParameterType
+            modelAsString: true
+        defaultValue:
+          type: object
+          description: Default value of parameter.
+      required:
+      - type
+    ParameterDefinitionSpecification:
+      description: Definition of all parameters for an entity.
+      type: object
+      additionalProperties:
+        description: Definition of a single parameter for an entity.
+        type: object
+        properties:
+          type:
+            type: string
+            description: Parameter type.
+            enum:
+            - Object
+            - String
+            - Int
+            - Float
+            - Bool
+            - Array
+            - SecureString
+            x-ms-enum:
+              name: ParameterType
+              modelAsString: true
+          defaultValue:
+            type: object
+            description: Default value of parameter.
+        required:
+        - type

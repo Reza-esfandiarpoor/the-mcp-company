@@ -1,0 +1,1246 @@
+openapi: 3.0.0
+info:
+  version: 2020-03-01
+  title: azureactivedirectory
+  description: Azure Active Directory Client.
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.aadiam/privateLinkForAzureAd/{policyName}/privateEndpointConnections
+  : get:
+      tags:
+      - PrivateEndpointConnections
+      operationId: PrivateEndpointConnections_ListByPolicyName
+      description: Lists all Private Endpoint Connections for the given policy.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Name of an Azure resource group.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+          pattern: ^[-\w\._\(\)]+$
+      - name: policyName
+        in: path
+        required: true
+        description: The name of the private link policy in Azure AD.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        description: Version of the API to be used with the client request.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        description: Azure subscription ID.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Private Endpoint Connections for given policy returned successfully
+          content:
+            application/json:
+              schema:
+                properties:
+                  value:
+                    type: array
+                    description: Array of private link resources
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                        name:
+                          readOnly: true
+                          type: string
+                          description: The name of the resource
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                        properties:
+                          x-ms-client-flatten: true
+                          description: Resource properties.
+                          properties:
+                            privateEndpoint:
+                              description: Properties of the private endpoint object.
+                              properties:
+                                id:
+                                  type: string
+                                  description: Full identifier of the private endpoint
+                                    resource.
+                              type: object
+                            privateLinkServiceConnectionState:
+                              description: Approval state of the private link connection.
+                              properties:
+                                status:
+                                  description: Indicates whether the connection has
+                                    been approved, rejected or removed by the given
+                                    policy owner.
+                                  type: string
+                                  enum:
+                                  - Approved
+                                  - Pending
+                                  - Rejected
+                                  - Disconnected
+                                  x-ms-enum:
+                                    name: PrivateEndpointServiceConnectionStatus
+                                    modelAsString: true
+                                description:
+                                  type: string
+                                  description: The reason for approval or rejection.
+                                actionsRequired:
+                                  type: string
+                                  description: A message indicating if changes on
+                                    the service provider require any updates on the
+                                    consumer.
+                              type: object
+                            provisioningState:
+                              description: Provisioning state of the private endpoint
+                                connection.
+                              type: string
+                              readOnly: true
+                              enum:
+                              - Succeeded
+                              - Provisioning
+                              - Failed
+                              x-ms-enum:
+                                name: PrivateEndpointConnectionProvisioningState
+                                modelAsString: true
+                            privateLinkConnectionTags:
+                              description: Updated tag information to set into the
+                                PrivateLinkConnection instance.
+                              x-ms-mutability:
+                              - update
+                              properties:
+                                tags:
+                                  additionalProperties:
+                                    type: string
+                                  description: Resource tags
+                                  type: object
+                              type: object
+                          type: object
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                  nextLink:
+                    description: URL to next page of results
+                    type: string
+                type: object
+                description: A list of private link resources
+        default:
+          description: Aadiam error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+      x-ms-pageable:
+        nextLinkName: nextLink
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/microsoft.aadiam/privateLinkForAzureAd/{policyName}/privateEndpointConnections/{privateEndpointConnectionName}
+  : put:
+      tags:
+      - PrivateEndpointConnections
+      operationId: PrivateEndpointConnections_Create
+      description: Creates specified private endpoint connection associated with the
+        given policy.
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        description: Version of the API to be used with the client request.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        description: Azure subscription ID.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: resourceGroupName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Name of an Azure resource group.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+          pattern: ^[-\w\._\(\)]+$
+      - name: policyName
+        in: path
+        required: true
+        description: The name of the private link policy in Azure AD.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: privateEndpointConnectionName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: The PrivateEndpointConnection name.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  readOnly: true
+                  type: string
+                  description: Fully qualified resource ID for the resource. Ex -
+                    /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                name:
+                  readOnly: true
+                  type: string
+                  description: The name of the resource
+                type:
+                  readOnly: true
+                  type: string
+                  description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                    or "Microsoft.Storage/storageAccounts"
+                properties:
+                  x-ms-client-flatten: true
+                  description: Resource properties.
+                  properties:
+                    privateEndpoint:
+                      description: Properties of the private endpoint object.
+                      properties:
+                        id:
+                          type: string
+                          description: Full identifier of the private endpoint resource.
+                      type: object
+                    privateLinkServiceConnectionState:
+                      description: Approval state of the private link connection.
+                      properties:
+                        status:
+                          description: Indicates whether the connection has been approved,
+                            rejected or removed by the given policy owner.
+                          type: string
+                          enum:
+                          - Approved
+                          - Pending
+                          - Rejected
+                          - Disconnected
+                          x-ms-enum:
+                            name: PrivateEndpointServiceConnectionStatus
+                            modelAsString: true
+                        description:
+                          type: string
+                          description: The reason for approval or rejection.
+                        actionsRequired:
+                          type: string
+                          description: A message indicating if changes on the service
+                            provider require any updates on the consumer.
+                      type: object
+                    provisioningState:
+                      description: Provisioning state of the private endpoint connection.
+                      type: string
+                      readOnly: true
+                      enum:
+                      - Succeeded
+                      - Provisioning
+                      - Failed
+                      x-ms-enum:
+                        name: PrivateEndpointConnectionProvisioningState
+                        modelAsString: true
+                    privateLinkConnectionTags:
+                      description: Updated tag information to set into the PrivateLinkConnection
+                        instance.
+                      x-ms-mutability:
+                      - update
+                      properties:
+                        tags:
+                          additionalProperties:
+                            type: string
+                          description: Resource tags
+                          type: object
+                      type: object
+                  type: object
+              title: Resource
+              description: Common fields that are returned in the response for all
+                Azure Resource Manager resources
+              x-ms-azure-resource: true
+        description: The intended state of private endpoint connection.
+        required: true
+      responses:
+        '201':
+          description: The state of private endpoint connection was updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Resource properties.
+                    properties:
+                      privateEndpoint:
+                        description: Properties of the private endpoint object.
+                        properties:
+                          id:
+                            type: string
+                            description: Full identifier of the private endpoint resource.
+                        type: object
+                      privateLinkServiceConnectionState:
+                        description: Approval state of the private link connection.
+                        properties:
+                          status:
+                            description: Indicates whether the connection has been
+                              approved, rejected or removed by the given policy owner.
+                            type: string
+                            enum:
+                            - Approved
+                            - Pending
+                            - Rejected
+                            - Disconnected
+                            x-ms-enum:
+                              name: PrivateEndpointServiceConnectionStatus
+                              modelAsString: true
+                          description:
+                            type: string
+                            description: The reason for approval or rejection.
+                          actionsRequired:
+                            type: string
+                            description: A message indicating if changes on the service
+                              provider require any updates on the consumer.
+                        type: object
+                      provisioningState:
+                        description: Provisioning state of the private endpoint connection.
+                        type: string
+                        readOnly: true
+                        enum:
+                        - Succeeded
+                        - Provisioning
+                        - Failed
+                        x-ms-enum:
+                          name: PrivateEndpointConnectionProvisioningState
+                          modelAsString: true
+                      privateLinkConnectionTags:
+                        description: Updated tag information to set into the PrivateLinkConnection
+                          instance.
+                        x-ms-mutability:
+                        - update
+                        properties:
+                          tags:
+                            additionalProperties:
+                              type: string
+                            description: Resource tags
+                            type: object
+                        type: object
+                    type: object
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Aadiam error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+      x-ms-long-running-operation: true
+    delete:
+      tags:
+      - PrivateEndpointConnections
+      operationId: PrivateEndpointConnections_Delete
+      description: Deletes the specified private endpoint connection associated with
+        the given policy.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Name of an Azure resource group.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+          pattern: ^[-\w\._\(\)]+$
+      - name: policyName
+        in: path
+        required: true
+        description: The name of the private link policy in Azure AD.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: privateEndpointConnectionName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: The PrivateEndpointConnection name.
+        schema:
+          type: string
+          minLength: 1
+      - name: api-version
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        description: Version of the API to be used with the client request.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        description: Azure subscription ID.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The private endpoint connection does not exist.
+        '202':
+          description: The private endpoint connection does not exist.
+        '204':
+          description: The private endpoint connection does not exist.
+        default:
+          description: Aadiam error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+      x-ms-long-running-operation: true
+    get:
+      tags:
+      - PrivateEndpointConnections
+      operationId: PrivateEndpointConnections_Get
+      description: Gets the specified private endpoint connection associated with
+        the given policy.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Name of an Azure resource group.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+          pattern: ^[-\w\._\(\)]+$
+      - name: policyName
+        in: path
+        required: true
+        description: The name of the private link policy in Azure AD.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: privateEndpointConnectionName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: The PrivateEndpointConnection name.
+        schema:
+          type: string
+          minLength: 1
+      - name: api-version
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        description: Version of the API to be used with the client request.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        description: Azure subscription ID.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Private endpoint connection successfully returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Resource properties.
+                    properties:
+                      privateEndpoint:
+                        description: Properties of the private endpoint object.
+                        properties:
+                          id:
+                            type: string
+                            description: Full identifier of the private endpoint resource.
+                        type: object
+                      privateLinkServiceConnectionState:
+                        description: Approval state of the private link connection.
+                        properties:
+                          status:
+                            description: Indicates whether the connection has been
+                              approved, rejected or removed by the given policy owner.
+                            type: string
+                            enum:
+                            - Approved
+                            - Pending
+                            - Rejected
+                            - Disconnected
+                            x-ms-enum:
+                              name: PrivateEndpointServiceConnectionStatus
+                              modelAsString: true
+                          description:
+                            type: string
+                            description: The reason for approval or rejection.
+                          actionsRequired:
+                            type: string
+                            description: A message indicating if changes on the service
+                              provider require any updates on the consumer.
+                        type: object
+                      provisioningState:
+                        description: Provisioning state of the private endpoint connection.
+                        type: string
+                        readOnly: true
+                        enum:
+                        - Succeeded
+                        - Provisioning
+                        - Failed
+                        x-ms-enum:
+                          name: PrivateEndpointConnectionProvisioningState
+                          modelAsString: true
+                      privateLinkConnectionTags:
+                        description: Updated tag information to set into the PrivateLinkConnection
+                          instance.
+                        x-ms-mutability:
+                        - update
+                        properties:
+                          tags:
+                            additionalProperties:
+                              type: string
+                            description: Resource tags
+                            type: object
+                        type: object
+                    type: object
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Aadiam error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+components:
+  parameters:
+    privateEndpointConnectionName:
+      name: privateEndpointConnectionName
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      description: The PrivateEndpointConnection name.
+      schema:
+        type: string
+        minLength: 1
+    subscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: Azure subscription ID.
+      required: true
+      x-ms-parameter-location: client
+      schema:
+        type: string
+    apiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      x-ms-parameter-location: client
+      description: Version of the API to be used with the client request.
+      schema:
+        type: string
+    resourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      description: Name of an Azure resource group.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+        pattern: ^[-\w\._\(\)]+$
+    groupNameParameter:
+      name: groupName
+      in: path
+      description: The name of the private link resource.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    policyNameParameter:
+      name: policyName
+      in: path
+      required: true
+      description: The name of the private link policy in Azure AD.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    PrivateEndpointConnectionListResult:
+      properties:
+        value:
+          type: array
+          description: Array of private link resources
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+              name:
+                readOnly: true
+                type: string
+                description: The name of the resource
+              type:
+                readOnly: true
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+              properties:
+                x-ms-client-flatten: true
+                description: Resource properties.
+                properties:
+                  privateEndpoint:
+                    description: Properties of the private endpoint object.
+                    properties:
+                      id:
+                        type: string
+                        description: Full identifier of the private endpoint resource.
+                    type: object
+                  privateLinkServiceConnectionState:
+                    description: Approval state of the private link connection.
+                    properties:
+                      status:
+                        description: Indicates whether the connection has been approved,
+                          rejected or removed by the given policy owner.
+                        type: string
+                        enum:
+                        - Approved
+                        - Pending
+                        - Rejected
+                        - Disconnected
+                        x-ms-enum:
+                          name: PrivateEndpointServiceConnectionStatus
+                          modelAsString: true
+                      description:
+                        type: string
+                        description: The reason for approval or rejection.
+                      actionsRequired:
+                        type: string
+                        description: A message indicating if changes on the service
+                          provider require any updates on the consumer.
+                    type: object
+                  provisioningState:
+                    description: Provisioning state of the private endpoint connection.
+                    type: string
+                    readOnly: true
+                    enum:
+                    - Succeeded
+                    - Provisioning
+                    - Failed
+                    x-ms-enum:
+                      name: PrivateEndpointConnectionProvisioningState
+                      modelAsString: true
+                  privateLinkConnectionTags:
+                    description: Updated tag information to set into the PrivateLinkConnection
+                      instance.
+                    x-ms-mutability:
+                    - update
+                    properties:
+                      tags:
+                        additionalProperties:
+                          type: string
+                        description: Resource tags
+                        type: object
+                    type: object
+                type: object
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+        nextLink:
+          description: URL to next page of results
+          type: string
+      type: object
+      description: A list of private link resources
+    PrivateEndpointConnection:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        properties:
+          x-ms-client-flatten: true
+          description: Resource properties.
+          properties:
+            privateEndpoint:
+              description: Properties of the private endpoint object.
+              properties:
+                id:
+                  type: string
+                  description: Full identifier of the private endpoint resource.
+              type: object
+            privateLinkServiceConnectionState:
+              description: Approval state of the private link connection.
+              properties:
+                status:
+                  description: Indicates whether the connection has been approved,
+                    rejected or removed by the given policy owner.
+                  type: string
+                  enum:
+                  - Approved
+                  - Pending
+                  - Rejected
+                  - Disconnected
+                  x-ms-enum:
+                    name: PrivateEndpointServiceConnectionStatus
+                    modelAsString: true
+                description:
+                  type: string
+                  description: The reason for approval or rejection.
+                actionsRequired:
+                  type: string
+                  description: A message indicating if changes on the service provider
+                    require any updates on the consumer.
+              type: object
+            provisioningState:
+              description: Provisioning state of the private endpoint connection.
+              type: string
+              readOnly: true
+              enum:
+              - Succeeded
+              - Provisioning
+              - Failed
+              x-ms-enum:
+                name: PrivateEndpointConnectionProvisioningState
+                modelAsString: true
+            privateLinkConnectionTags:
+              description: Updated tag information to set into the PrivateLinkConnection
+                instance.
+              x-ms-mutability:
+              - update
+              properties:
+                tags:
+                  additionalProperties:
+                    type: string
+                  description: Resource tags
+                  type: object
+              type: object
+          type: object
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    PrivateEndpointConnectionProperties:
+      properties:
+        privateEndpoint:
+          description: Properties of the private endpoint object.
+          properties:
+            id:
+              type: string
+              description: Full identifier of the private endpoint resource.
+          type: object
+        privateLinkServiceConnectionState:
+          description: Approval state of the private link connection.
+          properties:
+            status:
+              description: Indicates whether the connection has been approved, rejected
+                or removed by the given policy owner.
+              type: string
+              enum:
+              - Approved
+              - Pending
+              - Rejected
+              - Disconnected
+              x-ms-enum:
+                name: PrivateEndpointServiceConnectionStatus
+                modelAsString: true
+            description:
+              type: string
+              description: The reason for approval or rejection.
+            actionsRequired:
+              type: string
+              description: A message indicating if changes on the service provider
+                require any updates on the consumer.
+          type: object
+        provisioningState:
+          description: Provisioning state of the private endpoint connection.
+          type: string
+          readOnly: true
+          enum:
+          - Succeeded
+          - Provisioning
+          - Failed
+          x-ms-enum:
+            name: PrivateEndpointConnectionProvisioningState
+            modelAsString: true
+        privateLinkConnectionTags:
+          description: Updated tag information to set into the PrivateLinkConnection
+            instance.
+          x-ms-mutability:
+          - update
+          properties:
+            tags:
+              additionalProperties:
+                type: string
+              description: Resource tags
+              type: object
+          type: object
+      type: object
+      description: Properties of the private endpoint connection resource.
+    PrivateEndpoint:
+      properties:
+        id:
+          type: string
+          description: Full identifier of the private endpoint resource.
+      type: object
+      description: Private endpoint object properties.
+    PrivateLinkServiceConnectionState:
+      properties:
+        status:
+          description: Indicates whether the connection has been approved, rejected
+            or removed by the given policy owner.
+          type: string
+          enum:
+          - Approved
+          - Pending
+          - Rejected
+          - Disconnected
+          x-ms-enum:
+            name: PrivateEndpointServiceConnectionStatus
+            modelAsString: true
+        description:
+          type: string
+          description: The reason for approval or rejection.
+        actionsRequired:
+          type: string
+          description: A message indicating if changes on the service provider require
+            any updates on the consumer.
+      type: object
+      description: An object that represents the approval state of the private link
+        connection.
+    PrivateEndpointServiceConnectionStatus:
+      type: string
+      description: The private endpoint connection status.
+      enum:
+      - Approved
+      - Pending
+      - Rejected
+      - Disconnected
+      x-ms-enum:
+        name: PrivateEndpointServiceConnectionStatus
+        modelAsString: true
+    PrivateEndpointConnectionProvisioningState:
+      type: string
+      readOnly: true
+      description: The current provisioning state.
+      enum:
+      - Succeeded
+      - Provisioning
+      - Failed
+      x-ms-enum:
+        name: PrivateEndpointConnectionProvisioningState
+        modelAsString: true
+    TagsResource:
+      properties:
+        tags:
+          additionalProperties:
+            type: string
+          description: Resource tags
+          type: object
+      type: object
+      description: A container holding only the Tags for a resource, allowing the
+        user to update the tags on a PrivateLinkConnection instance.
+    ErrorDefinition:
+      description: Error definition.
+      properties:
+        code:
+          description: Service specific error code which serves as the substatus for
+            the HTTP error code.
+          type: string
+          readOnly: true
+        message:
+          description: Description of the error.
+          type: string
+          readOnly: true
+        details:
+          description: Internal error details.
+          type: array
+          items:
+            description: Error definition.
+            properties:
+              code:
+                description: Service specific error code which serves as the substatus
+                  for the HTTP error code.
+                type: string
+                readOnly: true
+              message:
+                description: Description of the error.
+                type: string
+                readOnly: true
+              details:
+                description: Internal error details.
+                type: array
+                items:
+                  description: Error definition.
+                  properties:
+                    code:
+                      description: Service specific error code which serves as the
+                        substatus for the HTTP error code.
+                      type: string
+                      readOnly: true
+                    message:
+                      description: Description of the error.
+                      type: string
+                      readOnly: true
+                x-ms-identifiers: []
+                readOnly: true
+          x-ms-identifiers: []
+          readOnly: true
+    ErrorResponse:
+      description: Error response.
+      properties:
+        error:
+          description: The error details.
+          properties:
+            code:
+              description: Service specific error code which serves as the substatus
+                for the HTTP error code.
+              type: string
+              readOnly: true
+            message:
+              description: Description of the error.
+              type: string
+              readOnly: true
+            details:
+              description: Internal error details.
+              type: array
+              items:
+                description: Error definition.
+                properties:
+                  code:
+                    description: Service specific error code which serves as the substatus
+                      for the HTTP error code.
+                    type: string
+                    readOnly: true
+                  message:
+                    description: Description of the error.
+                    type: string
+                    readOnly: true
+                  details:
+                    description: Internal error details.
+                    type: array
+                    items:
+                      description: Error definition.
+                      properties:
+                        code:
+                          description: Service specific error code which serves as
+                            the substatus for the HTTP error code.
+                          type: string
+                          readOnly: true
+                        message:
+                          description: Description of the error.
+                          type: string
+                          readOnly: true
+                    x-ms-identifiers: []
+                    readOnly: true
+              x-ms-identifiers: []
+              readOnly: true
+    Resource:
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true

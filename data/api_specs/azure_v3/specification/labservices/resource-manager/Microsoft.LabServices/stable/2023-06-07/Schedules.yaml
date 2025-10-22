@@ -1,0 +1,3382 @@
+openapi: 3.0.0
+info:
+  version: 2023-06-07
+  title: LabServicesClient
+  description: REST API for managing Azure Lab Services schedules.
+servers:
+- url: https://management.azure.com
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labs/{labName}/schedules
+  : parameters:
+    - name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    - name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    - name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    - name: labName
+      in: path
+      required: true
+      description: The name of the lab that uniquely identifies it within containing
+        lab plan. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+    - in: query
+      name: $filter
+      description: The filter to apply to the operation.
+      schema:
+        type: string
+    get:
+      tags:
+      - Schedule
+      summary: Get all schedules for a lab.
+      description: Returns a list of all schedules for a lab.
+      operationId: Schedules_ListByLab
+      responses:
+        '200':
+          description: The request was successful; response contains all schedules
+            for the given lab.
+          content:
+            application/json:
+              schema:
+                description: Paged list of schedules.
+                type: object
+                properties:
+                  value:
+                    description: The array page of schedule results.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                        name:
+                          readOnly: true
+                          type: string
+                          description: The name of the resource
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                        systemData:
+                          description: Metadata pertaining to creation and last modification
+                            of the schedule.
+                          readOnly: true
+                          type: object
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource last modification
+                                (UTC)
+                        properties:
+                          type: object
+                          properties:
+                            startAt:
+                              description: When lab user virtual machines will be
+                                started. Timestamp offsets will be ignored and timeZoneId
+                                is used instead.
+                              type: string
+                              format: date-time
+                            stopAt:
+                              description: When lab user virtual machines will be
+                                stopped. Timestamp offsets will be ignored and timeZoneId
+                                is used instead.
+                              type: string
+                              format: date-time
+                            recurrencePattern:
+                              description: The recurrence pattern of the scheduled
+                                actions.
+                              type: object
+                              properties:
+                                frequency:
+                                  description: The frequency of the recurrence.
+                                  type: string
+                                  enum:
+                                  - Daily
+                                  - Weekly
+                                  x-ms-enum:
+                                    name: RecurrenceFrequency
+                                    modelAsString: false
+                                    values:
+                                    - value: Daily
+                                      description: Schedule will run every days.
+                                    - value: Weekly
+                                      description: Schedule will run every week on
+                                        days specified in weekDays.
+                                weekDays:
+                                  description: The week days the schedule runs. Used
+                                    for when the Frequency is set to Weekly.
+                                  type: array
+                                  items:
+                                    maxItems: 7
+                                    type: string
+                                    enum:
+                                    - Sunday
+                                    - Monday
+                                    - Tuesday
+                                    - Wednesday
+                                    - Thursday
+                                    - Friday
+                                    - Saturday
+                                    description: Days of the week.
+                                    x-ms-enum:
+                                      name: WeekDay
+                                      modelAsString: false
+                                      values:
+                                      - value: Sunday
+                                        description: Schedule will run on Sunday
+                                      - value: Monday
+                                        description: Schedule will run on Monday
+                                      - value: Tuesday
+                                        description: Schedule will run on Tuesday
+                                      - value: Wednesday
+                                        description: Schedule will run on Wednesday
+                                      - value: Thursday
+                                        description: Schedule will run on Thursday
+                                      - value: Friday
+                                        description: Schedule will run on Friday
+                                      - value: Saturday
+                                        description: Schedule will run on Saturday
+                                interval:
+                                  description: The interval to invoke the schedule
+                                    on. For example, interval = 2 and RecurrenceFrequency.Daily
+                                    will run every 2 days. When no interval is supplied,
+                                    an interval of 1 is used.
+                                  type: integer
+                                  format: int32
+                                  minimum: 1
+                                  maximum: 365
+                                expirationDate:
+                                  description: When the recurrence will expire. This
+                                    date is inclusive.
+                                  type: string
+                                  format: date-time
+                              required:
+                              - frequency
+                              - expirationDate
+                            timeZoneId:
+                              description: The IANA timezone id for the schedule.
+                              type: string
+                              maxLength: 50
+                            notes:
+                              description: Notes for this schedule.
+                              type: string
+                              maxLength: 1000
+                            provisioningState:
+                              description: Current provisioning state of the schedule.
+                              readOnly: true
+                              type: string
+                              enum:
+                              - Creating
+                              - Updating
+                              - Deleting
+                              - Succeeded
+                              - Failed
+                              - Locked
+                              x-ms-enum:
+                                name: ProvisioningState
+                                modelAsString: false
+                                values:
+                                - value: Creating
+                                  description: Resource is in the process of being
+                                    created.
+                                - value: Updating
+                                  description: New property values are being applied
+                                    to the resource.
+                                - value: Deleting
+                                  description: Resource is in the process of being
+                                    deleted.
+                                - value: Succeeded
+                                  description: Resource is in healthy state after
+                                    creation or update operation.
+                                - value: Failed
+                                  description: Previous operation on the resource
+                                    has failed leaving resource in unhealthy state.
+                                - value: Locked
+                                  description: The resource is locked and changes
+                                    are currently blocked. This could be due to maintenance
+                                    or a scheduled operation. The state will go back
+                                    to succeeded once the locking operation has finished.
+                            resourceOperationError:
+                              description: Error details of last operation done on
+                                schedule.
+                              readOnly: true
+                              type: object
+                              properties:
+                                timestamp:
+                                  description: The datetime of when the error occured
+                                  type: string
+                                  format: date-time
+                                code:
+                                  description: The code that corresponds to the type
+                                    of operation failure
+                                  type: string
+                                message:
+                                  description: The operation failure message
+                                  type: string
+                                action:
+                                  description: The operation action that failed
+                                  type: string
+                          description: Schedule resource properties used for updates.
+                          required:
+                          - stopAt
+                          - timeZoneId
+                          x-ms-client-flatten: true
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                      required:
+                      - properties
+                    readOnly: true
+                  nextLink:
+                    description: The link to get the next page of schedule results.
+                    type: string
+                    readOnly: true
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-pageable:
+        nextLinkName: nextLink
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labs/{labName}/schedules/{scheduleName}
+  : parameters:
+    - name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    - name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    - name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    - name: labName
+      in: path
+      required: true
+      description: The name of the lab that uniquely identifies it within containing
+        lab plan. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+    - name: scheduleName
+      in: path
+      required: true
+      description: The name of the schedule that uniquely identifies it within containing
+        lab. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+        pattern: ^[-\w\\._\\(\\)]+$
+    get:
+      tags:
+      - Schedule
+      summary: Get a lab Schedule.
+      description: Returns the properties of a lab Schedule.
+      operationId: Schedules_Get
+      responses:
+        '200':
+          description: The request was successful; response contains the lab schedule.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  systemData:
+                    description: Metadata pertaining to creation and last modification
+                      of the schedule.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    type: object
+                    properties:
+                      startAt:
+                        description: When lab user virtual machines will be started.
+                          Timestamp offsets will be ignored and timeZoneId is used
+                          instead.
+                        type: string
+                        format: date-time
+                      stopAt:
+                        description: When lab user virtual machines will be stopped.
+                          Timestamp offsets will be ignored and timeZoneId is used
+                          instead.
+                        type: string
+                        format: date-time
+                      recurrencePattern:
+                        description: The recurrence pattern of the scheduled actions.
+                        type: object
+                        properties:
+                          frequency:
+                            description: The frequency of the recurrence.
+                            type: string
+                            enum:
+                            - Daily
+                            - Weekly
+                            x-ms-enum:
+                              name: RecurrenceFrequency
+                              modelAsString: false
+                              values:
+                              - value: Daily
+                                description: Schedule will run every days.
+                              - value: Weekly
+                                description: Schedule will run every week on days
+                                  specified in weekDays.
+                          weekDays:
+                            description: The week days the schedule runs. Used for
+                              when the Frequency is set to Weekly.
+                            type: array
+                            items:
+                              maxItems: 7
+                              type: string
+                              enum:
+                              - Sunday
+                              - Monday
+                              - Tuesday
+                              - Wednesday
+                              - Thursday
+                              - Friday
+                              - Saturday
+                              description: Days of the week.
+                              x-ms-enum:
+                                name: WeekDay
+                                modelAsString: false
+                                values:
+                                - value: Sunday
+                                  description: Schedule will run on Sunday
+                                - value: Monday
+                                  description: Schedule will run on Monday
+                                - value: Tuesday
+                                  description: Schedule will run on Tuesday
+                                - value: Wednesday
+                                  description: Schedule will run on Wednesday
+                                - value: Thursday
+                                  description: Schedule will run on Thursday
+                                - value: Friday
+                                  description: Schedule will run on Friday
+                                - value: Saturday
+                                  description: Schedule will run on Saturday
+                          interval:
+                            description: The interval to invoke the schedule on. For
+                              example, interval = 2 and RecurrenceFrequency.Daily
+                              will run every 2 days. When no interval is supplied,
+                              an interval of 1 is used.
+                            type: integer
+                            format: int32
+                            minimum: 1
+                            maximum: 365
+                          expirationDate:
+                            description: When the recurrence will expire. This date
+                              is inclusive.
+                            type: string
+                            format: date-time
+                        required:
+                        - frequency
+                        - expirationDate
+                      timeZoneId:
+                        description: The IANA timezone id for the schedule.
+                        type: string
+                        maxLength: 50
+                      notes:
+                        description: Notes for this schedule.
+                        type: string
+                        maxLength: 1000
+                      provisioningState:
+                        description: Current provisioning state of the schedule.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Creating
+                        - Updating
+                        - Deleting
+                        - Succeeded
+                        - Failed
+                        - Locked
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: false
+                          values:
+                          - value: Creating
+                            description: Resource is in the process of being created.
+                          - value: Updating
+                            description: New property values are being applied to
+                              the resource.
+                          - value: Deleting
+                            description: Resource is in the process of being deleted.
+                          - value: Succeeded
+                            description: Resource is in healthy state after creation
+                              or update operation.
+                          - value: Failed
+                            description: Previous operation on the resource has failed
+                              leaving resource in unhealthy state.
+                          - value: Locked
+                            description: The resource is locked and changes are currently
+                              blocked. This could be due to maintenance or a scheduled
+                              operation. The state will go back to succeeded once
+                              the locking operation has finished.
+                      resourceOperationError:
+                        description: Error details of last operation done on schedule.
+                        readOnly: true
+                        type: object
+                        properties:
+                          timestamp:
+                            description: The datetime of when the error occured
+                            type: string
+                            format: date-time
+                          code:
+                            description: The code that corresponds to the type of
+                              operation failure
+                            type: string
+                          message:
+                            description: The operation failure message
+                            type: string
+                          action:
+                            description: The operation action that failed
+                            type: string
+                    description: Schedule resource properties used for updates.
+                    required:
+                    - stopAt
+                    - timeZoneId
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - properties
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+    put:
+      tags:
+      - Schedule
+      summary: Create or update a lab schedule.
+      description: Operation to create or update a lab schedule.
+      operationId: Schedules_CreateOrUpdate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  readOnly: true
+                  type: string
+                  description: Fully qualified resource ID for the resource. Ex -
+                    /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                name:
+                  readOnly: true
+                  type: string
+                  description: The name of the resource
+                type:
+                  readOnly: true
+                  type: string
+                  description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                    or "Microsoft.Storage/storageAccounts"
+                systemData:
+                  description: Metadata pertaining to creation and last modification
+                    of the schedule.
+                  readOnly: true
+                  type: object
+                  properties:
+                    createdBy:
+                      type: string
+                      description: The identity that created the resource.
+                    createdByType:
+                      type: string
+                      description: The type of identity that created the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource creation (UTC).
+                    lastModifiedBy:
+                      type: string
+                      description: The identity that last modified the resource.
+                    lastModifiedByType:
+                      type: string
+                      description: The type of identity that last modified the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    lastModifiedAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource last modification (UTC)
+                properties:
+                  type: object
+                  properties:
+                    startAt:
+                      description: When lab user virtual machines will be started.
+                        Timestamp offsets will be ignored and timeZoneId is used instead.
+                      type: string
+                      format: date-time
+                    stopAt:
+                      description: When lab user virtual machines will be stopped.
+                        Timestamp offsets will be ignored and timeZoneId is used instead.
+                      type: string
+                      format: date-time
+                    recurrencePattern:
+                      description: The recurrence pattern of the scheduled actions.
+                      type: object
+                      properties:
+                        frequency:
+                          description: The frequency of the recurrence.
+                          type: string
+                          enum:
+                          - Daily
+                          - Weekly
+                          x-ms-enum:
+                            name: RecurrenceFrequency
+                            modelAsString: false
+                            values:
+                            - value: Daily
+                              description: Schedule will run every days.
+                            - value: Weekly
+                              description: Schedule will run every week on days specified
+                                in weekDays.
+                        weekDays:
+                          description: The week days the schedule runs. Used for when
+                            the Frequency is set to Weekly.
+                          type: array
+                          items:
+                            maxItems: 7
+                            type: string
+                            enum:
+                            - Sunday
+                            - Monday
+                            - Tuesday
+                            - Wednesday
+                            - Thursday
+                            - Friday
+                            - Saturday
+                            description: Days of the week.
+                            x-ms-enum:
+                              name: WeekDay
+                              modelAsString: false
+                              values:
+                              - value: Sunday
+                                description: Schedule will run on Sunday
+                              - value: Monday
+                                description: Schedule will run on Monday
+                              - value: Tuesday
+                                description: Schedule will run on Tuesday
+                              - value: Wednesday
+                                description: Schedule will run on Wednesday
+                              - value: Thursday
+                                description: Schedule will run on Thursday
+                              - value: Friday
+                                description: Schedule will run on Friday
+                              - value: Saturday
+                                description: Schedule will run on Saturday
+                        interval:
+                          description: The interval to invoke the schedule on. For
+                            example, interval = 2 and RecurrenceFrequency.Daily will
+                            run every 2 days. When no interval is supplied, an interval
+                            of 1 is used.
+                          type: integer
+                          format: int32
+                          minimum: 1
+                          maximum: 365
+                        expirationDate:
+                          description: When the recurrence will expire. This date
+                            is inclusive.
+                          type: string
+                          format: date-time
+                      required:
+                      - frequency
+                      - expirationDate
+                    timeZoneId:
+                      description: The IANA timezone id for the schedule.
+                      type: string
+                      maxLength: 50
+                    notes:
+                      description: Notes for this schedule.
+                      type: string
+                      maxLength: 1000
+                    provisioningState:
+                      description: Current provisioning state of the schedule.
+                      readOnly: true
+                      type: string
+                      enum:
+                      - Creating
+                      - Updating
+                      - Deleting
+                      - Succeeded
+                      - Failed
+                      - Locked
+                      x-ms-enum:
+                        name: ProvisioningState
+                        modelAsString: false
+                        values:
+                        - value: Creating
+                          description: Resource is in the process of being created.
+                        - value: Updating
+                          description: New property values are being applied to the
+                            resource.
+                        - value: Deleting
+                          description: Resource is in the process of being deleted.
+                        - value: Succeeded
+                          description: Resource is in healthy state after creation
+                            or update operation.
+                        - value: Failed
+                          description: Previous operation on the resource has failed
+                            leaving resource in unhealthy state.
+                        - value: Locked
+                          description: The resource is locked and changes are currently
+                            blocked. This could be due to maintenance or a scheduled
+                            operation. The state will go back to succeeded once the
+                            locking operation has finished.
+                    resourceOperationError:
+                      description: Error details of last operation done on schedule.
+                      readOnly: true
+                      type: object
+                      properties:
+                        timestamp:
+                          description: The datetime of when the error occured
+                          type: string
+                          format: date-time
+                        code:
+                          description: The code that corresponds to the type of operation
+                            failure
+                          type: string
+                        message:
+                          description: The operation failure message
+                          type: string
+                        action:
+                          description: The operation action that failed
+                          type: string
+                  description: Schedule resource properties used for updates.
+                  required:
+                  - stopAt
+                  - timeZoneId
+                  x-ms-client-flatten: true
+              title: Resource
+              description: Common fields that are returned in the response for all
+                Azure Resource Manager resources
+              x-ms-azure-resource: true
+              required:
+              - properties
+        description: The request body.
+        required: true
+      responses:
+        '200':
+          description: The schedule was updated; response contains the lab schedule.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  systemData:
+                    description: Metadata pertaining to creation and last modification
+                      of the schedule.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    type: object
+                    properties:
+                      startAt:
+                        description: When lab user virtual machines will be started.
+                          Timestamp offsets will be ignored and timeZoneId is used
+                          instead.
+                        type: string
+                        format: date-time
+                      stopAt:
+                        description: When lab user virtual machines will be stopped.
+                          Timestamp offsets will be ignored and timeZoneId is used
+                          instead.
+                        type: string
+                        format: date-time
+                      recurrencePattern:
+                        description: The recurrence pattern of the scheduled actions.
+                        type: object
+                        properties:
+                          frequency:
+                            description: The frequency of the recurrence.
+                            type: string
+                            enum:
+                            - Daily
+                            - Weekly
+                            x-ms-enum:
+                              name: RecurrenceFrequency
+                              modelAsString: false
+                              values:
+                              - value: Daily
+                                description: Schedule will run every days.
+                              - value: Weekly
+                                description: Schedule will run every week on days
+                                  specified in weekDays.
+                          weekDays:
+                            description: The week days the schedule runs. Used for
+                              when the Frequency is set to Weekly.
+                            type: array
+                            items:
+                              maxItems: 7
+                              type: string
+                              enum:
+                              - Sunday
+                              - Monday
+                              - Tuesday
+                              - Wednesday
+                              - Thursday
+                              - Friday
+                              - Saturday
+                              description: Days of the week.
+                              x-ms-enum:
+                                name: WeekDay
+                                modelAsString: false
+                                values:
+                                - value: Sunday
+                                  description: Schedule will run on Sunday
+                                - value: Monday
+                                  description: Schedule will run on Monday
+                                - value: Tuesday
+                                  description: Schedule will run on Tuesday
+                                - value: Wednesday
+                                  description: Schedule will run on Wednesday
+                                - value: Thursday
+                                  description: Schedule will run on Thursday
+                                - value: Friday
+                                  description: Schedule will run on Friday
+                                - value: Saturday
+                                  description: Schedule will run on Saturday
+                          interval:
+                            description: The interval to invoke the schedule on. For
+                              example, interval = 2 and RecurrenceFrequency.Daily
+                              will run every 2 days. When no interval is supplied,
+                              an interval of 1 is used.
+                            type: integer
+                            format: int32
+                            minimum: 1
+                            maximum: 365
+                          expirationDate:
+                            description: When the recurrence will expire. This date
+                              is inclusive.
+                            type: string
+                            format: date-time
+                        required:
+                        - frequency
+                        - expirationDate
+                      timeZoneId:
+                        description: The IANA timezone id for the schedule.
+                        type: string
+                        maxLength: 50
+                      notes:
+                        description: Notes for this schedule.
+                        type: string
+                        maxLength: 1000
+                      provisioningState:
+                        description: Current provisioning state of the schedule.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Creating
+                        - Updating
+                        - Deleting
+                        - Succeeded
+                        - Failed
+                        - Locked
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: false
+                          values:
+                          - value: Creating
+                            description: Resource is in the process of being created.
+                          - value: Updating
+                            description: New property values are being applied to
+                              the resource.
+                          - value: Deleting
+                            description: Resource is in the process of being deleted.
+                          - value: Succeeded
+                            description: Resource is in healthy state after creation
+                              or update operation.
+                          - value: Failed
+                            description: Previous operation on the resource has failed
+                              leaving resource in unhealthy state.
+                          - value: Locked
+                            description: The resource is locked and changes are currently
+                              blocked. This could be due to maintenance or a scheduled
+                              operation. The state will go back to succeeded once
+                              the locking operation has finished.
+                      resourceOperationError:
+                        description: Error details of last operation done on schedule.
+                        readOnly: true
+                        type: object
+                        properties:
+                          timestamp:
+                            description: The datetime of when the error occured
+                            type: string
+                            format: date-time
+                          code:
+                            description: The code that corresponds to the type of
+                              operation failure
+                            type: string
+                          message:
+                            description: The operation failure message
+                            type: string
+                          action:
+                            description: The operation action that failed
+                            type: string
+                    description: Schedule resource properties used for updates.
+                    required:
+                    - stopAt
+                    - timeZoneId
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - properties
+        '201':
+          description: The schedule was created; response contains the lab schedule.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  systemData:
+                    description: Metadata pertaining to creation and last modification
+                      of the schedule.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    type: object
+                    properties:
+                      startAt:
+                        description: When lab user virtual machines will be started.
+                          Timestamp offsets will be ignored and timeZoneId is used
+                          instead.
+                        type: string
+                        format: date-time
+                      stopAt:
+                        description: When lab user virtual machines will be stopped.
+                          Timestamp offsets will be ignored and timeZoneId is used
+                          instead.
+                        type: string
+                        format: date-time
+                      recurrencePattern:
+                        description: The recurrence pattern of the scheduled actions.
+                        type: object
+                        properties:
+                          frequency:
+                            description: The frequency of the recurrence.
+                            type: string
+                            enum:
+                            - Daily
+                            - Weekly
+                            x-ms-enum:
+                              name: RecurrenceFrequency
+                              modelAsString: false
+                              values:
+                              - value: Daily
+                                description: Schedule will run every days.
+                              - value: Weekly
+                                description: Schedule will run every week on days
+                                  specified in weekDays.
+                          weekDays:
+                            description: The week days the schedule runs. Used for
+                              when the Frequency is set to Weekly.
+                            type: array
+                            items:
+                              maxItems: 7
+                              type: string
+                              enum:
+                              - Sunday
+                              - Monday
+                              - Tuesday
+                              - Wednesday
+                              - Thursday
+                              - Friday
+                              - Saturday
+                              description: Days of the week.
+                              x-ms-enum:
+                                name: WeekDay
+                                modelAsString: false
+                                values:
+                                - value: Sunday
+                                  description: Schedule will run on Sunday
+                                - value: Monday
+                                  description: Schedule will run on Monday
+                                - value: Tuesday
+                                  description: Schedule will run on Tuesday
+                                - value: Wednesday
+                                  description: Schedule will run on Wednesday
+                                - value: Thursday
+                                  description: Schedule will run on Thursday
+                                - value: Friday
+                                  description: Schedule will run on Friday
+                                - value: Saturday
+                                  description: Schedule will run on Saturday
+                          interval:
+                            description: The interval to invoke the schedule on. For
+                              example, interval = 2 and RecurrenceFrequency.Daily
+                              will run every 2 days. When no interval is supplied,
+                              an interval of 1 is used.
+                            type: integer
+                            format: int32
+                            minimum: 1
+                            maximum: 365
+                          expirationDate:
+                            description: When the recurrence will expire. This date
+                              is inclusive.
+                            type: string
+                            format: date-time
+                        required:
+                        - frequency
+                        - expirationDate
+                      timeZoneId:
+                        description: The IANA timezone id for the schedule.
+                        type: string
+                        maxLength: 50
+                      notes:
+                        description: Notes for this schedule.
+                        type: string
+                        maxLength: 1000
+                      provisioningState:
+                        description: Current provisioning state of the schedule.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Creating
+                        - Updating
+                        - Deleting
+                        - Succeeded
+                        - Failed
+                        - Locked
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: false
+                          values:
+                          - value: Creating
+                            description: Resource is in the process of being created.
+                          - value: Updating
+                            description: New property values are being applied to
+                              the resource.
+                          - value: Deleting
+                            description: Resource is in the process of being deleted.
+                          - value: Succeeded
+                            description: Resource is in healthy state after creation
+                              or update operation.
+                          - value: Failed
+                            description: Previous operation on the resource has failed
+                              leaving resource in unhealthy state.
+                          - value: Locked
+                            description: The resource is locked and changes are currently
+                              blocked. This could be due to maintenance or a scheduled
+                              operation. The state will go back to succeeded once
+                              the locking operation has finished.
+                      resourceOperationError:
+                        description: Error details of last operation done on schedule.
+                        readOnly: true
+                        type: object
+                        properties:
+                          timestamp:
+                            description: The datetime of when the error occured
+                            type: string
+                            format: date-time
+                          code:
+                            description: The code that corresponds to the type of
+                              operation failure
+                            type: string
+                          message:
+                            description: The operation failure message
+                            type: string
+                          action:
+                            description: The operation action that failed
+                            type: string
+                    description: Schedule resource properties used for updates.
+                    required:
+                    - stopAt
+                    - timeZoneId
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - properties
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+    patch:
+      tags:
+      - Schedule
+      summary: Update a lab schedule.
+      description: Operation to update a lab schedule.
+      operationId: Schedules_Update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Schedule for automatically turning virtual machines in
+                a lab on and off at specified times. Used for updates.
+              type: object
+              properties:
+                properties:
+                  description: Schedule resource properties
+                  x-ms-client-flatten: true
+                  type: object
+                  properties:
+                    startAt:
+                      description: When lab user virtual machines will be started.
+                        Timestamp offsets will be ignored and timeZoneId is used instead.
+                      type: string
+                      format: date-time
+                    stopAt:
+                      description: When lab user virtual machines will be stopped.
+                        Timestamp offsets will be ignored and timeZoneId is used instead.
+                      type: string
+                      format: date-time
+                    recurrencePattern:
+                      description: The recurrence pattern of the scheduled actions.
+                      type: object
+                      properties:
+                        frequency:
+                          description: The frequency of the recurrence.
+                          type: string
+                          enum:
+                          - Daily
+                          - Weekly
+                          x-ms-enum:
+                            name: RecurrenceFrequency
+                            modelAsString: false
+                            values:
+                            - value: Daily
+                              description: Schedule will run every days.
+                            - value: Weekly
+                              description: Schedule will run every week on days specified
+                                in weekDays.
+                        weekDays:
+                          description: The week days the schedule runs. Used for when
+                            the Frequency is set to Weekly.
+                          type: array
+                          items:
+                            maxItems: 7
+                            type: string
+                            enum:
+                            - Sunday
+                            - Monday
+                            - Tuesday
+                            - Wednesday
+                            - Thursday
+                            - Friday
+                            - Saturday
+                            description: Days of the week.
+                            x-ms-enum:
+                              name: WeekDay
+                              modelAsString: false
+                              values:
+                              - value: Sunday
+                                description: Schedule will run on Sunday
+                              - value: Monday
+                                description: Schedule will run on Monday
+                              - value: Tuesday
+                                description: Schedule will run on Tuesday
+                              - value: Wednesday
+                                description: Schedule will run on Wednesday
+                              - value: Thursday
+                                description: Schedule will run on Thursday
+                              - value: Friday
+                                description: Schedule will run on Friday
+                              - value: Saturday
+                                description: Schedule will run on Saturday
+                        interval:
+                          description: The interval to invoke the schedule on. For
+                            example, interval = 2 and RecurrenceFrequency.Daily will
+                            run every 2 days. When no interval is supplied, an interval
+                            of 1 is used.
+                          type: integer
+                          format: int32
+                          minimum: 1
+                          maximum: 365
+                        expirationDate:
+                          description: When the recurrence will expire. This date
+                            is inclusive.
+                          type: string
+                          format: date-time
+                      required:
+                      - frequency
+                      - expirationDate
+                    timeZoneId:
+                      description: The IANA timezone id for the schedule.
+                      type: string
+                      maxLength: 50
+                    notes:
+                      description: Notes for this schedule.
+                      type: string
+                      maxLength: 1000
+        description: The request body.
+        required: true
+      responses:
+        '200':
+          description: The schedule was updated; response contains the lab schedule.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  systemData:
+                    description: Metadata pertaining to creation and last modification
+                      of the schedule.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    type: object
+                    properties:
+                      startAt:
+                        description: When lab user virtual machines will be started.
+                          Timestamp offsets will be ignored and timeZoneId is used
+                          instead.
+                        type: string
+                        format: date-time
+                      stopAt:
+                        description: When lab user virtual machines will be stopped.
+                          Timestamp offsets will be ignored and timeZoneId is used
+                          instead.
+                        type: string
+                        format: date-time
+                      recurrencePattern:
+                        description: The recurrence pattern of the scheduled actions.
+                        type: object
+                        properties:
+                          frequency:
+                            description: The frequency of the recurrence.
+                            type: string
+                            enum:
+                            - Daily
+                            - Weekly
+                            x-ms-enum:
+                              name: RecurrenceFrequency
+                              modelAsString: false
+                              values:
+                              - value: Daily
+                                description: Schedule will run every days.
+                              - value: Weekly
+                                description: Schedule will run every week on days
+                                  specified in weekDays.
+                          weekDays:
+                            description: The week days the schedule runs. Used for
+                              when the Frequency is set to Weekly.
+                            type: array
+                            items:
+                              maxItems: 7
+                              type: string
+                              enum:
+                              - Sunday
+                              - Monday
+                              - Tuesday
+                              - Wednesday
+                              - Thursday
+                              - Friday
+                              - Saturday
+                              description: Days of the week.
+                              x-ms-enum:
+                                name: WeekDay
+                                modelAsString: false
+                                values:
+                                - value: Sunday
+                                  description: Schedule will run on Sunday
+                                - value: Monday
+                                  description: Schedule will run on Monday
+                                - value: Tuesday
+                                  description: Schedule will run on Tuesday
+                                - value: Wednesday
+                                  description: Schedule will run on Wednesday
+                                - value: Thursday
+                                  description: Schedule will run on Thursday
+                                - value: Friday
+                                  description: Schedule will run on Friday
+                                - value: Saturday
+                                  description: Schedule will run on Saturday
+                          interval:
+                            description: The interval to invoke the schedule on. For
+                              example, interval = 2 and RecurrenceFrequency.Daily
+                              will run every 2 days. When no interval is supplied,
+                              an interval of 1 is used.
+                            type: integer
+                            format: int32
+                            minimum: 1
+                            maximum: 365
+                          expirationDate:
+                            description: When the recurrence will expire. This date
+                              is inclusive.
+                            type: string
+                            format: date-time
+                        required:
+                        - frequency
+                        - expirationDate
+                      timeZoneId:
+                        description: The IANA timezone id for the schedule.
+                        type: string
+                        maxLength: 50
+                      notes:
+                        description: Notes for this schedule.
+                        type: string
+                        maxLength: 1000
+                      provisioningState:
+                        description: Current provisioning state of the schedule.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Creating
+                        - Updating
+                        - Deleting
+                        - Succeeded
+                        - Failed
+                        - Locked
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: false
+                          values:
+                          - value: Creating
+                            description: Resource is in the process of being created.
+                          - value: Updating
+                            description: New property values are being applied to
+                              the resource.
+                          - value: Deleting
+                            description: Resource is in the process of being deleted.
+                          - value: Succeeded
+                            description: Resource is in healthy state after creation
+                              or update operation.
+                          - value: Failed
+                            description: Previous operation on the resource has failed
+                              leaving resource in unhealthy state.
+                          - value: Locked
+                            description: The resource is locked and changes are currently
+                              blocked. This could be due to maintenance or a scheduled
+                              operation. The state will go back to succeeded once
+                              the locking operation has finished.
+                      resourceOperationError:
+                        description: Error details of last operation done on schedule.
+                        readOnly: true
+                        type: object
+                        properties:
+                          timestamp:
+                            description: The datetime of when the error occured
+                            type: string
+                            format: date-time
+                          code:
+                            description: The code that corresponds to the type of
+                              operation failure
+                            type: string
+                          message:
+                            description: The operation failure message
+                            type: string
+                          action:
+                            description: The operation action that failed
+                            type: string
+                    description: Schedule resource properties used for updates.
+                    required:
+                    - stopAt
+                    - timeZoneId
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - properties
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+    delete:
+      tags:
+      - Schedule
+      summary: Deletes a schedule resource.
+      description: Operation to delete a schedule resource.
+      operationId: Schedules_Delete
+      responses:
+        '200':
+          description: The request was successful.
+        '202':
+          description: The request was accepted.
+        '204':
+          description: The request has been fulfilled.
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: location
+components:
+  parameters:
+    ScheduleNameParameter:
+      name: scheduleName
+      in: path
+      required: true
+      description: The name of the schedule that uniquely identifies it within containing
+        lab. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+        pattern: ^[-\w\\._\\(\\)]+$
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    LabNameParameter:
+      name: labName
+      in: path
+      required: true
+      description: The name of the lab that uniquely identifies it within containing
+        lab plan. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    Schedule:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        systemData:
+          description: Metadata pertaining to creation and last modification of the
+            schedule.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+        properties:
+          type: object
+          properties:
+            startAt:
+              description: When lab user virtual machines will be started. Timestamp
+                offsets will be ignored and timeZoneId is used instead.
+              type: string
+              format: date-time
+            stopAt:
+              description: When lab user virtual machines will be stopped. Timestamp
+                offsets will be ignored and timeZoneId is used instead.
+              type: string
+              format: date-time
+            recurrencePattern:
+              description: The recurrence pattern of the scheduled actions.
+              type: object
+              properties:
+                frequency:
+                  description: The frequency of the recurrence.
+                  type: string
+                  enum:
+                  - Daily
+                  - Weekly
+                  x-ms-enum:
+                    name: RecurrenceFrequency
+                    modelAsString: false
+                    values:
+                    - value: Daily
+                      description: Schedule will run every days.
+                    - value: Weekly
+                      description: Schedule will run every week on days specified
+                        in weekDays.
+                weekDays:
+                  description: The week days the schedule runs. Used for when the
+                    Frequency is set to Weekly.
+                  type: array
+                  items:
+                    maxItems: 7
+                    type: string
+                    enum:
+                    - Sunday
+                    - Monday
+                    - Tuesday
+                    - Wednesday
+                    - Thursday
+                    - Friday
+                    - Saturday
+                    description: Days of the week.
+                    x-ms-enum:
+                      name: WeekDay
+                      modelAsString: false
+                      values:
+                      - value: Sunday
+                        description: Schedule will run on Sunday
+                      - value: Monday
+                        description: Schedule will run on Monday
+                      - value: Tuesday
+                        description: Schedule will run on Tuesday
+                      - value: Wednesday
+                        description: Schedule will run on Wednesday
+                      - value: Thursday
+                        description: Schedule will run on Thursday
+                      - value: Friday
+                        description: Schedule will run on Friday
+                      - value: Saturday
+                        description: Schedule will run on Saturday
+                interval:
+                  description: The interval to invoke the schedule on. For example,
+                    interval = 2 and RecurrenceFrequency.Daily will run every 2 days.
+                    When no interval is supplied, an interval of 1 is used.
+                  type: integer
+                  format: int32
+                  minimum: 1
+                  maximum: 365
+                expirationDate:
+                  description: When the recurrence will expire. This date is inclusive.
+                  type: string
+                  format: date-time
+              required:
+              - frequency
+              - expirationDate
+            timeZoneId:
+              description: The IANA timezone id for the schedule.
+              type: string
+              maxLength: 50
+            notes:
+              description: Notes for this schedule.
+              type: string
+              maxLength: 1000
+            provisioningState:
+              description: Current provisioning state of the schedule.
+              readOnly: true
+              type: string
+              enum:
+              - Creating
+              - Updating
+              - Deleting
+              - Succeeded
+              - Failed
+              - Locked
+              x-ms-enum:
+                name: ProvisioningState
+                modelAsString: false
+                values:
+                - value: Creating
+                  description: Resource is in the process of being created.
+                - value: Updating
+                  description: New property values are being applied to the resource.
+                - value: Deleting
+                  description: Resource is in the process of being deleted.
+                - value: Succeeded
+                  description: Resource is in healthy state after creation or update
+                    operation.
+                - value: Failed
+                  description: Previous operation on the resource has failed leaving
+                    resource in unhealthy state.
+                - value: Locked
+                  description: The resource is locked and changes are currently blocked.
+                    This could be due to maintenance or a scheduled operation. The
+                    state will go back to succeeded once the locking operation has
+                    finished.
+            resourceOperationError:
+              description: Error details of last operation done on schedule.
+              readOnly: true
+              type: object
+              properties:
+                timestamp:
+                  description: The datetime of when the error occured
+                  type: string
+                  format: date-time
+                code:
+                  description: The code that corresponds to the type of operation
+                    failure
+                  type: string
+                message:
+                  description: The operation failure message
+                  type: string
+                action:
+                  description: The operation action that failed
+                  type: string
+          description: Schedule resource properties used for updates.
+          required:
+          - stopAt
+          - timeZoneId
+          x-ms-client-flatten: true
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+      required:
+      - properties
+    PagedSchedules:
+      description: Paged list of schedules.
+      type: object
+      properties:
+        value:
+          description: The array page of schedule results.
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+              name:
+                readOnly: true
+                type: string
+                description: The name of the resource
+              type:
+                readOnly: true
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+              systemData:
+                description: Metadata pertaining to creation and last modification
+                  of the schedule.
+                readOnly: true
+                type: object
+                properties:
+                  createdBy:
+                    type: string
+                    description: The identity that created the resource.
+                  createdByType:
+                    type: string
+                    description: The type of identity that created the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource creation (UTC).
+                  lastModifiedBy:
+                    type: string
+                    description: The identity that last modified the resource.
+                  lastModifiedByType:
+                    type: string
+                    description: The type of identity that last modified the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  lastModifiedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource last modification (UTC)
+              properties:
+                type: object
+                properties:
+                  startAt:
+                    description: When lab user virtual machines will be started. Timestamp
+                      offsets will be ignored and timeZoneId is used instead.
+                    type: string
+                    format: date-time
+                  stopAt:
+                    description: When lab user virtual machines will be stopped. Timestamp
+                      offsets will be ignored and timeZoneId is used instead.
+                    type: string
+                    format: date-time
+                  recurrencePattern:
+                    description: The recurrence pattern of the scheduled actions.
+                    type: object
+                    properties:
+                      frequency:
+                        description: The frequency of the recurrence.
+                        type: string
+                        enum:
+                        - Daily
+                        - Weekly
+                        x-ms-enum:
+                          name: RecurrenceFrequency
+                          modelAsString: false
+                          values:
+                          - value: Daily
+                            description: Schedule will run every days.
+                          - value: Weekly
+                            description: Schedule will run every week on days specified
+                              in weekDays.
+                      weekDays:
+                        description: The week days the schedule runs. Used for when
+                          the Frequency is set to Weekly.
+                        type: array
+                        items:
+                          maxItems: 7
+                          type: string
+                          enum:
+                          - Sunday
+                          - Monday
+                          - Tuesday
+                          - Wednesday
+                          - Thursday
+                          - Friday
+                          - Saturday
+                          description: Days of the week.
+                          x-ms-enum:
+                            name: WeekDay
+                            modelAsString: false
+                            values:
+                            - value: Sunday
+                              description: Schedule will run on Sunday
+                            - value: Monday
+                              description: Schedule will run on Monday
+                            - value: Tuesday
+                              description: Schedule will run on Tuesday
+                            - value: Wednesday
+                              description: Schedule will run on Wednesday
+                            - value: Thursday
+                              description: Schedule will run on Thursday
+                            - value: Friday
+                              description: Schedule will run on Friday
+                            - value: Saturday
+                              description: Schedule will run on Saturday
+                      interval:
+                        description: The interval to invoke the schedule on. For example,
+                          interval = 2 and RecurrenceFrequency.Daily will run every
+                          2 days. When no interval is supplied, an interval of 1 is
+                          used.
+                        type: integer
+                        format: int32
+                        minimum: 1
+                        maximum: 365
+                      expirationDate:
+                        description: When the recurrence will expire. This date is
+                          inclusive.
+                        type: string
+                        format: date-time
+                    required:
+                    - frequency
+                    - expirationDate
+                  timeZoneId:
+                    description: The IANA timezone id for the schedule.
+                    type: string
+                    maxLength: 50
+                  notes:
+                    description: Notes for this schedule.
+                    type: string
+                    maxLength: 1000
+                  provisioningState:
+                    description: Current provisioning state of the schedule.
+                    readOnly: true
+                    type: string
+                    enum:
+                    - Creating
+                    - Updating
+                    - Deleting
+                    - Succeeded
+                    - Failed
+                    - Locked
+                    x-ms-enum:
+                      name: ProvisioningState
+                      modelAsString: false
+                      values:
+                      - value: Creating
+                        description: Resource is in the process of being created.
+                      - value: Updating
+                        description: New property values are being applied to the
+                          resource.
+                      - value: Deleting
+                        description: Resource is in the process of being deleted.
+                      - value: Succeeded
+                        description: Resource is in healthy state after creation or
+                          update operation.
+                      - value: Failed
+                        description: Previous operation on the resource has failed
+                          leaving resource in unhealthy state.
+                      - value: Locked
+                        description: The resource is locked and changes are currently
+                          blocked. This could be due to maintenance or a scheduled
+                          operation. The state will go back to succeeded once the
+                          locking operation has finished.
+                  resourceOperationError:
+                    description: Error details of last operation done on schedule.
+                    readOnly: true
+                    type: object
+                    properties:
+                      timestamp:
+                        description: The datetime of when the error occured
+                        type: string
+                        format: date-time
+                      code:
+                        description: The code that corresponds to the type of operation
+                          failure
+                        type: string
+                      message:
+                        description: The operation failure message
+                        type: string
+                      action:
+                        description: The operation action that failed
+                        type: string
+                description: Schedule resource properties used for updates.
+                required:
+                - stopAt
+                - timeZoneId
+                x-ms-client-flatten: true
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+            required:
+            - properties
+          readOnly: true
+        nextLink:
+          description: The link to get the next page of schedule results.
+          type: string
+          readOnly: true
+    ScheduleUpdate:
+      description: Schedule for automatically turning virtual machines in a lab on
+        and off at specified times. Used for updates.
+      type: object
+      properties:
+        properties:
+          description: Schedule resource properties
+          x-ms-client-flatten: true
+          type: object
+          properties:
+            startAt:
+              description: When lab user virtual machines will be started. Timestamp
+                offsets will be ignored and timeZoneId is used instead.
+              type: string
+              format: date-time
+            stopAt:
+              description: When lab user virtual machines will be stopped. Timestamp
+                offsets will be ignored and timeZoneId is used instead.
+              type: string
+              format: date-time
+            recurrencePattern:
+              description: The recurrence pattern of the scheduled actions.
+              type: object
+              properties:
+                frequency:
+                  description: The frequency of the recurrence.
+                  type: string
+                  enum:
+                  - Daily
+                  - Weekly
+                  x-ms-enum:
+                    name: RecurrenceFrequency
+                    modelAsString: false
+                    values:
+                    - value: Daily
+                      description: Schedule will run every days.
+                    - value: Weekly
+                      description: Schedule will run every week on days specified
+                        in weekDays.
+                weekDays:
+                  description: The week days the schedule runs. Used for when the
+                    Frequency is set to Weekly.
+                  type: array
+                  items:
+                    maxItems: 7
+                    type: string
+                    enum:
+                    - Sunday
+                    - Monday
+                    - Tuesday
+                    - Wednesday
+                    - Thursday
+                    - Friday
+                    - Saturday
+                    description: Days of the week.
+                    x-ms-enum:
+                      name: WeekDay
+                      modelAsString: false
+                      values:
+                      - value: Sunday
+                        description: Schedule will run on Sunday
+                      - value: Monday
+                        description: Schedule will run on Monday
+                      - value: Tuesday
+                        description: Schedule will run on Tuesday
+                      - value: Wednesday
+                        description: Schedule will run on Wednesday
+                      - value: Thursday
+                        description: Schedule will run on Thursday
+                      - value: Friday
+                        description: Schedule will run on Friday
+                      - value: Saturday
+                        description: Schedule will run on Saturday
+                interval:
+                  description: The interval to invoke the schedule on. For example,
+                    interval = 2 and RecurrenceFrequency.Daily will run every 2 days.
+                    When no interval is supplied, an interval of 1 is used.
+                  type: integer
+                  format: int32
+                  minimum: 1
+                  maximum: 365
+                expirationDate:
+                  description: When the recurrence will expire. This date is inclusive.
+                  type: string
+                  format: date-time
+              required:
+              - frequency
+              - expirationDate
+            timeZoneId:
+              description: The IANA timezone id for the schedule.
+              type: string
+              maxLength: 50
+            notes:
+              description: Notes for this schedule.
+              type: string
+              maxLength: 1000
+    ScheduleUpdateProperties:
+      description: Schedule resource properties used for updates.
+      type: object
+      properties:
+        startAt:
+          description: When lab user virtual machines will be started. Timestamp offsets
+            will be ignored and timeZoneId is used instead.
+          type: string
+          format: date-time
+        stopAt:
+          description: When lab user virtual machines will be stopped. Timestamp offsets
+            will be ignored and timeZoneId is used instead.
+          type: string
+          format: date-time
+        recurrencePattern:
+          description: The recurrence pattern of the scheduled actions.
+          type: object
+          properties:
+            frequency:
+              description: The frequency of the recurrence.
+              type: string
+              enum:
+              - Daily
+              - Weekly
+              x-ms-enum:
+                name: RecurrenceFrequency
+                modelAsString: false
+                values:
+                - value: Daily
+                  description: Schedule will run every days.
+                - value: Weekly
+                  description: Schedule will run every week on days specified in weekDays.
+            weekDays:
+              description: The week days the schedule runs. Used for when the Frequency
+                is set to Weekly.
+              type: array
+              items:
+                maxItems: 7
+                type: string
+                enum:
+                - Sunday
+                - Monday
+                - Tuesday
+                - Wednesday
+                - Thursday
+                - Friday
+                - Saturday
+                description: Days of the week.
+                x-ms-enum:
+                  name: WeekDay
+                  modelAsString: false
+                  values:
+                  - value: Sunday
+                    description: Schedule will run on Sunday
+                  - value: Monday
+                    description: Schedule will run on Monday
+                  - value: Tuesday
+                    description: Schedule will run on Tuesday
+                  - value: Wednesday
+                    description: Schedule will run on Wednesday
+                  - value: Thursday
+                    description: Schedule will run on Thursday
+                  - value: Friday
+                    description: Schedule will run on Friday
+                  - value: Saturday
+                    description: Schedule will run on Saturday
+            interval:
+              description: The interval to invoke the schedule on. For example, interval
+                = 2 and RecurrenceFrequency.Daily will run every 2 days. When no interval
+                is supplied, an interval of 1 is used.
+              type: integer
+              format: int32
+              minimum: 1
+              maximum: 365
+            expirationDate:
+              description: When the recurrence will expire. This date is inclusive.
+              type: string
+              format: date-time
+          required:
+          - frequency
+          - expirationDate
+        timeZoneId:
+          description: The IANA timezone id for the schedule.
+          type: string
+          maxLength: 50
+        notes:
+          description: Notes for this schedule.
+          type: string
+          maxLength: 1000
+    ScheduleProperties:
+      type: object
+      properties:
+        startAt:
+          description: When lab user virtual machines will be started. Timestamp offsets
+            will be ignored and timeZoneId is used instead.
+          type: string
+          format: date-time
+        stopAt:
+          description: When lab user virtual machines will be stopped. Timestamp offsets
+            will be ignored and timeZoneId is used instead.
+          type: string
+          format: date-time
+        recurrencePattern:
+          description: The recurrence pattern of the scheduled actions.
+          type: object
+          properties:
+            frequency:
+              description: The frequency of the recurrence.
+              type: string
+              enum:
+              - Daily
+              - Weekly
+              x-ms-enum:
+                name: RecurrenceFrequency
+                modelAsString: false
+                values:
+                - value: Daily
+                  description: Schedule will run every days.
+                - value: Weekly
+                  description: Schedule will run every week on days specified in weekDays.
+            weekDays:
+              description: The week days the schedule runs. Used for when the Frequency
+                is set to Weekly.
+              type: array
+              items:
+                maxItems: 7
+                type: string
+                enum:
+                - Sunday
+                - Monday
+                - Tuesday
+                - Wednesday
+                - Thursday
+                - Friday
+                - Saturday
+                description: Days of the week.
+                x-ms-enum:
+                  name: WeekDay
+                  modelAsString: false
+                  values:
+                  - value: Sunday
+                    description: Schedule will run on Sunday
+                  - value: Monday
+                    description: Schedule will run on Monday
+                  - value: Tuesday
+                    description: Schedule will run on Tuesday
+                  - value: Wednesday
+                    description: Schedule will run on Wednesday
+                  - value: Thursday
+                    description: Schedule will run on Thursday
+                  - value: Friday
+                    description: Schedule will run on Friday
+                  - value: Saturday
+                    description: Schedule will run on Saturday
+            interval:
+              description: The interval to invoke the schedule on. For example, interval
+                = 2 and RecurrenceFrequency.Daily will run every 2 days. When no interval
+                is supplied, an interval of 1 is used.
+              type: integer
+              format: int32
+              minimum: 1
+              maximum: 365
+            expirationDate:
+              description: When the recurrence will expire. This date is inclusive.
+              type: string
+              format: date-time
+          required:
+          - frequency
+          - expirationDate
+        timeZoneId:
+          description: The IANA timezone id for the schedule.
+          type: string
+          maxLength: 50
+        notes:
+          description: Notes for this schedule.
+          type: string
+          maxLength: 1000
+        provisioningState:
+          description: Current provisioning state of the schedule.
+          readOnly: true
+          type: string
+          enum:
+          - Creating
+          - Updating
+          - Deleting
+          - Succeeded
+          - Failed
+          - Locked
+          x-ms-enum:
+            name: ProvisioningState
+            modelAsString: false
+            values:
+            - value: Creating
+              description: Resource is in the process of being created.
+            - value: Updating
+              description: New property values are being applied to the resource.
+            - value: Deleting
+              description: Resource is in the process of being deleted.
+            - value: Succeeded
+              description: Resource is in healthy state after creation or update operation.
+            - value: Failed
+              description: Previous operation on the resource has failed leaving resource
+                in unhealthy state.
+            - value: Locked
+              description: The resource is locked and changes are currently blocked.
+                This could be due to maintenance or a scheduled operation. The state
+                will go back to succeeded once the locking operation has finished.
+        resourceOperationError:
+          description: Error details of last operation done on schedule.
+          readOnly: true
+          type: object
+          properties:
+            timestamp:
+              description: The datetime of when the error occured
+              type: string
+              format: date-time
+            code:
+              description: The code that corresponds to the type of operation failure
+              type: string
+            message:
+              description: The operation failure message
+              type: string
+            action:
+              description: The operation action that failed
+              type: string
+      description: Schedule resource properties used for updates.
+      required:
+      - stopAt
+      - timeZoneId
+    RecurrencePattern:
+      description: Recurrence pattern of a lab schedule.
+      type: object
+      properties:
+        frequency:
+          description: The frequency of the recurrence.
+          type: string
+          enum:
+          - Daily
+          - Weekly
+          x-ms-enum:
+            name: RecurrenceFrequency
+            modelAsString: false
+            values:
+            - value: Daily
+              description: Schedule will run every days.
+            - value: Weekly
+              description: Schedule will run every week on days specified in weekDays.
+        weekDays:
+          description: The week days the schedule runs. Used for when the Frequency
+            is set to Weekly.
+          type: array
+          items:
+            maxItems: 7
+            type: string
+            enum:
+            - Sunday
+            - Monday
+            - Tuesday
+            - Wednesday
+            - Thursday
+            - Friday
+            - Saturday
+            description: Days of the week.
+            x-ms-enum:
+              name: WeekDay
+              modelAsString: false
+              values:
+              - value: Sunday
+                description: Schedule will run on Sunday
+              - value: Monday
+                description: Schedule will run on Monday
+              - value: Tuesday
+                description: Schedule will run on Tuesday
+              - value: Wednesday
+                description: Schedule will run on Wednesday
+              - value: Thursday
+                description: Schedule will run on Thursday
+              - value: Friday
+                description: Schedule will run on Friday
+              - value: Saturday
+                description: Schedule will run on Saturday
+        interval:
+          description: The interval to invoke the schedule on. For example, interval
+            = 2 and RecurrenceFrequency.Daily will run every 2 days. When no interval
+            is supplied, an interval of 1 is used.
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 365
+        expirationDate:
+          description: When the recurrence will expire. This date is inclusive.
+          type: string
+          format: date-time
+      required:
+      - frequency
+      - expirationDate
+    WeekDay:
+      type: string
+      enum:
+      - Sunday
+      - Monday
+      - Tuesday
+      - Wednesday
+      - Thursday
+      - Friday
+      - Saturday
+      description: Days of the week.
+      x-ms-enum:
+        name: WeekDay
+        modelAsString: false
+        values:
+        - value: Sunday
+          description: Schedule will run on Sunday
+        - value: Monday
+          description: Schedule will run on Monday
+        - value: Tuesday
+          description: Schedule will run on Tuesday
+        - value: Wednesday
+          description: Schedule will run on Wednesday
+        - value: Thursday
+          description: Schedule will run on Thursday
+        - value: Friday
+          description: Schedule will run on Friday
+        - value: Saturday
+          description: Schedule will run on Saturday
+    RecurrenceFrequency:
+      type: string
+      enum:
+      - Daily
+      - Weekly
+      description: Schedule recurrence frequencies.
+      x-ms-enum:
+        name: RecurrenceFrequency
+        modelAsString: false
+        values:
+        - value: Daily
+          description: Schedule will run every days.
+        - value: Weekly
+          description: Schedule will run every week on days specified in weekDays.
+    ErrorDetail:
+      description: The error detail.
+      type: object
+      properties:
+        code:
+          readOnly: true
+          type: string
+          description: The error code.
+        message:
+          readOnly: true
+          type: string
+          description: The error message.
+        target:
+          readOnly: true
+          type: string
+          description: The error target.
+        details:
+          readOnly: true
+          type: array
+          items:
+            description: The error detail.
+            type: object
+            properties:
+              code:
+                readOnly: true
+                type: string
+                description: The error code.
+              message:
+                readOnly: true
+                type: string
+                description: The error message.
+              target:
+                readOnly: true
+                type: string
+                description: The error target.
+              details:
+                readOnly: true
+                type: array
+                items:
+                  description: The error detail.
+                  type: object
+                  properties:
+                    code:
+                      readOnly: true
+                      type: string
+                      description: The error code.
+                    message:
+                      readOnly: true
+                      type: string
+                      description: The error message.
+                    target:
+                      readOnly: true
+                      type: string
+                      description: The error target.
+                x-ms-identifiers:
+                - message
+                - target
+                description: The error details.
+              additionalInfo:
+                readOnly: true
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      readOnly: true
+                      type: string
+                      description: The additional info type.
+                    info:
+                      readOnly: true
+                      type: object
+                      description: The additional info.
+                  description: The resource management error additional info.
+                x-ms-identifiers: []
+                description: The error additional info.
+          x-ms-identifiers:
+          - message
+          - target
+          description: The error details.
+        additionalInfo:
+          readOnly: true
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                readOnly: true
+                type: string
+                description: The additional info type.
+              info:
+                readOnly: true
+                type: object
+                description: The additional info.
+            description: The resource management error additional info.
+          x-ms-identifiers: []
+          description: The error additional info.
+    ErrorAdditionalInfo:
+      type: object
+      properties:
+        type:
+          readOnly: true
+          type: string
+          description: The additional info type.
+        info:
+          readOnly: true
+          type: object
+          description: The additional info.
+      description: The resource management error additional info.
+    ErrorResponse:
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      type: object
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              readOnly: true
+              type: string
+              description: The error code.
+            message:
+              readOnly: true
+              type: string
+              description: The error message.
+            target:
+              readOnly: true
+              type: string
+              description: The error target.
+            details:
+              readOnly: true
+              type: array
+              items:
+                description: The error detail.
+                type: object
+                properties:
+                  code:
+                    readOnly: true
+                    type: string
+                    description: The error code.
+                  message:
+                    readOnly: true
+                    type: string
+                    description: The error message.
+                  target:
+                    readOnly: true
+                    type: string
+                    description: The error target.
+                  details:
+                    readOnly: true
+                    type: array
+                    items:
+                      description: The error detail.
+                      type: object
+                      properties:
+                        code:
+                          readOnly: true
+                          type: string
+                          description: The error code.
+                        message:
+                          readOnly: true
+                          type: string
+                          description: The error message.
+                        target:
+                          readOnly: true
+                          type: string
+                          description: The error target.
+                    x-ms-identifiers:
+                    - message
+                    - target
+                    description: The error details.
+                  additionalInfo:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The additional info type.
+                        info:
+                          readOnly: true
+                          type: object
+                          description: The additional info.
+                      description: The resource management error additional info.
+                    x-ms-identifiers: []
+                    description: The error additional info.
+              x-ms-identifiers:
+              - message
+              - target
+              description: The error details.
+            additionalInfo:
+              readOnly: true
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The additional info type.
+                  info:
+                    readOnly: true
+                    type: object
+                    description: The additional info.
+                description: The resource management error additional info.
+              x-ms-identifiers: []
+              description: The error additional info.
+    Resource:
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    systemData:
+      description: Metadata pertaining to creation and last modification of the resource.
+      type: object
+      readOnly: true
+      properties:
+        createdBy:
+          type: string
+          description: The identity that created the resource.
+        createdByType:
+          type: string
+          description: The type of identity that created the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource creation (UTC).
+        lastModifiedBy:
+          type: string
+          description: The identity that last modified the resource.
+        lastModifiedByType:
+          type: string
+          description: The type of identity that last modified the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource last modification (UTC)
+    provisioningState:
+      type: string
+      enum:
+      - Creating
+      - Updating
+      - Deleting
+      - Succeeded
+      - Failed
+      - Locked
+      description: Resource provisioning state.
+      x-ms-enum:
+        name: ProvisioningState
+        modelAsString: false
+        values:
+        - value: Creating
+          description: Resource is in the process of being created.
+        - value: Updating
+          description: New property values are being applied to the resource.
+        - value: Deleting
+          description: Resource is in the process of being deleted.
+        - value: Succeeded
+          description: Resource is in healthy state after creation or update operation.
+        - value: Failed
+          description: Previous operation on the resource has failed leaving resource
+            in unhealthy state.
+        - value: Locked
+          description: The resource is locked and changes are currently blocked. This
+            could be due to maintenance or a scheduled operation. The state will go
+            back to succeeded once the locking operation has finished.
+    ResourceOperationError:
+      description: Error details of the latest operation failure on this resource
+      type: object
+      properties:
+        timestamp:
+          description: The datetime of when the error occured
+          type: string
+          format: date-time
+        code:
+          description: The code that corresponds to the type of operation failure
+          type: string
+        message:
+          description: The operation failure message
+          type: string
+        action:
+          description: The operation action that failed
+          type: string

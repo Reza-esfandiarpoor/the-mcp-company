@@ -1,0 +1,3428 @@
+openapi: 3.0.0
+info:
+  title: Open Energy Platform Management Service APIs
+  description: Open Energy Platform Management Service APIs
+  version: 2022-04-04-preview
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  /subscriptions/{subscriptionId}/providers/Microsoft.OpenEnergyPlatform/checkNameAvailability:
+    post:
+      tags:
+      - Locations
+      description: Checks the name availability of the resource with requested resource
+        name.
+      operationId: Locations_CheckNameAvailability
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: NameAvailabilityRequest object.
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: The name of the resource for which availability needs
+                    to be checked.
+                type:
+                  type: string
+                  description: The resource type.
+        description: NameAvailabilityRequest object.
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                description: The check availability result.
+                properties:
+                  nameAvailable:
+                    type: boolean
+                    description: Indicates if the resource name is available.
+                  reason:
+                    type: string
+                    description: The reason why the given name is not available.
+                    enum:
+                    - Invalid
+                    - AlreadyExists
+                    x-ms-enum:
+                      name: CheckNameAvailabilityReason
+                      modelAsString: true
+                  message:
+                    type: string
+                    description: Detailed reason why the given name is available.
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OpenEnergyPlatform/energyServices:
+    get:
+      tags:
+      - UserRPOepResource
+      description: Returns list of oep resources..
+      operationId: EnergyServices_ListByResourceGroup
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                description: The list of oep resources.
+                type: object
+                properties:
+                  nextLink:
+                    description: The link used to get the next page of oep resources
+                      list.
+                    type: string
+                  value:
+                    description: The list of oep resources.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                          readOnly: true
+                        name:
+                          type: string
+                          description: The name of the resource
+                          readOnly: true
+                        type:
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                          readOnly: true
+                        systemData:
+                          type: object
+                          description: Azure Resource Manager metadata containing
+                            createdBy and modifiedBy information.
+                          readOnly: true
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource last modification
+                                (UTC)
+                        properties:
+                          type: object
+                          properties:
+                            dnsName:
+                              type: string
+                              readOnly: true
+                            provisioningState:
+                              enum:
+                              - Unknown
+                              - Succeeded
+                              - Failed
+                              - Canceled
+                              - Creating
+                              - Deleting
+                              - Updating
+                              type: string
+                              readOnly: true
+                              x-ms-enum:
+                                name: ProvisioningState
+                                modelAsString: true
+                            authAppId:
+                              type: string
+                              readOnly: false
+                            dataPartitionNames:
+                              type: array
+                              items:
+                                type: object
+                                description: The list of Energy services resource's
+                                  Data Partition Names.
+                                properties:
+                                  name:
+                                    type: string
+                              x-ms-identifiers: []
+                        tags:
+                          description: Resource tags.
+                          type: object
+                          additionalProperties:
+                            type: string
+                        location:
+                          description: Geo-location where the resource lives.
+                          type: string
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                      required:
+                      - location
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /subscriptions/{subscriptionId}/providers/Microsoft.OpenEnergyPlatform/energyServices:
+    get:
+      tags:
+      - UserRPOepResource
+      description: Lists a collection of oep resources under the given Azure Subscription
+        ID.
+      operationId: EnergyServices_ListBySubscription
+      x-ms-pageable:
+        nextLinkName: nextLink
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Returned when the operation is successful.
+          content:
+            application/json:
+              schema:
+                description: The list of oep resources.
+                type: object
+                properties:
+                  nextLink:
+                    description: The link used to get the next page of oep resources
+                      list.
+                    type: string
+                  value:
+                    description: The list of oep resources.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                          readOnly: true
+                        name:
+                          type: string
+                          description: The name of the resource
+                          readOnly: true
+                        type:
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                          readOnly: true
+                        systemData:
+                          type: object
+                          description: Azure Resource Manager metadata containing
+                            createdBy and modifiedBy information.
+                          readOnly: true
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource last modification
+                                (UTC)
+                        properties:
+                          type: object
+                          properties:
+                            dnsName:
+                              type: string
+                              readOnly: true
+                            provisioningState:
+                              enum:
+                              - Unknown
+                              - Succeeded
+                              - Failed
+                              - Canceled
+                              - Creating
+                              - Deleting
+                              - Updating
+                              type: string
+                              readOnly: true
+                              x-ms-enum:
+                                name: ProvisioningState
+                                modelAsString: true
+                            authAppId:
+                              type: string
+                              readOnly: false
+                            dataPartitionNames:
+                              type: array
+                              items:
+                                type: object
+                                description: The list of Energy services resource's
+                                  Data Partition Names.
+                                properties:
+                                  name:
+                                    type: string
+                              x-ms-identifiers: []
+                        tags:
+                          description: Resource tags.
+                          type: object
+                          additionalProperties:
+                            type: string
+                        location:
+                          description: Geo-location where the resource lives.
+                          type: string
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                      required:
+                      - location
+        default:
+          x-nullable: false
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OpenEnergyPlatform/energyServices/{resourceName}
+  : get:
+      tags:
+      - UserRPOepResource
+      description: Returns oep resource for a given name.
+      operationId: EnergyServices_Get
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - in: path
+        name: resourceName
+        description: The resource name.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                    readOnly: true
+                  name:
+                    type: string
+                    description: The name of the resource
+                    readOnly: true
+                  type:
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                    readOnly: true
+                  systemData:
+                    type: object
+                    description: Azure Resource Manager metadata containing createdBy
+                      and modifiedBy information.
+                    readOnly: true
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    type: object
+                    properties:
+                      dnsName:
+                        type: string
+                        readOnly: true
+                      provisioningState:
+                        enum:
+                        - Unknown
+                        - Succeeded
+                        - Failed
+                        - Canceled
+                        - Creating
+                        - Deleting
+                        - Updating
+                        type: string
+                        readOnly: true
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: true
+                      authAppId:
+                        type: string
+                        readOnly: false
+                      dataPartitionNames:
+                        type: array
+                        items:
+                          type: object
+                          description: The list of Energy services resource's Data
+                            Partition Names.
+                          properties:
+                            name:
+                              type: string
+                        x-ms-identifiers: []
+                  tags:
+                    description: Resource tags.
+                    type: object
+                    additionalProperties:
+                      type: string
+                  location:
+                    description: Geo-location where the resource lives.
+                    type: string
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - location
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    put:
+      tags:
+      - UserRPOepResource
+      description: Method that gets called if subscribed for ResourceCreationBegin
+        trigger.
+      operationId: EnergyServices_Create
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: azure-async-operation
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - in: path
+        name: resourceName
+        description: The resource name.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: Fully qualified resource ID for the resource. Ex -
+                    /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  readOnly: true
+                name:
+                  type: string
+                  description: The name of the resource
+                  readOnly: true
+                type:
+                  type: string
+                  description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                    or "Microsoft.Storage/storageAccounts"
+                  readOnly: true
+                systemData:
+                  type: object
+                  description: Azure Resource Manager metadata containing createdBy
+                    and modifiedBy information.
+                  readOnly: true
+                  properties:
+                    createdBy:
+                      type: string
+                      description: The identity that created the resource.
+                    createdByType:
+                      type: string
+                      description: The type of identity that created the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource creation (UTC).
+                    lastModifiedBy:
+                      type: string
+                      description: The identity that last modified the resource.
+                    lastModifiedByType:
+                      type: string
+                      description: The type of identity that last modified the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    lastModifiedAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource last modification (UTC)
+                properties:
+                  type: object
+                  properties:
+                    dnsName:
+                      type: string
+                      readOnly: true
+                    provisioningState:
+                      enum:
+                      - Unknown
+                      - Succeeded
+                      - Failed
+                      - Canceled
+                      - Creating
+                      - Deleting
+                      - Updating
+                      type: string
+                      readOnly: true
+                      x-ms-enum:
+                        name: ProvisioningState
+                        modelAsString: true
+                    authAppId:
+                      type: string
+                      readOnly: false
+                    dataPartitionNames:
+                      type: array
+                      items:
+                        type: object
+                        description: The list of Energy services resource's Data Partition
+                          Names.
+                        properties:
+                          name:
+                            type: string
+                      x-ms-identifiers: []
+                tags:
+                  description: Resource tags.
+                  type: object
+                  additionalProperties:
+                    type: string
+                location:
+                  description: Geo-location where the resource lives.
+                  type: string
+              title: Resource
+              description: Common fields that are returned in the response for all
+                Azure Resource Manager resources
+              x-ms-azure-resource: true
+              required:
+              - location
+        description: Request body.
+      responses:
+        '200':
+          description: The OEP resource created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                    readOnly: true
+                  name:
+                    type: string
+                    description: The name of the resource
+                    readOnly: true
+                  type:
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                    readOnly: true
+                  systemData:
+                    type: object
+                    description: Azure Resource Manager metadata containing createdBy
+                      and modifiedBy information.
+                    readOnly: true
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    type: object
+                    properties:
+                      dnsName:
+                        type: string
+                        readOnly: true
+                      provisioningState:
+                        enum:
+                        - Unknown
+                        - Succeeded
+                        - Failed
+                        - Canceled
+                        - Creating
+                        - Deleting
+                        - Updating
+                        type: string
+                        readOnly: true
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: true
+                      authAppId:
+                        type: string
+                        readOnly: false
+                      dataPartitionNames:
+                        type: array
+                        items:
+                          type: object
+                          description: The list of Energy services resource's Data
+                            Partition Names.
+                          properties:
+                            name:
+                              type: string
+                        x-ms-identifiers: []
+                  tags:
+                    description: Resource tags.
+                    type: object
+                    additionalProperties:
+                      type: string
+                  location:
+                    description: Geo-location where the resource lives.
+                    type: string
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - location
+        '201':
+          description: The OEP resource will be created asynchronously
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                    readOnly: true
+                  name:
+                    type: string
+                    description: The name of the resource
+                    readOnly: true
+                  type:
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                    readOnly: true
+                  systemData:
+                    type: object
+                    description: Azure Resource Manager metadata containing createdBy
+                      and modifiedBy information.
+                    readOnly: true
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    type: object
+                    properties:
+                      dnsName:
+                        type: string
+                        readOnly: true
+                      provisioningState:
+                        enum:
+                        - Unknown
+                        - Succeeded
+                        - Failed
+                        - Canceled
+                        - Creating
+                        - Deleting
+                        - Updating
+                        type: string
+                        readOnly: true
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: true
+                      authAppId:
+                        type: string
+                        readOnly: false
+                      dataPartitionNames:
+                        type: array
+                        items:
+                          type: object
+                          description: The list of Energy services resource's Data
+                            Partition Names.
+                          properties:
+                            name:
+                              type: string
+                        x-ms-identifiers: []
+                  tags:
+                    description: Resource tags.
+                    type: object
+                    additionalProperties:
+                      type: string
+                  location:
+                    description: Geo-location where the resource lives.
+                    type: string
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - location
+        default:
+          description: Error response describing the reason for operation failure.
+            404 - NotFound (Confidential Ledger could not be created/updated)
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    patch:
+      operationId: EnergyServices_Update
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - in: path
+        name: resourceName
+        description: The resource name.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: The resource model definition used for updating a tracked
+                ARM resource.
+              type: object
+              properties:
+                tags:
+                  description: Resource tags.
+                  type: object
+                  additionalProperties:
+                    type: string
+      responses:
+        '200':
+          description: Updates the oep resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                    readOnly: true
+                  name:
+                    type: string
+                    description: The name of the resource
+                    readOnly: true
+                  type:
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                    readOnly: true
+                  systemData:
+                    type: object
+                    description: Azure Resource Manager metadata containing createdBy
+                      and modifiedBy information.
+                    readOnly: true
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    type: object
+                    properties:
+                      dnsName:
+                        type: string
+                        readOnly: true
+                      provisioningState:
+                        enum:
+                        - Unknown
+                        - Succeeded
+                        - Failed
+                        - Canceled
+                        - Creating
+                        - Deleting
+                        - Updating
+                        type: string
+                        readOnly: true
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: true
+                      authAppId:
+                        type: string
+                        readOnly: false
+                      dataPartitionNames:
+                        type: array
+                        items:
+                          type: object
+                          description: The list of Energy services resource's Data
+                            Partition Names.
+                          properties:
+                            name:
+                              type: string
+                        x-ms-identifiers: []
+                  tags:
+                    description: Resource tags.
+                    type: object
+                    additionalProperties:
+                      type: string
+                  location:
+                    description: Geo-location where the resource lives.
+                    type: string
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - location
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    delete:
+      description: Deletes oep resource
+      operationId: EnergyServices_Delete
+      x-ms-long-running-operation: true
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - in: path
+        name: resourceName
+        description: The resource name.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Success
+        '202':
+          description: The OEP resource will be deleted asynchronously
+        '204':
+          description: Returned when the operation returns no content.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OpenEnergyPlatform/energyServices/{resourceName}/addPartition
+  : post:
+      tags:
+      - OEPResourcePartition
+      description: Method that gets called if new partition is to be added in a resource.
+      operationId: EnergyServices_AddPartition
+      x-ms-long-running-operation: true
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - in: path
+        name: resourceName
+        description: The resource name.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Request body.
+              type: object
+              properties:
+                name:
+                  type: object
+                  description: The list of Energy services resource's Data Partition
+                    Names.
+                  properties:
+                    name:
+                      type: string
+        description: add partition action payload
+      responses:
+        '202':
+          description: The data partitions will be created asynchronously
+          content:
+            application/json:
+              schema:
+                description: Defines the partition add/ delete action properties.
+                type: object
+                properties:
+                  name:
+                    type: object
+                    description: The list of Energy services resource's Data Partition
+                      Names.
+                    properties:
+                      name:
+                        type: string
+        default:
+          description: Error response describing the reason for operation failure.
+            404 - NotFound (Confidential Ledger could not be created/updated)
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OpenEnergyPlatform/energyServices/{resourceName}/removePartition
+  : post:
+      tags:
+      - OEPResourcePartition
+      description: Method that gets called if new partition is to be removed from
+        a resource.
+      operationId: EnergyServices_RemovePartition
+      x-ms-long-running-operation: true
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - in: path
+        name: resourceName
+        description: The resource name.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Request body.
+              type: object
+              properties:
+                name:
+                  type: object
+                  description: The list of Energy services resource's Data Partition
+                    Names.
+                  properties:
+                    name:
+                      type: string
+        description: remove partition action payload
+      responses:
+        '202':
+          description: The data partitions will be deleted asynchronously
+          content:
+            application/json:
+              schema:
+                description: Defines the partition add/ delete action properties.
+                type: object
+                properties:
+                  name:
+                    type: object
+                    description: The list of Energy services resource's Data Partition
+                      Names.
+                    properties:
+                      name:
+                        type: string
+        default:
+          description: Error response describing the reason for operation failure.
+            404 - NotFound (Confidential Ledger could not be created/updated)
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.OpenEnergyPlatform/energyServices/{resourceName}/listPartitions
+  : post:
+      tags:
+      - OEPResourcePartition
+      description: Method that gets called when list of partitions is requested.
+      operationId: EnergyServices_ListPartitions
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - in: path
+        name: resourceName
+        description: The resource name.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of data partitions.
+                properties:
+                  dataPartitionInfo:
+                    type: array
+                    description: List of data partitions along with their properties
+                      in a given OEP resource.
+                    items:
+                      description: Defines the properties of an individual data partition.
+                      type: object
+                      properties:
+                        name:
+                          description: Name of the data partition
+                          type: string
+                        provisioningState:
+                          description: Name of the data partition
+                          type: string
+                    x-ms-identifiers: []
+        default:
+          description: Error response describing the reason for operation failure.
+            404 - NotFound (Confidential Ledger could not be created/updated)
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  /providers/Microsoft.OpenEnergyPlatform/operations:
+    get:
+      tags:
+      - Operations
+      description: Lists the available operations of Microsoft.OpenEnergyPlatform
+        resource provider.
+      operationId: Operations_List
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                description: A list of REST API operations supported by an Azure Resource
+                  Provider. It contains an URL link to get the next set of results.
+                properties:
+                  value:
+                    type: array
+                    description: List of operations supported by the resource provider
+                    items:
+                      type: object
+                      title: REST API Operation
+                      description: Details of a REST API operation, returned from
+                        the Resource Provider Operations API
+                      properties:
+                        name:
+                          type: string
+                          description: 'The name of the operation, as per Resource-Based
+                            Access Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write",
+                            "Microsoft.Compute/virtualMachines/capture/action"'
+                          readOnly: true
+                        isDataAction:
+                          type: boolean
+                          description: Whether the operation applies to data-plane.
+                            This is "true" for data-plane operations and "false" for
+                            ARM/control-plane operations.
+                          readOnly: true
+                        display:
+                          type: object
+                          description: Localized display information for this particular
+                            operation.
+                          properties:
+                            provider:
+                              type: string
+                              description: The localized friendly form of the resource
+                                provider name, e.g. "Microsoft Monitoring Insights"
+                                or "Microsoft Compute".
+                              readOnly: true
+                            resource:
+                              type: string
+                              description: The localized friendly name of the resource
+                                type related to this operation. E.g. "Virtual Machines"
+                                or "Job Schedule Collections".
+                              readOnly: true
+                            operation:
+                              type: string
+                              description: The concise, localized friendly name for
+                                the operation; suitable for dropdowns. E.g. "Create
+                                or Update Virtual Machine", "Restart Virtual Machine".
+                              readOnly: true
+                            description:
+                              type: string
+                              description: The short, localized friendly description
+                                of the operation; suitable for tool tips and detailed
+                                views.
+                              readOnly: true
+                        origin:
+                          type: string
+                          description: The intended executor of the operation; as
+                            in Resource Based Access Control (RBAC) and audit logs
+                            UX. Default value is "user,system"
+                          enum:
+                          - user
+                          - system
+                          - user,system
+                          x-ms-enum:
+                            name: Origin
+                            modelAsString: true
+                          readOnly: true
+                        actionType:
+                          type: string
+                          description: Enum. Indicates the action type. "Internal"
+                            refers to actions that are for internal only APIs.
+                          enum:
+                          - Internal
+                          x-ms-enum:
+                            name: ActionType
+                            modelAsString: true
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - name
+                  nextLink:
+                    type: string
+                    description: URL to get the next set of operation list results
+                      (if there are any).
+                    readOnly: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+components:
+  parameters:
+    DataPartitionIdParameter:
+      name: dataPartitionId
+      in: path
+      required: true
+      description: The data partition id.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      description: The name of the resource group. The name is case insensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    EnergyServiceList:
+      description: The list of oep resources.
+      type: object
+      properties:
+        nextLink:
+          description: The link used to get the next page of oep resources list.
+          type: string
+        value:
+          description: The list of oep resources.
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                readOnly: true
+              name:
+                type: string
+                description: The name of the resource
+                readOnly: true
+              type:
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+                readOnly: true
+              systemData:
+                type: object
+                description: Azure Resource Manager metadata containing createdBy
+                  and modifiedBy information.
+                readOnly: true
+                properties:
+                  createdBy:
+                    type: string
+                    description: The identity that created the resource.
+                  createdByType:
+                    type: string
+                    description: The type of identity that created the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource creation (UTC).
+                  lastModifiedBy:
+                    type: string
+                    description: The identity that last modified the resource.
+                  lastModifiedByType:
+                    type: string
+                    description: The type of identity that last modified the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  lastModifiedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource last modification (UTC)
+              properties:
+                type: object
+                properties:
+                  dnsName:
+                    type: string
+                    readOnly: true
+                  provisioningState:
+                    enum:
+                    - Unknown
+                    - Succeeded
+                    - Failed
+                    - Canceled
+                    - Creating
+                    - Deleting
+                    - Updating
+                    type: string
+                    readOnly: true
+                    x-ms-enum:
+                      name: ProvisioningState
+                      modelAsString: true
+                  authAppId:
+                    type: string
+                    readOnly: false
+                  dataPartitionNames:
+                    type: array
+                    items:
+                      type: object
+                      description: The list of Energy services resource's Data Partition
+                        Names.
+                      properties:
+                        name:
+                          type: string
+                    x-ms-identifiers: []
+              tags:
+                description: Resource tags.
+                type: object
+                additionalProperties:
+                  type: string
+              location:
+                description: Geo-location where the resource lives.
+                type: string
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+            required:
+            - location
+    DataPartitionsList:
+      type: object
+      description: List of data partitions
+      properties:
+        dataPartitionNames:
+          type: array
+          items:
+            type: object
+            description: The list of Energy services resource's Data Partition Names.
+            properties:
+              name:
+                type: string
+          x-ms-identifiers: []
+    DataPartitionNames:
+      type: object
+      description: The list of Energy services resource's Data Partition Names.
+      properties:
+        name:
+          type: string
+    DataPartitionAddOrRemoveRequest:
+      description: Defines the partition add/ delete action properties.
+      type: object
+      properties:
+        name:
+          type: object
+          description: The list of Energy services resource's Data Partition Names.
+          properties:
+            name:
+              type: string
+    DataPartitionProperties:
+      description: Defines the properties of an individual data partition.
+      type: object
+      properties:
+        name:
+          description: Name of the data partition
+          type: string
+        provisioningState:
+          description: Name of the data partition
+          type: string
+    DataPartitionsListResult:
+      type: object
+      description: List of data partitions.
+      properties:
+        dataPartitionInfo:
+          type: array
+          description: List of data partitions along with their properties in a given
+            OEP resource.
+          items:
+            description: Defines the properties of an individual data partition.
+            type: object
+            properties:
+              name:
+                description: Name of the data partition
+                type: string
+              provisioningState:
+                description: Name of the data partition
+                type: string
+          x-ms-identifiers: []
+    EnergyServiceProperties:
+      type: object
+      properties:
+        dnsName:
+          type: string
+          readOnly: true
+        provisioningState:
+          enum:
+          - Unknown
+          - Succeeded
+          - Failed
+          - Canceled
+          - Creating
+          - Deleting
+          - Updating
+          type: string
+          readOnly: true
+          x-ms-enum:
+            name: ProvisioningState
+            modelAsString: true
+        authAppId:
+          type: string
+          readOnly: false
+        dataPartitionNames:
+          type: array
+          items:
+            type: object
+            description: The list of Energy services resource's Data Partition Names.
+            properties:
+              name:
+                type: string
+          x-ms-identifiers: []
+    EnergyService:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          type: object
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+        properties:
+          type: object
+          properties:
+            dnsName:
+              type: string
+              readOnly: true
+            provisioningState:
+              enum:
+              - Unknown
+              - Succeeded
+              - Failed
+              - Canceled
+              - Creating
+              - Deleting
+              - Updating
+              type: string
+              readOnly: true
+              x-ms-enum:
+                name: ProvisioningState
+                modelAsString: true
+            authAppId:
+              type: string
+              readOnly: false
+            dataPartitionNames:
+              type: array
+              items:
+                type: object
+                description: The list of Energy services resource's Data Partition
+                  Names.
+                properties:
+                  name:
+                    type: string
+              x-ms-identifiers: []
+        tags:
+          description: Resource tags.
+          type: object
+          additionalProperties:
+            type: string
+        location:
+          description: Geo-location where the resource lives.
+          type: string
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+      required:
+      - location
+    EnergyResourceUpdate:
+      description: The resource model definition used for updating a tracked ARM resource.
+      type: object
+      properties:
+        tags:
+          description: Resource tags.
+          type: object
+          additionalProperties:
+            type: string
+    CheckNameAvailabilityRequest:
+      type: object
+      description: The check availability request body.
+      properties:
+        name:
+          type: string
+          description: The name of the resource for which availability needs to be
+            checked.
+        type:
+          type: string
+          description: The resource type.
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+    CheckNameAvailabilityResponse:
+      type: object
+      description: The check availability result.
+      properties:
+        nameAvailable:
+          type: boolean
+          description: Indicates if the resource name is available.
+        reason:
+          type: string
+          description: The reason why the given name is not available.
+          enum:
+          - Invalid
+          - AlreadyExists
+          x-ms-enum:
+            name: CheckNameAvailabilityReason
+            modelAsString: true
+        message:
+          type: string
+          description: Detailed reason why the given name is available.
+    systemData:
+      type: object
+      description: Metadata pertaining to creation and last modification of the resource.
+      properties:
+        createdBy:
+          type: string
+          description: The identity that created the resource.
+        createdByType:
+          type: string
+          description: The type of identity that created the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource creation (UTC).
+        lastModifiedBy:
+          type: string
+          description: The identity that last modified the resource.
+        lastModifiedByType:
+          type: string
+          description: The type of identity that last modified the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource last modification (UTC)
+      readOnly: true
+    Resource:
+      type: object
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      properties:
+        id:
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          type: object
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+      x-ms-azure-resource: true
+    Operation:
+      type: object
+      title: REST API Operation
+      description: Details of a REST API operation, returned from the Resource Provider
+        Operations API
+      properties:
+        name:
+          type: string
+          description: 'The name of the operation, as per Resource-Based Access Control
+            (RBAC). Examples: "Microsoft.Compute/virtualMachines/write", "Microsoft.Compute/virtualMachines/capture/action"'
+          readOnly: true
+        isDataAction:
+          type: boolean
+          description: Whether the operation applies to data-plane. This is "true"
+            for data-plane operations and "false" for ARM/control-plane operations.
+          readOnly: true
+        display:
+          type: object
+          description: Localized display information for this particular operation.
+          properties:
+            provider:
+              type: string
+              description: The localized friendly form of the resource provider name,
+                e.g. "Microsoft Monitoring Insights" or "Microsoft Compute".
+              readOnly: true
+            resource:
+              type: string
+              description: The localized friendly name of the resource type related
+                to this operation. E.g. "Virtual Machines" or "Job Schedule Collections".
+              readOnly: true
+            operation:
+              type: string
+              description: The concise, localized friendly name for the operation;
+                suitable for dropdowns. E.g. "Create or Update Virtual Machine", "Restart
+                Virtual Machine".
+              readOnly: true
+            description:
+              type: string
+              description: The short, localized friendly description of the operation;
+                suitable for tool tips and detailed views.
+              readOnly: true
+        origin:
+          type: string
+          description: The intended executor of the operation; as in Resource Based
+            Access Control (RBAC) and audit logs UX. Default value is "user,system"
+          enum:
+          - user
+          - system
+          - user,system
+          x-ms-enum:
+            name: Origin
+            modelAsString: true
+          readOnly: true
+        actionType:
+          type: string
+          description: Enum. Indicates the action type. "Internal" refers to actions
+            that are for internal only APIs.
+          enum:
+          - Internal
+          x-ms-enum:
+            name: ActionType
+            modelAsString: true
+          readOnly: true
+    OperationListResult:
+      type: object
+      description: A list of REST API operations supported by an Azure Resource Provider.
+        It contains an URL link to get the next set of results.
+      properties:
+        value:
+          type: array
+          description: List of operations supported by the resource provider
+          items:
+            type: object
+            title: REST API Operation
+            description: Details of a REST API operation, returned from the Resource
+              Provider Operations API
+            properties:
+              name:
+                type: string
+                description: 'The name of the operation, as per Resource-Based Access
+                  Control (RBAC). Examples: "Microsoft.Compute/virtualMachines/write",
+                  "Microsoft.Compute/virtualMachines/capture/action"'
+                readOnly: true
+              isDataAction:
+                type: boolean
+                description: Whether the operation applies to data-plane. This is
+                  "true" for data-plane operations and "false" for ARM/control-plane
+                  operations.
+                readOnly: true
+              display:
+                type: object
+                description: Localized display information for this particular operation.
+                properties:
+                  provider:
+                    type: string
+                    description: The localized friendly form of the resource provider
+                      name, e.g. "Microsoft Monitoring Insights" or "Microsoft Compute".
+                    readOnly: true
+                  resource:
+                    type: string
+                    description: The localized friendly name of the resource type
+                      related to this operation. E.g. "Virtual Machines" or "Job Schedule
+                      Collections".
+                    readOnly: true
+                  operation:
+                    type: string
+                    description: The concise, localized friendly name for the operation;
+                      suitable for dropdowns. E.g. "Create or Update Virtual Machine",
+                      "Restart Virtual Machine".
+                    readOnly: true
+                  description:
+                    type: string
+                    description: The short, localized friendly description of the
+                      operation; suitable for tool tips and detailed views.
+                    readOnly: true
+              origin:
+                type: string
+                description: The intended executor of the operation; as in Resource
+                  Based Access Control (RBAC) and audit logs UX. Default value is
+                  "user,system"
+                enum:
+                - user
+                - system
+                - user,system
+                x-ms-enum:
+                  name: Origin
+                  modelAsString: true
+                readOnly: true
+              actionType:
+                type: string
+                description: Enum. Indicates the action type. "Internal" refers to
+                  actions that are for internal only APIs.
+                enum:
+                - Internal
+                x-ms-enum:
+                  name: ActionType
+                  modelAsString: true
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers:
+          - name
+        nextLink:
+          type: string
+          description: URL to get the next set of operation list results (if there
+            are any).
+          readOnly: true

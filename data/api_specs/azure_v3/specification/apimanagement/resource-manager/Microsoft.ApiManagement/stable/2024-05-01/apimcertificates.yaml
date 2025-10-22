@@ -1,0 +1,2220 @@
+openapi: 3.0.0
+info:
+  title: ApiManagementClient
+  description: Use these REST APIs for performing operations on Certificate entity
+    in your Azure API Management deployment. Certificates can be used to setup mutual
+    authentication with your Backend in API Management. For more information refer
+    to [How to secure backend using Mutual Auth Certificate](https://docs.microsoft.com/en-us/azure/api-management/api-management-howto-mutual-certificates).
+  version: 2024-05-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/certificates
+  : get:
+      tags:
+      - Certificate
+      operationId: Certificate_ListByService
+      description: Lists a collection of all certificates in the specified service
+        instance.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: $filter
+        in: query
+        required: false
+        description: '|     Field     |     Usage     |     Supported operators     |     Supported
+          functions     |</br>|-------------|-------------|-------------|-------------|</br>|
+          name | filter | ge, le, eq, ne, gt, lt | substringof, contains, startswith,
+          endswith |</br>| subject | filter | ge, le, eq, ne, gt, lt | substringof,
+          contains, startswith, endswith |</br>| thumbprint | filter | ge, le, eq,
+          ne, gt, lt | substringof, contains, startswith, endswith |</br>| expirationDate
+          | filter | ge, le, eq, ne, gt, lt |     |</br>'
+        schema:
+          type: string
+      - name: $top
+        in: query
+        required: false
+        description: Number of records to return.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - name: $skip
+        in: query
+        required: false
+        description: Number of records to skip.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+      - name: isKeyVaultRefreshFailed
+        in: query
+        required: false
+        description: When set to true, the response contains only certificates entities
+          which failed refresh.
+        schema:
+          type: boolean
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Returns a collection of Certificate entity.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                        name:
+                          readOnly: true
+                          type: string
+                          description: The name of the resource
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                        properties:
+                          x-ms-client-flatten: true
+                          description: Certificate properties details.
+                          type: object
+                          properties:
+                            subject:
+                              type: string
+                              description: Subject attribute of the certificate.
+                            thumbprint:
+                              type: string
+                              description: Thumbprint of the certificate.
+                            expirationDate:
+                              type: string
+                              format: date-time
+                              description: 'Expiration date of the certificate. The
+                                date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                                as specified by the ISO 8601 standard.
+
+                                '
+                            keyVault:
+                              type: object
+                              properties:
+                                secretIdentifier:
+                                  type: string
+                                  description: Key vault secret identifier for fetching
+                                    secret. Providing a versioned secret will prevent
+                                    auto-refresh. This requires API Management service
+                                    to be configured with aka.ms/apimmsi
+                                identityClientId:
+                                  type: string
+                                  description: Null for SystemAssignedIdentity or
+                                    Client Id for UserAssignedIdentity , which will
+                                    be used to access key vault secret.
+                                lastStatus:
+                                  description: Last time sync and refresh status of
+                                    secret from key vault.
+                                  type: object
+                                  properties:
+                                    code:
+                                      type: string
+                                      description: Last status code for sync and refresh
+                                        of secret from key vault.
+                                    message:
+                                      type: string
+                                      description: Details of the error else empty.
+                                    timeStampUtc:
+                                      type: string
+                                      format: date-time
+                                      description: 'Last time secret was accessed.
+                                        The date conforms to the following format:
+                                        `yyyy-MM-ddTHH:mm:ssZ` as specified by the
+                                        ISO 8601 standard.
+
+                                        '
+                              description: Create keyVault contract details.
+                          required:
+                          - subject
+                          - thumbprint
+                          - expirationDate
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                    description: Page values.
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                  nextLink:
+                    type: string
+                    description: Next page link if any.
+                description: Paged Certificates list representation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+      x-ms-odata: ./definitions.json#/definitions/CertificateContract
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/certificates/{certificateId}
+  : head:
+      tags:
+      - Certificate
+      operationId: Certificate_GetEntityTag
+      description: Gets the entity state (Etag) version of the certificate specified
+        by its identifier.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: certificateId
+        in: path
+        required: true
+        description: Identifier of the certificate entity. Must be unique in the current
+          API Management service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+          pattern: ^[^*#&+:<>?]+$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Specified certificate entity exists and current entity state
+            version is present in the ETag header.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    get:
+      tags:
+      - Certificate
+      operationId: Certificate_Get
+      description: Gets the details of the certificate specified by its identifier.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: certificateId
+        in: path
+        required: true
+        description: Identifier of the certificate entity. Must be unique in the current
+          API Management service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+          pattern: ^[^*#&+:<>?]+$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The response body contains the specified Certificate entity.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Certificate properties details.
+                    type: object
+                    properties:
+                      subject:
+                        type: string
+                        description: Subject attribute of the certificate.
+                      thumbprint:
+                        type: string
+                        description: Thumbprint of the certificate.
+                      expirationDate:
+                        type: string
+                        format: date-time
+                        description: 'Expiration date of the certificate. The date
+                          conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                          as specified by the ISO 8601 standard.
+
+                          '
+                      keyVault:
+                        type: object
+                        properties:
+                          secretIdentifier:
+                            type: string
+                            description: Key vault secret identifier for fetching
+                              secret. Providing a versioned secret will prevent auto-refresh.
+                              This requires API Management service to be configured
+                              with aka.ms/apimmsi
+                          identityClientId:
+                            type: string
+                            description: Null for SystemAssignedIdentity or Client
+                              Id for UserAssignedIdentity , which will be used to
+                              access key vault secret.
+                          lastStatus:
+                            description: Last time sync and refresh status of secret
+                              from key vault.
+                            type: object
+                            properties:
+                              code:
+                                type: string
+                                description: Last status code for sync and refresh
+                                  of secret from key vault.
+                              message:
+                                type: string
+                                description: Details of the error else empty.
+                              timeStampUtc:
+                                type: string
+                                format: date-time
+                                description: 'Last time secret was accessed. The date
+                                  conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                                  as specified by the ISO 8601 standard.
+
+                                  '
+                        description: Create keyVault contract details.
+                    required:
+                    - subject
+                    - thumbprint
+                    - expirationDate
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    put:
+      tags:
+      - Certificate
+      operationId: Certificate_CreateOrUpdate
+      description: Creates or updates the certificate being used for authentication
+        with the backend.
+      externalDocs:
+        description: How to secure back-end services using client certificate authentication
+          in Azure API Management
+        url: https://azure.microsoft.com/en-us/documentation/articles/api-management-howto-mutual-certificates/
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: certificateId
+        in: path
+        required: true
+        description: Identifier of the certificate entity. Must be unique in the current
+          API Management service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+          pattern: ^[^*#&+:<>?]+$
+      - name: If-Match
+        in: header
+        required: false
+        description: ETag of the Entity. Not required when creating an entity, but
+          required when updating an entity.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                properties:
+                  x-ms-client-flatten: true
+                  description: Certificate create or update properties details.
+                  type: object
+                  properties:
+                    data:
+                      type: string
+                      description: Base 64 encoded certificate using the application/x-pkcs12
+                        representation.
+                    password:
+                      type: string
+                      description: Password for the Certificate
+                    keyVault:
+                      description: KeyVault location details of the certificate.
+                      type: object
+                      properties:
+                        secretIdentifier:
+                          type: string
+                          description: Key vault secret identifier for fetching secret.
+                            Providing a versioned secret will prevent auto-refresh.
+                            This requires API Management service to be configured
+                            with aka.ms/apimmsi
+                        identityClientId:
+                          type: string
+                          description: Null for SystemAssignedIdentity or Client Id
+                            for UserAssignedIdentity , which will be used to access
+                            key vault secret.
+              description: Certificate create or update details.
+        description: Create or Update parameters.
+        required: true
+      responses:
+        '200':
+          description: The certificate details were successfully updated.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Certificate properties details.
+                    type: object
+                    properties:
+                      subject:
+                        type: string
+                        description: Subject attribute of the certificate.
+                      thumbprint:
+                        type: string
+                        description: Thumbprint of the certificate.
+                      expirationDate:
+                        type: string
+                        format: date-time
+                        description: 'Expiration date of the certificate. The date
+                          conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                          as specified by the ISO 8601 standard.
+
+                          '
+                      keyVault:
+                        type: object
+                        properties:
+                          secretIdentifier:
+                            type: string
+                            description: Key vault secret identifier for fetching
+                              secret. Providing a versioned secret will prevent auto-refresh.
+                              This requires API Management service to be configured
+                              with aka.ms/apimmsi
+                          identityClientId:
+                            type: string
+                            description: Null for SystemAssignedIdentity or Client
+                              Id for UserAssignedIdentity , which will be used to
+                              access key vault secret.
+                          lastStatus:
+                            description: Last time sync and refresh status of secret
+                              from key vault.
+                            type: object
+                            properties:
+                              code:
+                                type: string
+                                description: Last status code for sync and refresh
+                                  of secret from key vault.
+                              message:
+                                type: string
+                                description: Details of the error else empty.
+                              timeStampUtc:
+                                type: string
+                                format: date-time
+                                description: 'Last time secret was accessed. The date
+                                  conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                                  as specified by the ISO 8601 standard.
+
+                                  '
+                        description: Create keyVault contract details.
+                    required:
+                    - subject
+                    - thumbprint
+                    - expirationDate
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        '201':
+          description: The new certificate was successfully added.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Certificate properties details.
+                    type: object
+                    properties:
+                      subject:
+                        type: string
+                        description: Subject attribute of the certificate.
+                      thumbprint:
+                        type: string
+                        description: Thumbprint of the certificate.
+                      expirationDate:
+                        type: string
+                        format: date-time
+                        description: 'Expiration date of the certificate. The date
+                          conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                          as specified by the ISO 8601 standard.
+
+                          '
+                      keyVault:
+                        type: object
+                        properties:
+                          secretIdentifier:
+                            type: string
+                            description: Key vault secret identifier for fetching
+                              secret. Providing a versioned secret will prevent auto-refresh.
+                              This requires API Management service to be configured
+                              with aka.ms/apimmsi
+                          identityClientId:
+                            type: string
+                            description: Null for SystemAssignedIdentity or Client
+                              Id for UserAssignedIdentity , which will be used to
+                              access key vault secret.
+                          lastStatus:
+                            description: Last time sync and refresh status of secret
+                              from key vault.
+                            type: object
+                            properties:
+                              code:
+                                type: string
+                                description: Last status code for sync and refresh
+                                  of secret from key vault.
+                              message:
+                                type: string
+                                description: Details of the error else empty.
+                              timeStampUtc:
+                                type: string
+                                format: date-time
+                                description: 'Last time secret was accessed. The date
+                                  conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                                  as specified by the ISO 8601 standard.
+
+                                  '
+                        description: Create keyVault contract details.
+                    required:
+                    - subject
+                    - thumbprint
+                    - expirationDate
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    delete:
+      tags:
+      - Certificate
+      operationId: Certificate_Delete
+      description: Deletes specific certificate.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: certificateId
+        in: path
+        required: true
+        description: Identifier of the certificate entity. Must be unique in the current
+          API Management service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+          pattern: ^[^*#&+:<>?]+$
+      - name: If-Match
+        in: header
+        required: true
+        description: ETag of the Entity. ETag should match the current entity state
+          from the header response of the GET request or it should be * for unconditional
+          update.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The certificate was successfully deleted.
+        '204':
+          description: The certificate was successfully deleted.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/certificates/{certificateId}/refreshSecret
+  : post:
+      tags:
+      - Certificate
+      operationId: Certificate_RefreshSecret
+      description: From KeyVault, Refresh the certificate being used for authentication
+        with the backend.
+      externalDocs:
+        description: How to secure back-end services using client certificate authentication
+          in Azure API Management
+        url: https://azure.microsoft.com/en-us/documentation/articles/api-management-howto-mutual-certificates/
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: certificateId
+        in: path
+        required: true
+        description: Identifier of the certificate entity. Must be unique in the current
+          API Management service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+          pattern: ^[^*#&+:<>?]+$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The certificate details were successfully updated.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Certificate properties details.
+                    type: object
+                    properties:
+                      subject:
+                        type: string
+                        description: Subject attribute of the certificate.
+                      thumbprint:
+                        type: string
+                        description: Thumbprint of the certificate.
+                      expirationDate:
+                        type: string
+                        format: date-time
+                        description: 'Expiration date of the certificate. The date
+                          conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                          as specified by the ISO 8601 standard.
+
+                          '
+                      keyVault:
+                        type: object
+                        properties:
+                          secretIdentifier:
+                            type: string
+                            description: Key vault secret identifier for fetching
+                              secret. Providing a versioned secret will prevent auto-refresh.
+                              This requires API Management service to be configured
+                              with aka.ms/apimmsi
+                          identityClientId:
+                            type: string
+                            description: Null for SystemAssignedIdentity or Client
+                              Id for UserAssignedIdentity , which will be used to
+                              access key vault secret.
+                          lastStatus:
+                            description: Last time sync and refresh status of secret
+                              from key vault.
+                            type: object
+                            properties:
+                              code:
+                                type: string
+                                description: Last status code for sync and refresh
+                                  of secret from key vault.
+                              message:
+                                type: string
+                                description: Details of the error else empty.
+                              timeStampUtc:
+                                type: string
+                                format: date-time
+                                description: 'Last time secret was accessed. The date
+                                  conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                                  as specified by the ISO 8601 standard.
+
+                                  '
+                        description: Create keyVault contract details.
+                    required:
+                    - subject
+                    - thumbprint
+                    - expirationDate
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+components:
+  parameters:
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      description: The name of the resource group. The name is case insensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    ServiceNameParameter:
+      name: serviceName
+      in: path
+      required: true
+      description: The name of the API Management service.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 50
+        pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+    TopQueryParameter:
+      name: $top
+      in: query
+      required: false
+      description: Number of records to return.
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+    SkipQueryParameter:
+      name: $skip
+      in: query
+      required: false
+      description: Number of records to skip.
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription. The value must be an UUID.
+      required: true
+      schema:
+        type: string
+        format: uuid
+    CertificateIdParameter:
+      name: certificateId
+      in: path
+      required: true
+      description: Identifier of the certificate entity. Must be unique in the current
+        API Management service instance.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 80
+        pattern: ^[^*#&+:<>?]+$
+    IfMatchOptionalParameter:
+      name: If-Match
+      in: header
+      required: false
+      description: ETag of the Entity. Not required when creating an entity, but required
+        when updating an entity.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    IfMatchRequiredParameter:
+      name: If-Match
+      in: header
+      required: true
+      description: ETag of the Entity. ETag should match the current entity state
+        from the header response of the GET request or it should be * for unconditional
+        update.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+    Resource:
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    KeyVaultContractCreateProperties:
+      type: object
+      properties:
+        secretIdentifier:
+          type: string
+          description: Key vault secret identifier for fetching secret. Providing
+            a versioned secret will prevent auto-refresh. This requires API Management
+            service to be configured with aka.ms/apimmsi
+        identityClientId:
+          type: string
+          description: Null for SystemAssignedIdentity or Client Id for UserAssignedIdentity
+            , which will be used to access key vault secret.
+      description: Create keyVault contract details.
+    KeyVaultLastAccessStatusContractProperties:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Last status code for sync and refresh of secret from key vault.
+        message:
+          type: string
+          description: Details of the error else empty.
+        timeStampUtc:
+          type: string
+          format: date-time
+          description: 'Last time secret was accessed. The date conforms to the following
+            format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601 standard.
+
+            '
+      description: Issue contract Update Properties.
+    KeyVaultContractProperties:
+      type: object
+      properties:
+        secretIdentifier:
+          type: string
+          description: Key vault secret identifier for fetching secret. Providing
+            a versioned secret will prevent auto-refresh. This requires API Management
+            service to be configured with aka.ms/apimmsi
+        identityClientId:
+          type: string
+          description: Null for SystemAssignedIdentity or Client Id for UserAssignedIdentity
+            , which will be used to access key vault secret.
+        lastStatus:
+          description: Last time sync and refresh status of secret from key vault.
+          type: object
+          properties:
+            code:
+              type: string
+              description: Last status code for sync and refresh of secret from key
+                vault.
+            message:
+              type: string
+              description: Details of the error else empty.
+            timeStampUtc:
+              type: string
+              format: date-time
+              description: 'Last time secret was accessed. The date conforms to the
+                following format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601
+                standard.
+
+                '
+      description: Create keyVault contract details.
+    CertificateContractProperties:
+      type: object
+      properties:
+        subject:
+          type: string
+          description: Subject attribute of the certificate.
+        thumbprint:
+          type: string
+          description: Thumbprint of the certificate.
+        expirationDate:
+          type: string
+          format: date-time
+          description: 'Expiration date of the certificate. The date conforms to the
+            following format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601
+            standard.
+
+            '
+        keyVault:
+          type: object
+          properties:
+            secretIdentifier:
+              type: string
+              description: Key vault secret identifier for fetching secret. Providing
+                a versioned secret will prevent auto-refresh. This requires API Management
+                service to be configured with aka.ms/apimmsi
+            identityClientId:
+              type: string
+              description: Null for SystemAssignedIdentity or Client Id for UserAssignedIdentity
+                , which will be used to access key vault secret.
+            lastStatus:
+              description: Last time sync and refresh status of secret from key vault.
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: Last status code for sync and refresh of secret from
+                    key vault.
+                message:
+                  type: string
+                  description: Details of the error else empty.
+                timeStampUtc:
+                  type: string
+                  format: date-time
+                  description: 'Last time secret was accessed. The date conforms to
+                    the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the
+                    ISO 8601 standard.
+
+                    '
+          description: Create keyVault contract details.
+      required:
+      - subject
+      - thumbprint
+      - expirationDate
+      description: Properties of the Certificate contract.
+    CertificateContract:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        properties:
+          x-ms-client-flatten: true
+          description: Certificate properties details.
+          type: object
+          properties:
+            subject:
+              type: string
+              description: Subject attribute of the certificate.
+            thumbprint:
+              type: string
+              description: Thumbprint of the certificate.
+            expirationDate:
+              type: string
+              format: date-time
+              description: 'Expiration date of the certificate. The date conforms
+                to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the
+                ISO 8601 standard.
+
+                '
+            keyVault:
+              type: object
+              properties:
+                secretIdentifier:
+                  type: string
+                  description: Key vault secret identifier for fetching secret. Providing
+                    a versioned secret will prevent auto-refresh. This requires API
+                    Management service to be configured with aka.ms/apimmsi
+                identityClientId:
+                  type: string
+                  description: Null for SystemAssignedIdentity or Client Id for UserAssignedIdentity
+                    , which will be used to access key vault secret.
+                lastStatus:
+                  description: Last time sync and refresh status of secret from key
+                    vault.
+                  type: object
+                  properties:
+                    code:
+                      type: string
+                      description: Last status code for sync and refresh of secret
+                        from key vault.
+                    message:
+                      type: string
+                      description: Details of the error else empty.
+                    timeStampUtc:
+                      type: string
+                      format: date-time
+                      description: 'Last time secret was accessed. The date conforms
+                        to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                        by the ISO 8601 standard.
+
+                        '
+              description: Create keyVault contract details.
+          required:
+          - subject
+          - thumbprint
+          - expirationDate
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    CertificateCollection:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+              name:
+                readOnly: true
+                type: string
+                description: The name of the resource
+              type:
+                readOnly: true
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+              properties:
+                x-ms-client-flatten: true
+                description: Certificate properties details.
+                type: object
+                properties:
+                  subject:
+                    type: string
+                    description: Subject attribute of the certificate.
+                  thumbprint:
+                    type: string
+                    description: Thumbprint of the certificate.
+                  expirationDate:
+                    type: string
+                    format: date-time
+                    description: 'Expiration date of the certificate. The date conforms
+                      to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                      by the ISO 8601 standard.
+
+                      '
+                  keyVault:
+                    type: object
+                    properties:
+                      secretIdentifier:
+                        type: string
+                        description: Key vault secret identifier for fetching secret.
+                          Providing a versioned secret will prevent auto-refresh.
+                          This requires API Management service to be configured with
+                          aka.ms/apimmsi
+                      identityClientId:
+                        type: string
+                        description: Null for SystemAssignedIdentity or Client Id
+                          for UserAssignedIdentity , which will be used to access
+                          key vault secret.
+                      lastStatus:
+                        description: Last time sync and refresh status of secret from
+                          key vault.
+                        type: object
+                        properties:
+                          code:
+                            type: string
+                            description: Last status code for sync and refresh of
+                              secret from key vault.
+                          message:
+                            type: string
+                            description: Details of the error else empty.
+                          timeStampUtc:
+                            type: string
+                            format: date-time
+                            description: 'Last time secret was accessed. The date
+                              conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                              as specified by the ISO 8601 standard.
+
+                              '
+                    description: Create keyVault contract details.
+                required:
+                - subject
+                - thumbprint
+                - expirationDate
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+          description: Page values.
+        count:
+          type: integer
+          format: int64
+          description: Total record count number across all pages.
+        nextLink:
+          type: string
+          description: Next page link if any.
+      description: Paged Certificates list representation.
+    CertificateCreateOrUpdateProperties:
+      type: object
+      properties:
+        data:
+          type: string
+          description: Base 64 encoded certificate using the application/x-pkcs12
+            representation.
+        password:
+          type: string
+          description: Password for the Certificate
+        keyVault:
+          description: KeyVault location details of the certificate.
+          type: object
+          properties:
+            secretIdentifier:
+              type: string
+              description: Key vault secret identifier for fetching secret. Providing
+                a versioned secret will prevent auto-refresh. This requires API Management
+                service to be configured with aka.ms/apimmsi
+            identityClientId:
+              type: string
+              description: Null for SystemAssignedIdentity or Client Id for UserAssignedIdentity
+                , which will be used to access key vault secret.
+      description: Parameters supplied to the CreateOrUpdate certificate operation.
+    CertificateCreateOrUpdateParameters:
+      type: object
+      properties:
+        properties:
+          x-ms-client-flatten: true
+          description: Certificate create or update properties details.
+          type: object
+          properties:
+            data:
+              type: string
+              description: Base 64 encoded certificate using the application/x-pkcs12
+                representation.
+            password:
+              type: string
+              description: Password for the Certificate
+            keyVault:
+              description: KeyVault location details of the certificate.
+              type: object
+              properties:
+                secretIdentifier:
+                  type: string
+                  description: Key vault secret identifier for fetching secret. Providing
+                    a versioned secret will prevent auto-refresh. This requires API
+                    Management service to be configured with aka.ms/apimmsi
+                identityClientId:
+                  type: string
+                  description: Null for SystemAssignedIdentity or Client Id for UserAssignedIdentity
+                    , which will be used to access key vault secret.
+      description: Certificate create or update details.

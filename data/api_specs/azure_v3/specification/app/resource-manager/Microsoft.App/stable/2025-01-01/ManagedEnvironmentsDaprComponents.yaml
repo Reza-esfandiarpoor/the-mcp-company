@@ -1,0 +1,1734 @@
+openapi: 3.0.0
+info:
+  version: 2025-01-01
+  title: ContainerApps API Client
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/managedEnvironments/{environmentName}/daprComponents
+  : get:
+      tags:
+      - DaprComponents
+      summary: Get the Dapr Components for a managed environment.
+      operationId: DaprComponents_List
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: environmentName
+        in: path
+        description: Name of the Managed Environment.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Dapr Components ARM resource.
+                required:
+                - value
+                type: object
+                properties:
+                  value:
+                    description: Collection of resources.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: arm-id
+                          description: Fully qualified resource ID for the resource.
+                            E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                          readOnly: true
+                        name:
+                          type: string
+                          description: The name of the resource
+                          readOnly: true
+                        type:
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                          readOnly: true
+                        systemData:
+                          description: Azure Resource Manager metadata containing
+                            createdBy and modifiedBy information.
+                          readOnly: true
+                          type: object
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource last modification
+                                (UTC)
+                        properties:
+                          description: Dapr Component resource specific properties
+                          type: object
+                          properties:
+                            componentType:
+                              description: Component type
+                              type: string
+                            version:
+                              description: Component version
+                              type: string
+                            ignoreErrors:
+                              description: Boolean describing if the component errors
+                                are ignores
+                              type: boolean
+                              default: false
+                            initTimeout:
+                              description: Initialization timeout
+                              type: string
+                            secrets:
+                              description: Collection of secrets used by a Dapr component
+                              type: array
+                              items:
+                                description: Secret definition.
+                                type: object
+                                properties:
+                                  name:
+                                    description: Secret Name.
+                                    type: string
+                                  value:
+                                    description: Secret Value.
+                                    type: string
+                                    x-ms-mutability:
+                                    - create
+                                    - update
+                                    x-ms-secret: true
+                                  identity:
+                                    description: Resource ID of a managed identity
+                                      to authenticate with Azure Key Vault, or System
+                                      to use a system-assigned identity.
+                                    type: string
+                                  keyVaultUrl:
+                                    description: Azure Key Vault URL pointing to the
+                                      secret referenced by the container app.
+                                    type: string
+                              x-ms-identifiers:
+                              - name
+                            secretStoreComponent:
+                              description: Name of a Dapr component to retrieve component
+                                secrets from
+                              type: string
+                            metadata:
+                              description: Component metadata
+                              type: array
+                              items:
+                                description: Dapr component metadata.
+                                type: object
+                                properties:
+                                  name:
+                                    description: Metadata property name.
+                                    type: string
+                                  value:
+                                    description: Metadata property value.
+                                    type: string
+                                  secretRef:
+                                    description: Name of the Dapr Component secret
+                                      from which to pull the metadata property value.
+                                    type: string
+                              x-ms-identifiers:
+                              - name
+                            scopes:
+                              description: Names of container apps that can use this
+                                Dapr component
+                              type: array
+                              items:
+                                type: string
+                          x-ms-client-flatten: true
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                  nextLink:
+                    description: Link to next page of resources.
+                    type: string
+                    readOnly: true
+        default:
+          description: Common error response.
+          content:
+            application/json:
+              schema:
+                description: App Service error response.
+                type: object
+                properties:
+                  error:
+                    description: Error model.
+                    type: object
+                    properties:
+                      code:
+                        description: Standardized string to programmatically identify
+                          the error.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Detailed error description and debugging information.
+                        type: string
+                        readOnly: true
+                      target:
+                        description: Detailed error description and debugging information.
+                        type: string
+                        readOnly: true
+                      details:
+                        type: array
+                        description: Details or the error
+                        items:
+                          description: Detailed errors.
+                          type: object
+                          properties:
+                            code:
+                              description: Standardized string to programmatically
+                                identify the error.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Detailed error description and debugging
+                                information.
+                              type: string
+                              readOnly: true
+                            target:
+                              description: Detailed error description and debugging
+                                information.
+                              type: string
+                              readOnly: true
+                          readOnly: true
+                        x-ms-identifiers:
+                        - code
+                      innererror:
+                        description: More information to debug error.
+                        type: string
+                        readOnly: true
+                    readOnly: true
+      x-ms-pageable:
+        nextLinkName: nextLink
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/managedEnvironments/{environmentName}/daprComponents/{componentName}
+  : get:
+      tags:
+      - DaprComponents
+      summary: Get a dapr component.
+      operationId: DaprComponents_Get
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: environmentName
+        in: path
+        description: Name of the Managed Environment.
+        required: true
+        schema:
+          type: string
+      - name: componentName
+        in: path
+        description: Name of the Dapr Component.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: arm-id
+                    description: Fully qualified resource ID for the resource. E.g.
+                      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                    readOnly: true
+                  name:
+                    type: string
+                    description: The name of the resource
+                    readOnly: true
+                  type:
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                    readOnly: true
+                  systemData:
+                    description: Azure Resource Manager metadata containing createdBy
+                      and modifiedBy information.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    description: Dapr Component resource specific properties
+                    type: object
+                    properties:
+                      componentType:
+                        description: Component type
+                        type: string
+                      version:
+                        description: Component version
+                        type: string
+                      ignoreErrors:
+                        description: Boolean describing if the component errors are
+                          ignores
+                        type: boolean
+                        default: false
+                      initTimeout:
+                        description: Initialization timeout
+                        type: string
+                      secrets:
+                        description: Collection of secrets used by a Dapr component
+                        type: array
+                        items:
+                          description: Secret definition.
+                          type: object
+                          properties:
+                            name:
+                              description: Secret Name.
+                              type: string
+                            value:
+                              description: Secret Value.
+                              type: string
+                              x-ms-mutability:
+                              - create
+                              - update
+                              x-ms-secret: true
+                            identity:
+                              description: Resource ID of a managed identity to authenticate
+                                with Azure Key Vault, or System to use a system-assigned
+                                identity.
+                              type: string
+                            keyVaultUrl:
+                              description: Azure Key Vault URL pointing to the secret
+                                referenced by the container app.
+                              type: string
+                        x-ms-identifiers:
+                        - name
+                      secretStoreComponent:
+                        description: Name of a Dapr component to retrieve component
+                          secrets from
+                        type: string
+                      metadata:
+                        description: Component metadata
+                        type: array
+                        items:
+                          description: Dapr component metadata.
+                          type: object
+                          properties:
+                            name:
+                              description: Metadata property name.
+                              type: string
+                            value:
+                              description: Metadata property value.
+                              type: string
+                            secretRef:
+                              description: Name of the Dapr Component secret from
+                                which to pull the metadata property value.
+                              type: string
+                        x-ms-identifiers:
+                        - name
+                      scopes:
+                        description: Names of container apps that can use this Dapr
+                          component
+                        type: array
+                        items:
+                          type: string
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Common error response.
+          content:
+            application/json:
+              schema:
+                description: App Service error response.
+                type: object
+                properties:
+                  error:
+                    description: Error model.
+                    type: object
+                    properties:
+                      code:
+                        description: Standardized string to programmatically identify
+                          the error.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Detailed error description and debugging information.
+                        type: string
+                        readOnly: true
+                      target:
+                        description: Detailed error description and debugging information.
+                        type: string
+                        readOnly: true
+                      details:
+                        type: array
+                        description: Details or the error
+                        items:
+                          description: Detailed errors.
+                          type: object
+                          properties:
+                            code:
+                              description: Standardized string to programmatically
+                                identify the error.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Detailed error description and debugging
+                                information.
+                              type: string
+                              readOnly: true
+                            target:
+                              description: Detailed error description and debugging
+                                information.
+                              type: string
+                              readOnly: true
+                          readOnly: true
+                        x-ms-identifiers:
+                        - code
+                      innererror:
+                        description: More information to debug error.
+                        type: string
+                        readOnly: true
+                    readOnly: true
+    put:
+      tags:
+      - DaprComponents
+      summary: Creates or updates a Dapr Component.
+      description: Creates or updates a Dapr Component in a Managed Environment.
+      operationId: DaprComponents_CreateOrUpdate
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: environmentName
+        in: path
+        description: Name of the Managed Environment.
+        required: true
+        schema:
+          type: string
+      - name: componentName
+        in: path
+        description: Name of the Dapr Component.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: arm-id
+                  description: Fully qualified resource ID for the resource. E.g.
+                    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                  readOnly: true
+                name:
+                  type: string
+                  description: The name of the resource
+                  readOnly: true
+                type:
+                  type: string
+                  description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                    or "Microsoft.Storage/storageAccounts"
+                  readOnly: true
+                systemData:
+                  description: Azure Resource Manager metadata containing createdBy
+                    and modifiedBy information.
+                  readOnly: true
+                  type: object
+                  properties:
+                    createdBy:
+                      type: string
+                      description: The identity that created the resource.
+                    createdByType:
+                      type: string
+                      description: The type of identity that created the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource creation (UTC).
+                    lastModifiedBy:
+                      type: string
+                      description: The identity that last modified the resource.
+                    lastModifiedByType:
+                      type: string
+                      description: The type of identity that last modified the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    lastModifiedAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource last modification (UTC)
+                properties:
+                  description: Dapr Component resource specific properties
+                  type: object
+                  properties:
+                    componentType:
+                      description: Component type
+                      type: string
+                    version:
+                      description: Component version
+                      type: string
+                    ignoreErrors:
+                      description: Boolean describing if the component errors are
+                        ignores
+                      type: boolean
+                      default: false
+                    initTimeout:
+                      description: Initialization timeout
+                      type: string
+                    secrets:
+                      description: Collection of secrets used by a Dapr component
+                      type: array
+                      items:
+                        description: Secret definition.
+                        type: object
+                        properties:
+                          name:
+                            description: Secret Name.
+                            type: string
+                          value:
+                            description: Secret Value.
+                            type: string
+                            x-ms-mutability:
+                            - create
+                            - update
+                            x-ms-secret: true
+                          identity:
+                            description: Resource ID of a managed identity to authenticate
+                              with Azure Key Vault, or System to use a system-assigned
+                              identity.
+                            type: string
+                          keyVaultUrl:
+                            description: Azure Key Vault URL pointing to the secret
+                              referenced by the container app.
+                            type: string
+                      x-ms-identifiers:
+                      - name
+                    secretStoreComponent:
+                      description: Name of a Dapr component to retrieve component
+                        secrets from
+                      type: string
+                    metadata:
+                      description: Component metadata
+                      type: array
+                      items:
+                        description: Dapr component metadata.
+                        type: object
+                        properties:
+                          name:
+                            description: Metadata property name.
+                            type: string
+                          value:
+                            description: Metadata property value.
+                            type: string
+                          secretRef:
+                            description: Name of the Dapr Component secret from which
+                              to pull the metadata property value.
+                            type: string
+                      x-ms-identifiers:
+                      - name
+                    scopes:
+                      description: Names of container apps that can use this Dapr
+                        component
+                      type: array
+                      items:
+                        type: string
+                  x-ms-client-flatten: true
+              title: Resource
+              description: Common fields that are returned in the response for all
+                Azure Resource Manager resources
+              x-ms-azure-resource: true
+        description: Configuration details of the Dapr Component.
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: arm-id
+                    description: Fully qualified resource ID for the resource. E.g.
+                      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                    readOnly: true
+                  name:
+                    type: string
+                    description: The name of the resource
+                    readOnly: true
+                  type:
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                    readOnly: true
+                  systemData:
+                    description: Azure Resource Manager metadata containing createdBy
+                      and modifiedBy information.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    description: Dapr Component resource specific properties
+                    type: object
+                    properties:
+                      componentType:
+                        description: Component type
+                        type: string
+                      version:
+                        description: Component version
+                        type: string
+                      ignoreErrors:
+                        description: Boolean describing if the component errors are
+                          ignores
+                        type: boolean
+                        default: false
+                      initTimeout:
+                        description: Initialization timeout
+                        type: string
+                      secrets:
+                        description: Collection of secrets used by a Dapr component
+                        type: array
+                        items:
+                          description: Secret definition.
+                          type: object
+                          properties:
+                            name:
+                              description: Secret Name.
+                              type: string
+                            value:
+                              description: Secret Value.
+                              type: string
+                              x-ms-mutability:
+                              - create
+                              - update
+                              x-ms-secret: true
+                            identity:
+                              description: Resource ID of a managed identity to authenticate
+                                with Azure Key Vault, or System to use a system-assigned
+                                identity.
+                              type: string
+                            keyVaultUrl:
+                              description: Azure Key Vault URL pointing to the secret
+                                referenced by the container app.
+                              type: string
+                        x-ms-identifiers:
+                        - name
+                      secretStoreComponent:
+                        description: Name of a Dapr component to retrieve component
+                          secrets from
+                        type: string
+                      metadata:
+                        description: Component metadata
+                        type: array
+                        items:
+                          description: Dapr component metadata.
+                          type: object
+                          properties:
+                            name:
+                              description: Metadata property name.
+                              type: string
+                            value:
+                              description: Metadata property value.
+                              type: string
+                            secretRef:
+                              description: Name of the Dapr Component secret from
+                                which to pull the metadata property value.
+                              type: string
+                        x-ms-identifiers:
+                        - name
+                      scopes:
+                        description: Names of container apps that can use this Dapr
+                          component
+                        type: array
+                        items:
+                          type: string
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Common error response.
+          content:
+            application/json:
+              schema:
+                description: App Service error response.
+                type: object
+                properties:
+                  error:
+                    description: Error model.
+                    type: object
+                    properties:
+                      code:
+                        description: Standardized string to programmatically identify
+                          the error.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Detailed error description and debugging information.
+                        type: string
+                        readOnly: true
+                      target:
+                        description: Detailed error description and debugging information.
+                        type: string
+                        readOnly: true
+                      details:
+                        type: array
+                        description: Details or the error
+                        items:
+                          description: Detailed errors.
+                          type: object
+                          properties:
+                            code:
+                              description: Standardized string to programmatically
+                                identify the error.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Detailed error description and debugging
+                                information.
+                              type: string
+                              readOnly: true
+                            target:
+                              description: Detailed error description and debugging
+                                information.
+                              type: string
+                              readOnly: true
+                          readOnly: true
+                        x-ms-identifiers:
+                        - code
+                      innererror:
+                        description: More information to debug error.
+                        type: string
+                        readOnly: true
+                    readOnly: true
+      x-ms-long-running-operation: false
+    delete:
+      tags:
+      - DaprComponents
+      summary: Delete a Dapr Component.
+      description: Delete a Dapr Component from a Managed Environment.
+      operationId: DaprComponents_Delete
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: environmentName
+        in: path
+        description: Name of the Managed Environment.
+        required: true
+        schema:
+          type: string
+      - name: componentName
+        in: path
+        description: Name of the Dapr Component.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Delete operation completed
+        '204':
+          description: Environment does not exist
+        default:
+          description: Common error response.
+          content:
+            application/json:
+              schema:
+                description: App Service error response.
+                type: object
+                properties:
+                  error:
+                    description: Error model.
+                    type: object
+                    properties:
+                      code:
+                        description: Standardized string to programmatically identify
+                          the error.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Detailed error description and debugging information.
+                        type: string
+                        readOnly: true
+                      target:
+                        description: Detailed error description and debugging information.
+                        type: string
+                        readOnly: true
+                      details:
+                        type: array
+                        description: Details or the error
+                        items:
+                          description: Detailed errors.
+                          type: object
+                          properties:
+                            code:
+                              description: Standardized string to programmatically
+                                identify the error.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Detailed error description and debugging
+                                information.
+                              type: string
+                              readOnly: true
+                            target:
+                              description: Detailed error description and debugging
+                                information.
+                              type: string
+                              readOnly: true
+                          readOnly: true
+                        x-ms-identifiers:
+                        - code
+                      innererror:
+                        description: More information to debug error.
+                        type: string
+                        readOnly: true
+                    readOnly: true
+      x-ms-long-running-operation: false
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.App/managedEnvironments/{environmentName}/daprComponents/{componentName}/listSecrets
+  : post:
+      tags:
+      - DaprComponents
+      summary: List secrets for a dapr component
+      operationId: DaprComponents_ListSecrets
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: environmentName
+        in: path
+        description: Name of the Managed Environment.
+        required: true
+        schema:
+          type: string
+      - name: componentName
+        in: path
+        description: Name of the Dapr Component.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Dapr component Secrets Collection for ListSecrets Action.
+                required:
+                - value
+                type: object
+                properties:
+                  value:
+                    description: Collection of secrets used by a Dapr component
+                    type: array
+                    items:
+                      description: Dapr component Secret for ListSecrets Action
+                      type: object
+                      properties:
+                        name:
+                          description: Secret Name.
+                          type: string
+                          readOnly: true
+                        value:
+                          description: Secret Value.
+                          type: string
+                          x-ms-secret: true
+                          readOnly: true
+                    x-ms-identifiers:
+                    - name
+        default:
+          description: Common error response.
+          content:
+            application/json:
+              schema:
+                description: App Service error response.
+                type: object
+                properties:
+                  error:
+                    description: Error model.
+                    type: object
+                    properties:
+                      code:
+                        description: Standardized string to programmatically identify
+                          the error.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Detailed error description and debugging information.
+                        type: string
+                        readOnly: true
+                      target:
+                        description: Detailed error description and debugging information.
+                        type: string
+                        readOnly: true
+                      details:
+                        type: array
+                        description: Details or the error
+                        items:
+                          description: Detailed errors.
+                          type: object
+                          properties:
+                            code:
+                              description: Standardized string to programmatically
+                                identify the error.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Detailed error description and debugging
+                                information.
+                              type: string
+                              readOnly: true
+                            target:
+                              description: Detailed error description and debugging
+                                information.
+                              type: string
+                              readOnly: true
+                          readOnly: true
+                        x-ms-identifiers:
+                        - code
+                      innererror:
+                        description: More information to debug error.
+                        type: string
+                        readOnly: true
+                    readOnly: true
+components:
+  parameters:
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      description: The name of the resource group. The name is case insensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    DefaultErrorResponse:
+      description: App Service error response.
+      type: object
+      properties:
+        error:
+          description: Error model.
+          type: object
+          properties:
+            code:
+              description: Standardized string to programmatically identify the error.
+              type: string
+              readOnly: true
+            message:
+              description: Detailed error description and debugging information.
+              type: string
+              readOnly: true
+            target:
+              description: Detailed error description and debugging information.
+              type: string
+              readOnly: true
+            details:
+              type: array
+              description: Details or the error
+              items:
+                description: Detailed errors.
+                type: object
+                properties:
+                  code:
+                    description: Standardized string to programmatically identify
+                      the error.
+                    type: string
+                    readOnly: true
+                  message:
+                    description: Detailed error description and debugging information.
+                    type: string
+                    readOnly: true
+                  target:
+                    description: Detailed error description and debugging information.
+                    type: string
+                    readOnly: true
+                readOnly: true
+              x-ms-identifiers:
+              - code
+            innererror:
+              description: More information to debug error.
+              type: string
+              readOnly: true
+          readOnly: true
+    systemData:
+      type: object
+      description: Metadata pertaining to creation and last modification of the resource.
+      properties:
+        createdBy:
+          type: string
+          description: The identity that created the resource.
+        createdByType:
+          type: string
+          description: The type of identity that created the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource creation (UTC).
+        lastModifiedBy:
+          type: string
+          description: The identity that last modified the resource.
+        lastModifiedByType:
+          type: string
+          description: The type of identity that last modified the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource last modification (UTC)
+      readOnly: true
+    Resource:
+      type: object
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    Secret:
+      description: Secret definition.
+      type: object
+      properties:
+        name:
+          description: Secret Name.
+          type: string
+        value:
+          description: Secret Value.
+          type: string
+          x-ms-mutability:
+          - create
+          - update
+          x-ms-secret: true
+        identity:
+          description: Resource ID of a managed identity to authenticate with Azure
+            Key Vault, or System to use a system-assigned identity.
+          type: string
+        keyVaultUrl:
+          description: Azure Key Vault URL pointing to the secret referenced by the
+            container app.
+          type: string
+    DaprMetadata:
+      description: Dapr component metadata.
+      type: object
+      properties:
+        name:
+          description: Metadata property name.
+          type: string
+        value:
+          description: Metadata property value.
+          type: string
+        secretRef:
+          description: Name of the Dapr Component secret from which to pull the metadata
+            property value.
+          type: string
+    DaprComponent:
+      type: object
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+        properties:
+          description: Dapr Component resource specific properties
+          type: object
+          properties:
+            componentType:
+              description: Component type
+              type: string
+            version:
+              description: Component version
+              type: string
+            ignoreErrors:
+              description: Boolean describing if the component errors are ignores
+              type: boolean
+              default: false
+            initTimeout:
+              description: Initialization timeout
+              type: string
+            secrets:
+              description: Collection of secrets used by a Dapr component
+              type: array
+              items:
+                description: Secret definition.
+                type: object
+                properties:
+                  name:
+                    description: Secret Name.
+                    type: string
+                  value:
+                    description: Secret Value.
+                    type: string
+                    x-ms-mutability:
+                    - create
+                    - update
+                    x-ms-secret: true
+                  identity:
+                    description: Resource ID of a managed identity to authenticate
+                      with Azure Key Vault, or System to use a system-assigned identity.
+                    type: string
+                  keyVaultUrl:
+                    description: Azure Key Vault URL pointing to the secret referenced
+                      by the container app.
+                    type: string
+              x-ms-identifiers:
+              - name
+            secretStoreComponent:
+              description: Name of a Dapr component to retrieve component secrets
+                from
+              type: string
+            metadata:
+              description: Component metadata
+              type: array
+              items:
+                description: Dapr component metadata.
+                type: object
+                properties:
+                  name:
+                    description: Metadata property name.
+                    type: string
+                  value:
+                    description: Metadata property value.
+                    type: string
+                  secretRef:
+                    description: Name of the Dapr Component secret from which to pull
+                      the metadata property value.
+                    type: string
+              x-ms-identifiers:
+              - name
+            scopes:
+              description: Names of container apps that can use this Dapr component
+              type: array
+              items:
+                type: string
+          x-ms-client-flatten: true
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    DaprComponentsCollection:
+      description: Dapr Components ARM resource.
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          description: Collection of resources.
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: arm-id
+                description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                readOnly: true
+              name:
+                type: string
+                description: The name of the resource
+                readOnly: true
+              type:
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+                readOnly: true
+              systemData:
+                description: Azure Resource Manager metadata containing createdBy
+                  and modifiedBy information.
+                readOnly: true
+                type: object
+                properties:
+                  createdBy:
+                    type: string
+                    description: The identity that created the resource.
+                  createdByType:
+                    type: string
+                    description: The type of identity that created the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource creation (UTC).
+                  lastModifiedBy:
+                    type: string
+                    description: The identity that last modified the resource.
+                  lastModifiedByType:
+                    type: string
+                    description: The type of identity that last modified the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  lastModifiedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource last modification (UTC)
+              properties:
+                description: Dapr Component resource specific properties
+                type: object
+                properties:
+                  componentType:
+                    description: Component type
+                    type: string
+                  version:
+                    description: Component version
+                    type: string
+                  ignoreErrors:
+                    description: Boolean describing if the component errors are ignores
+                    type: boolean
+                    default: false
+                  initTimeout:
+                    description: Initialization timeout
+                    type: string
+                  secrets:
+                    description: Collection of secrets used by a Dapr component
+                    type: array
+                    items:
+                      description: Secret definition.
+                      type: object
+                      properties:
+                        name:
+                          description: Secret Name.
+                          type: string
+                        value:
+                          description: Secret Value.
+                          type: string
+                          x-ms-mutability:
+                          - create
+                          - update
+                          x-ms-secret: true
+                        identity:
+                          description: Resource ID of a managed identity to authenticate
+                            with Azure Key Vault, or System to use a system-assigned
+                            identity.
+                          type: string
+                        keyVaultUrl:
+                          description: Azure Key Vault URL pointing to the secret
+                            referenced by the container app.
+                          type: string
+                    x-ms-identifiers:
+                    - name
+                  secretStoreComponent:
+                    description: Name of a Dapr component to retrieve component secrets
+                      from
+                    type: string
+                  metadata:
+                    description: Component metadata
+                    type: array
+                    items:
+                      description: Dapr component metadata.
+                      type: object
+                      properties:
+                        name:
+                          description: Metadata property name.
+                          type: string
+                        value:
+                          description: Metadata property value.
+                          type: string
+                        secretRef:
+                          description: Name of the Dapr Component secret from which
+                            to pull the metadata property value.
+                          type: string
+                    x-ms-identifiers:
+                    - name
+                  scopes:
+                    description: Names of container apps that can use this Dapr component
+                    type: array
+                    items:
+                      type: string
+                x-ms-client-flatten: true
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+        nextLink:
+          description: Link to next page of resources.
+          type: string
+          readOnly: true
+    DaprSecret:
+      description: Dapr component Secret for ListSecrets Action
+      type: object
+      properties:
+        name:
+          description: Secret Name.
+          type: string
+          readOnly: true
+        value:
+          description: Secret Value.
+          type: string
+          x-ms-secret: true
+          readOnly: true
+    DaprSecretsCollection:
+      description: Dapr component Secrets Collection for ListSecrets Action.
+      required:
+      - value
+      type: object
+      properties:
+        value:
+          description: Collection of secrets used by a Dapr component
+          type: array
+          items:
+            description: Dapr component Secret for ListSecrets Action
+            type: object
+            properties:
+              name:
+                description: Secret Name.
+                type: string
+                readOnly: true
+              value:
+                description: Secret Value.
+                type: string
+                x-ms-secret: true
+                readOnly: true
+          x-ms-identifiers:
+          - name

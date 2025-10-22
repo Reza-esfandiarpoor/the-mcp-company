@@ -1,0 +1,2290 @@
+openapi: 3.0.0
+info:
+  title: CostManagementClient
+  version: 2025-03-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+tags:
+- name: CostAllocationRules
+  description: An API for creating and managing cost allocation rules within a billing
+    account or enterprise enrollment. These rules can be used to reallocate cost between
+    resources, filtered by Resource Group, Subscription, or Tag.
+paths:
+  /providers/Microsoft.Billing/billingAccounts/{billingAccountId}/providers/Microsoft.CostManagement/costAllocationRules:
+    get:
+      tags:
+      - CostAllocationRules
+      operationId: CostAllocationRules_List
+      description: Get the list of all cost allocation rules for a billing account
+        or enterprise enrollment.
+      x-ms-pageable:
+        nextLinkName: nextLink
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: billingAccountId
+        in: path
+        description: BillingAccount ID
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of cost allocation rules for the billing account or enterprise
+            enrollment.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Result of listing cost allocation rules. It contains
+                  a list of available rules in the billing account or enterprise enrollment
+                  provided.
+                properties:
+                  value:
+                    description: The list of cost allocation rules.
+                    type: array
+                    items:
+                      type: object
+                      description: The cost allocation rule model definition
+                      properties:
+                        id:
+                          type: string
+                          readOnly: true
+                          description: Azure Resource Manager Id for the rule. This
+                            is a read ony value.
+                        name:
+                          type: string
+                          readOnly: true
+                          description: Name of the rule. This is a read only value.
+                        type:
+                          type: string
+                          readOnly: true
+                          description: Resource type of the rule. This is a read only
+                            value of Microsoft.CostManagement/CostAllocationRule.
+                        properties:
+                          description: Cost allocation rule properties
+                          type: object
+                          additionalProperties: false
+                          required:
+                          - details
+                          - status
+                          properties:
+                            description:
+                              description: Description of a cost allocation rule.
+                              type: string
+                            details:
+                              description: Resource information for the cost allocation
+                                rule
+                              type: object
+                              properties:
+                                sourceResources:
+                                  description: Source resources for cost allocation.
+                                    At this time, this list can contain no more than
+                                    one element.
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      resourceType:
+                                        description: Type of resources contained in
+                                          this cost allocation rule
+                                        type: string
+                                        enum:
+                                        - Dimension
+                                        - Tag
+                                        x-ms-enum:
+                                          name: CostAllocationResourceType
+                                          modelAsString: true
+                                          values:
+                                          - value: Dimension
+                                            description: Indicates an Azure dimension
+                                              such as a subscription id or resource
+                                              group name is being used for allocation.
+                                            name: Dimension
+                                          - value: Tag
+                                            description: Allocates cost based on Azure
+                                              Tag key value pairs.
+                                            name: Tag
+                                      name:
+                                        description: If resource type is dimension,
+                                          this must be either ResourceGroupName or
+                                          SubscriptionId. If resource type is tag,
+                                          this must be a valid Azure tag
+                                        type: string
+                                      values:
+                                        description: Source Resources for cost allocation.
+                                          This list cannot contain more than 25 values.
+                                        type: array
+                                        items:
+                                          description: Source resource for cost allocation
+                                          type: string
+                                        x-ms-identifiers:
+                                        - name
+                                    required:
+                                    - resourceType
+                                    - name
+                                    - values
+                                    description: Common values for resources for cost
+                                      allocation
+                                  x-ms-identifiers:
+                                  - name
+                                targetResources:
+                                  type: array
+                                  description: Target resources for cost allocation.
+                                    At this time, this list can contain no more than
+                                    one element.
+                                  items:
+                                    type: object
+                                    properties:
+                                      resourceType:
+                                        description: Type of resources contained in
+                                          this cost allocation rule
+                                        type: string
+                                        enum:
+                                        - Dimension
+                                        - Tag
+                                        x-ms-enum:
+                                          name: CostAllocationResourceType
+                                          modelAsString: true
+                                          values:
+                                          - value: Dimension
+                                            description: Indicates an Azure dimension
+                                              such as a subscription id or resource
+                                              group name is being used for allocation.
+                                            name: Dimension
+                                          - value: Tag
+                                            description: Allocates cost based on Azure
+                                              Tag key value pairs.
+                                            name: Tag
+                                      name:
+                                        description: If resource type is dimension,
+                                          this must be either ResourceGroupName or
+                                          SubscriptionId. If resource type is tag,
+                                          this must be a valid Azure tag
+                                        type: string
+                                      values:
+                                        description: Target resources for cost allocation.
+                                          This list cannot contain more than 25 values.
+                                        type: array
+                                        items:
+                                          type: object
+                                          description: Target resources and allocation
+                                          required:
+                                          - percentage
+                                          - name
+                                          properties:
+                                            name:
+                                              description: Target resource for cost
+                                                allocation
+                                              type: string
+                                            percentage:
+                                              description: Percentage of source cost
+                                                to allocate to this resource. This
+                                                value can be specified to two decimal
+                                                places and the total percentage of
+                                                all resources in this rule must sum
+                                                to 100.00.
+                                              type: number
+                                        x-ms-identifiers:
+                                        - name
+                                      policyType:
+                                        description: Method of cost allocation for
+                                          the rule
+                                        type: string
+                                        enum:
+                                        - FixedProportion
+                                        x-ms-enum:
+                                          name: CostAllocationPolicyType
+                                          modelAsString: true
+                                    required:
+                                    - resourceType
+                                    - name
+                                    - values
+                                    - policyType
+                                    description: Common values for resources for cost
+                                      allocation
+                                  x-ms-identifiers:
+                                  - name
+                            status:
+                              description: Status of the rule
+                              type: string
+                              enum:
+                              - NotActive
+                              - Active
+                              - Processing
+                              x-ms-enum:
+                                name: RuleStatus
+                                modelAsString: true
+                                values:
+                                - value: NotActive
+                                  description: Rule is saved but not used to allocate
+                                    costs.
+                                  name: NotActive
+                                - value: Active
+                                  description: Rule is saved and impacting cost allocation.
+                                  name: Active
+                                - value: Processing
+                                  description: Rule is saved and cost allocation is
+                                    being updated. Readonly value that cannot be submitted
+                                    in a put request.
+                                  name: Processing
+                            createdDate:
+                              type: string
+                              format: date-time
+                              readOnly: true
+                              description: Time at which the rule was created. Rules
+                                that change cost for the same resource are applied
+                                in order of creation.
+                            updatedDate:
+                              type: string
+                              format: date-time
+                              readOnly: true
+                              description: Time at which the rule was last updated.
+                      x-ms-azure-resource: true
+                    x-ms-identifiers:
+                    - id
+                  nextLink:
+                    description: URL to get the next set of rule list results if there
+                      are any.
+                    type: string
+                    readOnly: true
+        default:
+          description: Error response describing why the operation failed
+          content:
+            application/json:
+              schema:
+                description: "Error response indicates that the service is not able\
+                  \ to process the incoming request. The reason is provided in the\
+                  \ error message. \n\nSome Error responses: \n\n * 429 TooManyRequests\
+                  \ - Request is throttled. Retry after waiting for the time specified\
+                  \ in the \"x-ms-ratelimit-microsoft.consumption-retry-after\" header.\
+                  \ \n\n * 503 ServiceUnavailable - Service is temporarily unavailable.\
+                  \ Retry after waiting for the time specified in the \"Retry-After\"\
+                  \ header."
+                type: object
+                properties:
+                  error:
+                    description: The details of the error.
+                    type: object
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                        readOnly: true
+  ? /providers/Microsoft.Billing/billingAccounts/{billingAccountId}/providers/Microsoft.CostManagement/costAllocationRules/checkNameAvailability
+  : post:
+      tags:
+      - CostAllocationRules
+      operationId: CostAllocationRules_CheckNameAvailability
+      description: Checks availability and correctness of a name for a cost allocation
+        rule
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: billingAccountId
+        in: path
+        description: BillingAccount ID
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: The cost allocation rule check name availability request
+              properties:
+                name:
+                  type: string
+                  description: Rule name
+                type:
+                  type: string
+                  description: Resource type. This is expected to be Microsoft.CostManagement/costAllocationRules
+        description: Cost allocation rule to be created or updated
+        required: true
+      responses:
+        '200':
+          description: Response of cost allocation rule name availability.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: The cost allocation rule check name availability response
+                properties:
+                  nameAvailable:
+                    type: boolean
+                    description: Whether this rule name is available
+                  reason:
+                    description: The reason this name is not available
+                    type: string
+                    enum:
+                    - Invalid
+                    - AlreadyExists
+                    - Valid
+                    x-ms-enum:
+                      name: Reason
+                      modelAsString: true
+                  message:
+                    type: string
+                    description: Error message if the name is not available
+        default:
+          description: Error response describing why the operation failed
+          content:
+            application/json:
+              schema:
+                description: "Error response indicates that the service is not able\
+                  \ to process the incoming request. The reason is provided in the\
+                  \ error message. \n\nSome Error responses: \n\n * 429 TooManyRequests\
+                  \ - Request is throttled. Retry after waiting for the time specified\
+                  \ in the \"x-ms-ratelimit-microsoft.consumption-retry-after\" header.\
+                  \ \n\n * 503 ServiceUnavailable - Service is temporarily unavailable.\
+                  \ Retry after waiting for the time specified in the \"Retry-After\"\
+                  \ header."
+                type: object
+                properties:
+                  error:
+                    description: The details of the error.
+                    type: object
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                        readOnly: true
+  ? /providers/Microsoft.Billing/billingAccounts/{billingAccountId}/providers/Microsoft.CostManagement/costAllocationRules/{ruleName}
+  : get:
+      tags:
+      - CostAllocationRules
+      operationId: CostAllocationRules_Get
+      description: Get a cost allocation rule by rule name and billing account or
+        enterprise enrollment.
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: billingAccountId
+        in: path
+        description: BillingAccount ID
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: ruleName
+        in: path
+        description: Cost allocation rule name. The name cannot include spaces or
+          any non alphanumeric characters other than '_' and '-'. The max length is
+          260 characters.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: '[A-Za-z0-9\-_]+'
+      responses:
+        '200':
+          description: OK. The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: The cost allocation rule model definition
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                    description: Azure Resource Manager Id for the rule. This is a
+                      read ony value.
+                  name:
+                    type: string
+                    readOnly: true
+                    description: Name of the rule. This is a read only value.
+                  type:
+                    type: string
+                    readOnly: true
+                    description: Resource type of the rule. This is a read only value
+                      of Microsoft.CostManagement/CostAllocationRule.
+                  properties:
+                    description: Cost allocation rule properties
+                    type: object
+                    additionalProperties: false
+                    required:
+                    - details
+                    - status
+                    properties:
+                      description:
+                        description: Description of a cost allocation rule.
+                        type: string
+                      details:
+                        description: Resource information for the cost allocation
+                          rule
+                        type: object
+                        properties:
+                          sourceResources:
+                            description: Source resources for cost allocation. At
+                              this time, this list can contain no more than one element.
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                resourceType:
+                                  description: Type of resources contained in this
+                                    cost allocation rule
+                                  type: string
+                                  enum:
+                                  - Dimension
+                                  - Tag
+                                  x-ms-enum:
+                                    name: CostAllocationResourceType
+                                    modelAsString: true
+                                    values:
+                                    - value: Dimension
+                                      description: Indicates an Azure dimension such
+                                        as a subscription id or resource group name
+                                        is being used for allocation.
+                                      name: Dimension
+                                    - value: Tag
+                                      description: Allocates cost based on Azure Tag
+                                        key value pairs.
+                                      name: Tag
+                                name:
+                                  description: If resource type is dimension, this
+                                    must be either ResourceGroupName or SubscriptionId.
+                                    If resource type is tag, this must be a valid
+                                    Azure tag
+                                  type: string
+                                values:
+                                  description: Source Resources for cost allocation.
+                                    This list cannot contain more than 25 values.
+                                  type: array
+                                  items:
+                                    description: Source resource for cost allocation
+                                    type: string
+                                  x-ms-identifiers:
+                                  - name
+                              required:
+                              - resourceType
+                              - name
+                              - values
+                              description: Common values for resources for cost allocation
+                            x-ms-identifiers:
+                            - name
+                          targetResources:
+                            type: array
+                            description: Target resources for cost allocation. At
+                              this time, this list can contain no more than one element.
+                            items:
+                              type: object
+                              properties:
+                                resourceType:
+                                  description: Type of resources contained in this
+                                    cost allocation rule
+                                  type: string
+                                  enum:
+                                  - Dimension
+                                  - Tag
+                                  x-ms-enum:
+                                    name: CostAllocationResourceType
+                                    modelAsString: true
+                                    values:
+                                    - value: Dimension
+                                      description: Indicates an Azure dimension such
+                                        as a subscription id or resource group name
+                                        is being used for allocation.
+                                      name: Dimension
+                                    - value: Tag
+                                      description: Allocates cost based on Azure Tag
+                                        key value pairs.
+                                      name: Tag
+                                name:
+                                  description: If resource type is dimension, this
+                                    must be either ResourceGroupName or SubscriptionId.
+                                    If resource type is tag, this must be a valid
+                                    Azure tag
+                                  type: string
+                                values:
+                                  description: Target resources for cost allocation.
+                                    This list cannot contain more than 25 values.
+                                  type: array
+                                  items:
+                                    type: object
+                                    description: Target resources and allocation
+                                    required:
+                                    - percentage
+                                    - name
+                                    properties:
+                                      name:
+                                        description: Target resource for cost allocation
+                                        type: string
+                                      percentage:
+                                        description: Percentage of source cost to
+                                          allocate to this resource. This value can
+                                          be specified to two decimal places and the
+                                          total percentage of all resources in this
+                                          rule must sum to 100.00.
+                                        type: number
+                                  x-ms-identifiers:
+                                  - name
+                                policyType:
+                                  description: Method of cost allocation for the rule
+                                  type: string
+                                  enum:
+                                  - FixedProportion
+                                  x-ms-enum:
+                                    name: CostAllocationPolicyType
+                                    modelAsString: true
+                              required:
+                              - resourceType
+                              - name
+                              - values
+                              - policyType
+                              description: Common values for resources for cost allocation
+                            x-ms-identifiers:
+                            - name
+                      status:
+                        description: Status of the rule
+                        type: string
+                        enum:
+                        - NotActive
+                        - Active
+                        - Processing
+                        x-ms-enum:
+                          name: RuleStatus
+                          modelAsString: true
+                          values:
+                          - value: NotActive
+                            description: Rule is saved but not used to allocate costs.
+                            name: NotActive
+                          - value: Active
+                            description: Rule is saved and impacting cost allocation.
+                            name: Active
+                          - value: Processing
+                            description: Rule is saved and cost allocation is being
+                              updated. Readonly value that cannot be submitted in
+                              a put request.
+                            name: Processing
+                      createdDate:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Time at which the rule was created. Rules that
+                          change cost for the same resource are applied in order of
+                          creation.
+                      updatedDate:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Time at which the rule was last updated.
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: "Error response indicates that the service is not able\
+                  \ to process the incoming request. The reason is provided in the\
+                  \ error message. \n\nSome Error responses: \n\n * 429 TooManyRequests\
+                  \ - Request is throttled. Retry after waiting for the time specified\
+                  \ in the \"x-ms-ratelimit-microsoft.consumption-retry-after\" header.\
+                  \ \n\n * 503 ServiceUnavailable - Service is temporarily unavailable.\
+                  \ Retry after waiting for the time specified in the \"Retry-After\"\
+                  \ header."
+                type: object
+                properties:
+                  error:
+                    description: The details of the error.
+                    type: object
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                        readOnly: true
+    put:
+      tags:
+      - CostAllocationRules
+      operationId: CostAllocationRules_CreateOrUpdate
+      description: Create/Update a rule to allocate cost between different resources
+        within a billing account or enterprise enrollment.
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: billingAccountId
+        in: path
+        description: BillingAccount ID
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: ruleName
+        in: path
+        description: Cost allocation rule name. The name cannot include spaces or
+          any non alphanumeric characters other than '_' and '-'. The max length is
+          260 characters.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: '[A-Za-z0-9\-_]+'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: The cost allocation rule model definition
+              properties:
+                id:
+                  type: string
+                  readOnly: true
+                  description: Azure Resource Manager Id for the rule. This is a read
+                    ony value.
+                name:
+                  type: string
+                  readOnly: true
+                  description: Name of the rule. This is a read only value.
+                type:
+                  type: string
+                  readOnly: true
+                  description: Resource type of the rule. This is a read only value
+                    of Microsoft.CostManagement/CostAllocationRule.
+                properties:
+                  description: Cost allocation rule properties
+                  type: object
+                  additionalProperties: false
+                  required:
+                  - details
+                  - status
+                  properties:
+                    description:
+                      description: Description of a cost allocation rule.
+                      type: string
+                    details:
+                      description: Resource information for the cost allocation rule
+                      type: object
+                      properties:
+                        sourceResources:
+                          description: Source resources for cost allocation. At this
+                            time, this list can contain no more than one element.
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              resourceType:
+                                description: Type of resources contained in this cost
+                                  allocation rule
+                                type: string
+                                enum:
+                                - Dimension
+                                - Tag
+                                x-ms-enum:
+                                  name: CostAllocationResourceType
+                                  modelAsString: true
+                                  values:
+                                  - value: Dimension
+                                    description: Indicates an Azure dimension such
+                                      as a subscription id or resource group name
+                                      is being used for allocation.
+                                    name: Dimension
+                                  - value: Tag
+                                    description: Allocates cost based on Azure Tag
+                                      key value pairs.
+                                    name: Tag
+                              name:
+                                description: If resource type is dimension, this must
+                                  be either ResourceGroupName or SubscriptionId. If
+                                  resource type is tag, this must be a valid Azure
+                                  tag
+                                type: string
+                              values:
+                                description: Source Resources for cost allocation.
+                                  This list cannot contain more than 25 values.
+                                type: array
+                                items:
+                                  description: Source resource for cost allocation
+                                  type: string
+                                x-ms-identifiers:
+                                - name
+                            required:
+                            - resourceType
+                            - name
+                            - values
+                            description: Common values for resources for cost allocation
+                          x-ms-identifiers:
+                          - name
+                        targetResources:
+                          type: array
+                          description: Target resources for cost allocation. At this
+                            time, this list can contain no more than one element.
+                          items:
+                            type: object
+                            properties:
+                              resourceType:
+                                description: Type of resources contained in this cost
+                                  allocation rule
+                                type: string
+                                enum:
+                                - Dimension
+                                - Tag
+                                x-ms-enum:
+                                  name: CostAllocationResourceType
+                                  modelAsString: true
+                                  values:
+                                  - value: Dimension
+                                    description: Indicates an Azure dimension such
+                                      as a subscription id or resource group name
+                                      is being used for allocation.
+                                    name: Dimension
+                                  - value: Tag
+                                    description: Allocates cost based on Azure Tag
+                                      key value pairs.
+                                    name: Tag
+                              name:
+                                description: If resource type is dimension, this must
+                                  be either ResourceGroupName or SubscriptionId. If
+                                  resource type is tag, this must be a valid Azure
+                                  tag
+                                type: string
+                              values:
+                                description: Target resources for cost allocation.
+                                  This list cannot contain more than 25 values.
+                                type: array
+                                items:
+                                  type: object
+                                  description: Target resources and allocation
+                                  required:
+                                  - percentage
+                                  - name
+                                  properties:
+                                    name:
+                                      description: Target resource for cost allocation
+                                      type: string
+                                    percentage:
+                                      description: Percentage of source cost to allocate
+                                        to this resource. This value can be specified
+                                        to two decimal places and the total percentage
+                                        of all resources in this rule must sum to
+                                        100.00.
+                                      type: number
+                                x-ms-identifiers:
+                                - name
+                              policyType:
+                                description: Method of cost allocation for the rule
+                                type: string
+                                enum:
+                                - FixedProportion
+                                x-ms-enum:
+                                  name: CostAllocationPolicyType
+                                  modelAsString: true
+                            required:
+                            - resourceType
+                            - name
+                            - values
+                            - policyType
+                            description: Common values for resources for cost allocation
+                          x-ms-identifiers:
+                          - name
+                    status:
+                      description: Status of the rule
+                      type: string
+                      enum:
+                      - NotActive
+                      - Active
+                      - Processing
+                      x-ms-enum:
+                        name: RuleStatus
+                        modelAsString: true
+                        values:
+                        - value: NotActive
+                          description: Rule is saved but not used to allocate costs.
+                          name: NotActive
+                        - value: Active
+                          description: Rule is saved and impacting cost allocation.
+                          name: Active
+                        - value: Processing
+                          description: Rule is saved and cost allocation is being
+                            updated. Readonly value that cannot be submitted in a
+                            put request.
+                          name: Processing
+                    createdDate:
+                      type: string
+                      format: date-time
+                      readOnly: true
+                      description: Time at which the rule was created. Rules that
+                        change cost for the same resource are applied in order of
+                        creation.
+                    updatedDate:
+                      type: string
+                      format: date-time
+                      readOnly: true
+                      description: Time at which the rule was last updated.
+              x-ms-azure-resource: true
+        description: Cost allocation rule to be created or updated
+        required: true
+      responses:
+        '200':
+          description: OK. The update request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: The cost allocation rule model definition
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                    description: Azure Resource Manager Id for the rule. This is a
+                      read ony value.
+                  name:
+                    type: string
+                    readOnly: true
+                    description: Name of the rule. This is a read only value.
+                  type:
+                    type: string
+                    readOnly: true
+                    description: Resource type of the rule. This is a read only value
+                      of Microsoft.CostManagement/CostAllocationRule.
+                  properties:
+                    description: Cost allocation rule properties
+                    type: object
+                    additionalProperties: false
+                    required:
+                    - details
+                    - status
+                    properties:
+                      description:
+                        description: Description of a cost allocation rule.
+                        type: string
+                      details:
+                        description: Resource information for the cost allocation
+                          rule
+                        type: object
+                        properties:
+                          sourceResources:
+                            description: Source resources for cost allocation. At
+                              this time, this list can contain no more than one element.
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                resourceType:
+                                  description: Type of resources contained in this
+                                    cost allocation rule
+                                  type: string
+                                  enum:
+                                  - Dimension
+                                  - Tag
+                                  x-ms-enum:
+                                    name: CostAllocationResourceType
+                                    modelAsString: true
+                                    values:
+                                    - value: Dimension
+                                      description: Indicates an Azure dimension such
+                                        as a subscription id or resource group name
+                                        is being used for allocation.
+                                      name: Dimension
+                                    - value: Tag
+                                      description: Allocates cost based on Azure Tag
+                                        key value pairs.
+                                      name: Tag
+                                name:
+                                  description: If resource type is dimension, this
+                                    must be either ResourceGroupName or SubscriptionId.
+                                    If resource type is tag, this must be a valid
+                                    Azure tag
+                                  type: string
+                                values:
+                                  description: Source Resources for cost allocation.
+                                    This list cannot contain more than 25 values.
+                                  type: array
+                                  items:
+                                    description: Source resource for cost allocation
+                                    type: string
+                                  x-ms-identifiers:
+                                  - name
+                              required:
+                              - resourceType
+                              - name
+                              - values
+                              description: Common values for resources for cost allocation
+                            x-ms-identifiers:
+                            - name
+                          targetResources:
+                            type: array
+                            description: Target resources for cost allocation. At
+                              this time, this list can contain no more than one element.
+                            items:
+                              type: object
+                              properties:
+                                resourceType:
+                                  description: Type of resources contained in this
+                                    cost allocation rule
+                                  type: string
+                                  enum:
+                                  - Dimension
+                                  - Tag
+                                  x-ms-enum:
+                                    name: CostAllocationResourceType
+                                    modelAsString: true
+                                    values:
+                                    - value: Dimension
+                                      description: Indicates an Azure dimension such
+                                        as a subscription id or resource group name
+                                        is being used for allocation.
+                                      name: Dimension
+                                    - value: Tag
+                                      description: Allocates cost based on Azure Tag
+                                        key value pairs.
+                                      name: Tag
+                                name:
+                                  description: If resource type is dimension, this
+                                    must be either ResourceGroupName or SubscriptionId.
+                                    If resource type is tag, this must be a valid
+                                    Azure tag
+                                  type: string
+                                values:
+                                  description: Target resources for cost allocation.
+                                    This list cannot contain more than 25 values.
+                                  type: array
+                                  items:
+                                    type: object
+                                    description: Target resources and allocation
+                                    required:
+                                    - percentage
+                                    - name
+                                    properties:
+                                      name:
+                                        description: Target resource for cost allocation
+                                        type: string
+                                      percentage:
+                                        description: Percentage of source cost to
+                                          allocate to this resource. This value can
+                                          be specified to two decimal places and the
+                                          total percentage of all resources in this
+                                          rule must sum to 100.00.
+                                        type: number
+                                  x-ms-identifiers:
+                                  - name
+                                policyType:
+                                  description: Method of cost allocation for the rule
+                                  type: string
+                                  enum:
+                                  - FixedProportion
+                                  x-ms-enum:
+                                    name: CostAllocationPolicyType
+                                    modelAsString: true
+                              required:
+                              - resourceType
+                              - name
+                              - values
+                              - policyType
+                              description: Common values for resources for cost allocation
+                            x-ms-identifiers:
+                            - name
+                      status:
+                        description: Status of the rule
+                        type: string
+                        enum:
+                        - NotActive
+                        - Active
+                        - Processing
+                        x-ms-enum:
+                          name: RuleStatus
+                          modelAsString: true
+                          values:
+                          - value: NotActive
+                            description: Rule is saved but not used to allocate costs.
+                            name: NotActive
+                          - value: Active
+                            description: Rule is saved and impacting cost allocation.
+                            name: Active
+                          - value: Processing
+                            description: Rule is saved and cost allocation is being
+                              updated. Readonly value that cannot be submitted in
+                              a put request.
+                            name: Processing
+                      createdDate:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Time at which the rule was created. Rules that
+                          change cost for the same resource are applied in order of
+                          creation.
+                      updatedDate:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Time at which the rule was last updated.
+                x-ms-azure-resource: true
+        '201':
+          description: Created. The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: The cost allocation rule model definition
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                    description: Azure Resource Manager Id for the rule. This is a
+                      read ony value.
+                  name:
+                    type: string
+                    readOnly: true
+                    description: Name of the rule. This is a read only value.
+                  type:
+                    type: string
+                    readOnly: true
+                    description: Resource type of the rule. This is a read only value
+                      of Microsoft.CostManagement/CostAllocationRule.
+                  properties:
+                    description: Cost allocation rule properties
+                    type: object
+                    additionalProperties: false
+                    required:
+                    - details
+                    - status
+                    properties:
+                      description:
+                        description: Description of a cost allocation rule.
+                        type: string
+                      details:
+                        description: Resource information for the cost allocation
+                          rule
+                        type: object
+                        properties:
+                          sourceResources:
+                            description: Source resources for cost allocation. At
+                              this time, this list can contain no more than one element.
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                resourceType:
+                                  description: Type of resources contained in this
+                                    cost allocation rule
+                                  type: string
+                                  enum:
+                                  - Dimension
+                                  - Tag
+                                  x-ms-enum:
+                                    name: CostAllocationResourceType
+                                    modelAsString: true
+                                    values:
+                                    - value: Dimension
+                                      description: Indicates an Azure dimension such
+                                        as a subscription id or resource group name
+                                        is being used for allocation.
+                                      name: Dimension
+                                    - value: Tag
+                                      description: Allocates cost based on Azure Tag
+                                        key value pairs.
+                                      name: Tag
+                                name:
+                                  description: If resource type is dimension, this
+                                    must be either ResourceGroupName or SubscriptionId.
+                                    If resource type is tag, this must be a valid
+                                    Azure tag
+                                  type: string
+                                values:
+                                  description: Source Resources for cost allocation.
+                                    This list cannot contain more than 25 values.
+                                  type: array
+                                  items:
+                                    description: Source resource for cost allocation
+                                    type: string
+                                  x-ms-identifiers:
+                                  - name
+                              required:
+                              - resourceType
+                              - name
+                              - values
+                              description: Common values for resources for cost allocation
+                            x-ms-identifiers:
+                            - name
+                          targetResources:
+                            type: array
+                            description: Target resources for cost allocation. At
+                              this time, this list can contain no more than one element.
+                            items:
+                              type: object
+                              properties:
+                                resourceType:
+                                  description: Type of resources contained in this
+                                    cost allocation rule
+                                  type: string
+                                  enum:
+                                  - Dimension
+                                  - Tag
+                                  x-ms-enum:
+                                    name: CostAllocationResourceType
+                                    modelAsString: true
+                                    values:
+                                    - value: Dimension
+                                      description: Indicates an Azure dimension such
+                                        as a subscription id or resource group name
+                                        is being used for allocation.
+                                      name: Dimension
+                                    - value: Tag
+                                      description: Allocates cost based on Azure Tag
+                                        key value pairs.
+                                      name: Tag
+                                name:
+                                  description: If resource type is dimension, this
+                                    must be either ResourceGroupName or SubscriptionId.
+                                    If resource type is tag, this must be a valid
+                                    Azure tag
+                                  type: string
+                                values:
+                                  description: Target resources for cost allocation.
+                                    This list cannot contain more than 25 values.
+                                  type: array
+                                  items:
+                                    type: object
+                                    description: Target resources and allocation
+                                    required:
+                                    - percentage
+                                    - name
+                                    properties:
+                                      name:
+                                        description: Target resource for cost allocation
+                                        type: string
+                                      percentage:
+                                        description: Percentage of source cost to
+                                          allocate to this resource. This value can
+                                          be specified to two decimal places and the
+                                          total percentage of all resources in this
+                                          rule must sum to 100.00.
+                                        type: number
+                                  x-ms-identifiers:
+                                  - name
+                                policyType:
+                                  description: Method of cost allocation for the rule
+                                  type: string
+                                  enum:
+                                  - FixedProportion
+                                  x-ms-enum:
+                                    name: CostAllocationPolicyType
+                                    modelAsString: true
+                              required:
+                              - resourceType
+                              - name
+                              - values
+                              - policyType
+                              description: Common values for resources for cost allocation
+                            x-ms-identifiers:
+                            - name
+                      status:
+                        description: Status of the rule
+                        type: string
+                        enum:
+                        - NotActive
+                        - Active
+                        - Processing
+                        x-ms-enum:
+                          name: RuleStatus
+                          modelAsString: true
+                          values:
+                          - value: NotActive
+                            description: Rule is saved but not used to allocate costs.
+                            name: NotActive
+                          - value: Active
+                            description: Rule is saved and impacting cost allocation.
+                            name: Active
+                          - value: Processing
+                            description: Rule is saved and cost allocation is being
+                              updated. Readonly value that cannot be submitted in
+                              a put request.
+                            name: Processing
+                      createdDate:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Time at which the rule was created. Rules that
+                          change cost for the same resource are applied in order of
+                          creation.
+                      updatedDate:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Time at which the rule was last updated.
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: "Error response indicates that the service is not able\
+                  \ to process the incoming request. The reason is provided in the\
+                  \ error message. \n\nSome Error responses: \n\n * 429 TooManyRequests\
+                  \ - Request is throttled. Retry after waiting for the time specified\
+                  \ in the \"x-ms-ratelimit-microsoft.consumption-retry-after\" header.\
+                  \ \n\n * 503 ServiceUnavailable - Service is temporarily unavailable.\
+                  \ Retry after waiting for the time specified in the \"Retry-After\"\
+                  \ header."
+                type: object
+                properties:
+                  error:
+                    description: The details of the error.
+                    type: object
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                        readOnly: true
+    delete:
+      tags:
+      - CostAllocationRules
+      operationId: CostAllocationRules_Delete
+      description: Delete cost allocation rule for billing account or enterprise enrollment.
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: billingAccountId
+        in: path
+        description: BillingAccount ID
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: ruleName
+        in: path
+        description: Cost allocation rule name. The name cannot include spaces or
+          any non alphanumeric characters other than '_' and '-'. The max length is
+          260 characters.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: '[A-Za-z0-9\-_]+'
+      responses:
+        '200':
+          description: OK. The request has succeeded.
+        '204':
+          description: NoContent. Rule did not exist.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: "Error response indicates that the service is not able\
+                  \ to process the incoming request. The reason is provided in the\
+                  \ error message. \n\nSome Error responses: \n\n * 429 TooManyRequests\
+                  \ - Request is throttled. Retry after waiting for the time specified\
+                  \ in the \"x-ms-ratelimit-microsoft.consumption-retry-after\" header.\
+                  \ \n\n * 503 ServiceUnavailable - Service is temporarily unavailable.\
+                  \ Retry after waiting for the time specified in the \"Retry-After\"\
+                  \ header."
+                type: object
+                properties:
+                  error:
+                    description: The details of the error.
+                    type: object
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                        readOnly: true
+components:
+  parameters:
+    billingAccountIdParameter:
+      name: billingAccountId
+      in: path
+      description: BillingAccount ID
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    ruleNameParameter:
+      name: ruleName
+      in: path
+      description: Cost allocation rule name. The name cannot include spaces or any
+        non alphanumeric characters other than '_' and '-'. The max length is 260
+        characters.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        pattern: '[A-Za-z0-9\-_]+'
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    ErrorDetails:
+      description: The details of the error.
+      type: object
+      properties:
+        code:
+          description: Error code.
+          type: string
+          readOnly: true
+        message:
+          description: Error message indicating why the operation failed.
+          type: string
+          readOnly: true
+    ErrorResponse:
+      description: "Error response indicates that the service is not able to process\
+        \ the incoming request. The reason is provided in the error message. \n\n\
+        Some Error responses: \n\n * 429 TooManyRequests - Request is throttled. Retry\
+        \ after waiting for the time specified in the \"x-ms-ratelimit-microsoft.consumption-retry-after\"\
+        \ header. \n\n * 503 ServiceUnavailable - Service is temporarily unavailable.\
+        \ Retry after waiting for the time specified in the \"Retry-After\" header."
+      type: object
+      properties:
+        error:
+          description: The details of the error.
+          type: object
+          properties:
+            code:
+              description: Error code.
+              type: string
+              readOnly: true
+            message:
+              description: Error message indicating why the operation failed.
+              type: string
+              readOnly: true
+    CostAllocationRuleList:
+      type: object
+      description: Result of listing cost allocation rules. It contains a list of
+        available rules in the billing account or enterprise enrollment provided.
+      properties:
+        value:
+          description: The list of cost allocation rules.
+          type: array
+          items:
+            type: object
+            description: The cost allocation rule model definition
+            properties:
+              id:
+                type: string
+                readOnly: true
+                description: Azure Resource Manager Id for the rule. This is a read
+                  ony value.
+              name:
+                type: string
+                readOnly: true
+                description: Name of the rule. This is a read only value.
+              type:
+                type: string
+                readOnly: true
+                description: Resource type of the rule. This is a read only value
+                  of Microsoft.CostManagement/CostAllocationRule.
+              properties:
+                description: Cost allocation rule properties
+                type: object
+                additionalProperties: false
+                required:
+                - details
+                - status
+                properties:
+                  description:
+                    description: Description of a cost allocation rule.
+                    type: string
+                  details:
+                    description: Resource information for the cost allocation rule
+                    type: object
+                    properties:
+                      sourceResources:
+                        description: Source resources for cost allocation. At this
+                          time, this list can contain no more than one element.
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            resourceType:
+                              description: Type of resources contained in this cost
+                                allocation rule
+                              type: string
+                              enum:
+                              - Dimension
+                              - Tag
+                              x-ms-enum:
+                                name: CostAllocationResourceType
+                                modelAsString: true
+                                values:
+                                - value: Dimension
+                                  description: Indicates an Azure dimension such as
+                                    a subscription id or resource group name is being
+                                    used for allocation.
+                                  name: Dimension
+                                - value: Tag
+                                  description: Allocates cost based on Azure Tag key
+                                    value pairs.
+                                  name: Tag
+                            name:
+                              description: If resource type is dimension, this must
+                                be either ResourceGroupName or SubscriptionId. If
+                                resource type is tag, this must be a valid Azure tag
+                              type: string
+                            values:
+                              description: Source Resources for cost allocation. This
+                                list cannot contain more than 25 values.
+                              type: array
+                              items:
+                                description: Source resource for cost allocation
+                                type: string
+                              x-ms-identifiers:
+                              - name
+                          required:
+                          - resourceType
+                          - name
+                          - values
+                          description: Common values for resources for cost allocation
+                        x-ms-identifiers:
+                        - name
+                      targetResources:
+                        type: array
+                        description: Target resources for cost allocation. At this
+                          time, this list can contain no more than one element.
+                        items:
+                          type: object
+                          properties:
+                            resourceType:
+                              description: Type of resources contained in this cost
+                                allocation rule
+                              type: string
+                              enum:
+                              - Dimension
+                              - Tag
+                              x-ms-enum:
+                                name: CostAllocationResourceType
+                                modelAsString: true
+                                values:
+                                - value: Dimension
+                                  description: Indicates an Azure dimension such as
+                                    a subscription id or resource group name is being
+                                    used for allocation.
+                                  name: Dimension
+                                - value: Tag
+                                  description: Allocates cost based on Azure Tag key
+                                    value pairs.
+                                  name: Tag
+                            name:
+                              description: If resource type is dimension, this must
+                                be either ResourceGroupName or SubscriptionId. If
+                                resource type is tag, this must be a valid Azure tag
+                              type: string
+                            values:
+                              description: Target resources for cost allocation. This
+                                list cannot contain more than 25 values.
+                              type: array
+                              items:
+                                type: object
+                                description: Target resources and allocation
+                                required:
+                                - percentage
+                                - name
+                                properties:
+                                  name:
+                                    description: Target resource for cost allocation
+                                    type: string
+                                  percentage:
+                                    description: Percentage of source cost to allocate
+                                      to this resource. This value can be specified
+                                      to two decimal places and the total percentage
+                                      of all resources in this rule must sum to 100.00.
+                                    type: number
+                              x-ms-identifiers:
+                              - name
+                            policyType:
+                              description: Method of cost allocation for the rule
+                              type: string
+                              enum:
+                              - FixedProportion
+                              x-ms-enum:
+                                name: CostAllocationPolicyType
+                                modelAsString: true
+                          required:
+                          - resourceType
+                          - name
+                          - values
+                          - policyType
+                          description: Common values for resources for cost allocation
+                        x-ms-identifiers:
+                        - name
+                  status:
+                    description: Status of the rule
+                    type: string
+                    enum:
+                    - NotActive
+                    - Active
+                    - Processing
+                    x-ms-enum:
+                      name: RuleStatus
+                      modelAsString: true
+                      values:
+                      - value: NotActive
+                        description: Rule is saved but not used to allocate costs.
+                        name: NotActive
+                      - value: Active
+                        description: Rule is saved and impacting cost allocation.
+                        name: Active
+                      - value: Processing
+                        description: Rule is saved and cost allocation is being updated.
+                          Readonly value that cannot be submitted in a put request.
+                        name: Processing
+                  createdDate:
+                    type: string
+                    format: date-time
+                    readOnly: true
+                    description: Time at which the rule was created. Rules that change
+                      cost for the same resource are applied in order of creation.
+                  updatedDate:
+                    type: string
+                    format: date-time
+                    readOnly: true
+                    description: Time at which the rule was last updated.
+            x-ms-azure-resource: true
+          x-ms-identifiers:
+          - id
+        nextLink:
+          description: URL to get the next set of rule list results if there are any.
+          type: string
+          readOnly: true
+    CostAllocationRuleCheckNameAvailabilityRequest:
+      type: object
+      description: The cost allocation rule check name availability request
+      properties:
+        name:
+          type: string
+          description: Rule name
+        type:
+          type: string
+          description: Resource type. This is expected to be Microsoft.CostManagement/costAllocationRules
+    CostAllocationRuleCheckNameAvailabilityResponse:
+      type: object
+      description: The cost allocation rule check name availability response
+      properties:
+        nameAvailable:
+          type: boolean
+          description: Whether this rule name is available
+        reason:
+          description: The reason this name is not available
+          type: string
+          enum:
+          - Invalid
+          - AlreadyExists
+          - Valid
+          x-ms-enum:
+            name: Reason
+            modelAsString: true
+        message:
+          type: string
+          description: Error message if the name is not available
+    Reason:
+      type: string
+      description: The reason this name is not available.
+      enum:
+      - Invalid
+      - AlreadyExists
+      - Valid
+      x-ms-enum:
+        name: Reason
+        modelAsString: true
+    CostAllocationRuleDefinition:
+      type: object
+      description: The cost allocation rule model definition
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: Azure Resource Manager Id for the rule. This is a read ony
+            value.
+        name:
+          type: string
+          readOnly: true
+          description: Name of the rule. This is a read only value.
+        type:
+          type: string
+          readOnly: true
+          description: Resource type of the rule. This is a read only value of Microsoft.CostManagement/CostAllocationRule.
+        properties:
+          description: Cost allocation rule properties
+          type: object
+          additionalProperties: false
+          required:
+          - details
+          - status
+          properties:
+            description:
+              description: Description of a cost allocation rule.
+              type: string
+            details:
+              description: Resource information for the cost allocation rule
+              type: object
+              properties:
+                sourceResources:
+                  description: Source resources for cost allocation. At this time,
+                    this list can contain no more than one element.
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      resourceType:
+                        description: Type of resources contained in this cost allocation
+                          rule
+                        type: string
+                        enum:
+                        - Dimension
+                        - Tag
+                        x-ms-enum:
+                          name: CostAllocationResourceType
+                          modelAsString: true
+                          values:
+                          - value: Dimension
+                            description: Indicates an Azure dimension such as a subscription
+                              id or resource group name is being used for allocation.
+                            name: Dimension
+                          - value: Tag
+                            description: Allocates cost based on Azure Tag key value
+                              pairs.
+                            name: Tag
+                      name:
+                        description: If resource type is dimension, this must be either
+                          ResourceGroupName or SubscriptionId. If resource type is
+                          tag, this must be a valid Azure tag
+                        type: string
+                      values:
+                        description: Source Resources for cost allocation. This list
+                          cannot contain more than 25 values.
+                        type: array
+                        items:
+                          description: Source resource for cost allocation
+                          type: string
+                        x-ms-identifiers:
+                        - name
+                    required:
+                    - resourceType
+                    - name
+                    - values
+                    description: Common values for resources for cost allocation
+                  x-ms-identifiers:
+                  - name
+                targetResources:
+                  type: array
+                  description: Target resources for cost allocation. At this time,
+                    this list can contain no more than one element.
+                  items:
+                    type: object
+                    properties:
+                      resourceType:
+                        description: Type of resources contained in this cost allocation
+                          rule
+                        type: string
+                        enum:
+                        - Dimension
+                        - Tag
+                        x-ms-enum:
+                          name: CostAllocationResourceType
+                          modelAsString: true
+                          values:
+                          - value: Dimension
+                            description: Indicates an Azure dimension such as a subscription
+                              id or resource group name is being used for allocation.
+                            name: Dimension
+                          - value: Tag
+                            description: Allocates cost based on Azure Tag key value
+                              pairs.
+                            name: Tag
+                      name:
+                        description: If resource type is dimension, this must be either
+                          ResourceGroupName or SubscriptionId. If resource type is
+                          tag, this must be a valid Azure tag
+                        type: string
+                      values:
+                        description: Target resources for cost allocation. This list
+                          cannot contain more than 25 values.
+                        type: array
+                        items:
+                          type: object
+                          description: Target resources and allocation
+                          required:
+                          - percentage
+                          - name
+                          properties:
+                            name:
+                              description: Target resource for cost allocation
+                              type: string
+                            percentage:
+                              description: Percentage of source cost to allocate to
+                                this resource. This value can be specified to two
+                                decimal places and the total percentage of all resources
+                                in this rule must sum to 100.00.
+                              type: number
+                        x-ms-identifiers:
+                        - name
+                      policyType:
+                        description: Method of cost allocation for the rule
+                        type: string
+                        enum:
+                        - FixedProportion
+                        x-ms-enum:
+                          name: CostAllocationPolicyType
+                          modelAsString: true
+                    required:
+                    - resourceType
+                    - name
+                    - values
+                    - policyType
+                    description: Common values for resources for cost allocation
+                  x-ms-identifiers:
+                  - name
+            status:
+              description: Status of the rule
+              type: string
+              enum:
+              - NotActive
+              - Active
+              - Processing
+              x-ms-enum:
+                name: RuleStatus
+                modelAsString: true
+                values:
+                - value: NotActive
+                  description: Rule is saved but not used to allocate costs.
+                  name: NotActive
+                - value: Active
+                  description: Rule is saved and impacting cost allocation.
+                  name: Active
+                - value: Processing
+                  description: Rule is saved and cost allocation is being updated.
+                    Readonly value that cannot be submitted in a put request.
+                  name: Processing
+            createdDate:
+              type: string
+              format: date-time
+              readOnly: true
+              description: Time at which the rule was created. Rules that change cost
+                for the same resource are applied in order of creation.
+            updatedDate:
+              type: string
+              format: date-time
+              readOnly: true
+              description: Time at which the rule was last updated.
+      x-ms-azure-resource: true
+    CostAllocationRuleProperties:
+      type: object
+      description: The properties of a cost allocation rule
+      additionalProperties: false
+      required:
+      - details
+      - status
+      properties:
+        description:
+          description: Description of a cost allocation rule.
+          type: string
+        details:
+          description: Resource information for the cost allocation rule
+          type: object
+          properties:
+            sourceResources:
+              description: Source resources for cost allocation. At this time, this
+                list can contain no more than one element.
+              type: array
+              items:
+                type: object
+                properties:
+                  resourceType:
+                    description: Type of resources contained in this cost allocation
+                      rule
+                    type: string
+                    enum:
+                    - Dimension
+                    - Tag
+                    x-ms-enum:
+                      name: CostAllocationResourceType
+                      modelAsString: true
+                      values:
+                      - value: Dimension
+                        description: Indicates an Azure dimension such as a subscription
+                          id or resource group name is being used for allocation.
+                        name: Dimension
+                      - value: Tag
+                        description: Allocates cost based on Azure Tag key value pairs.
+                        name: Tag
+                  name:
+                    description: If resource type is dimension, this must be either
+                      ResourceGroupName or SubscriptionId. If resource type is tag,
+                      this must be a valid Azure tag
+                    type: string
+                  values:
+                    description: Source Resources for cost allocation. This list cannot
+                      contain more than 25 values.
+                    type: array
+                    items:
+                      description: Source resource for cost allocation
+                      type: string
+                    x-ms-identifiers:
+                    - name
+                required:
+                - resourceType
+                - name
+                - values
+                description: Common values for resources for cost allocation
+              x-ms-identifiers:
+              - name
+            targetResources:
+              type: array
+              description: Target resources for cost allocation. At this time, this
+                list can contain no more than one element.
+              items:
+                type: object
+                properties:
+                  resourceType:
+                    description: Type of resources contained in this cost allocation
+                      rule
+                    type: string
+                    enum:
+                    - Dimension
+                    - Tag
+                    x-ms-enum:
+                      name: CostAllocationResourceType
+                      modelAsString: true
+                      values:
+                      - value: Dimension
+                        description: Indicates an Azure dimension such as a subscription
+                          id or resource group name is being used for allocation.
+                        name: Dimension
+                      - value: Tag
+                        description: Allocates cost based on Azure Tag key value pairs.
+                        name: Tag
+                  name:
+                    description: If resource type is dimension, this must be either
+                      ResourceGroupName or SubscriptionId. If resource type is tag,
+                      this must be a valid Azure tag
+                    type: string
+                  values:
+                    description: Target resources for cost allocation. This list cannot
+                      contain more than 25 values.
+                    type: array
+                    items:
+                      type: object
+                      description: Target resources and allocation
+                      required:
+                      - percentage
+                      - name
+                      properties:
+                        name:
+                          description: Target resource for cost allocation
+                          type: string
+                        percentage:
+                          description: Percentage of source cost to allocate to this
+                            resource. This value can be specified to two decimal places
+                            and the total percentage of all resources in this rule
+                            must sum to 100.00.
+                          type: number
+                    x-ms-identifiers:
+                    - name
+                  policyType:
+                    description: Method of cost allocation for the rule
+                    type: string
+                    enum:
+                    - FixedProportion
+                    x-ms-enum:
+                      name: CostAllocationPolicyType
+                      modelAsString: true
+                required:
+                - resourceType
+                - name
+                - values
+                - policyType
+                description: Common values for resources for cost allocation
+              x-ms-identifiers:
+              - name
+        status:
+          description: Status of the rule
+          type: string
+          enum:
+          - NotActive
+          - Active
+          - Processing
+          x-ms-enum:
+            name: RuleStatus
+            modelAsString: true
+            values:
+            - value: NotActive
+              description: Rule is saved but not used to allocate costs.
+              name: NotActive
+            - value: Active
+              description: Rule is saved and impacting cost allocation.
+              name: Active
+            - value: Processing
+              description: Rule is saved and cost allocation is being updated. Readonly
+                value that cannot be submitted in a put request.
+              name: Processing
+        createdDate:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Time at which the rule was created. Rules that change cost
+            for the same resource are applied in order of creation.
+        updatedDate:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Time at which the rule was last updated.
+    RuleStatus:
+      type: string
+      description: Current status of the rule.
+      enum:
+      - NotActive
+      - Active
+      - Processing
+      x-ms-enum:
+        name: RuleStatus
+        modelAsString: true
+        values:
+        - value: NotActive
+          description: Rule is saved but not used to allocate costs.
+          name: NotActive
+        - value: Active
+          description: Rule is saved and impacting cost allocation.
+          name: Active
+        - value: Processing
+          description: Rule is saved and cost allocation is being updated. Readonly
+            value that cannot be submitted in a put request.
+          name: Processing
+    CostAllocationRuleDetails:
+      type: object
+      description: Resource details of the cost allocation rule
+      properties:
+        sourceResources:
+          description: Source resources for cost allocation. At this time, this list
+            can contain no more than one element.
+          type: array
+          items:
+            type: object
+            properties:
+              resourceType:
+                description: Type of resources contained in this cost allocation rule
+                type: string
+                enum:
+                - Dimension
+                - Tag
+                x-ms-enum:
+                  name: CostAllocationResourceType
+                  modelAsString: true
+                  values:
+                  - value: Dimension
+                    description: Indicates an Azure dimension such as a subscription
+                      id or resource group name is being used for allocation.
+                    name: Dimension
+                  - value: Tag
+                    description: Allocates cost based on Azure Tag key value pairs.
+                    name: Tag
+              name:
+                description: If resource type is dimension, this must be either ResourceGroupName
+                  or SubscriptionId. If resource type is tag, this must be a valid
+                  Azure tag
+                type: string
+              values:
+                description: Source Resources for cost allocation. This list cannot
+                  contain more than 25 values.
+                type: array
+                items:
+                  description: Source resource for cost allocation
+                  type: string
+                x-ms-identifiers:
+                - name
+            required:
+            - resourceType
+            - name
+            - values
+            description: Common values for resources for cost allocation
+          x-ms-identifiers:
+          - name
+        targetResources:
+          type: array
+          description: Target resources for cost allocation. At this time, this list
+            can contain no more than one element.
+          items:
+            type: object
+            properties:
+              resourceType:
+                description: Type of resources contained in this cost allocation rule
+                type: string
+                enum:
+                - Dimension
+                - Tag
+                x-ms-enum:
+                  name: CostAllocationResourceType
+                  modelAsString: true
+                  values:
+                  - value: Dimension
+                    description: Indicates an Azure dimension such as a subscription
+                      id or resource group name is being used for allocation.
+                    name: Dimension
+                  - value: Tag
+                    description: Allocates cost based on Azure Tag key value pairs.
+                    name: Tag
+              name:
+                description: If resource type is dimension, this must be either ResourceGroupName
+                  or SubscriptionId. If resource type is tag, this must be a valid
+                  Azure tag
+                type: string
+              values:
+                description: Target resources for cost allocation. This list cannot
+                  contain more than 25 values.
+                type: array
+                items:
+                  type: object
+                  description: Target resources and allocation
+                  required:
+                  - percentage
+                  - name
+                  properties:
+                    name:
+                      description: Target resource for cost allocation
+                      type: string
+                    percentage:
+                      description: Percentage of source cost to allocate to this resource.
+                        This value can be specified to two decimal places and the
+                        total percentage of all resources in this rule must sum to
+                        100.00.
+                      type: number
+                x-ms-identifiers:
+                - name
+              policyType:
+                description: Method of cost allocation for the rule
+                type: string
+                enum:
+                - FixedProportion
+                x-ms-enum:
+                  name: CostAllocationPolicyType
+                  modelAsString: true
+            required:
+            - resourceType
+            - name
+            - values
+            - policyType
+            description: Common values for resources for cost allocation
+          x-ms-identifiers:
+          - name
+    CostAllocationResource:
+      type: object
+      description: Common values for resources for cost allocation
+      required:
+      - resourceType
+      - name
+      properties:
+        resourceType:
+          description: Type of resources contained in this cost allocation rule
+          type: string
+          enum:
+          - Dimension
+          - Tag
+          x-ms-enum:
+            name: CostAllocationResourceType
+            modelAsString: true
+            values:
+            - value: Dimension
+              description: Indicates an Azure dimension such as a subscription id
+                or resource group name is being used for allocation.
+              name: Dimension
+            - value: Tag
+              description: Allocates cost based on Azure Tag key value pairs.
+              name: Tag
+        name:
+          description: If resource type is dimension, this must be either ResourceGroupName
+            or SubscriptionId. If resource type is tag, this must be a valid Azure
+            tag
+          type: string
+    SourceCostAllocationResource:
+      type: object
+      properties:
+        resourceType:
+          description: Type of resources contained in this cost allocation rule
+          type: string
+          enum:
+          - Dimension
+          - Tag
+          x-ms-enum:
+            name: CostAllocationResourceType
+            modelAsString: true
+            values:
+            - value: Dimension
+              description: Indicates an Azure dimension such as a subscription id
+                or resource group name is being used for allocation.
+              name: Dimension
+            - value: Tag
+              description: Allocates cost based on Azure Tag key value pairs.
+              name: Tag
+        name:
+          description: If resource type is dimension, this must be either ResourceGroupName
+            or SubscriptionId. If resource type is tag, this must be a valid Azure
+            tag
+          type: string
+        values:
+          description: Source Resources for cost allocation. This list cannot contain
+            more than 25 values.
+          type: array
+          items:
+            description: Source resource for cost allocation
+            type: string
+          x-ms-identifiers:
+          - name
+      required:
+      - resourceType
+      - name
+      - values
+      description: Common values for resources for cost allocation
+    TargetCostAllocationResource:
+      type: object
+      properties:
+        resourceType:
+          description: Type of resources contained in this cost allocation rule
+          type: string
+          enum:
+          - Dimension
+          - Tag
+          x-ms-enum:
+            name: CostAllocationResourceType
+            modelAsString: true
+            values:
+            - value: Dimension
+              description: Indicates an Azure dimension such as a subscription id
+                or resource group name is being used for allocation.
+              name: Dimension
+            - value: Tag
+              description: Allocates cost based on Azure Tag key value pairs.
+              name: Tag
+        name:
+          description: If resource type is dimension, this must be either ResourceGroupName
+            or SubscriptionId. If resource type is tag, this must be a valid Azure
+            tag
+          type: string
+        values:
+          description: Target resources for cost allocation. This list cannot contain
+            more than 25 values.
+          type: array
+          items:
+            type: object
+            description: Target resources and allocation
+            required:
+            - percentage
+            - name
+            properties:
+              name:
+                description: Target resource for cost allocation
+                type: string
+              percentage:
+                description: Percentage of source cost to allocate to this resource.
+                  This value can be specified to two decimal places and the total
+                  percentage of all resources in this rule must sum to 100.00.
+                type: number
+          x-ms-identifiers:
+          - name
+        policyType:
+          description: Method of cost allocation for the rule
+          type: string
+          enum:
+          - FixedProportion
+          x-ms-enum:
+            name: CostAllocationPolicyType
+            modelAsString: true
+      required:
+      - resourceType
+      - name
+      - values
+      - policyType
+      description: Common values for resources for cost allocation
+    CostAllocationResourceType:
+      type: string
+      description: Category of resource to use for allocation.
+      enum:
+      - Dimension
+      - Tag
+      x-ms-enum:
+        name: CostAllocationResourceType
+        modelAsString: true
+        values:
+        - value: Dimension
+          description: Indicates an Azure dimension such as a subscription id or resource
+            group name is being used for allocation.
+          name: Dimension
+        - value: Tag
+          description: Allocates cost based on Azure Tag key value pairs.
+          name: Tag
+    CostAllocationProportion:
+      type: object
+      description: Target resources and allocation
+      required:
+      - percentage
+      - name
+      properties:
+        name:
+          description: Target resource for cost allocation
+          type: string
+        percentage:
+          description: Percentage of source cost to allocate to this resource. This
+            value can be specified to two decimal places and the total percentage
+            of all resources in this rule must sum to 100.00.
+          type: number
+    CostAllocationPolicyType:
+      type: string
+      description: Method to use for allocating cost. FixedProportion indicates that
+        cost will be split based on specified percentage values.
+      enum:
+      - FixedProportion
+      x-ms-enum:
+        name: CostAllocationPolicyType
+        modelAsString: true

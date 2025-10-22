@@ -1,0 +1,1587 @@
+openapi: 3.0.0
+info:
+  title: Azure Network Fabric Management Service API
+  description: Self service experience for Azure Network Fabric API.
+  version: 2023-06-15
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  /subscriptions/{subscriptionId}/providers/Microsoft.ManagedNetworkFabric/networkDeviceSkus/{networkDeviceSkuName}:
+    get:
+      tags:
+      - NetworkDeviceSkus
+      operationId: NetworkDeviceSkus_Get
+      summary: Gets a Network Device Sku.
+      description: Get a Network Device SKU details.
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - description: Name of the Network Device SKU.
+        in: path
+        name: networkDeviceSkuName
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: arm-id
+                    description: Fully qualified resource ID for the resource. E.g.
+                      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                    readOnly: true
+                  name:
+                    type: string
+                    description: The name of the resource
+                    readOnly: true
+                  type:
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                    readOnly: true
+                  systemData:
+                    description: Azure Resource Manager metadata containing createdBy
+                      and modifiedBy information.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Resource properties.
+                    type: object
+                    properties:
+                      model:
+                        type: string
+                        description: Model of the network device.
+                      manufacturer:
+                        type: string
+                        description: Manufacturer of the network device.
+                      supportedVersions:
+                        type: array
+                        description: List of supported version details of network
+                          device.
+                        x-ms-identifiers:
+                        - version
+                        items:
+                          description: Supported version details of the network device.
+                          type: object
+                          properties:
+                            version:
+                              type: string
+                              description: Operating system and firmware combined
+                                versions.
+                            vendorOsVersion:
+                              type: string
+                              description: Operating system version.
+                            vendorFirmwareVersion:
+                              type: string
+                              description: Firmware version.
+                            isDefault:
+                              description: If true newly provisioned Fabric will use
+                                this device version by default to bootstrap the network
+                                devices for the first time.
+                              type: string
+                              enum:
+                              - 'True'
+                              - 'False'
+                              x-ms-enum:
+                                modelAsString: true
+                                name: BooleanEnumProperty
+                      supportedRoleTypes:
+                        type: array
+                        description: Available roles for the network device.
+                        items:
+                          type: string
+                          description: Available roles for the network device.
+                          enum:
+                          - CE
+                          - ToR
+                          - NPB
+                          - TS
+                          - Management
+                          x-ms-enum:
+                            modelAsString: true
+                            name: networkDeviceRoleName
+                      interfaces:
+                        type: array
+                        description: List of network device interfaces.
+                        x-ms-identifiers:
+                        - identifier
+                        items:
+                          description: Network device interface properties.
+                          type: object
+                          properties:
+                            identifier:
+                              type: string
+                              description: 'Interface identifier. Example: HundredGigE0/0.'
+                            interfaceType:
+                              type: string
+                              description: Interface type.
+                            supportedConnectorTypes:
+                              type: array
+                              description: List of supported connector types.
+                              x-ms-identifiers:
+                              - connectorType
+                              items:
+                                description: Supported connector properties.
+                                type: object
+                                properties:
+                                  connectorType:
+                                    type: string
+                                    description: 'Type of connector used. Example:
+                                      Optical.'
+                                  maxSpeedInMbps:
+                                    type: integer
+                                    format: int32
+                                    description: Maximum speed of the connector in
+                                      Mbps.
+                      provisioningState:
+                        description: Provisioning state of the resource.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Accepted
+                        - Succeeded
+                        - Updating
+                        - Deleting
+                        - Failed
+                        - Canceled
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: true
+                    required:
+                    - model
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - properties
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  /subscriptions/{subscriptionId}/providers/Microsoft.ManagedNetworkFabric/networkDeviceSkus:
+    get:
+      operationId: NetworkDeviceSkus_ListBySubscription
+      summary: List Network Device SKUs by subscription.
+      description: List Network Device SKUs for the given subscription.
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Lists all Network Device SKU under the subscription.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of Network Device SKUs.
+                properties:
+                  value:
+                    type: array
+                    description: List of Network Device SKU resources.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: arm-id
+                          description: Fully qualified resource ID for the resource.
+                            E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                          readOnly: true
+                        name:
+                          type: string
+                          description: The name of the resource
+                          readOnly: true
+                        type:
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                          readOnly: true
+                        systemData:
+                          description: Azure Resource Manager metadata containing
+                            createdBy and modifiedBy information.
+                          readOnly: true
+                          type: object
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource last modification
+                                (UTC)
+                        properties:
+                          x-ms-client-flatten: true
+                          description: Resource properties.
+                          type: object
+                          properties:
+                            model:
+                              type: string
+                              description: Model of the network device.
+                            manufacturer:
+                              type: string
+                              description: Manufacturer of the network device.
+                            supportedVersions:
+                              type: array
+                              description: List of supported version details of network
+                                device.
+                              x-ms-identifiers:
+                              - version
+                              items:
+                                description: Supported version details of the network
+                                  device.
+                                type: object
+                                properties:
+                                  version:
+                                    type: string
+                                    description: Operating system and firmware combined
+                                      versions.
+                                  vendorOsVersion:
+                                    type: string
+                                    description: Operating system version.
+                                  vendorFirmwareVersion:
+                                    type: string
+                                    description: Firmware version.
+                                  isDefault:
+                                    description: If true newly provisioned Fabric
+                                      will use this device version by default to bootstrap
+                                      the network devices for the first time.
+                                    type: string
+                                    enum:
+                                    - 'True'
+                                    - 'False'
+                                    x-ms-enum:
+                                      modelAsString: true
+                                      name: BooleanEnumProperty
+                            supportedRoleTypes:
+                              type: array
+                              description: Available roles for the network device.
+                              items:
+                                type: string
+                                description: Available roles for the network device.
+                                enum:
+                                - CE
+                                - ToR
+                                - NPB
+                                - TS
+                                - Management
+                                x-ms-enum:
+                                  modelAsString: true
+                                  name: networkDeviceRoleName
+                            interfaces:
+                              type: array
+                              description: List of network device interfaces.
+                              x-ms-identifiers:
+                              - identifier
+                              items:
+                                description: Network device interface properties.
+                                type: object
+                                properties:
+                                  identifier:
+                                    type: string
+                                    description: 'Interface identifier. Example: HundredGigE0/0.'
+                                  interfaceType:
+                                    type: string
+                                    description: Interface type.
+                                  supportedConnectorTypes:
+                                    type: array
+                                    description: List of supported connector types.
+                                    x-ms-identifiers:
+                                    - connectorType
+                                    items:
+                                      description: Supported connector properties.
+                                      type: object
+                                      properties:
+                                        connectorType:
+                                          type: string
+                                          description: 'Type of connector used. Example:
+                                            Optical.'
+                                        maxSpeedInMbps:
+                                          type: integer
+                                          format: int32
+                                          description: Maximum speed of the connector
+                                            in Mbps.
+                            provisioningState:
+                              description: Provisioning state of the resource.
+                              readOnly: true
+                              type: string
+                              enum:
+                              - Accepted
+                              - Succeeded
+                              - Updating
+                              - Deleting
+                              - Failed
+                              - Canceled
+                              x-ms-enum:
+                                name: ProvisioningState
+                                modelAsString: true
+                          required:
+                          - model
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                      required:
+                      - properties
+                  nextLink:
+                    type: string
+                    description: Url to follow for getting next page of resources.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+components:
+  parameters:
+    NetworkDeviceSkuNameParameter:
+      description: Name of the Network Device SKU.
+      in: path
+      name: networkDeviceSkuName
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription. The value must be an UUID.
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    NetworkDeviceSkuProperties:
+      type: object
+      properties:
+        model:
+          type: string
+          description: Model of the network device.
+        manufacturer:
+          type: string
+          description: Manufacturer of the network device.
+        supportedVersions:
+          type: array
+          description: List of supported version details of network device.
+          x-ms-identifiers:
+          - version
+          items:
+            description: Supported version details of the network device.
+            type: object
+            properties:
+              version:
+                type: string
+                description: Operating system and firmware combined versions.
+              vendorOsVersion:
+                type: string
+                description: Operating system version.
+              vendorFirmwareVersion:
+                type: string
+                description: Firmware version.
+              isDefault:
+                description: If true newly provisioned Fabric will use this device
+                  version by default to bootstrap the network devices for the first
+                  time.
+                type: string
+                enum:
+                - 'True'
+                - 'False'
+                x-ms-enum:
+                  modelAsString: true
+                  name: BooleanEnumProperty
+        supportedRoleTypes:
+          type: array
+          description: Available roles for the network device.
+          items:
+            type: string
+            description: Available roles for the network device.
+            enum:
+            - CE
+            - ToR
+            - NPB
+            - TS
+            - Management
+            x-ms-enum:
+              modelAsString: true
+              name: networkDeviceRoleName
+        interfaces:
+          type: array
+          description: List of network device interfaces.
+          x-ms-identifiers:
+          - identifier
+          items:
+            description: Network device interface properties.
+            type: object
+            properties:
+              identifier:
+                type: string
+                description: 'Interface identifier. Example: HundredGigE0/0.'
+              interfaceType:
+                type: string
+                description: Interface type.
+              supportedConnectorTypes:
+                type: array
+                description: List of supported connector types.
+                x-ms-identifiers:
+                - connectorType
+                items:
+                  description: Supported connector properties.
+                  type: object
+                  properties:
+                    connectorType:
+                      type: string
+                      description: 'Type of connector used. Example: Optical.'
+                    maxSpeedInMbps:
+                      type: integer
+                      format: int32
+                      description: Maximum speed of the connector in Mbps.
+        provisioningState:
+          description: Provisioning state of the resource.
+          readOnly: true
+          type: string
+          enum:
+          - Accepted
+          - Succeeded
+          - Updating
+          - Deleting
+          - Failed
+          - Canceled
+          x-ms-enum:
+            name: ProvisioningState
+            modelAsString: true
+      required:
+      - model
+      description: Network Device SKU Properties defines the properties of the resource.
+    NetworkDeviceSku:
+      type: object
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+        properties:
+          x-ms-client-flatten: true
+          description: Resource properties.
+          type: object
+          properties:
+            model:
+              type: string
+              description: Model of the network device.
+            manufacturer:
+              type: string
+              description: Manufacturer of the network device.
+            supportedVersions:
+              type: array
+              description: List of supported version details of network device.
+              x-ms-identifiers:
+              - version
+              items:
+                description: Supported version details of the network device.
+                type: object
+                properties:
+                  version:
+                    type: string
+                    description: Operating system and firmware combined versions.
+                  vendorOsVersion:
+                    type: string
+                    description: Operating system version.
+                  vendorFirmwareVersion:
+                    type: string
+                    description: Firmware version.
+                  isDefault:
+                    description: If true newly provisioned Fabric will use this device
+                      version by default to bootstrap the network devices for the
+                      first time.
+                    type: string
+                    enum:
+                    - 'True'
+                    - 'False'
+                    x-ms-enum:
+                      modelAsString: true
+                      name: BooleanEnumProperty
+            supportedRoleTypes:
+              type: array
+              description: Available roles for the network device.
+              items:
+                type: string
+                description: Available roles for the network device.
+                enum:
+                - CE
+                - ToR
+                - NPB
+                - TS
+                - Management
+                x-ms-enum:
+                  modelAsString: true
+                  name: networkDeviceRoleName
+            interfaces:
+              type: array
+              description: List of network device interfaces.
+              x-ms-identifiers:
+              - identifier
+              items:
+                description: Network device interface properties.
+                type: object
+                properties:
+                  identifier:
+                    type: string
+                    description: 'Interface identifier. Example: HundredGigE0/0.'
+                  interfaceType:
+                    type: string
+                    description: Interface type.
+                  supportedConnectorTypes:
+                    type: array
+                    description: List of supported connector types.
+                    x-ms-identifiers:
+                    - connectorType
+                    items:
+                      description: Supported connector properties.
+                      type: object
+                      properties:
+                        connectorType:
+                          type: string
+                          description: 'Type of connector used. Example: Optical.'
+                        maxSpeedInMbps:
+                          type: integer
+                          format: int32
+                          description: Maximum speed of the connector in Mbps.
+            provisioningState:
+              description: Provisioning state of the resource.
+              readOnly: true
+              type: string
+              enum:
+              - Accepted
+              - Succeeded
+              - Updating
+              - Deleting
+              - Failed
+              - Canceled
+              x-ms-enum:
+                name: ProvisioningState
+                modelAsString: true
+          required:
+          - model
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+      required:
+      - properties
+    NetworkDeviceSkusListResult:
+      type: object
+      description: List of Network Device SKUs.
+      properties:
+        value:
+          type: array
+          description: List of Network Device SKU resources.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: arm-id
+                description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                readOnly: true
+              name:
+                type: string
+                description: The name of the resource
+                readOnly: true
+              type:
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+                readOnly: true
+              systemData:
+                description: Azure Resource Manager metadata containing createdBy
+                  and modifiedBy information.
+                readOnly: true
+                type: object
+                properties:
+                  createdBy:
+                    type: string
+                    description: The identity that created the resource.
+                  createdByType:
+                    type: string
+                    description: The type of identity that created the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource creation (UTC).
+                  lastModifiedBy:
+                    type: string
+                    description: The identity that last modified the resource.
+                  lastModifiedByType:
+                    type: string
+                    description: The type of identity that last modified the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  lastModifiedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource last modification (UTC)
+              properties:
+                x-ms-client-flatten: true
+                description: Resource properties.
+                type: object
+                properties:
+                  model:
+                    type: string
+                    description: Model of the network device.
+                  manufacturer:
+                    type: string
+                    description: Manufacturer of the network device.
+                  supportedVersions:
+                    type: array
+                    description: List of supported version details of network device.
+                    x-ms-identifiers:
+                    - version
+                    items:
+                      description: Supported version details of the network device.
+                      type: object
+                      properties:
+                        version:
+                          type: string
+                          description: Operating system and firmware combined versions.
+                        vendorOsVersion:
+                          type: string
+                          description: Operating system version.
+                        vendorFirmwareVersion:
+                          type: string
+                          description: Firmware version.
+                        isDefault:
+                          description: If true newly provisioned Fabric will use this
+                            device version by default to bootstrap the network devices
+                            for the first time.
+                          type: string
+                          enum:
+                          - 'True'
+                          - 'False'
+                          x-ms-enum:
+                            modelAsString: true
+                            name: BooleanEnumProperty
+                  supportedRoleTypes:
+                    type: array
+                    description: Available roles for the network device.
+                    items:
+                      type: string
+                      description: Available roles for the network device.
+                      enum:
+                      - CE
+                      - ToR
+                      - NPB
+                      - TS
+                      - Management
+                      x-ms-enum:
+                        modelAsString: true
+                        name: networkDeviceRoleName
+                  interfaces:
+                    type: array
+                    description: List of network device interfaces.
+                    x-ms-identifiers:
+                    - identifier
+                    items:
+                      description: Network device interface properties.
+                      type: object
+                      properties:
+                        identifier:
+                          type: string
+                          description: 'Interface identifier. Example: HundredGigE0/0.'
+                        interfaceType:
+                          type: string
+                          description: Interface type.
+                        supportedConnectorTypes:
+                          type: array
+                          description: List of supported connector types.
+                          x-ms-identifiers:
+                          - connectorType
+                          items:
+                            description: Supported connector properties.
+                            type: object
+                            properties:
+                              connectorType:
+                                type: string
+                                description: 'Type of connector used. Example: Optical.'
+                              maxSpeedInMbps:
+                                type: integer
+                                format: int32
+                                description: Maximum speed of the connector in Mbps.
+                  provisioningState:
+                    description: Provisioning state of the resource.
+                    readOnly: true
+                    type: string
+                    enum:
+                    - Accepted
+                    - Succeeded
+                    - Updating
+                    - Deleting
+                    - Failed
+                    - Canceled
+                    x-ms-enum:
+                      name: ProvisioningState
+                      modelAsString: true
+                required:
+                - model
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+            required:
+            - properties
+        nextLink:
+          type: string
+          description: Url to follow for getting next page of resources.
+    SupportedVersionProperties:
+      description: Supported version details of the network device.
+      type: object
+      properties:
+        version:
+          type: string
+          description: Operating system and firmware combined versions.
+        vendorOsVersion:
+          type: string
+          description: Operating system version.
+        vendorFirmwareVersion:
+          type: string
+          description: Firmware version.
+        isDefault:
+          description: If true newly provisioned Fabric will use this device version
+            by default to bootstrap the network devices for the first time.
+          type: string
+          enum:
+          - 'True'
+          - 'False'
+          x-ms-enum:
+            modelAsString: true
+            name: BooleanEnumProperty
+    DeviceInterfaceProperties:
+      description: Network device interface properties.
+      type: object
+      properties:
+        identifier:
+          type: string
+          description: 'Interface identifier. Example: HundredGigE0/0.'
+        interfaceType:
+          type: string
+          description: Interface type.
+        supportedConnectorTypes:
+          type: array
+          description: List of supported connector types.
+          x-ms-identifiers:
+          - connectorType
+          items:
+            description: Supported connector properties.
+            type: object
+            properties:
+              connectorType:
+                type: string
+                description: 'Type of connector used. Example: Optical.'
+              maxSpeedInMbps:
+                type: integer
+                format: int32
+                description: Maximum speed of the connector in Mbps.
+    SupportedConnectorProperties:
+      description: Supported connector properties.
+      type: object
+      properties:
+        connectorType:
+          type: string
+          description: 'Type of connector used. Example: Optical.'
+        maxSpeedInMbps:
+          type: integer
+          format: int32
+          description: Maximum speed of the connector in Mbps.
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+    systemData:
+      type: object
+      description: Metadata pertaining to creation and last modification of the resource.
+      properties:
+        createdBy:
+          type: string
+          description: The identity that created the resource.
+        createdByType:
+          type: string
+          description: The type of identity that created the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource creation (UTC).
+        lastModifiedBy:
+          type: string
+          description: The identity that last modified the resource.
+        lastModifiedByType:
+          type: string
+          description: The type of identity that last modified the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource last modification (UTC)
+      readOnly: true
+    Resource:
+      type: object
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    BooleanEnumProperty:
+      type: string
+      description: Boolean Enum. Example- True/False
+      enum:
+      - 'True'
+      - 'False'
+      x-ms-enum:
+        modelAsString: true
+        name: BooleanEnumProperty
+    ProvisioningState:
+      type: string
+      readOnly: true
+      description: The current provisioning state.
+      enum:
+      - Accepted
+      - Succeeded
+      - Updating
+      - Deleting
+      - Failed
+      - Canceled
+      x-ms-enum:
+        name: ProvisioningState
+        modelAsString: true

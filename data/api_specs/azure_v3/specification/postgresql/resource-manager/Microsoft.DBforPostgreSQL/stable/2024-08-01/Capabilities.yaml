@@ -1,0 +1,3272 @@
+openapi: 3.0.0
+info:
+  title: PostgreSQLManagementClient
+  description: The Azure Database for PostgreSQL management API provides create, read,
+    update, and delete functionality for Azure PostgreSQL resources including servers,
+    databases, firewall rules, network configuration, security alert policies, log
+    files and configurations with new business model.
+  version: 2024-08-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  /subscriptions/{subscriptionId}/providers/Microsoft.DBforPostgreSQL/locations/{locationName}/capabilities:
+    get:
+      tags:
+      - LocationBasedCapabilities
+      operationId: LocationBasedCapabilities_Execute
+      description: Lists the capabilities available in a given location for a specific
+        subscription.
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: locationName
+        in: path
+        required: true
+        description: The name of the location.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          pattern: ^[-\w\._]+$
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    description: List of supported capabilities.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          description: The status of the capability.
+                          enum:
+                          - Visible
+                          - Available
+                          - Default
+                          - Disabled
+                          type: string
+                          readOnly: true
+                          x-ms-mutability:
+                          - read
+                          x-ms-enum:
+                            name: CapabilityStatus
+                            modelAsString: false
+                        reason:
+                          description: The reason for the capability not being available.
+                          type: string
+                          readOnly: true
+                          x-ms-mutability:
+                          - read
+                        name:
+                          type: string
+                          description: Name of flexible servers capabilities.
+                        supportedServerEditions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              status:
+                                description: The status of the capability.
+                                enum:
+                                - Visible
+                                - Available
+                                - Default
+                                - Disabled
+                                type: string
+                                readOnly: true
+                                x-ms-mutability:
+                                - read
+                                x-ms-enum:
+                                  name: CapabilityStatus
+                                  modelAsString: false
+                              reason:
+                                description: The reason for the capability not being
+                                  available.
+                                type: string
+                                readOnly: true
+                                x-ms-mutability:
+                                - read
+                              name:
+                                type: string
+                                description: Name of compute tier.
+                                readOnly: true
+                              defaultSkuName:
+                                type: string
+                                description: Default compute name (SKU) for this computer
+                                  tier.
+                                readOnly: true
+                              supportedStorageEditions:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    status:
+                                      description: The status of the capability.
+                                      enum:
+                                      - Visible
+                                      - Available
+                                      - Default
+                                      - Disabled
+                                      type: string
+                                      readOnly: true
+                                      x-ms-mutability:
+                                      - read
+                                      x-ms-enum:
+                                        name: CapabilityStatus
+                                        modelAsString: false
+                                    reason:
+                                      description: The reason for the capability not
+                                        being available.
+                                      type: string
+                                      readOnly: true
+                                      x-ms-mutability:
+                                      - read
+                                    name:
+                                      type: string
+                                      description: Name of storage tier.
+                                      readOnly: true
+                                    defaultStorageSizeMb:
+                                      type: integer
+                                      format: int64
+                                      description: Default storage size (in MB) for
+                                        this storage tier.
+                                      readOnly: true
+                                    supportedStorageMb:
+                                      type: array
+                                      description: Configurations of storage supported
+                                        for this storage tier.
+                                      items:
+                                        type: object
+                                        properties:
+                                          status:
+                                            description: The status of the capability.
+                                            enum:
+                                            - Visible
+                                            - Available
+                                            - Default
+                                            - Disabled
+                                            type: string
+                                            readOnly: true
+                                            x-ms-mutability:
+                                            - read
+                                            x-ms-enum:
+                                              name: CapabilityStatus
+                                              modelAsString: false
+                                          reason:
+                                            description: The reason for the capability
+                                              not being available.
+                                            type: string
+                                            readOnly: true
+                                            x-ms-mutability:
+                                            - read
+                                          supportedIops:
+                                            type: integer
+                                            format: int32
+                                            description: Minimum IOPS supported by
+                                              the storage size.
+                                            readOnly: true
+                                          supportedMaximumIops:
+                                            type: integer
+                                            format: int32
+                                            description: Maximum IOPS supported by
+                                              the storage size.
+                                            readOnly: true
+                                          storageSizeMb:
+                                            type: integer
+                                            format: int64
+                                            description: Minimum supported size (in
+                                              MB) of storage.
+                                            readOnly: true
+                                          maximumStorageSizeMb:
+                                            type: integer
+                                            format: int64
+                                            description: Maximum supported size (in
+                                              MB) of storage.
+                                            readOnly: true
+                                          supportedThroughput:
+                                            type: integer
+                                            format: int32
+                                            description: Minimum supported throughput
+                                              (in MB/s) of storage.
+                                            readOnly: true
+                                          supportedMaximumThroughput:
+                                            type: integer
+                                            format: int32
+                                            description: Maximum supported throughput
+                                              (in MB/s) of storage.
+                                            readOnly: true
+                                          defaultIopsTier:
+                                            type: string
+                                            description: Default IOPS for this tier
+                                              and storage size.
+                                            readOnly: true
+                                          supportedIopsTiers:
+                                            type: array
+                                            description: List of all supported storage
+                                              tiers for this tier and storage size.
+                                            items:
+                                              type: object
+                                              properties:
+                                                status:
+                                                  description: The status of the capability.
+                                                  enum:
+                                                  - Visible
+                                                  - Available
+                                                  - Default
+                                                  - Disabled
+                                                  type: string
+                                                  readOnly: true
+                                                  x-ms-mutability:
+                                                  - read
+                                                  x-ms-enum:
+                                                    name: CapabilityStatus
+                                                    modelAsString: false
+                                                reason:
+                                                  description: The reason for the
+                                                    capability not being available.
+                                                  type: string
+                                                  readOnly: true
+                                                  x-ms-mutability:
+                                                  - read
+                                                name:
+                                                  type: string
+                                                  description: Name of the storage
+                                                    tier.
+                                                  readOnly: true
+                                                iops:
+                                                  type: integer
+                                                  format: int32
+                                                  description: Supported IOPS for
+                                                    the storage tier.
+                                                  readOnly: true
+                                              description: Base object for representing
+                                                capability
+                                            x-ms-identifiers:
+                                            - name
+                                            readOnly: true
+                                        description: Base object for representing
+                                          capability
+                                      x-ms-identifiers:
+                                      - storageSizeMb
+                                      readOnly: true
+                                  description: Base object for representing capability
+                                description: List of storage editions supported by
+                                  this compute tier and compute name.
+                                readOnly: true
+                                x-ms-identifiers:
+                                - name
+                              supportedServerSkus:
+                                type: array
+                                description: List of supported compute names (SKUs).
+                                items:
+                                  type: object
+                                  properties:
+                                    status:
+                                      description: The status of the capability.
+                                      enum:
+                                      - Visible
+                                      - Available
+                                      - Default
+                                      - Disabled
+                                      type: string
+                                      readOnly: true
+                                      x-ms-mutability:
+                                      - read
+                                      x-ms-enum:
+                                        name: CapabilityStatus
+                                        modelAsString: false
+                                    reason:
+                                      description: The reason for the capability not
+                                        being available.
+                                      type: string
+                                      readOnly: true
+                                      x-ms-mutability:
+                                      - read
+                                    name:
+                                      type: string
+                                      description: Name of the compute (SKU).
+                                      readOnly: true
+                                    vCores:
+                                      type: integer
+                                      format: int32
+                                      description: Number of virtual cores available
+                                        for this compute.
+                                      readOnly: true
+                                    supportedIops:
+                                      type: integer
+                                      format: int32
+                                      description: Maximum IOPS supported by this
+                                        compute.
+                                      readOnly: true
+                                    supportedMemoryPerVcoreMb:
+                                      type: integer
+                                      format: int64
+                                      description: Supported memory (in MB) per virtual
+                                        core assigned to this compute.
+                                      readOnly: true
+                                    supportedZones:
+                                      type: array
+                                      description: List of supported availability
+                                        zones. E.g. "1", "2", "3"
+                                      items:
+                                        type: string
+                                      readOnly: true
+                                    supportedHaMode:
+                                      type: array
+                                      items:
+                                        type: string
+                                        description: Modes of high availability supported
+                                          for this compute.
+                                        enum:
+                                        - SameZone
+                                        - ZoneRedundant
+                                        x-ms-enum:
+                                          name: HaMode
+                                          modelAsString: true
+                                      description: Modes of high availability supported
+                                        for this compute.
+                                      readOnly: true
+                                  description: Base object for representing capability
+                                x-ms-identifiers:
+                                - name
+                                readOnly: true
+                            description: Base object for representing capability
+                          x-ms-identifiers:
+                          - name
+                          readOnly: true
+                          description: List of supported compute tiers.
+                        supportedServerVersions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              status:
+                                description: The status of the capability.
+                                enum:
+                                - Visible
+                                - Available
+                                - Default
+                                - Disabled
+                                type: string
+                                readOnly: true
+                                x-ms-mutability:
+                                - read
+                                x-ms-enum:
+                                  name: CapabilityStatus
+                                  modelAsString: false
+                              reason:
+                                description: The reason for the capability not being
+                                  available.
+                                type: string
+                                readOnly: true
+                                x-ms-mutability:
+                                - read
+                              name:
+                                type: string
+                                description: Major version of PostgreSQL database
+                                  engine.
+                                readOnly: true
+                              supportedVersionsToUpgrade:
+                                type: array
+                                items:
+                                  type: string
+                                description: Major versions of PostgreSQL database
+                                  engine to which this version can be automatically
+                                  upgraded.
+                                readOnly: true
+                            description: Base object for representing capability
+                          x-ms-identifiers:
+                          - name
+                          description: List of supported major versions of PostgreSQL
+                            database engine.
+                          readOnly: true
+                        fastProvisioningSupported:
+                          type: string
+                          description: Indicates if fast provisioning is supported.
+                            "Enabled" means fast provisioning is supported. "Disabled"
+                            stands for fast provisioning is not supported.
+                          readOnly: true
+                          enum:
+                          - Enabled
+                          - Disabled
+                          x-ms-enum:
+                            name: fastProvisioningSupportedEnum
+                            modelAsString: true
+                        supportedFastProvisioningEditions:
+                          type: array
+                          description: List of compute tiers supporting fast provisioning.
+                          items:
+                            type: object
+                            properties:
+                              status:
+                                description: The status of the capability.
+                                enum:
+                                - Visible
+                                - Available
+                                - Default
+                                - Disabled
+                                type: string
+                                readOnly: true
+                                x-ms-mutability:
+                                - read
+                                x-ms-enum:
+                                  name: CapabilityStatus
+                                  modelAsString: false
+                              reason:
+                                description: The reason for the capability not being
+                                  available.
+                                type: string
+                                readOnly: true
+                                x-ms-mutability:
+                                - read
+                              supportedTier:
+                                type: string
+                                description: Compute tier supporting fast provisioning.
+                                readOnly: true
+                              supportedSku:
+                                type: string
+                                description: Compute name (SKU) supporting fast provisioning.
+                                readOnly: true
+                              supportedStorageGb:
+                                type: integer
+                                format: int32
+                                description: Storage size (in GB) supporting fast
+                                  provisioning.
+                                readOnly: true
+                              supportedServerVersions:
+                                type: string
+                                description: Major version of PostgreSQL database
+                                  engine supporting fast provisioning.
+                                readOnly: true
+                              serverCount:
+                                type: integer
+                                description: Count of servers in cache matching this
+                                  specification.
+                                format: int32
+                                readOnly: true
+                            description: Base object for representing capability
+                          x-ms-identifiers:
+                          - supportedSku
+                          readOnly: true
+                        geoBackupSupported:
+                          type: string
+                          description: Indicates if geographically redundant backups
+                            are supported in this location. "Enabled" means geographically
+                            redundant backups are supported. "Disabled" stands for
+                            geographically redundant backup is not supported.
+                          readOnly: true
+                          enum:
+                          - Enabled
+                          - Disabled
+                          x-ms-enum:
+                            name: geoBackupSupportedEnum
+                            modelAsString: true
+                        zoneRedundantHaSupported:
+                          type: string
+                          description: Indicates if high availability with zone redundancy
+                            is supported in this location. "Enabled" means high availability
+                            with zone redundancy is supported. "Disabled" stands for
+                            high availability with zone redundancy is not supported.
+                          readOnly: true
+                          enum:
+                          - Enabled
+                          - Disabled
+                          x-ms-enum:
+                            name: zoneRedundantHaSupportedEnum
+                            modelAsString: true
+                        zoneRedundantHaAndGeoBackupSupported:
+                          type: string
+                          description: Indicates if high availability with zone redundancy
+                            is supported in conjunction with geographically redundant
+                            backups in this location. "Enabled" means high availability
+                            with zone redundancy is supported in conjunction with
+                            geographically redundant backups is supported. "Disabled"
+                            stands for high availability with zone redundancy is supported
+                            in conjunction with geographically redundant backups is
+                            not supported.
+                          readOnly: true
+                          enum:
+                          - Enabled
+                          - Disabled
+                          x-ms-enum:
+                            name: zoneRedundantHaAndGeoBackupSupportedEnum
+                            modelAsString: true
+                        storageAutoGrowthSupported:
+                          type: string
+                          description: Indicates if storage autogrow is supported
+                            in this location. "Enabled" means storage autogrow is
+                            supported. "Disabled" stands for storage autogrow is not
+                            supported.
+                          readOnly: true
+                          enum:
+                          - Enabled
+                          - Disabled
+                          x-ms-enum:
+                            name: storageAutoGrowthSupportedEnum
+                            modelAsString: true
+                        onlineResizeSupported:
+                          type: string
+                          description: Indicates if resizing the storage without interrupting
+                            the operation of the database engine is supported in this
+                            location for the given subscription. "Enabled" means resizing
+                            the storage without interrupting the operation of the
+                            database engine is supported. "Disabled" means resizing
+                            the storage without interrupting the operation of the
+                            database engine is not supported.
+                          readOnly: true
+                          enum:
+                          - Enabled
+                          - Disabled
+                          x-ms-enum:
+                            name: onlineResizeSupportedEnum
+                            modelAsString: true
+                        restricted:
+                          type: string
+                          description: Indicates if this location is restricted. "Enabled"
+                            means location is restricted. "Disabled" stands for location
+                            is not restricted.
+                          readOnly: true
+                          enum:
+                          - Enabled
+                          - Disabled
+                          x-ms-enum:
+                            name: restrictedEnum
+                            modelAsString: true
+                      description: Base object for representing capability
+                    x-ms-identifiers:
+                    - name
+                    readOnly: true
+                  nextLink:
+                    description: Link to retrieve next page of results.
+                    type: string
+                    readOnly: true
+                description: Capability for the Azure Database for PostgreSQL flexible
+                  server.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DBforPostgreSQL/flexibleServers/{serverName}/capabilities
+  : get:
+      tags:
+      - FlexibleServerCapabilities
+      operationId: ServerCapabilities_List
+      description: Lists the capabilities available for a given flexible server.
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serverName
+        in: path
+        required: true
+        description: The name of the server.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 63
+          pattern: ^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    description: List of supported capabilities.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status:
+                          description: The status of the capability.
+                          enum:
+                          - Visible
+                          - Available
+                          - Default
+                          - Disabled
+                          type: string
+                          readOnly: true
+                          x-ms-mutability:
+                          - read
+                          x-ms-enum:
+                            name: CapabilityStatus
+                            modelAsString: false
+                        reason:
+                          description: The reason for the capability not being available.
+                          type: string
+                          readOnly: true
+                          x-ms-mutability:
+                          - read
+                        name:
+                          type: string
+                          description: Name of flexible servers capabilities.
+                        supportedServerEditions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              status:
+                                description: The status of the capability.
+                                enum:
+                                - Visible
+                                - Available
+                                - Default
+                                - Disabled
+                                type: string
+                                readOnly: true
+                                x-ms-mutability:
+                                - read
+                                x-ms-enum:
+                                  name: CapabilityStatus
+                                  modelAsString: false
+                              reason:
+                                description: The reason for the capability not being
+                                  available.
+                                type: string
+                                readOnly: true
+                                x-ms-mutability:
+                                - read
+                              name:
+                                type: string
+                                description: Name of compute tier.
+                                readOnly: true
+                              defaultSkuName:
+                                type: string
+                                description: Default compute name (SKU) for this computer
+                                  tier.
+                                readOnly: true
+                              supportedStorageEditions:
+                                type: array
+                                items:
+                                  type: object
+                                  properties:
+                                    status:
+                                      description: The status of the capability.
+                                      enum:
+                                      - Visible
+                                      - Available
+                                      - Default
+                                      - Disabled
+                                      type: string
+                                      readOnly: true
+                                      x-ms-mutability:
+                                      - read
+                                      x-ms-enum:
+                                        name: CapabilityStatus
+                                        modelAsString: false
+                                    reason:
+                                      description: The reason for the capability not
+                                        being available.
+                                      type: string
+                                      readOnly: true
+                                      x-ms-mutability:
+                                      - read
+                                    name:
+                                      type: string
+                                      description: Name of storage tier.
+                                      readOnly: true
+                                    defaultStorageSizeMb:
+                                      type: integer
+                                      format: int64
+                                      description: Default storage size (in MB) for
+                                        this storage tier.
+                                      readOnly: true
+                                    supportedStorageMb:
+                                      type: array
+                                      description: Configurations of storage supported
+                                        for this storage tier.
+                                      items:
+                                        type: object
+                                        properties:
+                                          status:
+                                            description: The status of the capability.
+                                            enum:
+                                            - Visible
+                                            - Available
+                                            - Default
+                                            - Disabled
+                                            type: string
+                                            readOnly: true
+                                            x-ms-mutability:
+                                            - read
+                                            x-ms-enum:
+                                              name: CapabilityStatus
+                                              modelAsString: false
+                                          reason:
+                                            description: The reason for the capability
+                                              not being available.
+                                            type: string
+                                            readOnly: true
+                                            x-ms-mutability:
+                                            - read
+                                          supportedIops:
+                                            type: integer
+                                            format: int32
+                                            description: Minimum IOPS supported by
+                                              the storage size.
+                                            readOnly: true
+                                          supportedMaximumIops:
+                                            type: integer
+                                            format: int32
+                                            description: Maximum IOPS supported by
+                                              the storage size.
+                                            readOnly: true
+                                          storageSizeMb:
+                                            type: integer
+                                            format: int64
+                                            description: Minimum supported size (in
+                                              MB) of storage.
+                                            readOnly: true
+                                          maximumStorageSizeMb:
+                                            type: integer
+                                            format: int64
+                                            description: Maximum supported size (in
+                                              MB) of storage.
+                                            readOnly: true
+                                          supportedThroughput:
+                                            type: integer
+                                            format: int32
+                                            description: Minimum supported throughput
+                                              (in MB/s) of storage.
+                                            readOnly: true
+                                          supportedMaximumThroughput:
+                                            type: integer
+                                            format: int32
+                                            description: Maximum supported throughput
+                                              (in MB/s) of storage.
+                                            readOnly: true
+                                          defaultIopsTier:
+                                            type: string
+                                            description: Default IOPS for this tier
+                                              and storage size.
+                                            readOnly: true
+                                          supportedIopsTiers:
+                                            type: array
+                                            description: List of all supported storage
+                                              tiers for this tier and storage size.
+                                            items:
+                                              type: object
+                                              properties:
+                                                status:
+                                                  description: The status of the capability.
+                                                  enum:
+                                                  - Visible
+                                                  - Available
+                                                  - Default
+                                                  - Disabled
+                                                  type: string
+                                                  readOnly: true
+                                                  x-ms-mutability:
+                                                  - read
+                                                  x-ms-enum:
+                                                    name: CapabilityStatus
+                                                    modelAsString: false
+                                                reason:
+                                                  description: The reason for the
+                                                    capability not being available.
+                                                  type: string
+                                                  readOnly: true
+                                                  x-ms-mutability:
+                                                  - read
+                                                name:
+                                                  type: string
+                                                  description: Name of the storage
+                                                    tier.
+                                                  readOnly: true
+                                                iops:
+                                                  type: integer
+                                                  format: int32
+                                                  description: Supported IOPS for
+                                                    the storage tier.
+                                                  readOnly: true
+                                              description: Base object for representing
+                                                capability
+                                            x-ms-identifiers:
+                                            - name
+                                            readOnly: true
+                                        description: Base object for representing
+                                          capability
+                                      x-ms-identifiers:
+                                      - storageSizeMb
+                                      readOnly: true
+                                  description: Base object for representing capability
+                                description: List of storage editions supported by
+                                  this compute tier and compute name.
+                                readOnly: true
+                                x-ms-identifiers:
+                                - name
+                              supportedServerSkus:
+                                type: array
+                                description: List of supported compute names (SKUs).
+                                items:
+                                  type: object
+                                  properties:
+                                    status:
+                                      description: The status of the capability.
+                                      enum:
+                                      - Visible
+                                      - Available
+                                      - Default
+                                      - Disabled
+                                      type: string
+                                      readOnly: true
+                                      x-ms-mutability:
+                                      - read
+                                      x-ms-enum:
+                                        name: CapabilityStatus
+                                        modelAsString: false
+                                    reason:
+                                      description: The reason for the capability not
+                                        being available.
+                                      type: string
+                                      readOnly: true
+                                      x-ms-mutability:
+                                      - read
+                                    name:
+                                      type: string
+                                      description: Name of the compute (SKU).
+                                      readOnly: true
+                                    vCores:
+                                      type: integer
+                                      format: int32
+                                      description: Number of virtual cores available
+                                        for this compute.
+                                      readOnly: true
+                                    supportedIops:
+                                      type: integer
+                                      format: int32
+                                      description: Maximum IOPS supported by this
+                                        compute.
+                                      readOnly: true
+                                    supportedMemoryPerVcoreMb:
+                                      type: integer
+                                      format: int64
+                                      description: Supported memory (in MB) per virtual
+                                        core assigned to this compute.
+                                      readOnly: true
+                                    supportedZones:
+                                      type: array
+                                      description: List of supported availability
+                                        zones. E.g. "1", "2", "3"
+                                      items:
+                                        type: string
+                                      readOnly: true
+                                    supportedHaMode:
+                                      type: array
+                                      items:
+                                        type: string
+                                        description: Modes of high availability supported
+                                          for this compute.
+                                        enum:
+                                        - SameZone
+                                        - ZoneRedundant
+                                        x-ms-enum:
+                                          name: HaMode
+                                          modelAsString: true
+                                      description: Modes of high availability supported
+                                        for this compute.
+                                      readOnly: true
+                                  description: Base object for representing capability
+                                x-ms-identifiers:
+                                - name
+                                readOnly: true
+                            description: Base object for representing capability
+                          x-ms-identifiers:
+                          - name
+                          readOnly: true
+                          description: List of supported compute tiers.
+                        supportedServerVersions:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              status:
+                                description: The status of the capability.
+                                enum:
+                                - Visible
+                                - Available
+                                - Default
+                                - Disabled
+                                type: string
+                                readOnly: true
+                                x-ms-mutability:
+                                - read
+                                x-ms-enum:
+                                  name: CapabilityStatus
+                                  modelAsString: false
+                              reason:
+                                description: The reason for the capability not being
+                                  available.
+                                type: string
+                                readOnly: true
+                                x-ms-mutability:
+                                - read
+                              name:
+                                type: string
+                                description: Major version of PostgreSQL database
+                                  engine.
+                                readOnly: true
+                              supportedVersionsToUpgrade:
+                                type: array
+                                items:
+                                  type: string
+                                description: Major versions of PostgreSQL database
+                                  engine to which this version can be automatically
+                                  upgraded.
+                                readOnly: true
+                            description: Base object for representing capability
+                          x-ms-identifiers:
+                          - name
+                          description: List of supported major versions of PostgreSQL
+                            database engine.
+                          readOnly: true
+                        fastProvisioningSupported:
+                          type: string
+                          description: Indicates if fast provisioning is supported.
+                            "Enabled" means fast provisioning is supported. "Disabled"
+                            stands for fast provisioning is not supported.
+                          readOnly: true
+                          enum:
+                          - Enabled
+                          - Disabled
+                          x-ms-enum:
+                            name: fastProvisioningSupportedEnum
+                            modelAsString: true
+                        supportedFastProvisioningEditions:
+                          type: array
+                          description: List of compute tiers supporting fast provisioning.
+                          items:
+                            type: object
+                            properties:
+                              status:
+                                description: The status of the capability.
+                                enum:
+                                - Visible
+                                - Available
+                                - Default
+                                - Disabled
+                                type: string
+                                readOnly: true
+                                x-ms-mutability:
+                                - read
+                                x-ms-enum:
+                                  name: CapabilityStatus
+                                  modelAsString: false
+                              reason:
+                                description: The reason for the capability not being
+                                  available.
+                                type: string
+                                readOnly: true
+                                x-ms-mutability:
+                                - read
+                              supportedTier:
+                                type: string
+                                description: Compute tier supporting fast provisioning.
+                                readOnly: true
+                              supportedSku:
+                                type: string
+                                description: Compute name (SKU) supporting fast provisioning.
+                                readOnly: true
+                              supportedStorageGb:
+                                type: integer
+                                format: int32
+                                description: Storage size (in GB) supporting fast
+                                  provisioning.
+                                readOnly: true
+                              supportedServerVersions:
+                                type: string
+                                description: Major version of PostgreSQL database
+                                  engine supporting fast provisioning.
+                                readOnly: true
+                              serverCount:
+                                type: integer
+                                description: Count of servers in cache matching this
+                                  specification.
+                                format: int32
+                                readOnly: true
+                            description: Base object for representing capability
+                          x-ms-identifiers:
+                          - supportedSku
+                          readOnly: true
+                        geoBackupSupported:
+                          type: string
+                          description: Indicates if geographically redundant backups
+                            are supported in this location. "Enabled" means geographically
+                            redundant backups are supported. "Disabled" stands for
+                            geographically redundant backup is not supported.
+                          readOnly: true
+                          enum:
+                          - Enabled
+                          - Disabled
+                          x-ms-enum:
+                            name: geoBackupSupportedEnum
+                            modelAsString: true
+                        zoneRedundantHaSupported:
+                          type: string
+                          description: Indicates if high availability with zone redundancy
+                            is supported in this location. "Enabled" means high availability
+                            with zone redundancy is supported. "Disabled" stands for
+                            high availability with zone redundancy is not supported.
+                          readOnly: true
+                          enum:
+                          - Enabled
+                          - Disabled
+                          x-ms-enum:
+                            name: zoneRedundantHaSupportedEnum
+                            modelAsString: true
+                        zoneRedundantHaAndGeoBackupSupported:
+                          type: string
+                          description: Indicates if high availability with zone redundancy
+                            is supported in conjunction with geographically redundant
+                            backups in this location. "Enabled" means high availability
+                            with zone redundancy is supported in conjunction with
+                            geographically redundant backups is supported. "Disabled"
+                            stands for high availability with zone redundancy is supported
+                            in conjunction with geographically redundant backups is
+                            not supported.
+                          readOnly: true
+                          enum:
+                          - Enabled
+                          - Disabled
+                          x-ms-enum:
+                            name: zoneRedundantHaAndGeoBackupSupportedEnum
+                            modelAsString: true
+                        storageAutoGrowthSupported:
+                          type: string
+                          description: Indicates if storage autogrow is supported
+                            in this location. "Enabled" means storage autogrow is
+                            supported. "Disabled" stands for storage autogrow is not
+                            supported.
+                          readOnly: true
+                          enum:
+                          - Enabled
+                          - Disabled
+                          x-ms-enum:
+                            name: storageAutoGrowthSupportedEnum
+                            modelAsString: true
+                        onlineResizeSupported:
+                          type: string
+                          description: Indicates if resizing the storage without interrupting
+                            the operation of the database engine is supported in this
+                            location for the given subscription. "Enabled" means resizing
+                            the storage without interrupting the operation of the
+                            database engine is supported. "Disabled" means resizing
+                            the storage without interrupting the operation of the
+                            database engine is not supported.
+                          readOnly: true
+                          enum:
+                          - Enabled
+                          - Disabled
+                          x-ms-enum:
+                            name: onlineResizeSupportedEnum
+                            modelAsString: true
+                        restricted:
+                          type: string
+                          description: Indicates if this location is restricted. "Enabled"
+                            means location is restricted. "Disabled" stands for location
+                            is not restricted.
+                          readOnly: true
+                          enum:
+                          - Enabled
+                          - Disabled
+                          x-ms-enum:
+                            name: restrictedEnum
+                            modelAsString: true
+                      description: Base object for representing capability
+                    x-ms-identifiers:
+                    - name
+                    readOnly: true
+                  nextLink:
+                    description: Link to retrieve next page of results.
+                    type: string
+                    readOnly: true
+                description: Capability for the Azure Database for PostgreSQL flexible
+                  server.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+components:
+  parameters:
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription. The value must be an UUID.
+      required: true
+      schema:
+        type: string
+        format: uuid
+    LocationNameParameter:
+      name: locationName
+      in: path
+      required: true
+      description: The name of the location.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        pattern: ^[-\w\._]+$
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      description: The name of the resource group. The name is case insensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    ServerNameParameter:
+      name: serverName
+      in: path
+      required: true
+      description: The name of the server.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 63
+        pattern: ^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Microsoft Entra OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    StorageTierCapability:
+      type: object
+      properties:
+        status:
+          description: The status of the capability.
+          enum:
+          - Visible
+          - Available
+          - Default
+          - Disabled
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+          x-ms-enum:
+            name: CapabilityStatus
+            modelAsString: false
+        reason:
+          description: The reason for the capability not being available.
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+        name:
+          type: string
+          description: Name of the storage tier.
+          readOnly: true
+        iops:
+          type: integer
+          format: int32
+          description: Supported IOPS for the storage tier.
+          readOnly: true
+      description: Base object for representing capability
+    StorageMbCapability:
+      type: object
+      properties:
+        status:
+          description: The status of the capability.
+          enum:
+          - Visible
+          - Available
+          - Default
+          - Disabled
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+          x-ms-enum:
+            name: CapabilityStatus
+            modelAsString: false
+        reason:
+          description: The reason for the capability not being available.
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+        supportedIops:
+          type: integer
+          format: int32
+          description: Minimum IOPS supported by the storage size.
+          readOnly: true
+        supportedMaximumIops:
+          type: integer
+          format: int32
+          description: Maximum IOPS supported by the storage size.
+          readOnly: true
+        storageSizeMb:
+          type: integer
+          format: int64
+          description: Minimum supported size (in MB) of storage.
+          readOnly: true
+        maximumStorageSizeMb:
+          type: integer
+          format: int64
+          description: Maximum supported size (in MB) of storage.
+          readOnly: true
+        supportedThroughput:
+          type: integer
+          format: int32
+          description: Minimum supported throughput (in MB/s) of storage.
+          readOnly: true
+        supportedMaximumThroughput:
+          type: integer
+          format: int32
+          description: Maximum supported throughput (in MB/s) of storage.
+          readOnly: true
+        defaultIopsTier:
+          type: string
+          description: Default IOPS for this tier and storage size.
+          readOnly: true
+        supportedIopsTiers:
+          type: array
+          description: List of all supported storage tiers for this tier and storage
+            size.
+          items:
+            type: object
+            properties:
+              status:
+                description: The status of the capability.
+                enum:
+                - Visible
+                - Available
+                - Default
+                - Disabled
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+                x-ms-enum:
+                  name: CapabilityStatus
+                  modelAsString: false
+              reason:
+                description: The reason for the capability not being available.
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+              name:
+                type: string
+                description: Name of the storage tier.
+                readOnly: true
+              iops:
+                type: integer
+                format: int32
+                description: Supported IOPS for the storage tier.
+                readOnly: true
+            description: Base object for representing capability
+          x-ms-identifiers:
+          - name
+          readOnly: true
+      description: Base object for representing capability
+    ServerSkuCapability:
+      type: object
+      properties:
+        status:
+          description: The status of the capability.
+          enum:
+          - Visible
+          - Available
+          - Default
+          - Disabled
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+          x-ms-enum:
+            name: CapabilityStatus
+            modelAsString: false
+        reason:
+          description: The reason for the capability not being available.
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+        name:
+          type: string
+          description: Name of the compute (SKU).
+          readOnly: true
+        vCores:
+          type: integer
+          format: int32
+          description: Number of virtual cores available for this compute.
+          readOnly: true
+        supportedIops:
+          type: integer
+          format: int32
+          description: Maximum IOPS supported by this compute.
+          readOnly: true
+        supportedMemoryPerVcoreMb:
+          type: integer
+          format: int64
+          description: Supported memory (in MB) per virtual core assigned to this
+            compute.
+          readOnly: true
+        supportedZones:
+          type: array
+          description: List of supported availability zones. E.g. "1", "2", "3"
+          items:
+            type: string
+          readOnly: true
+        supportedHaMode:
+          type: array
+          items:
+            type: string
+            description: Modes of high availability supported for this compute.
+            enum:
+            - SameZone
+            - ZoneRedundant
+            x-ms-enum:
+              name: HaMode
+              modelAsString: true
+          description: Modes of high availability supported for this compute.
+          readOnly: true
+      description: Base object for representing capability
+    ServerVersion:
+      type: string
+      description: Major version of PostgreSQL database engine.
+      enum:
+      - '16'
+      - '15'
+      - '14'
+      - '13'
+      - '12'
+      - '11'
+      x-ms-enum:
+        name: ServerVersion
+        modelAsString: true
+    ServerVersionCapability:
+      type: object
+      properties:
+        status:
+          description: The status of the capability.
+          enum:
+          - Visible
+          - Available
+          - Default
+          - Disabled
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+          x-ms-enum:
+            name: CapabilityStatus
+            modelAsString: false
+        reason:
+          description: The reason for the capability not being available.
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+        name:
+          type: string
+          description: Major version of PostgreSQL database engine.
+          readOnly: true
+        supportedVersionsToUpgrade:
+          type: array
+          items:
+            type: string
+          description: Major versions of PostgreSQL database engine to which this
+            version can be automatically upgraded.
+          readOnly: true
+      description: Base object for representing capability
+    StorageEditionCapability:
+      type: object
+      properties:
+        status:
+          description: The status of the capability.
+          enum:
+          - Visible
+          - Available
+          - Default
+          - Disabled
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+          x-ms-enum:
+            name: CapabilityStatus
+            modelAsString: false
+        reason:
+          description: The reason for the capability not being available.
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+        name:
+          type: string
+          description: Name of storage tier.
+          readOnly: true
+        defaultStorageSizeMb:
+          type: integer
+          format: int64
+          description: Default storage size (in MB) for this storage tier.
+          readOnly: true
+        supportedStorageMb:
+          type: array
+          description: Configurations of storage supported for this storage tier.
+          items:
+            type: object
+            properties:
+              status:
+                description: The status of the capability.
+                enum:
+                - Visible
+                - Available
+                - Default
+                - Disabled
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+                x-ms-enum:
+                  name: CapabilityStatus
+                  modelAsString: false
+              reason:
+                description: The reason for the capability not being available.
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+              supportedIops:
+                type: integer
+                format: int32
+                description: Minimum IOPS supported by the storage size.
+                readOnly: true
+              supportedMaximumIops:
+                type: integer
+                format: int32
+                description: Maximum IOPS supported by the storage size.
+                readOnly: true
+              storageSizeMb:
+                type: integer
+                format: int64
+                description: Minimum supported size (in MB) of storage.
+                readOnly: true
+              maximumStorageSizeMb:
+                type: integer
+                format: int64
+                description: Maximum supported size (in MB) of storage.
+                readOnly: true
+              supportedThroughput:
+                type: integer
+                format: int32
+                description: Minimum supported throughput (in MB/s) of storage.
+                readOnly: true
+              supportedMaximumThroughput:
+                type: integer
+                format: int32
+                description: Maximum supported throughput (in MB/s) of storage.
+                readOnly: true
+              defaultIopsTier:
+                type: string
+                description: Default IOPS for this tier and storage size.
+                readOnly: true
+              supportedIopsTiers:
+                type: array
+                description: List of all supported storage tiers for this tier and
+                  storage size.
+                items:
+                  type: object
+                  properties:
+                    status:
+                      description: The status of the capability.
+                      enum:
+                      - Visible
+                      - Available
+                      - Default
+                      - Disabled
+                      type: string
+                      readOnly: true
+                      x-ms-mutability:
+                      - read
+                      x-ms-enum:
+                        name: CapabilityStatus
+                        modelAsString: false
+                    reason:
+                      description: The reason for the capability not being available.
+                      type: string
+                      readOnly: true
+                      x-ms-mutability:
+                      - read
+                    name:
+                      type: string
+                      description: Name of the storage tier.
+                      readOnly: true
+                    iops:
+                      type: integer
+                      format: int32
+                      description: Supported IOPS for the storage tier.
+                      readOnly: true
+                  description: Base object for representing capability
+                x-ms-identifiers:
+                - name
+                readOnly: true
+            description: Base object for representing capability
+          x-ms-identifiers:
+          - storageSizeMb
+          readOnly: true
+      description: Base object for representing capability
+    FastProvisioningEditionCapability:
+      type: object
+      properties:
+        status:
+          description: The status of the capability.
+          enum:
+          - Visible
+          - Available
+          - Default
+          - Disabled
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+          x-ms-enum:
+            name: CapabilityStatus
+            modelAsString: false
+        reason:
+          description: The reason for the capability not being available.
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+        supportedTier:
+          type: string
+          description: Compute tier supporting fast provisioning.
+          readOnly: true
+        supportedSku:
+          type: string
+          description: Compute name (SKU) supporting fast provisioning.
+          readOnly: true
+        supportedStorageGb:
+          type: integer
+          format: int32
+          description: Storage size (in GB) supporting fast provisioning.
+          readOnly: true
+        supportedServerVersions:
+          type: string
+          description: Major version of PostgreSQL database engine supporting fast
+            provisioning.
+          readOnly: true
+        serverCount:
+          type: integer
+          description: Count of servers in cache matching this specification.
+          format: int32
+          readOnly: true
+      description: Base object for representing capability
+    FlexibleServerEditionCapability:
+      type: object
+      properties:
+        status:
+          description: The status of the capability.
+          enum:
+          - Visible
+          - Available
+          - Default
+          - Disabled
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+          x-ms-enum:
+            name: CapabilityStatus
+            modelAsString: false
+        reason:
+          description: The reason for the capability not being available.
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+        name:
+          type: string
+          description: Name of compute tier.
+          readOnly: true
+        defaultSkuName:
+          type: string
+          description: Default compute name (SKU) for this computer tier.
+          readOnly: true
+        supportedStorageEditions:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                description: The status of the capability.
+                enum:
+                - Visible
+                - Available
+                - Default
+                - Disabled
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+                x-ms-enum:
+                  name: CapabilityStatus
+                  modelAsString: false
+              reason:
+                description: The reason for the capability not being available.
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+              name:
+                type: string
+                description: Name of storage tier.
+                readOnly: true
+              defaultStorageSizeMb:
+                type: integer
+                format: int64
+                description: Default storage size (in MB) for this storage tier.
+                readOnly: true
+              supportedStorageMb:
+                type: array
+                description: Configurations of storage supported for this storage
+                  tier.
+                items:
+                  type: object
+                  properties:
+                    status:
+                      description: The status of the capability.
+                      enum:
+                      - Visible
+                      - Available
+                      - Default
+                      - Disabled
+                      type: string
+                      readOnly: true
+                      x-ms-mutability:
+                      - read
+                      x-ms-enum:
+                        name: CapabilityStatus
+                        modelAsString: false
+                    reason:
+                      description: The reason for the capability not being available.
+                      type: string
+                      readOnly: true
+                      x-ms-mutability:
+                      - read
+                    supportedIops:
+                      type: integer
+                      format: int32
+                      description: Minimum IOPS supported by the storage size.
+                      readOnly: true
+                    supportedMaximumIops:
+                      type: integer
+                      format: int32
+                      description: Maximum IOPS supported by the storage size.
+                      readOnly: true
+                    storageSizeMb:
+                      type: integer
+                      format: int64
+                      description: Minimum supported size (in MB) of storage.
+                      readOnly: true
+                    maximumStorageSizeMb:
+                      type: integer
+                      format: int64
+                      description: Maximum supported size (in MB) of storage.
+                      readOnly: true
+                    supportedThroughput:
+                      type: integer
+                      format: int32
+                      description: Minimum supported throughput (in MB/s) of storage.
+                      readOnly: true
+                    supportedMaximumThroughput:
+                      type: integer
+                      format: int32
+                      description: Maximum supported throughput (in MB/s) of storage.
+                      readOnly: true
+                    defaultIopsTier:
+                      type: string
+                      description: Default IOPS for this tier and storage size.
+                      readOnly: true
+                    supportedIopsTiers:
+                      type: array
+                      description: List of all supported storage tiers for this tier
+                        and storage size.
+                      items:
+                        type: object
+                        properties:
+                          status:
+                            description: The status of the capability.
+                            enum:
+                            - Visible
+                            - Available
+                            - Default
+                            - Disabled
+                            type: string
+                            readOnly: true
+                            x-ms-mutability:
+                            - read
+                            x-ms-enum:
+                              name: CapabilityStatus
+                              modelAsString: false
+                          reason:
+                            description: The reason for the capability not being available.
+                            type: string
+                            readOnly: true
+                            x-ms-mutability:
+                            - read
+                          name:
+                            type: string
+                            description: Name of the storage tier.
+                            readOnly: true
+                          iops:
+                            type: integer
+                            format: int32
+                            description: Supported IOPS for the storage tier.
+                            readOnly: true
+                        description: Base object for representing capability
+                      x-ms-identifiers:
+                      - name
+                      readOnly: true
+                  description: Base object for representing capability
+                x-ms-identifiers:
+                - storageSizeMb
+                readOnly: true
+            description: Base object for representing capability
+          description: List of storage editions supported by this compute tier and
+            compute name.
+          readOnly: true
+          x-ms-identifiers:
+          - name
+        supportedServerSkus:
+          type: array
+          description: List of supported compute names (SKUs).
+          items:
+            type: object
+            properties:
+              status:
+                description: The status of the capability.
+                enum:
+                - Visible
+                - Available
+                - Default
+                - Disabled
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+                x-ms-enum:
+                  name: CapabilityStatus
+                  modelAsString: false
+              reason:
+                description: The reason for the capability not being available.
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+              name:
+                type: string
+                description: Name of the compute (SKU).
+                readOnly: true
+              vCores:
+                type: integer
+                format: int32
+                description: Number of virtual cores available for this compute.
+                readOnly: true
+              supportedIops:
+                type: integer
+                format: int32
+                description: Maximum IOPS supported by this compute.
+                readOnly: true
+              supportedMemoryPerVcoreMb:
+                type: integer
+                format: int64
+                description: Supported memory (in MB) per virtual core assigned to
+                  this compute.
+                readOnly: true
+              supportedZones:
+                type: array
+                description: List of supported availability zones. E.g. "1", "2",
+                  "3"
+                items:
+                  type: string
+                readOnly: true
+              supportedHaMode:
+                type: array
+                items:
+                  type: string
+                  description: Modes of high availability supported for this compute.
+                  enum:
+                  - SameZone
+                  - ZoneRedundant
+                  x-ms-enum:
+                    name: HaMode
+                    modelAsString: true
+                description: Modes of high availability supported for this compute.
+                readOnly: true
+            description: Base object for representing capability
+          x-ms-identifiers:
+          - name
+          readOnly: true
+      description: Base object for representing capability
+    FlexibleServerCapability:
+      type: object
+      properties:
+        status:
+          description: The status of the capability.
+          enum:
+          - Visible
+          - Available
+          - Default
+          - Disabled
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+          x-ms-enum:
+            name: CapabilityStatus
+            modelAsString: false
+        reason:
+          description: The reason for the capability not being available.
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+        name:
+          type: string
+          description: Name of flexible servers capabilities.
+        supportedServerEditions:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                description: The status of the capability.
+                enum:
+                - Visible
+                - Available
+                - Default
+                - Disabled
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+                x-ms-enum:
+                  name: CapabilityStatus
+                  modelAsString: false
+              reason:
+                description: The reason for the capability not being available.
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+              name:
+                type: string
+                description: Name of compute tier.
+                readOnly: true
+              defaultSkuName:
+                type: string
+                description: Default compute name (SKU) for this computer tier.
+                readOnly: true
+              supportedStorageEditions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    status:
+                      description: The status of the capability.
+                      enum:
+                      - Visible
+                      - Available
+                      - Default
+                      - Disabled
+                      type: string
+                      readOnly: true
+                      x-ms-mutability:
+                      - read
+                      x-ms-enum:
+                        name: CapabilityStatus
+                        modelAsString: false
+                    reason:
+                      description: The reason for the capability not being available.
+                      type: string
+                      readOnly: true
+                      x-ms-mutability:
+                      - read
+                    name:
+                      type: string
+                      description: Name of storage tier.
+                      readOnly: true
+                    defaultStorageSizeMb:
+                      type: integer
+                      format: int64
+                      description: Default storage size (in MB) for this storage tier.
+                      readOnly: true
+                    supportedStorageMb:
+                      type: array
+                      description: Configurations of storage supported for this storage
+                        tier.
+                      items:
+                        type: object
+                        properties:
+                          status:
+                            description: The status of the capability.
+                            enum:
+                            - Visible
+                            - Available
+                            - Default
+                            - Disabled
+                            type: string
+                            readOnly: true
+                            x-ms-mutability:
+                            - read
+                            x-ms-enum:
+                              name: CapabilityStatus
+                              modelAsString: false
+                          reason:
+                            description: The reason for the capability not being available.
+                            type: string
+                            readOnly: true
+                            x-ms-mutability:
+                            - read
+                          supportedIops:
+                            type: integer
+                            format: int32
+                            description: Minimum IOPS supported by the storage size.
+                            readOnly: true
+                          supportedMaximumIops:
+                            type: integer
+                            format: int32
+                            description: Maximum IOPS supported by the storage size.
+                            readOnly: true
+                          storageSizeMb:
+                            type: integer
+                            format: int64
+                            description: Minimum supported size (in MB) of storage.
+                            readOnly: true
+                          maximumStorageSizeMb:
+                            type: integer
+                            format: int64
+                            description: Maximum supported size (in MB) of storage.
+                            readOnly: true
+                          supportedThroughput:
+                            type: integer
+                            format: int32
+                            description: Minimum supported throughput (in MB/s) of
+                              storage.
+                            readOnly: true
+                          supportedMaximumThroughput:
+                            type: integer
+                            format: int32
+                            description: Maximum supported throughput (in MB/s) of
+                              storage.
+                            readOnly: true
+                          defaultIopsTier:
+                            type: string
+                            description: Default IOPS for this tier and storage size.
+                            readOnly: true
+                          supportedIopsTiers:
+                            type: array
+                            description: List of all supported storage tiers for this
+                              tier and storage size.
+                            items:
+                              type: object
+                              properties:
+                                status:
+                                  description: The status of the capability.
+                                  enum:
+                                  - Visible
+                                  - Available
+                                  - Default
+                                  - Disabled
+                                  type: string
+                                  readOnly: true
+                                  x-ms-mutability:
+                                  - read
+                                  x-ms-enum:
+                                    name: CapabilityStatus
+                                    modelAsString: false
+                                reason:
+                                  description: The reason for the capability not being
+                                    available.
+                                  type: string
+                                  readOnly: true
+                                  x-ms-mutability:
+                                  - read
+                                name:
+                                  type: string
+                                  description: Name of the storage tier.
+                                  readOnly: true
+                                iops:
+                                  type: integer
+                                  format: int32
+                                  description: Supported IOPS for the storage tier.
+                                  readOnly: true
+                              description: Base object for representing capability
+                            x-ms-identifiers:
+                            - name
+                            readOnly: true
+                        description: Base object for representing capability
+                      x-ms-identifiers:
+                      - storageSizeMb
+                      readOnly: true
+                  description: Base object for representing capability
+                description: List of storage editions supported by this compute tier
+                  and compute name.
+                readOnly: true
+                x-ms-identifiers:
+                - name
+              supportedServerSkus:
+                type: array
+                description: List of supported compute names (SKUs).
+                items:
+                  type: object
+                  properties:
+                    status:
+                      description: The status of the capability.
+                      enum:
+                      - Visible
+                      - Available
+                      - Default
+                      - Disabled
+                      type: string
+                      readOnly: true
+                      x-ms-mutability:
+                      - read
+                      x-ms-enum:
+                        name: CapabilityStatus
+                        modelAsString: false
+                    reason:
+                      description: The reason for the capability not being available.
+                      type: string
+                      readOnly: true
+                      x-ms-mutability:
+                      - read
+                    name:
+                      type: string
+                      description: Name of the compute (SKU).
+                      readOnly: true
+                    vCores:
+                      type: integer
+                      format: int32
+                      description: Number of virtual cores available for this compute.
+                      readOnly: true
+                    supportedIops:
+                      type: integer
+                      format: int32
+                      description: Maximum IOPS supported by this compute.
+                      readOnly: true
+                    supportedMemoryPerVcoreMb:
+                      type: integer
+                      format: int64
+                      description: Supported memory (in MB) per virtual core assigned
+                        to this compute.
+                      readOnly: true
+                    supportedZones:
+                      type: array
+                      description: List of supported availability zones. E.g. "1",
+                        "2", "3"
+                      items:
+                        type: string
+                      readOnly: true
+                    supportedHaMode:
+                      type: array
+                      items:
+                        type: string
+                        description: Modes of high availability supported for this
+                          compute.
+                        enum:
+                        - SameZone
+                        - ZoneRedundant
+                        x-ms-enum:
+                          name: HaMode
+                          modelAsString: true
+                      description: Modes of high availability supported for this compute.
+                      readOnly: true
+                  description: Base object for representing capability
+                x-ms-identifiers:
+                - name
+                readOnly: true
+            description: Base object for representing capability
+          x-ms-identifiers:
+          - name
+          readOnly: true
+          description: List of supported compute tiers.
+        supportedServerVersions:
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                description: The status of the capability.
+                enum:
+                - Visible
+                - Available
+                - Default
+                - Disabled
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+                x-ms-enum:
+                  name: CapabilityStatus
+                  modelAsString: false
+              reason:
+                description: The reason for the capability not being available.
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+              name:
+                type: string
+                description: Major version of PostgreSQL database engine.
+                readOnly: true
+              supportedVersionsToUpgrade:
+                type: array
+                items:
+                  type: string
+                description: Major versions of PostgreSQL database engine to which
+                  this version can be automatically upgraded.
+                readOnly: true
+            description: Base object for representing capability
+          x-ms-identifiers:
+          - name
+          description: List of supported major versions of PostgreSQL database engine.
+          readOnly: true
+        fastProvisioningSupported:
+          type: string
+          description: Indicates if fast provisioning is supported. "Enabled" means
+            fast provisioning is supported. "Disabled" stands for fast provisioning
+            is not supported.
+          readOnly: true
+          enum:
+          - Enabled
+          - Disabled
+          x-ms-enum:
+            name: fastProvisioningSupportedEnum
+            modelAsString: true
+        supportedFastProvisioningEditions:
+          type: array
+          description: List of compute tiers supporting fast provisioning.
+          items:
+            type: object
+            properties:
+              status:
+                description: The status of the capability.
+                enum:
+                - Visible
+                - Available
+                - Default
+                - Disabled
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+                x-ms-enum:
+                  name: CapabilityStatus
+                  modelAsString: false
+              reason:
+                description: The reason for the capability not being available.
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+              supportedTier:
+                type: string
+                description: Compute tier supporting fast provisioning.
+                readOnly: true
+              supportedSku:
+                type: string
+                description: Compute name (SKU) supporting fast provisioning.
+                readOnly: true
+              supportedStorageGb:
+                type: integer
+                format: int32
+                description: Storage size (in GB) supporting fast provisioning.
+                readOnly: true
+              supportedServerVersions:
+                type: string
+                description: Major version of PostgreSQL database engine supporting
+                  fast provisioning.
+                readOnly: true
+              serverCount:
+                type: integer
+                description: Count of servers in cache matching this specification.
+                format: int32
+                readOnly: true
+            description: Base object for representing capability
+          x-ms-identifiers:
+          - supportedSku
+          readOnly: true
+        geoBackupSupported:
+          type: string
+          description: Indicates if geographically redundant backups are supported
+            in this location. "Enabled" means geographically redundant backups are
+            supported. "Disabled" stands for geographically redundant backup is not
+            supported.
+          readOnly: true
+          enum:
+          - Enabled
+          - Disabled
+          x-ms-enum:
+            name: geoBackupSupportedEnum
+            modelAsString: true
+        zoneRedundantHaSupported:
+          type: string
+          description: Indicates if high availability with zone redundancy is supported
+            in this location. "Enabled" means high availability with zone redundancy
+            is supported. "Disabled" stands for high availability with zone redundancy
+            is not supported.
+          readOnly: true
+          enum:
+          - Enabled
+          - Disabled
+          x-ms-enum:
+            name: zoneRedundantHaSupportedEnum
+            modelAsString: true
+        zoneRedundantHaAndGeoBackupSupported:
+          type: string
+          description: Indicates if high availability with zone redundancy is supported
+            in conjunction with geographically redundant backups in this location.
+            "Enabled" means high availability with zone redundancy is supported in
+            conjunction with geographically redundant backups is supported. "Disabled"
+            stands for high availability with zone redundancy is supported in conjunction
+            with geographically redundant backups is not supported.
+          readOnly: true
+          enum:
+          - Enabled
+          - Disabled
+          x-ms-enum:
+            name: zoneRedundantHaAndGeoBackupSupportedEnum
+            modelAsString: true
+        storageAutoGrowthSupported:
+          type: string
+          description: Indicates if storage autogrow is supported in this location.
+            "Enabled" means storage autogrow is supported. "Disabled" stands for storage
+            autogrow is not supported.
+          readOnly: true
+          enum:
+          - Enabled
+          - Disabled
+          x-ms-enum:
+            name: storageAutoGrowthSupportedEnum
+            modelAsString: true
+        onlineResizeSupported:
+          type: string
+          description: Indicates if resizing the storage without interrupting the
+            operation of the database engine is supported in this location for the
+            given subscription. "Enabled" means resizing the storage without interrupting
+            the operation of the database engine is supported. "Disabled" means resizing
+            the storage without interrupting the operation of the database engine
+            is not supported.
+          readOnly: true
+          enum:
+          - Enabled
+          - Disabled
+          x-ms-enum:
+            name: onlineResizeSupportedEnum
+            modelAsString: true
+        restricted:
+          type: string
+          description: Indicates if this location is restricted. "Enabled" means location
+            is restricted. "Disabled" stands for location is not restricted.
+          readOnly: true
+          enum:
+          - Enabled
+          - Disabled
+          x-ms-enum:
+            name: restrictedEnum
+            modelAsString: true
+      description: Base object for representing capability
+    CapabilitiesListResult:
+      type: object
+      properties:
+        value:
+          description: List of supported capabilities.
+          type: array
+          items:
+            type: object
+            properties:
+              status:
+                description: The status of the capability.
+                enum:
+                - Visible
+                - Available
+                - Default
+                - Disabled
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+                x-ms-enum:
+                  name: CapabilityStatus
+                  modelAsString: false
+              reason:
+                description: The reason for the capability not being available.
+                type: string
+                readOnly: true
+                x-ms-mutability:
+                - read
+              name:
+                type: string
+                description: Name of flexible servers capabilities.
+              supportedServerEditions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    status:
+                      description: The status of the capability.
+                      enum:
+                      - Visible
+                      - Available
+                      - Default
+                      - Disabled
+                      type: string
+                      readOnly: true
+                      x-ms-mutability:
+                      - read
+                      x-ms-enum:
+                        name: CapabilityStatus
+                        modelAsString: false
+                    reason:
+                      description: The reason for the capability not being available.
+                      type: string
+                      readOnly: true
+                      x-ms-mutability:
+                      - read
+                    name:
+                      type: string
+                      description: Name of compute tier.
+                      readOnly: true
+                    defaultSkuName:
+                      type: string
+                      description: Default compute name (SKU) for this computer tier.
+                      readOnly: true
+                    supportedStorageEditions:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          status:
+                            description: The status of the capability.
+                            enum:
+                            - Visible
+                            - Available
+                            - Default
+                            - Disabled
+                            type: string
+                            readOnly: true
+                            x-ms-mutability:
+                            - read
+                            x-ms-enum:
+                              name: CapabilityStatus
+                              modelAsString: false
+                          reason:
+                            description: The reason for the capability not being available.
+                            type: string
+                            readOnly: true
+                            x-ms-mutability:
+                            - read
+                          name:
+                            type: string
+                            description: Name of storage tier.
+                            readOnly: true
+                          defaultStorageSizeMb:
+                            type: integer
+                            format: int64
+                            description: Default storage size (in MB) for this storage
+                              tier.
+                            readOnly: true
+                          supportedStorageMb:
+                            type: array
+                            description: Configurations of storage supported for this
+                              storage tier.
+                            items:
+                              type: object
+                              properties:
+                                status:
+                                  description: The status of the capability.
+                                  enum:
+                                  - Visible
+                                  - Available
+                                  - Default
+                                  - Disabled
+                                  type: string
+                                  readOnly: true
+                                  x-ms-mutability:
+                                  - read
+                                  x-ms-enum:
+                                    name: CapabilityStatus
+                                    modelAsString: false
+                                reason:
+                                  description: The reason for the capability not being
+                                    available.
+                                  type: string
+                                  readOnly: true
+                                  x-ms-mutability:
+                                  - read
+                                supportedIops:
+                                  type: integer
+                                  format: int32
+                                  description: Minimum IOPS supported by the storage
+                                    size.
+                                  readOnly: true
+                                supportedMaximumIops:
+                                  type: integer
+                                  format: int32
+                                  description: Maximum IOPS supported by the storage
+                                    size.
+                                  readOnly: true
+                                storageSizeMb:
+                                  type: integer
+                                  format: int64
+                                  description: Minimum supported size (in MB) of storage.
+                                  readOnly: true
+                                maximumStorageSizeMb:
+                                  type: integer
+                                  format: int64
+                                  description: Maximum supported size (in MB) of storage.
+                                  readOnly: true
+                                supportedThroughput:
+                                  type: integer
+                                  format: int32
+                                  description: Minimum supported throughput (in MB/s)
+                                    of storage.
+                                  readOnly: true
+                                supportedMaximumThroughput:
+                                  type: integer
+                                  format: int32
+                                  description: Maximum supported throughput (in MB/s)
+                                    of storage.
+                                  readOnly: true
+                                defaultIopsTier:
+                                  type: string
+                                  description: Default IOPS for this tier and storage
+                                    size.
+                                  readOnly: true
+                                supportedIopsTiers:
+                                  type: array
+                                  description: List of all supported storage tiers
+                                    for this tier and storage size.
+                                  items:
+                                    type: object
+                                    properties:
+                                      status:
+                                        description: The status of the capability.
+                                        enum:
+                                        - Visible
+                                        - Available
+                                        - Default
+                                        - Disabled
+                                        type: string
+                                        readOnly: true
+                                        x-ms-mutability:
+                                        - read
+                                        x-ms-enum:
+                                          name: CapabilityStatus
+                                          modelAsString: false
+                                      reason:
+                                        description: The reason for the capability
+                                          not being available.
+                                        type: string
+                                        readOnly: true
+                                        x-ms-mutability:
+                                        - read
+                                      name:
+                                        type: string
+                                        description: Name of the storage tier.
+                                        readOnly: true
+                                      iops:
+                                        type: integer
+                                        format: int32
+                                        description: Supported IOPS for the storage
+                                          tier.
+                                        readOnly: true
+                                    description: Base object for representing capability
+                                  x-ms-identifiers:
+                                  - name
+                                  readOnly: true
+                              description: Base object for representing capability
+                            x-ms-identifiers:
+                            - storageSizeMb
+                            readOnly: true
+                        description: Base object for representing capability
+                      description: List of storage editions supported by this compute
+                        tier and compute name.
+                      readOnly: true
+                      x-ms-identifiers:
+                      - name
+                    supportedServerSkus:
+                      type: array
+                      description: List of supported compute names (SKUs).
+                      items:
+                        type: object
+                        properties:
+                          status:
+                            description: The status of the capability.
+                            enum:
+                            - Visible
+                            - Available
+                            - Default
+                            - Disabled
+                            type: string
+                            readOnly: true
+                            x-ms-mutability:
+                            - read
+                            x-ms-enum:
+                              name: CapabilityStatus
+                              modelAsString: false
+                          reason:
+                            description: The reason for the capability not being available.
+                            type: string
+                            readOnly: true
+                            x-ms-mutability:
+                            - read
+                          name:
+                            type: string
+                            description: Name of the compute (SKU).
+                            readOnly: true
+                          vCores:
+                            type: integer
+                            format: int32
+                            description: Number of virtual cores available for this
+                              compute.
+                            readOnly: true
+                          supportedIops:
+                            type: integer
+                            format: int32
+                            description: Maximum IOPS supported by this compute.
+                            readOnly: true
+                          supportedMemoryPerVcoreMb:
+                            type: integer
+                            format: int64
+                            description: Supported memory (in MB) per virtual core
+                              assigned to this compute.
+                            readOnly: true
+                          supportedZones:
+                            type: array
+                            description: List of supported availability zones. E.g.
+                              "1", "2", "3"
+                            items:
+                              type: string
+                            readOnly: true
+                          supportedHaMode:
+                            type: array
+                            items:
+                              type: string
+                              description: Modes of high availability supported for
+                                this compute.
+                              enum:
+                              - SameZone
+                              - ZoneRedundant
+                              x-ms-enum:
+                                name: HaMode
+                                modelAsString: true
+                            description: Modes of high availability supported for
+                              this compute.
+                            readOnly: true
+                        description: Base object for representing capability
+                      x-ms-identifiers:
+                      - name
+                      readOnly: true
+                  description: Base object for representing capability
+                x-ms-identifiers:
+                - name
+                readOnly: true
+                description: List of supported compute tiers.
+              supportedServerVersions:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    status:
+                      description: The status of the capability.
+                      enum:
+                      - Visible
+                      - Available
+                      - Default
+                      - Disabled
+                      type: string
+                      readOnly: true
+                      x-ms-mutability:
+                      - read
+                      x-ms-enum:
+                        name: CapabilityStatus
+                        modelAsString: false
+                    reason:
+                      description: The reason for the capability not being available.
+                      type: string
+                      readOnly: true
+                      x-ms-mutability:
+                      - read
+                    name:
+                      type: string
+                      description: Major version of PostgreSQL database engine.
+                      readOnly: true
+                    supportedVersionsToUpgrade:
+                      type: array
+                      items:
+                        type: string
+                      description: Major versions of PostgreSQL database engine to
+                        which this version can be automatically upgraded.
+                      readOnly: true
+                  description: Base object for representing capability
+                x-ms-identifiers:
+                - name
+                description: List of supported major versions of PostgreSQL database
+                  engine.
+                readOnly: true
+              fastProvisioningSupported:
+                type: string
+                description: Indicates if fast provisioning is supported. "Enabled"
+                  means fast provisioning is supported. "Disabled" stands for fast
+                  provisioning is not supported.
+                readOnly: true
+                enum:
+                - Enabled
+                - Disabled
+                x-ms-enum:
+                  name: fastProvisioningSupportedEnum
+                  modelAsString: true
+              supportedFastProvisioningEditions:
+                type: array
+                description: List of compute tiers supporting fast provisioning.
+                items:
+                  type: object
+                  properties:
+                    status:
+                      description: The status of the capability.
+                      enum:
+                      - Visible
+                      - Available
+                      - Default
+                      - Disabled
+                      type: string
+                      readOnly: true
+                      x-ms-mutability:
+                      - read
+                      x-ms-enum:
+                        name: CapabilityStatus
+                        modelAsString: false
+                    reason:
+                      description: The reason for the capability not being available.
+                      type: string
+                      readOnly: true
+                      x-ms-mutability:
+                      - read
+                    supportedTier:
+                      type: string
+                      description: Compute tier supporting fast provisioning.
+                      readOnly: true
+                    supportedSku:
+                      type: string
+                      description: Compute name (SKU) supporting fast provisioning.
+                      readOnly: true
+                    supportedStorageGb:
+                      type: integer
+                      format: int32
+                      description: Storage size (in GB) supporting fast provisioning.
+                      readOnly: true
+                    supportedServerVersions:
+                      type: string
+                      description: Major version of PostgreSQL database engine supporting
+                        fast provisioning.
+                      readOnly: true
+                    serverCount:
+                      type: integer
+                      description: Count of servers in cache matching this specification.
+                      format: int32
+                      readOnly: true
+                  description: Base object for representing capability
+                x-ms-identifiers:
+                - supportedSku
+                readOnly: true
+              geoBackupSupported:
+                type: string
+                description: Indicates if geographically redundant backups are supported
+                  in this location. "Enabled" means geographically redundant backups
+                  are supported. "Disabled" stands for geographically redundant backup
+                  is not supported.
+                readOnly: true
+                enum:
+                - Enabled
+                - Disabled
+                x-ms-enum:
+                  name: geoBackupSupportedEnum
+                  modelAsString: true
+              zoneRedundantHaSupported:
+                type: string
+                description: Indicates if high availability with zone redundancy is
+                  supported in this location. "Enabled" means high availability with
+                  zone redundancy is supported. "Disabled" stands for high availability
+                  with zone redundancy is not supported.
+                readOnly: true
+                enum:
+                - Enabled
+                - Disabled
+                x-ms-enum:
+                  name: zoneRedundantHaSupportedEnum
+                  modelAsString: true
+              zoneRedundantHaAndGeoBackupSupported:
+                type: string
+                description: Indicates if high availability with zone redundancy is
+                  supported in conjunction with geographically redundant backups in
+                  this location. "Enabled" means high availability with zone redundancy
+                  is supported in conjunction with geographically redundant backups
+                  is supported. "Disabled" stands for high availability with zone
+                  redundancy is supported in conjunction with geographically redundant
+                  backups is not supported.
+                readOnly: true
+                enum:
+                - Enabled
+                - Disabled
+                x-ms-enum:
+                  name: zoneRedundantHaAndGeoBackupSupportedEnum
+                  modelAsString: true
+              storageAutoGrowthSupported:
+                type: string
+                description: Indicates if storage autogrow is supported in this location.
+                  "Enabled" means storage autogrow is supported. "Disabled" stands
+                  for storage autogrow is not supported.
+                readOnly: true
+                enum:
+                - Enabled
+                - Disabled
+                x-ms-enum:
+                  name: storageAutoGrowthSupportedEnum
+                  modelAsString: true
+              onlineResizeSupported:
+                type: string
+                description: Indicates if resizing the storage without interrupting
+                  the operation of the database engine is supported in this location
+                  for the given subscription. "Enabled" means resizing the storage
+                  without interrupting the operation of the database engine is supported.
+                  "Disabled" means resizing the storage without interrupting the operation
+                  of the database engine is not supported.
+                readOnly: true
+                enum:
+                - Enabled
+                - Disabled
+                x-ms-enum:
+                  name: onlineResizeSupportedEnum
+                  modelAsString: true
+              restricted:
+                type: string
+                description: Indicates if this location is restricted. "Enabled" means
+                  location is restricted. "Disabled" stands for location is not restricted.
+                readOnly: true
+                enum:
+                - Enabled
+                - Disabled
+                x-ms-enum:
+                  name: restrictedEnum
+                  modelAsString: true
+            description: Base object for representing capability
+          x-ms-identifiers:
+          - name
+          readOnly: true
+        nextLink:
+          description: Link to retrieve next page of results.
+          type: string
+          readOnly: true
+      description: Capability for the Azure Database for PostgreSQL flexible server.
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+    CapabilityBase:
+      type: object
+      description: Base object for representing capability
+      properties:
+        status:
+          description: The status of the capability.
+          enum:
+          - Visible
+          - Available
+          - Default
+          - Disabled
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read
+          x-ms-enum:
+            name: CapabilityStatus
+            modelAsString: false
+        reason:
+          description: The reason for the capability not being available.
+          type: string
+          readOnly: true
+          x-ms-mutability:
+          - read

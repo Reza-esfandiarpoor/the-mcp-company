@@ -1,0 +1,4089 @@
+openapi: 3.0.0
+info:
+  title: Content Understanding
+  version: 2025-05-01-preview
+  description: The Content Understanding service extracts content and fields from
+    multimodal input.
+  x-typespec-generated:
+  - emitter: '@azure-tools/typespec-autorest'
+security:
+- ApiKeyAuth: []
+- OAuth2Auth:
+  - https://cognitiveservices.azure.com/.default
+tags: []
+paths:
+  /analyzerResults/{operationId}:
+    get:
+      operationId: ContentAnalyzers_GetResult
+      description: Get the result of an analysis operation.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: operationId
+        in: path
+        description: The unique ID of the operation.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Provides status details for long running operations.
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the operation.
+                  status:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                  error:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                  result:
+                    $ref: '#/components/schemas/AnalyzeResult'
+                required:
+                - id
+                - status
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /analyzerResults/{operationId}/files/{path}:
+    get:
+      operationId: ContentAnalyzers_GetResultFile
+      description: Get a file associated with the result of an analysis operation.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: operationId
+        in: path
+        description: Operation identifier.
+        required: true
+        schema:
+          type: string
+      - name: path
+        in: path
+        description: File path.
+        required: true
+        x-ms-skip-url-encoding: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+            application/json:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /analyzers:
+    get:
+      operationId: ContentAnalyzers_List
+      description: List analyzers.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedContentAnalyzer'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /analyzers/{analyzerId}:
+    get:
+      operationId: ContentAnalyzers_Get
+      description: Get analyzer properties.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: analyzerId
+        in: path
+        description: The unique identifier of the analyzer.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentAnalyzer'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    put:
+      operationId: ContentAnalyzers_CreateOrReplace
+      description: Create a new analyzer asynchronously.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: analyzerId
+        in: path
+        description: The unique identifier of the analyzer.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentAnalyzer'
+        description: The resource instance.
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            Operation-Location:
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentAnalyzer'
+        '201':
+          description: The request has succeeded and a new resource has been created
+            as a result.
+          headers:
+            Operation-Location:
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentAnalyzer'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-long-running-operation: true
+    patch:
+      operationId: ContentAnalyzers_Update
+      description: Update analyzer properties.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: analyzerId
+        in: path
+        description: The unique identifier of the analyzer.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/ContentAnalyzerUpdate'
+        description: The resource instance.
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentAnalyzer'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    delete:
+      operationId: ContentAnalyzers_Delete
+      description: Delete analyzer.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: analyzerId
+        in: path
+        description: The unique identifier of the analyzer.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /analyzers/{analyzerId}:analyze:
+    post:
+      operationId: ContentAnalyzers_Analyze
+      description: Extract content and fields from input.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: analyzerId
+        in: path
+        description: The unique identifier of the analyzer.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/AnalyzeParameters.stringEncoding'
+      - $ref: '#/components/parameters/AnalyzeParameters.processingLocation'
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AnalyzeRequest'
+        required: true
+      responses:
+        '202':
+          description: The request has been accepted for processing, but processing
+            has not yet completed.
+          headers:
+            Operation-Location:
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Provides status details for long running operations.
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the operation.
+                  status:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                  error:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                  result:
+                    $ref: '#/components/schemas/AnalyzeResult'
+                required:
+                - id
+                - status
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-long-running-operation: true
+  /analyzers/{analyzerId}/operations/{operationId}:
+    get:
+      operationId: ContentAnalyzers_GetOperationStatus
+      description: Get the status of an analyzer creation operation.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: analyzerId
+        in: path
+        description: The unique identifier of the analyzer.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - name: operationId
+        in: path
+        description: The unique ID of the operation.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Provides status details for long running operations.
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the operation.
+                  status:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                  error:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                  result:
+                    $ref: '#/components/schemas/ContentAnalyzer'
+                required:
+                - id
+                - status
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /classifierResults/{operationId}:
+    get:
+      operationId: ContentClassifiers_GetResult
+      description: Get the result of a classifier operation.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: operationId
+        in: path
+        description: The unique ID of the operation.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Provides status details for long running operations.
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the operation.
+                  status:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                  error:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                  result:
+                    $ref: '#/components/schemas/ClassifyResult'
+                required:
+                - id
+                - status
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /classifiers:
+    get:
+      operationId: ContentClassifiers_List
+      description: List classifiers.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedContentClassifier'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /classifiers/{classifierId}:
+    get:
+      operationId: ContentClassifiers_Get
+      description: Get classifier properties.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: classifierId
+        in: path
+        description: The unique identifier of the classifier.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentClassifier'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    put:
+      operationId: ContentClassifiers_CreateOrReplace
+      description: Create a new classifier asynchronously.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: classifierId
+        in: path
+        description: The unique identifier of the classifier.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContentClassifier'
+        description: The resource instance.
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            Operation-Location:
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentClassifier'
+        '201':
+          description: The request has succeeded and a new resource has been created
+            as a result.
+          headers:
+            Operation-Location:
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentClassifier'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-long-running-operation: true
+    patch:
+      operationId: ContentClassifiers_Update
+      description: Update classifier properties.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: classifierId
+        in: path
+        description: The unique identifier of the classifier.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/ContentClassifierUpdate'
+        description: The resource instance.
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContentClassifier'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    delete:
+      operationId: ContentClassifiers_Delete
+      description: Delete classifier.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: classifierId
+        in: path
+        description: The unique identifier of the classifier.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /classifiers/{classifierId}:classify:
+    post:
+      operationId: ContentClassifiers_Classify
+      description: Classify content with optional splitting.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: classifierId
+        in: path
+        description: The unique identifier of the classifier.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/ClassifyParameters.stringEncoding'
+      - $ref: '#/components/parameters/ClassifyParameters.processingLocation'
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClassifyRequest'
+        required: true
+      responses:
+        '202':
+          description: The request has been accepted for processing, but processing
+            has not yet completed.
+          headers:
+            Operation-Location:
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Provides status details for long running operations.
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the operation.
+                  status:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                  error:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                  result:
+                    $ref: '#/components/schemas/ClassifyResult'
+                required:
+                - id
+                - status
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-long-running-operation: true
+  /classifiers/{classifierId}/operations/{operationId}:
+    get:
+      operationId: ContentClassifiers_GetOperationStatus
+      description: Get the status of a classifier creation operation.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: classifierId
+        in: path
+        description: The unique identifier of the classifier.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - name: operationId
+        in: path
+        description: The unique ID of the operation.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Provides status details for long running operations.
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the operation.
+                  status:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                  error:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                  result:
+                    $ref: '#/components/schemas/ContentClassifier'
+                required:
+                - id
+                - status
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /faces:compare:
+    post:
+      operationId: Faces_Compare
+      description: Compare the similarity between two faces.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompareFacesParameters'
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompareFacesResult'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /faces:detect:
+    post:
+      operationId: Faces_Detect
+      description: Detect faces in an image.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DetectFacesParameters'
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetectFacesResult'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /personDirectories:
+    get:
+      operationId: PersonDirectories_List
+      description: List person directories.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedPersonDirectory'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /personDirectories/{personDirectoryId}:
+    get:
+      operationId: PersonDirectories_Get
+      description: Get person directory properties.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: personDirectoryId
+        in: path
+        description: The unique identifier of the person directory.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDirectory'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    put:
+      operationId: PersonDirectories_Create
+      description: Create a new person directory.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: personDirectoryId
+        in: path
+        description: The unique identifier of the person directory.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonDirectory'
+        description: The resource instance.
+        required: true
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created
+            as a result.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDirectory'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    patch:
+      operationId: PersonDirectories_Update
+      description: Update person directory properties.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: personDirectoryId
+        in: path
+        description: The unique identifier of the person directory.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/PersonDirectoryUpdate'
+        description: The resource instance.
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDirectory'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    delete:
+      operationId: PersonDirectories_Delete
+      description: Delete person directory and all associated persons and faces.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: personDirectoryId
+        in: path
+        description: The unique identifier of the person directory.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /personDirectories/{personDirectoryId}/faces:
+    get:
+      operationId: PersonDirectories_ListFaces
+      description: List faces.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: personDirectoryId
+        in: path
+        description: The unique identifier of the person directory.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedPersonDirectoryFace'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-pageable:
+        nextLinkName: nextLink
+    post:
+      operationId: PersonDirectories_AddFace
+      description: Add a new face.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - $ref: '#/components/parameters/AddFaceParameters.personDirectoryId'
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddFaceParameters'
+        required: true
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created
+            as a result.
+          headers:
+            Location:
+              description: The location of an instance of PersonDirectoryFace
+              schema:
+                type: string
+                format: uri
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDirectoryFace'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /personDirectories/{personDirectoryId}/faces/{faceId}:
+    get:
+      operationId: PersonDirectories_GetFace
+      description: Get face properties.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: personDirectoryId
+        in: path
+        description: The unique identifier of the person directory.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - name: faceId
+        in: path
+        description: The unique identifier of the face.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDirectoryFace'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    patch:
+      operationId: PersonDirectories_UpdateFace
+      description: Update face properties, such as modifying the association with
+        a person.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: personDirectoryId
+        in: path
+        description: The unique identifier of the person directory.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - name: faceId
+        in: path
+        description: The unique identifier of the face.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/PersonDirectoryFaceUpdate'
+        description: The resource instance.
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDirectoryFace'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    delete:
+      operationId: PersonDirectories_DeleteFace
+      description: Delete face.  Any linked person will be disassociated, but not
+        deleted.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: personDirectoryId
+        in: path
+        description: The unique identifier of the person directory.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - name: faceId
+        in: path
+        description: The unique identifier of the face.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /personDirectories/{personDirectoryId}/faces:find:
+    post:
+      operationId: PersonDirectories_FindSimilarFaces
+      description: Find similar faces.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: personDirectoryId
+        in: path
+        description: The unique identifier of the person directory.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FindSimilarFacesParameters'
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FindSimilarFacesResult'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /personDirectories/{personDirectoryId}/persons:
+    get:
+      operationId: PersonDirectories_ListPersons
+      description: List persons.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: personDirectoryId
+        in: path
+        description: The unique identifier of the person directory.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedPersonDirectoryPerson'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-pageable:
+        nextLinkName: nextLink
+    post:
+      operationId: PersonDirectories_AddPerson
+      description: Add a new person and optionally associate with existing faces.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - $ref: '#/components/parameters/AddPersonParameters.personDirectoryId'
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddPersonParameters'
+        required: true
+      responses:
+        '201':
+          description: The request has succeeded and a new resource has been created
+            as a result.
+          headers:
+            Location:
+              description: The location of an instance of PersonDirectoryPerson
+              schema:
+                type: string
+                format: uri
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDirectoryPerson'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /personDirectories/{personDirectoryId}/persons/{personId}:
+    get:
+      operationId: PersonDirectories_GetPerson
+      description: Get person properties.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: personDirectoryId
+        in: path
+        description: The unique identifier of the person directory.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - name: personId
+        in: path
+        description: The unique identifier of the person.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDirectoryPerson'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    patch:
+      operationId: PersonDirectories_UpdatePerson
+      description: Update person properties.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: personDirectoryId
+        in: path
+        description: The unique identifier of the person directory.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - name: personId
+        in: path
+        description: The unique identifier of the person.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/PersonDirectoryPersonUpdate'
+        description: The resource instance.
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonDirectoryPerson'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    delete:
+      operationId: PersonDirectories_DeletePerson
+      description: Delete person.  Any linked faces will be disassociated, but not
+        deleted.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: personDirectoryId
+        in: path
+        description: The unique identifier of the person directory.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - name: personId
+        in: path
+        description: The unique identifier of the person.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /personDirectories/{personDirectoryId}/persons/{personId}:verify:
+    post:
+      operationId: PersonDirectories_VerifyPerson
+      description: Verify if a face matches the person.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: personDirectoryId
+        in: path
+        description: The unique identifier of the person directory.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - name: personId
+        in: path
+        description: The unique identifier of the person.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyPersonParameters'
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyPersonResult'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /personDirectories/{personDirectoryId}/persons:identify:
+    post:
+      operationId: PersonDirectories_IdentifyPerson
+      description: Identify the person from a face.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: personDirectoryId
+        in: path
+        description: The unique identifier of the person directory.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IdentifyPersonParameters'
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IdentifyPersonResult'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+x-ms-paths:
+  /analyzers/{analyzerId}:analyze?_overload=analyzeBinary:
+    post:
+      operationId: ContentAnalyzers_AnalyzeBinary
+      description: Extract content and fields from input.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: analyzerId
+        in: path
+        description: The unique identifier of the analyzer.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/AnalyzeParameters.stringEncoding'
+      - $ref: '#/components/parameters/AnalyzeParameters.processingLocation'
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              format: binary
+        description: The binary content of the document to analyze.
+        required: true
+        x-ms-parameter-location: method
+      responses:
+        '202':
+          description: The request has been accepted for processing, but processing
+            has not yet completed.
+          headers:
+            Operation-Location:
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Provides status details for long running operations.
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the operation.
+                  status:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                  error:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                  result:
+                    $ref: '#/components/schemas/AnalyzeResult'
+                required:
+                - id
+                - status
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-long-running-operation: true
+  /classifiers/{classifierId}:classify?_overload=classifyBinary:
+    post:
+      operationId: ContentClassifiers_ClassifyBinary
+      description: Classify content with optional splitting.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: classifierId
+        in: path
+        description: The unique identifier of the classifier.
+        required: true
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+      - $ref: '#/components/parameters/ClassifyParameters.stringEncoding'
+      - $ref: '#/components/parameters/ClassifyParameters.processingLocation'
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              format: binary
+        description: The binary content of the document to classify.
+        required: true
+        x-ms-parameter-location: method
+      responses:
+        '202':
+          description: The request has been accepted for processing, but processing
+            has not yet completed.
+          headers:
+            Operation-Location:
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Provides status details for long running operations.
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the operation.
+                  status:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                  error:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                  result:
+                    $ref: '#/components/schemas/ClassifyResult'
+                required:
+                - id
+                - status
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-long-running-operation: true
+servers:
+- url: '{endpoint}/contentunderstanding'
+  variables:
+    endpoint:
+      description: Content Understanding service endpoint.
+      format: uri
+      x-ms-skip-url-encoding: true
+      default: none
+components:
+  parameters:
+    AddFaceParameters.personDirectoryId:
+      name: personDirectoryId
+      in: path
+      description: The unique identifier of the person directory.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    AddPersonParameters.personDirectoryId:
+      name: personDirectoryId
+      in: path
+      description: The unique identifier of the person directory.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    AnalyzeParameters.processingLocation:
+      name: processingLocation
+      in: query
+      description: The location where the data may be processed.
+      required: false
+      x-ms-enum:
+        name: ProcessingLocation
+        modelAsString: true
+        values:
+        - name: geography
+          value: geography
+          description: Data may be processed in the same geography as the resource.
+        - name: dataZone
+          value: dataZone
+          description: Data may be processed in the same data zone as the resource.
+        - name: global
+          value: global
+          description: Data may be processed in any Azure data center globally.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        enum:
+        - geography
+        - dataZone
+        - global
+    AnalyzeParameters.stringEncoding:
+      name: stringEncoding
+      in: query
+      description: The encoding format for content spans in the response.
+      required: false
+      x-ms-enum:
+        name: StringEncoding
+        modelAsString: true
+        values:
+        - name: codePoint
+          value: codePoint
+          description: Unicode code point (UTF-32) encoding, used by languages such
+            as Python, etc.
+        - name: utf16
+          value: utf16
+          description: UTF-16 encoding, used by languages such as C#, JavaScript,
+            Java, etc.
+        - name: utf8
+          value: utf8
+          description: UTF-8 encoding, used by languages such as Go, Rust, Ruby, PHP,
+            etc.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        enum:
+        - codePoint
+        - utf16
+        - utf8
+        default: codePoint
+    Azure.Core.ClientRequestIdHeader:
+      name: x-ms-client-request-id
+      in: header
+      description: An opaque, globally-unique, client-generated string identifier
+        for the request.
+      required: false
+      x-ms-parameter-location: method
+      x-ms-client-name: clientRequestId
+      schema:
+        type: string
+        format: uuid
+    Azure.Core.Foundations.ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      x-ms-parameter-location: method
+      x-ms-client-name: apiVersion
+      schema:
+        type: string
+        minLength: 1
+    ClassifyParameters.processingLocation:
+      name: processingLocation
+      in: query
+      description: The location where the data may be processed.
+      required: false
+      x-ms-enum:
+        name: ProcessingLocation
+        modelAsString: true
+        values:
+        - name: geography
+          value: geography
+          description: Data may be processed in the same geography as the resource.
+        - name: dataZone
+          value: dataZone
+          description: Data may be processed in the same data zone as the resource.
+        - name: global
+          value: global
+          description: Data may be processed in any Azure data center globally.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        enum:
+        - geography
+        - dataZone
+        - global
+    ClassifyParameters.stringEncoding:
+      name: stringEncoding
+      in: query
+      description: The encoding format for content spans in the response.
+      required: false
+      x-ms-enum:
+        name: StringEncoding
+        modelAsString: true
+        values:
+        - name: codePoint
+          value: codePoint
+          description: Unicode code point (UTF-32) encoding, used by languages such
+            as Python, etc.
+        - name: utf16
+          value: utf16
+          description: UTF-16 encoding, used by languages such as C#, JavaScript,
+            Java, etc.
+        - name: utf8
+          value: utf8
+          description: UTF-8 encoding, used by languages such as Go, Rust, Ruby, PHP,
+            etc.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        enum:
+        - codePoint
+        - utf16
+        - utf8
+        default: codePoint
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: Ocp-Apim-Subscription-Key
+      in: header
+    OAuth2Auth:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          tokenUrl: https://login.microsoftonline.com/common/oauth2/token
+          scopes:
+            https://cognitiveservices.azure.com/.default: ''
+  schemas:
+    AddFaceParameters:
+      type: object
+      description: Add face parameters.
+      properties:
+        faceSource:
+          $ref: '#/components/schemas/FaceSource'
+        personId:
+          type: string
+          description: Person identifier with which to associate the face.
+        qualityThreshold:
+          type: string
+          description: Face quality threshold below which the face will not be added.
+            Default is medium.
+          default: medium
+          enum:
+          - low
+          - medium
+          - high
+          x-ms-enum:
+            name: QualityForRecognition
+            modelAsString: true
+            values:
+            - name: low
+              value: low
+              description: Low quality.
+            - name: medium
+              value: medium
+              description: Medium quality.
+            - name: high
+              value: high
+              description: High quality.
+      required:
+      - faceSource
+    AddPersonParameters:
+      type: object
+      description: Add person parameters.
+      properties:
+        tags:
+          type: object
+          description: Tags associated with the person.
+          additionalProperties:
+            type: string
+        faceIds:
+          type: array
+          description: List of faces associated with the person.
+          items:
+            type: string
+    AnalyzeInput:
+      type: object
+      description: Additional input to analyze.
+      properties:
+        url:
+          type: string
+          format: uri
+          description: The URL of the input to analyze.  Only one of url or data should
+            be specified.
+        data:
+          type: string
+          format: byte
+          description: Base64-encoded binary content of the input to analyze.  Only
+            one of url or data should be specified.
+        name:
+          type: string
+          description: Name of the input.
+      required:
+      - url
+    AnalyzeRequest:
+      type: object
+      description: Analyze operation request.
+      properties:
+        url:
+          type: string
+          format: uri
+          description: The URL of the primary input to analyze.  Only one of url or
+            data should be specified.
+        data:
+          type: string
+          format: byte
+          description: Base64-encoded binary content of the primary input to analyze.  Only
+            one of url or data should be specified.
+        inputs:
+          type: array
+          description: Additional inputs to analyze.  Only supported in analyzers
+            with mode=pro.
+          items:
+            $ref: '#/components/schemas/AnalyzeInput'
+    AnalyzeResult:
+      type: object
+      description: Analyze operation result.
+      properties:
+        analyzerId:
+          type: string
+          description: The unique identifier of the analyzer.
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+        apiVersion:
+          type: string
+          description: The version of the API used to analyze the document.
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the result was created.
+        warnings:
+          type: array
+          description: Warnings encountered while analyzing the document.
+          items:
+            $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+        stringEncoding:
+          type: string
+          description: The string encoding used for content spans.
+          default: codePoint
+          enum:
+          - codePoint
+          - utf16
+          - utf8
+          x-ms-enum:
+            name: StringEncoding
+            modelAsString: true
+            values:
+            - name: codePoint
+              value: codePoint
+              description: Unicode code point (UTF-32) encoding, used by languages
+                such as Python, etc.
+            - name: utf16
+              value: utf16
+              description: UTF-16 encoding, used by languages such as C#, JavaScript,
+                Java, etc.
+            - name: utf8
+              value: utf8
+              description: UTF-8 encoding, used by languages such as Go, Rust, Ruby,
+                PHP, etc.
+        contents:
+          type: array
+          description: The extracted content.
+          items:
+            $ref: '#/components/schemas/MediaContent'
+      required:
+      - contents
+    ArrayField:
+      $ref: '#/components/schemas/ContentField'
+      type: object
+      properties:
+        valueArray:
+          type: array
+          description: Array field value.
+          items:
+            $ref: '#/components/schemas/ContentField'
+      description: Array field extracted from the content.
+      x-ms-discriminator-value: array
+    AudioVisualContent:
+      $ref: '#/components/schemas/MediaContent'
+      type: object
+      properties:
+        startTimeMs:
+          type: integer
+          format: int64
+          description: Start time of the content in milliseconds.
+        endTimeMs:
+          type: integer
+          format: int64
+          description: End time of the content in milliseconds.
+        width:
+          type: integer
+          format: int32
+          description: Width of each video frame in pixels, if applicable.
+        height:
+          type: integer
+          format: int32
+          description: Height of each video frame in pixels, if applicable.
+        cameraShotTimesMs:
+          type: array
+          description: List of camera shot changes in the video, represented by its
+            timestamp in milliseconds.  Only if returnDetails is true.
+          items:
+            type: integer
+            format: int64
+        keyFrameTimesMs:
+          type: array
+          description: List of key frames in the video, represented by its timestamp
+            in milliseconds.  Only if returnDetails is true.
+          items:
+            type: integer
+            format: int64
+        transcriptPhrases:
+          type: array
+          description: List of transcript phrases.  Only if returnDetails is true.
+          items:
+            $ref: '#/components/schemas/TranscriptPhrase'
+        persons:
+          type: array
+          description: List of detected persons in the video.  Only if enableFace
+            and returnDetails are true.
+          items:
+            $ref: '#/components/schemas/DetectedPerson'
+        segments:
+          type: array
+          description: List of audio visual segments.  Only if enableSegmentation
+            and returnDetails are true.
+          items:
+            $ref: '#/components/schemas/AudioVisualSegment'
+      required:
+      - startTimeMs
+      - endTimeMs
+      description: Audio visual content.  Ex. audio/wav, video/mp4.
+      x-ms-discriminator-value: audioVisual
+    AudioVisualSegment:
+      type: object
+      description: Audio visual segment, such as a scene, chapter, etc.
+      properties:
+        segmentId:
+          type: string
+          description: Segment ID.
+        startTimeMs:
+          type: integer
+          format: int64
+          description: Start time of the segment in milliseconds.
+        endTimeMs:
+          type: integer
+          format: int64
+          description: End time of the segment in milliseconds.
+        description:
+          type: string
+          description: Short description of the segment.
+        span:
+          $ref: '#/components/schemas/ContentSpan'
+      required:
+      - segmentId
+      - startTimeMs
+      - endTimeMs
+      - description
+    Azure.Core.Foundations.Error:
+      type: object
+      description: The error object.
+      properties:
+        code:
+          type: string
+          description: One of a server-defined set of error codes.
+        message:
+          type: string
+          description: A human-readable representation of the error.
+        target:
+          type: string
+          description: The target of the error.
+        details:
+          type: array
+          description: An array of details about specific errors that led to this
+            reported error.
+          items:
+            $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+        innererror:
+          $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
+      required:
+      - code
+      - message
+    Azure.Core.Foundations.ErrorResponse:
+      type: object
+      description: A response containing error details.
+      properties:
+        error:
+          $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+      required:
+      - error
+    Azure.Core.Foundations.InnerError:
+      type: object
+      description: An object containing more specific information about the error.
+        As per Azure REST API guidelines - https://aka.ms/AzureRestApiGuidelines#handling-errors.
+      properties:
+        code:
+          type: string
+          description: One of a server-defined set of error codes.
+        innererror:
+          $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
+    Azure.Core.Foundations.OperationState:
+      type: string
+      description: Enum describing allowed operation states.
+      enum:
+      - NotStarted
+      - Running
+      - Succeeded
+      - Failed
+      - Canceled
+      x-ms-enum:
+        name: OperationState
+        modelAsString: true
+        values:
+        - name: NotStarted
+          value: NotStarted
+          description: The operation has not started.
+        - name: Running
+          value: Running
+          description: The operation is in progress.
+        - name: Succeeded
+          value: Succeeded
+          description: The operation has completed successfully.
+        - name: Failed
+          value: Failed
+          description: The operation has failed.
+        - name: Canceled
+          value: Canceled
+          description: The operation has been canceled by the user.
+    BlobDataSource:
+      $ref: '#/components/schemas/DataSource'
+      type: object
+      properties:
+        containerUrl:
+          type: string
+          format: uri
+          description: The URL of the blob container.
+        prefix:
+          type: string
+          description: An optional prefix to filter blobs within the container.
+        fileListPath:
+          type: string
+          description: An optional path to a file listing specific blobs to include.
+      required:
+      - containerUrl
+      description: Blob storage data source.
+      x-ms-discriminator-value: blob
+    BooleanField:
+      $ref: '#/components/schemas/ContentField'
+      type: object
+      properties:
+        valueBoolean:
+          type: boolean
+          description: Boolean field value.
+      description: Boolean field extracted from the content.
+      x-ms-discriminator-value: boolean
+    BoundingBox:
+      type: object
+      description: Bounding box in an image.
+      properties:
+        left:
+          type: integer
+          format: int32
+          description: Left coordinate of the bounding box.
+        top:
+          type: integer
+          format: int32
+          description: Top coordinate of the bounding box.
+        width:
+          type: integer
+          format: int32
+          description: Width of the bounding box.
+        height:
+          type: integer
+          format: int32
+          description: Height of the bounding box.
+      required:
+      - left
+      - top
+      - width
+      - height
+    ClassifierCategory:
+      type: object
+      description: A classifier category.
+      properties:
+        description:
+          type: string
+          description: The description of the category.
+          x-ms-mutability:
+          - read
+          - create
+        analyzerId:
+          type: string
+          description: Optional analyzer used to process the content.
+    ClassifyRequest:
+      type: object
+      description: Classify operation request.
+      properties:
+        url:
+          type: string
+          format: uri
+          description: The URL of the document to classify.
+    ClassifyResult:
+      type: object
+      description: Classify operation result.
+      properties:
+        classifierId:
+          type: string
+          description: The unique identifier of the classifier.
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+        apiVersion:
+          type: string
+          description: The version of the API used to classify the document.
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the result was created.
+        warnings:
+          type: array
+          description: Warnings encountered while classifying the document.
+          items:
+            $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+        stringEncoding:
+          type: string
+          description: The string encoding used for content spans.
+          default: codePoint
+          enum:
+          - codePoint
+          - utf16
+          - utf8
+          x-ms-enum:
+            name: StringEncoding
+            modelAsString: true
+            values:
+            - name: codePoint
+              value: codePoint
+              description: Unicode code point (UTF-32) encoding, used by languages
+                such as Python, etc.
+            - name: utf16
+              value: utf16
+              description: UTF-16 encoding, used by languages such as C#, JavaScript,
+                Java, etc.
+            - name: utf8
+              value: utf8
+              description: UTF-8 encoding, used by languages such as Go, Rust, Ruby,
+                PHP, etc.
+        contents:
+          type: array
+          description: The classified content.
+          items:
+            $ref: '#/components/schemas/MediaContent'
+      required:
+      - contents
+    CompareFacesParameters:
+      type: object
+      description: Compare faces parameters.
+      properties:
+        faceSource1:
+          $ref: '#/components/schemas/FaceSource'
+        faceSource2:
+          $ref: '#/components/schemas/FaceSource'
+      required:
+      - faceSource1
+      - faceSource2
+    CompareFacesResult:
+      type: object
+      description: Compare faces response.
+      properties:
+        detectedFace1:
+          $ref: '#/components/schemas/DetectedBoundingBox'
+        detectedFace2:
+          $ref: '#/components/schemas/DetectedBoundingBox'
+        confidence:
+          type: number
+          format: float
+          description: Confidence score of the face comparison.
+      required:
+      - detectedFace1
+      - detectedFace2
+      - confidence
+    ContentAnalyzer:
+      type: object
+      description: Analyzer that extracts content and fields from multimodal documents.
+      properties:
+        analyzerId:
+          type: string
+          description: The unique identifier of the analyzer.
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+          readOnly: true
+        description:
+          type: string
+          description: A description of the analyzer.
+        tags:
+          type: object
+          description: Tags associated with the analyzer.
+          additionalProperties:
+            type: string
+        status:
+          $ref: '#/components/schemas/ResourceStatus'
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the analyzer was created.
+          readOnly: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The date and time when the analyzer was last modified.
+          readOnly: true
+        warnings:
+          type: array
+          description: Warnings encountered while creating the analyzer.
+          items:
+            $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+          readOnly: true
+        baseAnalyzerId:
+          type: string
+          description: The analyzer to incrementally train from.
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+          x-ms-mutability:
+          - read
+          - create
+        config:
+          $ref: '#/components/schemas/ContentAnalyzerConfig'
+        fieldSchema:
+          $ref: '#/components/schemas/FieldSchema'
+        trainingData:
+          $ref: '#/components/schemas/DataSource'
+        processingLocation:
+          type: string
+          description: The location where the data may be processed.
+          default: geography
+          enum:
+          - geography
+          - dataZone
+          - global
+          x-ms-enum:
+            name: ProcessingLocation
+            modelAsString: true
+            values:
+            - name: geography
+              value: geography
+              description: Data may be processed in the same geography as the resource.
+            - name: dataZone
+              value: dataZone
+              description: Data may be processed in the same data zone as the resource.
+            - name: global
+              value: global
+              description: Data may be processed in any Azure data center globally.
+          x-ms-mutability:
+          - read
+          - create
+        mode:
+          type: string
+          description: 'The analysis mode: standard, pro.  Default is standard.'
+          default: standard
+          enum:
+          - standard
+          - pro
+          x-ms-enum:
+            name: AnalysisMode
+            modelAsString: true
+            values:
+            - name: standard
+              value: standard
+              description: Standard analysis mode.
+            - name: pro
+              value: pro
+              description: Pro analysis mode.
+          x-ms-mutability:
+          - read
+          - create
+        knowledgeSources:
+          type: array
+          description: Additional knowledge sources used to enhance the analyzer.
+          items:
+            $ref: '#/components/schemas/KnowledgeSource'
+      required:
+      - analyzerId
+      - status
+      - createdAt
+      - lastModifiedAt
+    ContentAnalyzerConfig:
+      type: object
+      description: Configuration settings for an analyzer.
+      properties:
+        returnDetails:
+          type: boolean
+          description: Return all content details.
+        locales:
+          type: array
+          description: List of locale hints for speech transcription.
+          items:
+            type: string
+        enableFace:
+          type: boolean
+          description: Enable face detection.
+        personDirectoryId:
+          type: string
+          description: Specify the person directory used for identifying detected
+            faces.
+        enableOcr:
+          type: boolean
+          description: Enable optical character recognition (OCR).
+        enableLayout:
+          type: boolean
+          description: Enable layout analysis.
+        tableFormat:
+          type: string
+          description: Representation format of tables in analyze result markdown.
+          default: html
+          enum:
+          - html
+          x-ms-enum:
+            name: TableFormat
+            modelAsString: true
+            values:
+            - name: html
+              value: html
+              description: 'Represent tables using HTML table elements: \<table>,
+                \<th>, \<tr>, \<td>.'
+        enableFormula:
+          type: boolean
+          description: Enable mathematical formula detection.
+        disableFaceBlurring:
+          type: boolean
+          description: Disable the default blurring of faces for privacy while processing
+            the content.
+        disableContentFiltering:
+          type: boolean
+          description: Disable content filtering that detects and prevents the output
+            of harmful content.
+        estimateFieldSourceAndConfidence:
+          type: boolean
+          description: Return grounding source and confidence for extracted fields.
+        segmentationMode:
+          type: string
+          description: Segmentation mode used to split audio/visual content.
+          default: noSegmentation
+          enum:
+          - noSegmentation
+          - auto
+          - custom
+          x-ms-enum:
+            name: SegmentationMode
+            modelAsString: true
+            values:
+            - name: noSegmentation
+              value: noSegmentation
+              description: No segmentation.
+            - name: auto
+              value: auto
+              description: Automatic segmentation.
+            - name: custom
+              value: custom
+              description: Segment according to custom segmentation definition.
+        segmentationDefinition:
+          type: string
+          description: Segmentation definition for use with custom segmentation mode.
+    ContentAnalyzerUpdate:
+      type: object
+      description: Analyzer that extracts content and fields from multimodal documents.
+      properties:
+        description:
+          type: string
+          description: A description of the analyzer.
+        tags:
+          type: object
+          description: Tags associated with the analyzer.
+          additionalProperties:
+            type: string
+        knowledgeSources:
+          type: array
+          description: Additional knowledge sources used to enhance the analyzer.
+          items:
+            $ref: '#/components/schemas/KnowledgeSource'
+    ContentClassifier:
+      type: object
+      description: Classifier that classifies content into categories with optional
+        splitting.
+      properties:
+        classifierId:
+          type: string
+          description: The unique identifier of the classifier.
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+          readOnly: true
+        description:
+          type: string
+          description: A description of the classifier.
+        tags:
+          type: object
+          description: Tags associated with the classifier.
+          additionalProperties:
+            type: string
+        status:
+          $ref: '#/components/schemas/ResourceStatus'
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the classifier was created.
+          readOnly: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The date and time when the classifier was last modified.
+          readOnly: true
+        warnings:
+          type: array
+          description: Warnings encountered while creating the classifier.
+          items:
+            $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+          readOnly: true
+        categories:
+          type: object
+          description: The categories to classify against.
+          additionalProperties:
+            $ref: '#/components/schemas/ClassifierCategory'
+          x-ms-mutability:
+          - read
+          - create
+        splitMode:
+          type: string
+          description: Mode used to split input into content objects.
+          default: noSplit
+          enum:
+          - noSplit
+          - perPage
+          - auto
+          x-ms-enum:
+            name: ClassifierSplitMode
+            modelAsString: true
+            values:
+            - name: noSplit
+              value: noSplit
+              description: Treat the entire input as a single content object.
+            - name: perPage
+              value: perPage
+              description: Split each page of the input into a separate content object.
+            - name: auto
+              value: auto
+              description: Split the input into content objects based on the input
+                and category definitions.
+          x-ms-mutability:
+          - read
+          - create
+        processingLocation:
+          type: string
+          description: The location where the data may be processed.
+          default: geography
+          enum:
+          - geography
+          - dataZone
+          - global
+          x-ms-enum:
+            name: ProcessingLocation
+            modelAsString: true
+            values:
+            - name: geography
+              value: geography
+              description: Data may be processed in the same geography as the resource.
+            - name: dataZone
+              value: dataZone
+              description: Data may be processed in the same data zone as the resource.
+            - name: global
+              value: global
+              description: Data may be processed in any Azure data center globally.
+          x-ms-mutability:
+          - read
+          - create
+      required:
+      - classifierId
+      - status
+      - createdAt
+      - lastModifiedAt
+      - categories
+    ContentClassifierUpdate:
+      type: object
+      description: Classifier that classifies content into categories with optional
+        splitting.
+      properties:
+        description:
+          type: string
+          description: A description of the classifier.
+        tags:
+          type: object
+          description: Tags associated with the classifier.
+          additionalProperties:
+            type: string
+    ContentField:
+      type: object
+      description: Field extracted from the content.
+      properties:
+        type:
+          $ref: '#/components/schemas/FieldType'
+        spans:
+          type: array
+          description: Span(s) associated with the field value in the markdown content.
+          items:
+            $ref: '#/components/schemas/ContentSpan'
+        confidence:
+          type: number
+          format: float
+          description: Confidence of predicting the field value.
+          minimum: 0
+          maximum: 1
+        source:
+          $ref: '#/components/schemas/SourceExpression'
+      discriminator:
+        propertyName: type
+      required:
+      - type
+    ContentSpan:
+      type: object
+      description: Position of the element in markdown, specified as a character offset
+        and length.
+      properties:
+        offset:
+          type: integer
+          format: int32
+          description: Starting position (0-indexed) of the element in markdown, specified
+            in characters.
+        length:
+          type: integer
+          format: int32
+          description: Length of the element in markdown, specified in characters.
+      required:
+      - offset
+      - length
+    DataSource:
+      type: object
+      description: Data source specifying a set of documents.
+      properties:
+        kind:
+          $ref: '#/components/schemas/DataSourceKind'
+      discriminator:
+        propertyName: kind
+      required:
+      - kind
+    DataSourceKind:
+      type: string
+      description: Data source kind.
+      enum:
+      - blob
+      x-ms-enum:
+        name: DataSourceKind
+        modelAsString: true
+        values:
+        - name: blob
+          value: blob
+          description: A blob storage data source.
+    DateField:
+      $ref: '#/components/schemas/ContentField'
+      type: object
+      properties:
+        valueDate:
+          type: string
+          format: date
+          description: Date field value, in ISO 8601 (YYYY-MM-DD) format.
+      description: Date field extracted from the content.
+      x-ms-discriminator-value: date
+    DetectFacesParameters:
+      type: object
+      description: Detect faces parameters.
+      properties:
+        url:
+          type: string
+          description: Image URL.  Only one of url or data should be specified.
+        data:
+          type: string
+          format: byte
+          description: Base64-encoded image data.  Only one of url or data should
+            be specified.
+        maxDetectedFaces:
+          type: integer
+          format: int32
+          description: Maximum number of faces to return (up to 100).
+          default: 100
+    DetectFacesResult:
+      type: object
+      description: Detect faces response.
+      properties:
+        detectedFaces:
+          type: array
+          description: List of detected faces.
+          items:
+            $ref: '#/components/schemas/DetectedBoundingBox'
+      required:
+      - detectedFaces
+    DetectedBoundingBox:
+      type: object
+      description: Detected bounding box of an object.
+      properties:
+        boundingBox:
+          $ref: '#/components/schemas/BoundingBox'
+    DetectedPerson:
+      type: object
+      description: Detected person.
+      properties:
+        personId:
+          type: string
+          description: Person identifier in the optional person directory if found.  Otherwise,
+            each unknown person is assigned a unique `Person-{Number}`.
+        confidence:
+          type: number
+          format: float
+          description: Confidence of the person identification, if a person directory
+            is provided.
+        source:
+          $ref: '#/components/schemas/SourceExpression'
+    DocumentBarcode:
+      type: object
+      description: Barcode in a document.
+      properties:
+        kind:
+          $ref: '#/components/schemas/DocumentBarcodeKind'
+        value:
+          type: string
+          description: Barcode value.
+        source:
+          $ref: '#/components/schemas/SourceExpression'
+        span:
+          $ref: '#/components/schemas/ContentSpan'
+        confidence:
+          type: number
+          format: float
+          description: Confidence of predicting the barcode.
+          minimum: 0
+          maximum: 1
+      required:
+      - kind
+      - value
+    DocumentBarcodeKind:
+      type: string
+      description: Barcode kind.
+      enum:
+      - QRCode
+      - PDF417
+      - UPCA
+      - UPCE
+      - Code39
+      - Code128
+      - EAN8
+      - EAN13
+      - DataBar
+      - Code93
+      - Codabar
+      - DataBarExpanded
+      - ITF
+      - MicroQRCode
+      - Aztec
+      - DataMatrix
+      - MaxiCode
+      x-ms-enum:
+        name: DocumentBarcodeKind
+        modelAsString: true
+        values:
+        - name: QRCode
+          value: QRCode
+          description: QR code, as defined in ISO/IEC 18004:2015.
+        - name: PDF417
+          value: PDF417
+          description: PDF417, as defined in ISO 15438.
+        - name: UPCA
+          value: UPCA
+          description: GS1 12-digit Universal Product Code.
+        - name: UPCE
+          value: UPCE
+          description: GS1 6-digit Universal Product Code.
+        - name: Code39
+          value: Code39
+          description: Code 39 barcode, as defined in ISO/IEC 16388:2007.
+        - name: Code128
+          value: Code128
+          description: Code 128 barcode, as defined in ISO/IEC 15417:2007.
+        - name: EAN8
+          value: EAN8
+          description: GS1 8-digit International Article Number (European Article
+            Number).
+        - name: EAN13
+          value: EAN13
+          description: GS1 13-digit International Article Number (European Article
+            Number).
+        - name: DataBar
+          value: DataBar
+          description: GS1 DataBar barcode.
+        - name: Code93
+          value: Code93
+          description: Code 93 barcode, as defined in ANSI/AIM BC5-1995.
+        - name: Codabar
+          value: Codabar
+          description: Codabar barcode, as defined in ANSI/AIM BC3-1995.
+        - name: DataBarExpanded
+          value: DataBarExpanded
+          description: GS1 DataBar Expanded barcode.
+        - name: ITF
+          value: ITF
+          description: Interleaved 2 of 5 barcode, as defined in ANSI/AIM BC2-1995.
+        - name: MicroQRCode
+          value: MicroQRCode
+          description: Micro QR code, as defined in ISO/IEC 23941:2022.
+        - name: Aztec
+          value: Aztec
+          description: Aztec code, as defined in ISO/IEC 24778:2008.
+        - name: DataMatrix
+          value: DataMatrix
+          description: Data matrix code, as defined in ISO/IEC 16022:2006.
+        - name: MaxiCode
+          value: MaxiCode
+          description: MaxiCode, as defined in ISO/IEC 16023:2000.
+    DocumentCaption:
+      type: object
+      description: Caption of a table or figure.
+      properties:
+        content:
+          type: string
+          description: Content of the caption.
+        source:
+          $ref: '#/components/schemas/SourceExpression'
+        span:
+          $ref: '#/components/schemas/ContentSpan'
+        elements:
+          type: array
+          description: Child elements of the caption.
+          items:
+            $ref: '#/components/schemas/DocumentElement'
+      required:
+      - content
+    DocumentContent:
+      $ref: '#/components/schemas/MediaContent'
+      type: object
+      properties:
+        startPageNumber:
+          type: integer
+          format: int32
+          description: Start page number (1-indexed) of the content.
+        endPageNumber:
+          type: integer
+          format: int32
+          description: End page number (1-indexed) of the content.
+        unit:
+          $ref: '#/components/schemas/LengthUnit'
+        pages:
+          type: array
+          description: List of pages in the document.
+          items:
+            $ref: '#/components/schemas/DocumentPage'
+        paragraphs:
+          type: array
+          description: List of paragraphs in the document.  Only if enableOcr and
+            returnDetails are true.
+          items:
+            $ref: '#/components/schemas/DocumentParagraph'
+        sections:
+          type: array
+          description: List of sections in the document.  Only if enableLayout and
+            returnDetails are true.
+          items:
+            $ref: '#/components/schemas/DocumentSection'
+        tables:
+          type: array
+          description: List of tables in the document.  Only if enableLayout and returnDetails
+            are true.
+          items:
+            $ref: '#/components/schemas/DocumentTable'
+        figures:
+          type: array
+          description: List of figures in the document.  Only if enableLayout and
+            returnDetails are true.
+          items:
+            $ref: '#/components/schemas/DocumentFigure'
+        persons:
+          type: array
+          description: List of detected persons in the document.  Only if enableFace
+            and returnDetails are true.
+          items:
+            $ref: '#/components/schemas/DetectedPerson'
+      required:
+      - startPageNumber
+      - endPageNumber
+      description: Document content.  Ex. text/plain, application/pdf, image/jpeg.
+      x-ms-discriminator-value: document
+    DocumentElement:
+      type: string
+      description: 'JSON pointer referencing an element of the document, such as paragraph,
+
+        table, section, etc.'
+    DocumentFigure:
+      type: object
+      description: Figure in a document.
+      properties:
+        id:
+          type: string
+          description: Figure identifier.
+        source:
+          $ref: '#/components/schemas/SourceExpression'
+        span:
+          $ref: '#/components/schemas/ContentSpan'
+        elements:
+          type: array
+          description: Child elements of the figure, excluding any caption or footnotes.
+          items:
+            $ref: '#/components/schemas/DocumentElement'
+        caption:
+          $ref: '#/components/schemas/DocumentCaption'
+        footnotes:
+          type: array
+          description: List of figure footnotes.
+          items:
+            $ref: '#/components/schemas/DocumentFootnote'
+      required:
+      - id
+    DocumentFootnote:
+      type: object
+      description: Footnote of a table or figure.
+      properties:
+        content:
+          type: string
+          description: Content of the footnote.
+        source:
+          $ref: '#/components/schemas/SourceExpression'
+        span:
+          $ref: '#/components/schemas/ContentSpan'
+        elements:
+          type: array
+          description: Child elements of the footnote.
+          items:
+            $ref: '#/components/schemas/DocumentElement'
+      required:
+      - content
+    DocumentFormula:
+      type: object
+      description: Mathematical formula in a document.
+      properties:
+        kind:
+          $ref: '#/components/schemas/DocumentFormulaKind'
+        value:
+          type: string
+          description: LaTex expression describing the formula.
+        source:
+          $ref: '#/components/schemas/SourceExpression'
+        span:
+          $ref: '#/components/schemas/ContentSpan'
+        confidence:
+          type: number
+          format: float
+          description: Confidence of predicting the formula.
+          minimum: 0
+          maximum: 1
+      required:
+      - kind
+      - value
+    DocumentFormulaKind:
+      type: string
+      description: Formula kind.
+      enum:
+      - inline
+      - display
+      x-ms-enum:
+        name: DocumentFormulaKind
+        modelAsString: true
+        values:
+        - name: inline
+          value: inline
+          description: A formula embedded within the content of a paragraph.
+        - name: display
+          value: display
+          description: A formula in display mode that takes up an entire line.
+    DocumentLine:
+      type: object
+      description: Line in a document, consisting of an contiguous sequence of words.
+      properties:
+        content:
+          type: string
+          description: Line text.
+        source:
+          $ref: '#/components/schemas/SourceExpression'
+        span:
+          $ref: '#/components/schemas/ContentSpan'
+      required:
+      - content
+    DocumentPage:
+      type: object
+      description: Content from a document page.
+      properties:
+        pageNumber:
+          type: integer
+          format: int32
+          description: Page number (1-based).
+          minimum: 1
+        width:
+          type: number
+          format: float
+          description: Width of the page.
+        height:
+          type: number
+          format: float
+          description: Height of the page.
+        spans:
+          type: array
+          description: Span(s) associated with the page in the markdown content.
+          items:
+            $ref: '#/components/schemas/ContentSpan'
+        angle:
+          type: number
+          format: float
+          description: 'The general orientation of the content in clockwise direction,
+
+            measured in degrees between (-180, 180].
+
+            Only if enableOcr is true.'
+          maximum: 180
+        words:
+          type: array
+          description: List of words in the page.  Only if enableOcr and returnDetails
+            are true.
+          items:
+            $ref: '#/components/schemas/DocumentWord'
+        lines:
+          type: array
+          description: List of lines in the page.  Only if enableOcr and returnDetails
+            are true.
+          items:
+            $ref: '#/components/schemas/DocumentLine'
+        barcodes:
+          type: array
+          description: List of barcodes in the page.  Only if enableBarcode and returnDetails
+            are true.
+          items:
+            $ref: '#/components/schemas/DocumentBarcode'
+        formulas:
+          type: array
+          description: List of mathematical formulas in the page.  Only if enableFormula
+            and returnDetails are true.
+          items:
+            $ref: '#/components/schemas/DocumentFormula'
+      required:
+      - pageNumber
+    DocumentParagraph:
+      type: object
+      description: 'Paragraph in a document, generally consisting of an contiguous
+        sequence of lines
+
+        with common alignment and spacing.'
+      properties:
+        role:
+          $ref: '#/components/schemas/ParagraphRole'
+        content:
+          type: string
+          description: Paragraph text.
+        source:
+          $ref: '#/components/schemas/SourceExpression'
+        span:
+          $ref: '#/components/schemas/ContentSpan'
+      required:
+      - content
+    DocumentSection:
+      type: object
+      description: Section in a document.
+      properties:
+        span:
+          $ref: '#/components/schemas/ContentSpan'
+        elements:
+          type: array
+          description: Child elements of the section.
+          items:
+            $ref: '#/components/schemas/DocumentElement'
+    DocumentTable:
+      type: object
+      description: Table in a document, consisting table cells arranged in a rectangular
+        layout.
+      properties:
+        rowCount:
+          type: integer
+          format: int32
+          description: Number of rows in the table.
+          minimum: 1
+        columnCount:
+          type: integer
+          format: int32
+          description: Number of columns in the table.
+          minimum: 1
+        cells:
+          type: array
+          description: Cells contained within the table.
+          items:
+            $ref: '#/components/schemas/DocumentTableCell'
+        source:
+          $ref: '#/components/schemas/SourceExpression'
+        span:
+          $ref: '#/components/schemas/ContentSpan'
+        caption:
+          $ref: '#/components/schemas/DocumentCaption'
+        footnotes:
+          type: array
+          description: List of table footnotes.
+          items:
+            $ref: '#/components/schemas/DocumentFootnote'
+      required:
+      - rowCount
+      - columnCount
+      - cells
+    DocumentTableCell:
+      type: object
+      description: Table cell in a document table.
+      properties:
+        kind:
+          type: string
+          description: Table cell kind.
+          default: content
+          enum:
+          - content
+          - rowHeader
+          - columnHeader
+          - stubHead
+          - description
+          x-ms-enum:
+            name: DocumentTableCellKind
+            modelAsString: true
+            values:
+            - name: content
+              value: content
+              description: Main content/data.
+            - name: rowHeader
+              value: rowHeader
+              description: Description of the row content.
+            - name: columnHeader
+              value: columnHeader
+              description: Description the column content.
+            - name: stubHead
+              value: stubHead
+              description: Description of the row headers, usually located at the
+                top left corner of a table.
+            - name: description
+              value: description
+              description: Description of the content in (parts of) the table.
+        rowIndex:
+          type: integer
+          format: int32
+          description: Row index of the cell.
+        columnIndex:
+          type: integer
+          format: int32
+          description: Column index of the cell.
+        rowSpan:
+          type: integer
+          format: int32
+          description: Number of rows spanned by this cell.
+          default: 1
+          minimum: 1
+        columnSpan:
+          type: integer
+          format: int32
+          description: Number of columns spanned by this cell.
+          default: 1
+          minimum: 1
+        content:
+          type: string
+          description: Content of the table cell.
+        source:
+          $ref: '#/components/schemas/SourceExpression'
+        span:
+          $ref: '#/components/schemas/ContentSpan'
+        elements:
+          type: array
+          description: Child elements of the table cell.
+          items:
+            $ref: '#/components/schemas/DocumentElement'
+      required:
+      - rowIndex
+      - columnIndex
+      - content
+    DocumentWord:
+      type: object
+      description: "Word in a document, consisting of a contiguous sequence of characters.\nFor
+        non-space delimited languages, such as Chinese, Japanese, and Korean, \neach
+        character is represented as its own word."
+      properties:
+        content:
+          type: string
+          description: Word text.
+        source:
+          $ref: '#/components/schemas/SourceExpression'
+        span:
+          $ref: '#/components/schemas/ContentSpan'
+        confidence:
+          type: number
+          format: float
+          description: Confidence of predicting the word.
+          minimum: 0
+          maximum: 1
+      required:
+      - content
+    FaceSource:
+      type: object
+      description: Input face source with an optional target bounding box.  If not
+        specified, the largest face will be used.
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Image URL.  Only one of url or data should be specified.
+        data:
+          type: string
+          format: byte
+          description: Base64-encoded image data.  Only one of url or data should
+            be specified.
+        imageReferenceId:
+          type: string
+          description: User provided identifier for the source image.
+        targetBoundingBox:
+          $ref: '#/components/schemas/BoundingBox'
+    FieldDefinition:
+      type: object
+      description: Definition of the field using a JSON Schema like syntax.
+      properties:
+        method:
+          type: string
+          description: Generation method.
+          default: generate
+          enum:
+          - generate
+          - extract
+          - classify
+          x-ms-enum:
+            name: GenerationMethod
+            modelAsString: true
+            values:
+            - name: generate
+              value: generate
+              description: Values are generated freely based on the content.
+            - name: extract
+              value: extract
+              description: Values are extracted as they appear in the content.
+            - name: classify
+              value: classify
+              description: Values are classified against a predefined set of categories.
+        type:
+          $ref: '#/components/schemas/FieldType'
+        description:
+          type: string
+          description: Field description.
+        items:
+          $ref: '#/components/schemas/FieldDefinition'
+        properties:
+          type: object
+          description: Named sub-fields, if type is object.
+          additionalProperties:
+            $ref: '#/components/schemas/FieldDefinition'
+        enum:
+          type: array
+          description: Enumeration of possible field values.
+          items:
+            type: string
+        enumDescriptions:
+          type: object
+          description: Descriptions for each enumeration value.
+          additionalProperties:
+            type: string
+        $ref:
+          type: string
+          description: Reference to another field definition.
+    FieldSchema:
+      type: object
+      description: Schema of fields to be extracted from documents.
+      properties:
+        name:
+          type: string
+          description: The name of the field schema.
+          x-ms-mutability:
+          - read
+          - create
+        description:
+          type: string
+          description: A description of the field schema.
+          x-ms-mutability:
+          - read
+          - create
+        fields:
+          type: object
+          description: The fields defined in the schema.
+          additionalProperties:
+            $ref: '#/components/schemas/FieldDefinition'
+          x-ms-mutability:
+          - read
+          - create
+        definitions:
+          type: object
+          description: Additional definitions referenced by the fields in the schema.
+          additionalProperties:
+            $ref: '#/components/schemas/FieldDefinition'
+          x-ms-mutability:
+          - read
+          - create
+      required:
+      - fields
+    FieldType:
+      type: string
+      description: Semantic data type of the field value.
+      enum:
+      - string
+      - date
+      - time
+      - number
+      - integer
+      - boolean
+      - array
+      - object
+      x-ms-enum:
+        name: FieldType
+        modelAsString: true
+        values:
+        - name: string
+          value: string
+          description: Plain text.
+        - name: date
+          value: date
+          description: Date, normalized to ISO 8601 (YYYY-MM-DD) format.
+        - name: time
+          value: time
+          description: Time, normalized to ISO 8601 (hh:mm:ss) format.
+        - name: number
+          value: number
+          description: Number as double precision floating point.
+        - name: integer
+          value: integer
+          description: Integer as 64-bit signed integer.
+        - name: boolean
+          value: boolean
+          description: Boolean value.
+        - name: array
+          value: array
+          description: List of subfields of the same type.
+        - name: object
+          value: object
+          description: Named list of subfields.
+    FindSimilarFacesParameters:
+      type: object
+      description: Find similar faces parameters.
+      properties:
+        faceSource:
+          $ref: '#/components/schemas/FaceSource'
+        maxSimilarFaces:
+          type: integer
+          format: int32
+          description: Maximum number of similar faces to return (up to 1000).
+          default: 1000
+    FindSimilarFacesResult:
+      type: object
+      description: Find similar faces response.
+      properties:
+        detectedFace:
+          $ref: '#/components/schemas/DetectedBoundingBox'
+        similarFaces:
+          type: array
+          description: List of similar faces.
+          items:
+            $ref: '#/components/schemas/SimilarFace'
+      required:
+      - detectedFace
+      - similarFaces
+    IdentifyPersonParameters:
+      type: object
+      description: Identify person parameters.
+      properties:
+        faceSource:
+          $ref: '#/components/schemas/FaceSource'
+        maxPersonCandidates:
+          type: integer
+          format: int32
+          description: Maximum number of person candidates to return (up to 10).
+          default: 1
+      required:
+      - faceSource
+    IdentifyPersonResult:
+      type: object
+      description: Identify person response.
+      properties:
+        detectedFace:
+          $ref: '#/components/schemas/DetectedBoundingBox'
+        personCandidates:
+          type: array
+          description: List of person candidates matching the input face.
+          items:
+            $ref: '#/components/schemas/PersonCandidate'
+      required:
+      - detectedFace
+      - personCandidates
+    IntegerField:
+      $ref: '#/components/schemas/ContentField'
+      type: object
+      properties:
+        valueInteger:
+          type: integer
+          format: int64
+          description: Integer field value.
+      description: Integer field extracted from the content.
+      x-ms-discriminator-value: integer
+    KnowledgeSource:
+      type: object
+      description: Knowledge source.
+      properties:
+        kind:
+          $ref: '#/components/schemas/KnowledgeSourceKind'
+      discriminator:
+        propertyName: kind
+      required:
+      - kind
+    KnowledgeSourceKind:
+      type: string
+      description: Knowledge source kind.
+      enum:
+      - reference
+      x-ms-enum:
+        name: KnowledgeSourceKind
+        modelAsString: true
+        values:
+        - name: reference
+          value: reference
+          description: A reference knowledge source.
+    LengthUnit:
+      type: string
+      description: Length unit used by the width, height, and source properties.
+      enum:
+      - pixel
+      - inch
+      x-ms-enum:
+        name: LengthUnit
+        modelAsString: true
+        values:
+        - name: pixel
+          value: pixel
+          description: Pixel unit.
+        - name: inch
+          value: inch
+          description: Inch unit.
+    MediaContent:
+      type: object
+      description: Media content base class.
+      properties:
+        kind:
+          $ref: '#/components/schemas/MediaContentKind'
+        mimeType:
+          type: string
+          description: Detected MIME type of the content.  Ex. application/pdf, image/jpeg,
+            etc.
+        category:
+          type: string
+          description: Classified content category.
+        path:
+          type: string
+          format: uri
+          description: The path of the content in the input.
+        markdown:
+          type: string
+          description: Markdown representation of the content.
+        fields:
+          type: object
+          description: Extracted fields from the content.
+          additionalProperties:
+            $ref: '#/components/schemas/ContentField'
+      discriminator:
+        propertyName: kind
+      required:
+      - kind
+    MediaContentKind:
+      type: string
+      description: Kind of media content.
+      enum:
+      - document
+      - audioVisual
+      x-ms-enum:
+        name: MediaContentKind
+        modelAsString: true
+        values:
+        - name: document
+          value: document
+          description: Document content, such as pdf, image, txt, etc.
+        - name: audioVisual
+          value: audioVisual
+          description: Audio visual content, such as mp3, mp4, etc.
+    NumberField:
+      $ref: '#/components/schemas/ContentField'
+      type: object
+      properties:
+        valueNumber:
+          type: number
+          format: double
+          description: Number field value.
+      description: Number field extracted from the content.
+      x-ms-discriminator-value: number
+    ObjectField:
+      $ref: '#/components/schemas/ContentField'
+      type: object
+      properties:
+        valueObject:
+          type: object
+          description: Object field value.
+          additionalProperties:
+            $ref: '#/components/schemas/ContentField'
+      description: Object field extracted from the content.
+      x-ms-discriminator-value: object
+    PagedContentAnalyzer:
+      type: object
+      description: Paged collection of ContentAnalyzer items
+      properties:
+        value:
+          type: array
+          description: The ContentAnalyzer items on this page
+          items:
+            $ref: '#/components/schemas/ContentAnalyzer'
+        nextLink:
+          type: string
+          format: uri
+          description: The link to the next page of items
+      required:
+      - value
+    PagedContentClassifier:
+      type: object
+      description: Paged collection of ContentClassifier items
+      properties:
+        value:
+          type: array
+          description: The ContentClassifier items on this page
+          items:
+            $ref: '#/components/schemas/ContentClassifier'
+        nextLink:
+          type: string
+          format: uri
+          description: The link to the next page of items
+      required:
+      - value
+    PagedPersonDirectory:
+      type: object
+      description: Paged collection of PersonDirectory items
+      properties:
+        value:
+          type: array
+          description: The PersonDirectory items on this page
+          items:
+            $ref: '#/components/schemas/PersonDirectory'
+        nextLink:
+          type: string
+          format: uri
+          description: The link to the next page of items
+      required:
+      - value
+    PagedPersonDirectoryFace:
+      type: object
+      description: Paged collection of PersonDirectoryFace items
+      properties:
+        value:
+          type: array
+          description: The PersonDirectoryFace items on this page
+          items:
+            $ref: '#/components/schemas/PersonDirectoryFace'
+        nextLink:
+          type: string
+          format: uri
+          description: The link to the next page of items
+      required:
+      - value
+    PagedPersonDirectoryPerson:
+      type: object
+      description: Paged collection of PersonDirectoryPerson items
+      properties:
+        value:
+          type: array
+          description: The PersonDirectoryPerson items on this page
+          items:
+            $ref: '#/components/schemas/PersonDirectoryPerson'
+        nextLink:
+          type: string
+          format: uri
+          description: The link to the next page of items
+      required:
+      - value
+    ParagraphRole:
+      type: string
+      description: Semantic role of the paragraph.
+      enum:
+      - pageHeader
+      - pageFooter
+      - pageNumber
+      - title
+      - sectionHeading
+      - footnote
+      - formulaBlock
+      x-ms-enum:
+        name: ParagraphRole
+        modelAsString: true
+        values:
+        - name: pageHeader
+          value: pageHeader
+          description: Text near the top edge of the page.
+        - name: pageFooter
+          value: pageFooter
+          description: Text near the bottom edge of the page.
+        - name: pageNumber
+          value: pageNumber
+          description: Page number.
+        - name: title
+          value: title
+          description: Top-level title describing the entire document.
+        - name: sectionHeading
+          value: sectionHeading
+          description: Sub heading describing a section of the document.
+        - name: footnote
+          value: footnote
+          description: Note usually placed after the main content on a page.
+        - name: formulaBlock
+          value: formulaBlock
+          description: Block of formulas, often with shared alignment.
+    PersonCandidate:
+      type: object
+      description: Identified person candidate.
+      properties:
+        personId:
+          type: string
+          description: The unique identifier of the person.
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+        tags:
+          type: object
+          description: Tags associated with the person.
+          additionalProperties:
+            type: string
+        confidence:
+          type: number
+          format: float
+          description: Confidence score of the person matching the input face.
+      required:
+      - personId
+      - confidence
+    PersonDirectory:
+      type: object
+      description: Directory of people and their faces.
+      properties:
+        personDirectoryId:
+          type: string
+          description: The unique identifier of the person directory.
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+          readOnly: true
+        description:
+          type: string
+          description: A description of the person directory.
+        tags:
+          type: object
+          description: Tags associated with the person directory.
+          additionalProperties:
+            type: string
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the person directory was created.
+          readOnly: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The date and time when the person directory was last modified.
+          readOnly: true
+        personCount:
+          type: integer
+          format: int32
+          description: Number of people in the person directory.
+          readOnly: true
+        faceCount:
+          type: integer
+          format: int32
+          description: Number of faces in the person directory.
+          readOnly: true
+      required:
+      - personDirectoryId
+      - createdAt
+      - lastModifiedAt
+      - personCount
+      - faceCount
+    PersonDirectoryFace:
+      type: object
+      description: Face in a person directory.
+      properties:
+        faceId:
+          type: string
+          description: The unique identifier of the face.
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+          readOnly: true
+        personId:
+          type: string
+          description: Person associated with the face, if any.
+        imageReferenceId:
+          type: string
+          description: User provided identifier for the source image.
+          readOnly: true
+        boundingBox:
+          $ref: '#/components/schemas/BoundingBox'
+      required:
+      - faceId
+    PersonDirectoryFaceUpdate:
+      type: object
+      description: Face in a person directory.
+      properties:
+        personId:
+          type: string
+          description: Person associated with the face, if any.
+    PersonDirectoryPerson:
+      type: object
+      description: Person in a person directory.
+      properties:
+        personId:
+          type: string
+          description: The unique identifier of the person.
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+          readOnly: true
+        tags:
+          type: object
+          description: Tags associated with the person.
+          additionalProperties:
+            type: string
+        faceIds:
+          type: array
+          description: List of faces associated with the person.
+          items:
+            type: string
+      required:
+      - personId
+    PersonDirectoryPersonUpdate:
+      type: object
+      description: Person in a person directory.
+      properties:
+        tags:
+          type: object
+          description: Tags associated with the person.
+          additionalProperties:
+            type: string
+        faceIds:
+          type: array
+          description: List of faces associated with the person.
+          items:
+            type: string
+    PersonDirectoryUpdate:
+      type: object
+      description: Directory of people and their faces.
+      properties:
+        description:
+          type: string
+          description: A description of the person directory.
+        tags:
+          type: object
+          description: Tags associated with the person directory.
+          additionalProperties:
+            type: string
+    ReferenceKnowledgeSource:
+      $ref: '#/components/schemas/KnowledgeSource'
+      type: object
+      properties:
+        containerUrl:
+          type: string
+          format: uri
+          description: The URL of the blob container.
+        prefix:
+          type: string
+          description: An optional prefix to filter blobs within the container.
+        fileListPath:
+          type: string
+          description: Path to a file listing specific blobs to include.
+      required:
+      - containerUrl
+      - fileListPath
+      description: File knowledge source.
+      x-ms-discriminator-value: reference
+    ResourceStatus:
+      type: string
+      description: Status of a resource.
+      enum:
+      - creating
+      - ready
+      - deleting
+      - failed
+      x-ms-enum:
+        name: ResourceStatus
+        modelAsString: true
+        values:
+        - name: creating
+          value: creating
+          description: The resource is being created.
+        - name: ready
+          value: ready
+          description: The resource is ready.
+        - name: deleting
+          value: deleting
+          description: The resource is being deleted.
+        - name: failed
+          value: failed
+          description: The resource failed during creation.
+    SimilarFace:
+      type: object
+      description: Similar face found in the person directory.
+      properties:
+        faceId:
+          type: string
+          description: The unique identifier of the face.
+          pattern: ^[a-zA-Z0-9._-]{1,64}$
+          readOnly: true
+        personId:
+          type: string
+          description: Person associated with the face, if any.
+        imageReferenceId:
+          type: string
+          description: User provided identifier for the source image.
+          readOnly: true
+        boundingBox:
+          $ref: '#/components/schemas/BoundingBox'
+        confidence:
+          type: number
+          format: float
+          description: Confidence that this face matches the input face.
+      required:
+      - faceId
+      - confidence
+    SourceExpression:
+      type: string
+      description: Encoded string expression that describes positions in the content.
+    StringField:
+      $ref: '#/components/schemas/ContentField'
+      type: object
+      properties:
+        valueString:
+          type: string
+          description: String field value.
+      description: String field extracted from the content.
+      x-ms-discriminator-value: string
+    TimeField:
+      $ref: '#/components/schemas/ContentField'
+      type: object
+      properties:
+        valueTime:
+          type: string
+          format: time
+          description: Time field value, in ISO 8601 (hh:mm:ss) format.
+      description: Time field extracted from the content.
+      x-ms-discriminator-value: time
+    TranscriptPhrase:
+      type: object
+      description: Transcript phrase.
+      properties:
+        speaker:
+          type: string
+          description: Speaker index or name.
+        startTimeMs:
+          type: integer
+          format: int64
+          description: Start time of the phrase in milliseconds.
+        endTimeMs:
+          type: integer
+          format: int64
+          description: End time of the phrase in milliseconds.
+        locale:
+          type: string
+          description: Detected locale of the phrase.  Ex. en-US.
+        text:
+          type: string
+          description: Transcript text.
+        confidence:
+          type: number
+          format: float
+          description: Confidence of predicting the phrase.
+          minimum: 0
+          maximum: 1
+        span:
+          $ref: '#/components/schemas/ContentSpan'
+        words:
+          type: array
+          description: List of words in the phrase.
+          items:
+            $ref: '#/components/schemas/TranscriptWord'
+      required:
+      - startTimeMs
+      - endTimeMs
+      - text
+      - words
+    TranscriptWord:
+      type: object
+      description: Transcript word.
+      properties:
+        startTimeMs:
+          type: integer
+          format: int64
+          description: Start time of the word in milliseconds.
+        endTimeMs:
+          type: integer
+          format: int64
+          description: End time of the word in milliseconds.
+        text:
+          type: string
+          description: Transcript text.
+        span:
+          $ref: '#/components/schemas/ContentSpan'
+      required:
+      - startTimeMs
+      - endTimeMs
+      - text
+    VerifyPersonParameters:
+      type: object
+      description: Verify person parameters.
+      properties:
+        faceSource:
+          $ref: '#/components/schemas/FaceSource'
+      required:
+      - faceSource
+    VerifyPersonResult:
+      type: object
+      description: Verify person response.
+      properties:
+        detectedFace:
+          $ref: '#/components/schemas/DetectedBoundingBox'
+        confidence:
+          type: number
+          format: float
+          description: Confidence score of the person verification.
+      required:
+      - detectedFace
+      - confidence

@@ -1,0 +1,2059 @@
+openapi: 3.0.0
+info:
+  title: Cosmos DB
+  description: Azure Cosmos DB Database Service Resource Provider REST API
+  version: 2025-04-15
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/services
+  : get:
+      operationId: Service_List
+      description: Gets the status of service.
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group. The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: accountName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Cosmos DB database account name.
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 50
+          pattern: ^[a-z0-9]+(-[a-z0-9]+)*
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: The ServiceResource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: The unique resource identifier of the database
+                            account.
+                        name:
+                          readOnly: true
+                          type: string
+                          description: The name of the database account.
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The type of Azure resource.
+                        properties:
+                          x-ms-client-flatten: false
+                          description: Services response resource.
+                          type: object
+                          discriminator:
+                            propertyName: serviceType
+                          properties:
+                            creationTime:
+                              readOnly: true
+                              type: string
+                              format: date-time
+                              description: Time of the last state change (ISO-8601
+                                format).
+                            instanceSize:
+                              type: string
+                              enum:
+                              - Cosmos.D4s
+                              - Cosmos.D8s
+                              - Cosmos.D16s
+                              description: Instance type for the service.
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ServiceSize
+                            instanceCount:
+                              description: Instance count for the service.
+                              type: integer
+                              minimum: 0
+                              format: int32
+                            serviceType:
+                              type: string
+                              enum:
+                              - SqlDedicatedGateway
+                              - DataTransfer
+                              - GraphAPICompute
+                              - MaterializedViewsBuilder
+                              description: ServiceType for the service.
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ServiceType
+                            status:
+                              readOnly: true
+                              type: string
+                              enum:
+                              - Creating
+                              - Running
+                              - Updating
+                              - Deleting
+                              - Error
+                              - Stopped
+                              description: Describes the status of a service.
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ServiceStatus
+                          additionalProperties: true
+                          required:
+                          - serviceType
+                      description: The resource model definition for a ARM proxy resource.
+                        It will have everything other than required location and tags
+                      x-ms-azure-resource: true
+                    description: List of Service Resource and their properties.
+                description: The List operation response, that contains the Service
+                  Resource and their properties.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                description: An error response from the service.
+                properties:
+                  error:
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                    description: Error Response.
+      x-ms-pageable: {}
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DocumentDB/databaseAccounts/{accountName}/services/{serviceName}
+  : put:
+      tags:
+      - DataTransfer
+      - SqlDedicatedGateway
+      - GraphAPICompute
+      - MaterializedViewsBuilder
+      operationId: Service_Create
+      description: Creates a service.
+      x-ms-long-running-operation: true
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group. The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: accountName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Cosmos DB database account name.
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 50
+          pattern: ^[a-z0-9]+(-[a-z0-9]+)*
+      - name: serviceName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Cosmos DB service name.
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 50
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Parameters for Create or Update request for ServiceResource
+              type: object
+              properties:
+                properties:
+                  description: Properties in ServiceResourceCreateUpdateParameters.
+                  type: object
+                  discriminator:
+                    propertyName: serviceType
+                  properties:
+                    instanceSize:
+                      type: string
+                      enum:
+                      - Cosmos.D4s
+                      - Cosmos.D8s
+                      - Cosmos.D16s
+                      description: Instance type for the service.
+                      x-ms-enum:
+                        modelAsString: true
+                        name: ServiceSize
+                    instanceCount:
+                      description: Instance count for the service.
+                      type: integer
+                      minimum: 0
+                      format: int32
+                    serviceType:
+                      type: string
+                      enum:
+                      - SqlDedicatedGateway
+                      - DataTransfer
+                      - GraphAPICompute
+                      - MaterializedViewsBuilder
+                      description: ServiceType for the service.
+                      x-ms-enum:
+                        modelAsString: true
+                        name: ServiceType
+                  required:
+                  - serviceType
+        description: The Service resource parameters.
+        required: true
+      responses:
+        '200':
+          description: The service status.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: The unique resource identifier of the database account.
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the database account.
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of Azure resource.
+                  properties:
+                    x-ms-client-flatten: false
+                    description: Services response resource.
+                    type: object
+                    discriminator:
+                      propertyName: serviceType
+                    properties:
+                      creationTime:
+                        readOnly: true
+                        type: string
+                        format: date-time
+                        description: Time of the last state change (ISO-8601 format).
+                      instanceSize:
+                        type: string
+                        enum:
+                        - Cosmos.D4s
+                        - Cosmos.D8s
+                        - Cosmos.D16s
+                        description: Instance type for the service.
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ServiceSize
+                      instanceCount:
+                        description: Instance count for the service.
+                        type: integer
+                        minimum: 0
+                        format: int32
+                      serviceType:
+                        type: string
+                        enum:
+                        - SqlDedicatedGateway
+                        - DataTransfer
+                        - GraphAPICompute
+                        - MaterializedViewsBuilder
+                        description: ServiceType for the service.
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ServiceType
+                      status:
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Creating
+                        - Running
+                        - Updating
+                        - Deleting
+                        - Error
+                        - Stopped
+                        description: Describes the status of a service.
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ServiceStatus
+                    additionalProperties: true
+                    required:
+                    - serviceType
+                description: The resource model definition for a ARM proxy resource.
+                  It will have everything other than required location and tags
+                x-ms-azure-resource: true
+        '202':
+          description: The job will complete asynchronously.
+          headers:
+            azure-AsyncOperation:
+              description: URI to poll for completion status.
+              schema:
+                type: string
+            location:
+              description: URI to poll for completion status.
+              schema:
+                type: string
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                description: An error response from the service.
+                properties:
+                  error:
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                    description: Error Response.
+    get:
+      tags:
+      - DataTransfer
+      - SqlDedicatedGateway
+      - GraphAPICompute
+      - MaterializedViewsBuilder
+      operationId: Service_Get
+      description: Gets the status of service.
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group. The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: accountName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Cosmos DB database account name.
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 50
+          pattern: ^[a-z0-9]+(-[a-z0-9]+)*
+      - name: serviceName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Cosmos DB service name.
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 50
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: The ServiceResource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: The unique resource identifier of the database account.
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the database account.
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of Azure resource.
+                  properties:
+                    x-ms-client-flatten: false
+                    description: Services response resource.
+                    type: object
+                    discriminator:
+                      propertyName: serviceType
+                    properties:
+                      creationTime:
+                        readOnly: true
+                        type: string
+                        format: date-time
+                        description: Time of the last state change (ISO-8601 format).
+                      instanceSize:
+                        type: string
+                        enum:
+                        - Cosmos.D4s
+                        - Cosmos.D8s
+                        - Cosmos.D16s
+                        description: Instance type for the service.
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ServiceSize
+                      instanceCount:
+                        description: Instance count for the service.
+                        type: integer
+                        minimum: 0
+                        format: int32
+                      serviceType:
+                        type: string
+                        enum:
+                        - SqlDedicatedGateway
+                        - DataTransfer
+                        - GraphAPICompute
+                        - MaterializedViewsBuilder
+                        description: ServiceType for the service.
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ServiceType
+                      status:
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Creating
+                        - Running
+                        - Updating
+                        - Deleting
+                        - Error
+                        - Stopped
+                        description: Describes the status of a service.
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ServiceStatus
+                    additionalProperties: true
+                    required:
+                    - serviceType
+                description: The resource model definition for a ARM proxy resource.
+                  It will have everything other than required location and tags
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                description: An error response from the service.
+                properties:
+                  error:
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                    description: Error Response.
+    delete:
+      tags:
+      - DataTransfer
+      - SqlDedicatedGateway
+      - GraphAPICompute
+      - MaterializedViewsBuilder
+      operationId: Service_Delete
+      description: Deletes service with the given serviceName.
+      x-ms-long-running-operation: true
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group. The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: accountName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Cosmos DB database account name.
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 50
+          pattern: ^[a-z0-9]+(-[a-z0-9]+)*
+      - name: serviceName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Cosmos DB service name.
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 50
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: The response for service deletion.
+        '202':
+          description: The job will complete asynchronously.
+          headers:
+            azure-AsyncOperation:
+              description: URI to poll for completion status.
+              schema:
+                type: string
+            location:
+              description: URI to poll for completion status.
+              schema:
+                type: string
+        '204':
+          description: The response for service deletion.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                description: An error response from the service.
+                properties:
+                  error:
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                    description: Error Response.
+components:
+  parameters:
+    accountNameParameter:
+      name: accountName
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      description: Cosmos DB database account name.
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 50
+        pattern: ^[a-z0-9]+(-[a-z0-9]+)*
+    serviceNameParameter:
+      name: serviceName
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      description: Cosmos DB service name.
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 50
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: Impersonate your user account
+  schemas:
+    ServiceResourceProperties:
+      description: Services response resource.
+      type: object
+      discriminator:
+        propertyName: serviceType
+      properties:
+        creationTime:
+          readOnly: true
+          type: string
+          format: date-time
+          description: Time of the last state change (ISO-8601 format).
+        instanceSize:
+          type: string
+          enum:
+          - Cosmos.D4s
+          - Cosmos.D8s
+          - Cosmos.D16s
+          description: Instance type for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceSize
+        instanceCount:
+          description: Instance count for the service.
+          type: integer
+          minimum: 0
+          format: int32
+        serviceType:
+          type: string
+          enum:
+          - SqlDedicatedGateway
+          - DataTransfer
+          - GraphAPICompute
+          - MaterializedViewsBuilder
+          description: ServiceType for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceType
+        status:
+          readOnly: true
+          type: string
+          enum:
+          - Creating
+          - Running
+          - Updating
+          - Deleting
+          - Error
+          - Stopped
+          description: Describes the status of a service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceStatus
+      additionalProperties: true
+      required:
+      - serviceType
+    ServiceResourceCreateUpdateParameters:
+      description: Parameters for Create or Update request for ServiceResource
+      type: object
+      properties:
+        properties:
+          description: Properties in ServiceResourceCreateUpdateParameters.
+          type: object
+          discriminator:
+            propertyName: serviceType
+          properties:
+            instanceSize:
+              type: string
+              enum:
+              - Cosmos.D4s
+              - Cosmos.D8s
+              - Cosmos.D16s
+              description: Instance type for the service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceSize
+            instanceCount:
+              description: Instance count for the service.
+              type: integer
+              minimum: 0
+              format: int32
+            serviceType:
+              type: string
+              enum:
+              - SqlDedicatedGateway
+              - DataTransfer
+              - GraphAPICompute
+              - MaterializedViewsBuilder
+              description: ServiceType for the service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceType
+          required:
+          - serviceType
+    ServiceResourceCreateUpdateProperties:
+      description: Properties in ServiceResourceCreateUpdateParameters.
+      type: object
+      discriminator:
+        propertyName: serviceType
+      properties:
+        instanceSize:
+          type: string
+          enum:
+          - Cosmos.D4s
+          - Cosmos.D8s
+          - Cosmos.D16s
+          description: Instance type for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceSize
+        instanceCount:
+          description: Instance count for the service.
+          type: integer
+          minimum: 0
+          format: int32
+        serviceType:
+          type: string
+          enum:
+          - SqlDedicatedGateway
+          - DataTransfer
+          - GraphAPICompute
+          - MaterializedViewsBuilder
+          description: ServiceType for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceType
+      required:
+      - serviceType
+    ServiceResource:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: The unique resource identifier of the database account.
+        name:
+          readOnly: true
+          type: string
+          description: The name of the database account.
+        type:
+          readOnly: true
+          type: string
+          description: The type of Azure resource.
+        properties:
+          x-ms-client-flatten: false
+          description: Services response resource.
+          type: object
+          discriminator:
+            propertyName: serviceType
+          properties:
+            creationTime:
+              readOnly: true
+              type: string
+              format: date-time
+              description: Time of the last state change (ISO-8601 format).
+            instanceSize:
+              type: string
+              enum:
+              - Cosmos.D4s
+              - Cosmos.D8s
+              - Cosmos.D16s
+              description: Instance type for the service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceSize
+            instanceCount:
+              description: Instance count for the service.
+              type: integer
+              minimum: 0
+              format: int32
+            serviceType:
+              type: string
+              enum:
+              - SqlDedicatedGateway
+              - DataTransfer
+              - GraphAPICompute
+              - MaterializedViewsBuilder
+              description: ServiceType for the service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceType
+            status:
+              readOnly: true
+              type: string
+              enum:
+              - Creating
+              - Running
+              - Updating
+              - Deleting
+              - Error
+              - Stopped
+              description: Describes the status of a service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceStatus
+          additionalProperties: true
+          required:
+          - serviceType
+      description: The resource model definition for a ARM proxy resource. It will
+        have everything other than required location and tags
+      x-ms-azure-resource: true
+    ServiceResourceListResult:
+      type: object
+      properties:
+        value:
+          readOnly: true
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: The unique resource identifier of the database account.
+              name:
+                readOnly: true
+                type: string
+                description: The name of the database account.
+              type:
+                readOnly: true
+                type: string
+                description: The type of Azure resource.
+              properties:
+                x-ms-client-flatten: false
+                description: Services response resource.
+                type: object
+                discriminator:
+                  propertyName: serviceType
+                properties:
+                  creationTime:
+                    readOnly: true
+                    type: string
+                    format: date-time
+                    description: Time of the last state change (ISO-8601 format).
+                  instanceSize:
+                    type: string
+                    enum:
+                    - Cosmos.D4s
+                    - Cosmos.D8s
+                    - Cosmos.D16s
+                    description: Instance type for the service.
+                    x-ms-enum:
+                      modelAsString: true
+                      name: ServiceSize
+                  instanceCount:
+                    description: Instance count for the service.
+                    type: integer
+                    minimum: 0
+                    format: int32
+                  serviceType:
+                    type: string
+                    enum:
+                    - SqlDedicatedGateway
+                    - DataTransfer
+                    - GraphAPICompute
+                    - MaterializedViewsBuilder
+                    description: ServiceType for the service.
+                    x-ms-enum:
+                      modelAsString: true
+                      name: ServiceType
+                  status:
+                    readOnly: true
+                    type: string
+                    enum:
+                    - Creating
+                    - Running
+                    - Updating
+                    - Deleting
+                    - Error
+                    - Stopped
+                    description: Describes the status of a service.
+                    x-ms-enum:
+                      modelAsString: true
+                      name: ServiceStatus
+                additionalProperties: true
+                required:
+                - serviceType
+            description: The resource model definition for a ARM proxy resource. It
+              will have everything other than required location and tags
+            x-ms-azure-resource: true
+          description: List of Service Resource and their properties.
+      description: The List operation response, that contains the Service Resource
+        and their properties.
+    DataTransferServiceResource:
+      description: Describes the service response property.
+      type: object
+      properties:
+        properties:
+          type: object
+          properties:
+            creationTime:
+              readOnly: true
+              type: string
+              format: date-time
+              description: Time of the last state change (ISO-8601 format).
+            instanceSize:
+              type: string
+              enum:
+              - Cosmos.D4s
+              - Cosmos.D8s
+              - Cosmos.D16s
+              description: Instance type for the service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceSize
+            instanceCount:
+              description: Instance count for the service.
+              type: integer
+              minimum: 0
+              format: int32
+            serviceType:
+              type: string
+              enum:
+              - SqlDedicatedGateway
+              - DataTransfer
+              - GraphAPICompute
+              - MaterializedViewsBuilder
+              description: ServiceType for the service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceType
+            status:
+              readOnly: true
+              type: string
+              enum:
+              - Creating
+              - Running
+              - Updating
+              - Deleting
+              - Error
+              - Stopped
+              description: Describes the status of a service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceStatus
+            locations:
+              type: array
+              readOnly: true
+              description: An array that contains all of the locations for the service.
+              items:
+                type: object
+                properties:
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The regional service name.
+                  location:
+                    readOnly: true
+                    type: string
+                    description: The location name.
+                  status:
+                    readOnly: true
+                    type: string
+                    enum:
+                    - Creating
+                    - Running
+                    - Updating
+                    - Deleting
+                    - Error
+                    - Stopped
+                    description: Describes the status of a service.
+                    x-ms-enum:
+                      modelAsString: true
+                      name: ServiceStatus
+                description: Resource for a regional service location.
+                readOnly: true
+          required:
+          - serviceType
+          additionalProperties: true
+          description: Services response resource.
+          discriminator:
+            propertyName: serviceType
+          x-ms-client-flatten: false
+          x-ms-discriminator-value: DataTransfer
+    DataTransferServiceResourceProperties:
+      type: object
+      properties:
+        creationTime:
+          readOnly: true
+          type: string
+          format: date-time
+          description: Time of the last state change (ISO-8601 format).
+        instanceSize:
+          type: string
+          enum:
+          - Cosmos.D4s
+          - Cosmos.D8s
+          - Cosmos.D16s
+          description: Instance type for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceSize
+        instanceCount:
+          description: Instance count for the service.
+          type: integer
+          minimum: 0
+          format: int32
+        serviceType:
+          type: string
+          enum:
+          - SqlDedicatedGateway
+          - DataTransfer
+          - GraphAPICompute
+          - MaterializedViewsBuilder
+          description: ServiceType for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceType
+        status:
+          readOnly: true
+          type: string
+          enum:
+          - Creating
+          - Running
+          - Updating
+          - Deleting
+          - Error
+          - Stopped
+          description: Describes the status of a service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceStatus
+        locations:
+          type: array
+          readOnly: true
+          description: An array that contains all of the locations for the service.
+          items:
+            type: object
+            properties:
+              name:
+                readOnly: true
+                type: string
+                description: The regional service name.
+              location:
+                readOnly: true
+                type: string
+                description: The location name.
+              status:
+                readOnly: true
+                type: string
+                enum:
+                - Creating
+                - Running
+                - Updating
+                - Deleting
+                - Error
+                - Stopped
+                description: Describes the status of a service.
+                x-ms-enum:
+                  modelAsString: true
+                  name: ServiceStatus
+            description: Resource for a regional service location.
+            readOnly: true
+      required:
+      - serviceType
+      additionalProperties: true
+      description: Services response resource.
+      discriminator:
+        propertyName: serviceType
+      x-ms-discriminator-value: DataTransfer
+    DataTransferServiceResourceCreateUpdateProperties:
+      type: object
+      properties:
+        instanceSize:
+          type: string
+          enum:
+          - Cosmos.D4s
+          - Cosmos.D8s
+          - Cosmos.D16s
+          description: Instance type for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceSize
+        instanceCount:
+          description: Instance count for the service.
+          type: integer
+          minimum: 0
+          format: int32
+        serviceType:
+          type: string
+          enum:
+          - SqlDedicatedGateway
+          - DataTransfer
+          - GraphAPICompute
+          - MaterializedViewsBuilder
+          description: ServiceType for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceType
+      required:
+      - serviceType
+      description: Properties in ServiceResourceCreateUpdateParameters.
+      discriminator:
+        propertyName: serviceType
+      x-ms-discriminator-value: DataTransfer
+    SqlDedicatedGatewayServiceResourceCreateUpdateProperties:
+      type: object
+      properties:
+        instanceSize:
+          type: string
+          enum:
+          - Cosmos.D4s
+          - Cosmos.D8s
+          - Cosmos.D16s
+          description: Instance type for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceSize
+        instanceCount:
+          description: Instance count for the service.
+          type: integer
+          minimum: 0
+          format: int32
+        serviceType:
+          type: string
+          enum:
+          - SqlDedicatedGateway
+          - DataTransfer
+          - GraphAPICompute
+          - MaterializedViewsBuilder
+          description: ServiceType for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceType
+        dedicatedGatewayType:
+          type: string
+          enum:
+          - IntegratedCache
+          - DistributedQuery
+          description: DedicatedGatewayType for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: DedicatedGatewayType
+      required:
+      - serviceType
+      description: Properties in ServiceResourceCreateUpdateParameters.
+      discriminator:
+        propertyName: serviceType
+      x-ms-discriminator-value: SqlDedicatedGateway
+    SqlDedicatedGatewayType:
+      type: string
+      enum:
+      - IntegratedCache
+      - DistributedQuery
+      description: DedicatedGatewayType for the service.
+      x-ms-enum:
+        modelAsString: true
+        name: DedicatedGatewayType
+    SqlDedicatedGatewayServiceResource:
+      description: Describes the service response property for SqlDedicatedGateway.
+      type: object
+      properties:
+        properties:
+          type: object
+          properties:
+            creationTime:
+              readOnly: true
+              type: string
+              format: date-time
+              description: Time of the last state change (ISO-8601 format).
+            instanceSize:
+              type: string
+              enum:
+              - Cosmos.D4s
+              - Cosmos.D8s
+              - Cosmos.D16s
+              description: Instance type for the service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceSize
+            instanceCount:
+              description: Instance count for the service.
+              type: integer
+              minimum: 0
+              format: int32
+            serviceType:
+              type: string
+              enum:
+              - SqlDedicatedGateway
+              - DataTransfer
+              - GraphAPICompute
+              - MaterializedViewsBuilder
+              description: ServiceType for the service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceType
+            status:
+              readOnly: true
+              type: string
+              enum:
+              - Creating
+              - Running
+              - Updating
+              - Deleting
+              - Error
+              - Stopped
+              description: Describes the status of a service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceStatus
+            sqlDedicatedGatewayEndpoint:
+              type: string
+              description: SqlDedicatedGateway endpoint for the service.
+            dedicatedGatewayType:
+              type: string
+              enum:
+              - IntegratedCache
+              - DistributedQuery
+              description: DedicatedGatewayType for the service.
+              x-ms-enum:
+                modelAsString: true
+                name: DedicatedGatewayType
+            locations:
+              type: array
+              readOnly: true
+              description: An array that contains all of the locations for the service.
+              items:
+                type: object
+                properties:
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The regional service name.
+                  location:
+                    readOnly: true
+                    type: string
+                    description: The location name.
+                  status:
+                    readOnly: true
+                    type: string
+                    enum:
+                    - Creating
+                    - Running
+                    - Updating
+                    - Deleting
+                    - Error
+                    - Stopped
+                    description: Describes the status of a service.
+                    x-ms-enum:
+                      modelAsString: true
+                      name: ServiceStatus
+                  sqlDedicatedGatewayEndpoint:
+                    readOnly: true
+                    type: string
+                    description: The regional endpoint for SqlDedicatedGateway.
+                description: Resource for a regional service location.
+                readOnly: true
+          required:
+          - serviceType
+          additionalProperties: true
+          description: Services response resource.
+          discriminator:
+            propertyName: serviceType
+          x-ms-client-flatten: false
+          x-ms-discriminator-value: SqlDedicatedGateway
+    SqlDedicatedGatewayServiceResourceProperties:
+      type: object
+      properties:
+        creationTime:
+          readOnly: true
+          type: string
+          format: date-time
+          description: Time of the last state change (ISO-8601 format).
+        instanceSize:
+          type: string
+          enum:
+          - Cosmos.D4s
+          - Cosmos.D8s
+          - Cosmos.D16s
+          description: Instance type for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceSize
+        instanceCount:
+          description: Instance count for the service.
+          type: integer
+          minimum: 0
+          format: int32
+        serviceType:
+          type: string
+          enum:
+          - SqlDedicatedGateway
+          - DataTransfer
+          - GraphAPICompute
+          - MaterializedViewsBuilder
+          description: ServiceType for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceType
+        status:
+          readOnly: true
+          type: string
+          enum:
+          - Creating
+          - Running
+          - Updating
+          - Deleting
+          - Error
+          - Stopped
+          description: Describes the status of a service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceStatus
+        sqlDedicatedGatewayEndpoint:
+          type: string
+          description: SqlDedicatedGateway endpoint for the service.
+        dedicatedGatewayType:
+          type: string
+          enum:
+          - IntegratedCache
+          - DistributedQuery
+          description: DedicatedGatewayType for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: DedicatedGatewayType
+        locations:
+          type: array
+          readOnly: true
+          description: An array that contains all of the locations for the service.
+          items:
+            type: object
+            properties:
+              name:
+                readOnly: true
+                type: string
+                description: The regional service name.
+              location:
+                readOnly: true
+                type: string
+                description: The location name.
+              status:
+                readOnly: true
+                type: string
+                enum:
+                - Creating
+                - Running
+                - Updating
+                - Deleting
+                - Error
+                - Stopped
+                description: Describes the status of a service.
+                x-ms-enum:
+                  modelAsString: true
+                  name: ServiceStatus
+              sqlDedicatedGatewayEndpoint:
+                readOnly: true
+                type: string
+                description: The regional endpoint for SqlDedicatedGateway.
+            description: Resource for a regional service location.
+            readOnly: true
+      required:
+      - serviceType
+      additionalProperties: true
+      description: Services response resource.
+      discriminator:
+        propertyName: serviceType
+      x-ms-discriminator-value: SqlDedicatedGateway
+    GraphAPIComputeServiceResource:
+      description: Describes the service response property for GraphAPICompute.
+      type: object
+      properties:
+        properties:
+          type: object
+          properties:
+            creationTime:
+              readOnly: true
+              type: string
+              format: date-time
+              description: Time of the last state change (ISO-8601 format).
+            instanceSize:
+              type: string
+              enum:
+              - Cosmos.D4s
+              - Cosmos.D8s
+              - Cosmos.D16s
+              description: Instance type for the service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceSize
+            instanceCount:
+              description: Instance count for the service.
+              type: integer
+              minimum: 0
+              format: int32
+            serviceType:
+              type: string
+              enum:
+              - SqlDedicatedGateway
+              - DataTransfer
+              - GraphAPICompute
+              - MaterializedViewsBuilder
+              description: ServiceType for the service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceType
+            status:
+              readOnly: true
+              type: string
+              enum:
+              - Creating
+              - Running
+              - Updating
+              - Deleting
+              - Error
+              - Stopped
+              description: Describes the status of a service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceStatus
+            graphApiComputeEndpoint:
+              type: string
+              description: GraphAPICompute endpoint for the service.
+            locations:
+              type: array
+              readOnly: true
+              description: An array that contains all of the locations for the service.
+              items:
+                type: object
+                properties:
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The regional service name.
+                  location:
+                    readOnly: true
+                    type: string
+                    description: The location name.
+                  status:
+                    readOnly: true
+                    type: string
+                    enum:
+                    - Creating
+                    - Running
+                    - Updating
+                    - Deleting
+                    - Error
+                    - Stopped
+                    description: Describes the status of a service.
+                    x-ms-enum:
+                      modelAsString: true
+                      name: ServiceStatus
+                  graphApiComputeEndpoint:
+                    readOnly: true
+                    type: string
+                    description: The regional endpoint for GraphAPICompute.
+                description: Resource for a regional service location.
+                readOnly: true
+          required:
+          - serviceType
+          additionalProperties: true
+          description: Services response resource.
+          discriminator:
+            propertyName: serviceType
+          x-ms-client-flatten: false
+          x-ms-discriminator-value: GraphAPICompute
+    GraphAPIComputeServiceResourceProperties:
+      type: object
+      properties:
+        creationTime:
+          readOnly: true
+          type: string
+          format: date-time
+          description: Time of the last state change (ISO-8601 format).
+        instanceSize:
+          type: string
+          enum:
+          - Cosmos.D4s
+          - Cosmos.D8s
+          - Cosmos.D16s
+          description: Instance type for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceSize
+        instanceCount:
+          description: Instance count for the service.
+          type: integer
+          minimum: 0
+          format: int32
+        serviceType:
+          type: string
+          enum:
+          - SqlDedicatedGateway
+          - DataTransfer
+          - GraphAPICompute
+          - MaterializedViewsBuilder
+          description: ServiceType for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceType
+        status:
+          readOnly: true
+          type: string
+          enum:
+          - Creating
+          - Running
+          - Updating
+          - Deleting
+          - Error
+          - Stopped
+          description: Describes the status of a service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceStatus
+        graphApiComputeEndpoint:
+          type: string
+          description: GraphAPICompute endpoint for the service.
+        locations:
+          type: array
+          readOnly: true
+          description: An array that contains all of the locations for the service.
+          items:
+            type: object
+            properties:
+              name:
+                readOnly: true
+                type: string
+                description: The regional service name.
+              location:
+                readOnly: true
+                type: string
+                description: The location name.
+              status:
+                readOnly: true
+                type: string
+                enum:
+                - Creating
+                - Running
+                - Updating
+                - Deleting
+                - Error
+                - Stopped
+                description: Describes the status of a service.
+                x-ms-enum:
+                  modelAsString: true
+                  name: ServiceStatus
+              graphApiComputeEndpoint:
+                readOnly: true
+                type: string
+                description: The regional endpoint for GraphAPICompute.
+            description: Resource for a regional service location.
+            readOnly: true
+      required:
+      - serviceType
+      additionalProperties: true
+      description: Services response resource.
+      discriminator:
+        propertyName: serviceType
+      x-ms-discriminator-value: GraphAPICompute
+    GraphAPIComputeServiceResourceCreateUpdateProperties:
+      type: object
+      properties:
+        instanceSize:
+          type: string
+          enum:
+          - Cosmos.D4s
+          - Cosmos.D8s
+          - Cosmos.D16s
+          description: Instance type for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceSize
+        instanceCount:
+          description: Instance count for the service.
+          type: integer
+          minimum: 0
+          format: int32
+        serviceType:
+          type: string
+          enum:
+          - SqlDedicatedGateway
+          - DataTransfer
+          - GraphAPICompute
+          - MaterializedViewsBuilder
+          description: ServiceType for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceType
+      required:
+      - serviceType
+      description: Properties in ServiceResourceCreateUpdateParameters.
+      discriminator:
+        propertyName: serviceType
+      x-ms-discriminator-value: GraphAPICompute
+    MaterializedViewsBuilderServiceResource:
+      description: Describes the service response property for MaterializedViewsBuilder.
+      type: object
+      properties:
+        properties:
+          type: object
+          properties:
+            creationTime:
+              readOnly: true
+              type: string
+              format: date-time
+              description: Time of the last state change (ISO-8601 format).
+            instanceSize:
+              type: string
+              enum:
+              - Cosmos.D4s
+              - Cosmos.D8s
+              - Cosmos.D16s
+              description: Instance type for the service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceSize
+            instanceCount:
+              description: Instance count for the service.
+              type: integer
+              minimum: 0
+              format: int32
+            serviceType:
+              type: string
+              enum:
+              - SqlDedicatedGateway
+              - DataTransfer
+              - GraphAPICompute
+              - MaterializedViewsBuilder
+              description: ServiceType for the service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceType
+            status:
+              readOnly: true
+              type: string
+              enum:
+              - Creating
+              - Running
+              - Updating
+              - Deleting
+              - Error
+              - Stopped
+              description: Describes the status of a service.
+              x-ms-enum:
+                modelAsString: true
+                name: ServiceStatus
+            locations:
+              type: array
+              readOnly: true
+              description: An array that contains all of the locations for the service.
+              items:
+                type: object
+                properties:
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The regional service name.
+                  location:
+                    readOnly: true
+                    type: string
+                    description: The location name.
+                  status:
+                    readOnly: true
+                    type: string
+                    enum:
+                    - Creating
+                    - Running
+                    - Updating
+                    - Deleting
+                    - Error
+                    - Stopped
+                    description: Describes the status of a service.
+                    x-ms-enum:
+                      modelAsString: true
+                      name: ServiceStatus
+                description: Resource for a regional service location.
+                readOnly: true
+          required:
+          - serviceType
+          additionalProperties: true
+          description: Services response resource.
+          discriminator:
+            propertyName: serviceType
+          x-ms-client-flatten: false
+          x-ms-discriminator-value: MaterializedViewsBuilder
+    MaterializedViewsBuilderServiceResourceProperties:
+      type: object
+      properties:
+        creationTime:
+          readOnly: true
+          type: string
+          format: date-time
+          description: Time of the last state change (ISO-8601 format).
+        instanceSize:
+          type: string
+          enum:
+          - Cosmos.D4s
+          - Cosmos.D8s
+          - Cosmos.D16s
+          description: Instance type for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceSize
+        instanceCount:
+          description: Instance count for the service.
+          type: integer
+          minimum: 0
+          format: int32
+        serviceType:
+          type: string
+          enum:
+          - SqlDedicatedGateway
+          - DataTransfer
+          - GraphAPICompute
+          - MaterializedViewsBuilder
+          description: ServiceType for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceType
+        status:
+          readOnly: true
+          type: string
+          enum:
+          - Creating
+          - Running
+          - Updating
+          - Deleting
+          - Error
+          - Stopped
+          description: Describes the status of a service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceStatus
+        locations:
+          type: array
+          readOnly: true
+          description: An array that contains all of the locations for the service.
+          items:
+            type: object
+            properties:
+              name:
+                readOnly: true
+                type: string
+                description: The regional service name.
+              location:
+                readOnly: true
+                type: string
+                description: The location name.
+              status:
+                readOnly: true
+                type: string
+                enum:
+                - Creating
+                - Running
+                - Updating
+                - Deleting
+                - Error
+                - Stopped
+                description: Describes the status of a service.
+                x-ms-enum:
+                  modelAsString: true
+                  name: ServiceStatus
+            description: Resource for a regional service location.
+            readOnly: true
+      required:
+      - serviceType
+      additionalProperties: true
+      description: Services response resource.
+      discriminator:
+        propertyName: serviceType
+      x-ms-discriminator-value: MaterializedViewsBuilder
+    MaterializedViewsBuilderServiceResourceCreateUpdateProperties:
+      type: object
+      properties:
+        instanceSize:
+          type: string
+          enum:
+          - Cosmos.D4s
+          - Cosmos.D8s
+          - Cosmos.D16s
+          description: Instance type for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceSize
+        instanceCount:
+          description: Instance count for the service.
+          type: integer
+          minimum: 0
+          format: int32
+        serviceType:
+          type: string
+          enum:
+          - SqlDedicatedGateway
+          - DataTransfer
+          - GraphAPICompute
+          - MaterializedViewsBuilder
+          description: ServiceType for the service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceType
+      required:
+      - serviceType
+      description: Properties in ServiceResourceCreateUpdateParameters.
+      discriminator:
+        propertyName: serviceType
+      x-ms-discriminator-value: MaterializedViewsBuilder
+    RegionalServiceResource:
+      description: Resource for a regional service location.
+      type: object
+      readOnly: true
+      properties:
+        name:
+          readOnly: true
+          type: string
+          description: The regional service name.
+        location:
+          readOnly: true
+          type: string
+          description: The location name.
+        status:
+          readOnly: true
+          type: string
+          enum:
+          - Creating
+          - Running
+          - Updating
+          - Deleting
+          - Error
+          - Stopped
+          description: Describes the status of a service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceStatus
+    SqlDedicatedGatewayRegionalServiceResource:
+      type: object
+      properties:
+        name:
+          readOnly: true
+          type: string
+          description: The regional service name.
+        location:
+          readOnly: true
+          type: string
+          description: The location name.
+        status:
+          readOnly: true
+          type: string
+          enum:
+          - Creating
+          - Running
+          - Updating
+          - Deleting
+          - Error
+          - Stopped
+          description: Describes the status of a service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceStatus
+        sqlDedicatedGatewayEndpoint:
+          readOnly: true
+          type: string
+          description: The regional endpoint for SqlDedicatedGateway.
+      description: Resource for a regional service location.
+      readOnly: true
+    GraphAPIComputeRegionalServiceResource:
+      type: object
+      properties:
+        name:
+          readOnly: true
+          type: string
+          description: The regional service name.
+        location:
+          readOnly: true
+          type: string
+          description: The location name.
+        status:
+          readOnly: true
+          type: string
+          enum:
+          - Creating
+          - Running
+          - Updating
+          - Deleting
+          - Error
+          - Stopped
+          description: Describes the status of a service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceStatus
+        graphApiComputeEndpoint:
+          readOnly: true
+          type: string
+          description: The regional endpoint for GraphAPICompute.
+      description: Resource for a regional service location.
+      readOnly: true
+    DataTransferRegionalServiceResource:
+      type: object
+      properties:
+        name:
+          readOnly: true
+          type: string
+          description: The regional service name.
+        location:
+          readOnly: true
+          type: string
+          description: The location name.
+        status:
+          readOnly: true
+          type: string
+          enum:
+          - Creating
+          - Running
+          - Updating
+          - Deleting
+          - Error
+          - Stopped
+          description: Describes the status of a service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceStatus
+      description: Resource for a regional service location.
+      readOnly: true
+    MaterializedViewsBuilderRegionalServiceResource:
+      type: object
+      properties:
+        name:
+          readOnly: true
+          type: string
+          description: The regional service name.
+        location:
+          readOnly: true
+          type: string
+          description: The location name.
+        status:
+          readOnly: true
+          type: string
+          enum:
+          - Creating
+          - Running
+          - Updating
+          - Deleting
+          - Error
+          - Stopped
+          description: Describes the status of a service.
+          x-ms-enum:
+            modelAsString: true
+            name: ServiceStatus
+      description: Resource for a regional service location.
+      readOnly: true
+    ServiceResourceStatus:
+      type: string
+      enum:
+      - Creating
+      - Running
+      - Updating
+      - Deleting
+      - Error
+      - Stopped
+      readOnly: true
+      description: Describes the status of a service.
+      x-ms-enum:
+        modelAsString: true
+        name: ServiceStatus
+    ServiceResourceInstanceSize:
+      type: string
+      enum:
+      - Cosmos.D4s
+      - Cosmos.D8s
+      - Cosmos.D16s
+      description: Instance type for the service.
+      x-ms-enum:
+        modelAsString: true
+        name: ServiceSize
+    ServiceType:
+      type: string
+      enum:
+      - SqlDedicatedGateway
+      - DataTransfer
+      - GraphAPICompute
+      - MaterializedViewsBuilder
+      description: ServiceType for the service.
+      x-ms-enum:
+        modelAsString: true
+        name: ServiceType
+    ErrorResponse:
+      properties:
+        code:
+          description: Error code.
+          type: string
+        message:
+          description: Error message indicating why the operation failed.
+          type: string
+      description: Error Response.
+    CloudError:
+      x-ms-external: true
+      description: An error response from the service.
+      properties:
+        error:
+          properties:
+            code:
+              description: Error code.
+              type: string
+            message:
+              description: Error message indicating why the operation failed.
+              type: string
+          description: Error Response.
+    ARMProxyResource:
+      type: object
+      description: The resource model definition for a ARM proxy resource. It will
+        have everything other than required location and tags
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: The unique resource identifier of the database account.
+        name:
+          readOnly: true
+          type: string
+          description: The name of the database account.
+        type:
+          readOnly: true
+          type: string
+          description: The type of Azure resource.
+      x-ms-azure-resource: true

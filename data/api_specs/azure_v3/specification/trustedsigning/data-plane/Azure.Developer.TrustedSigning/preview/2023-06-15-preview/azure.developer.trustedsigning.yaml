@@ -1,0 +1,448 @@
+openapi: 3.0.0
+info:
+  title: Azure Trusted Signing
+  version: 2023-06-15-preview
+  description: Azure Trusted Signing is a service that provides managed artifact signing
+    for all.
+  x-typespec-generated:
+  - emitter: '@azure-tools/typespec-autorest'
+security:
+- OAuth2Auth:
+  - https://codesigning.azure.net/.default
+tags: []
+paths:
+  /codesigningaccounts/{accountName}/certificateprofiles/{certificateProfile}:sign:
+    post:
+      operationId: CertificateProfileOperations_Sign
+      summary: Submit a sign operation.
+      description: Submit a sign operation under the created account and profile name
+        provided.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: accountName
+        in: path
+        description: Azure Trusted Signing account name.
+        required: true
+        schema:
+          type: string
+      - name: certificateProfile
+        in: path
+        description: Azure Trusted Signing certificate profile name under an account.
+        required: true
+        schema:
+          type: string
+      - name: client-version
+        in: header
+        description: An optional client version.
+        required: false
+        x-ms-client-name: clientVersion
+        schema:
+          type: string
+      - name: x-correlation-id
+        in: header
+        description: An identifier used to batch multiple requests.
+        required: false
+        x-ms-client-name: xCorrelationId
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SigningPayloadOptions'
+        description: Body parameter.
+        required: true
+      responses:
+        '202':
+          description: The request has been accepted for processing, but processing
+            has not yet completed.
+          headers:
+            Operation-Location:
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Provides status details for long running operations.
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the operation.
+                  status:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                  error:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+                  result:
+                    $ref: '#/components/schemas/SignResult'
+                required:
+                - id
+                - status
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-long-running-operation: true
+  /codesigningaccounts/{accountName}/certificateprofiles/{certificateProfile}/sign/{operationId}:
+    get:
+      operationId: CertificateProfileOperations_GetSigningStatus
+      summary: Gets the status of a signing operation.
+      description: This status operation requires that a Sign request has been submitted
+        and the operationId is known.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - $ref: '#/components/parameters/SigningOptions.accountName'
+      - $ref: '#/components/parameters/SigningOptions.certificateProfile'
+      - name: operationId
+        in: path
+        description: The unique ID of the operation.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Provides status details for long running operations.
+                properties:
+                  id:
+                    type: string
+                    description: The unique ID of the operation.
+                  status:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+                  error:
+                    $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+                  result:
+                    $ref: '#/components/schemas/SignResult'
+                required:
+                - id
+                - status
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /codesigningaccounts/{accountName}/certificateprofiles/{certificateProfile}/sign/eku:
+    get:
+      operationId: CertificateProfileOperations_ListExtendedKeyUsages
+      summary: Gets a list of extended key usage object identifiers that are allowed
+        for this account and profile combination.
+      description: The list of extended key usages are used to determine the purpose
+        of the certificate usage as part of the signing operation.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: accountName
+        in: path
+        description: Azure Trusted Signing account name.
+        required: true
+        schema:
+          type: string
+      - name: certificateProfile
+        in: path
+        description: Azure Trusted Signing certificate profile name under an account.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedExtendedKeyUsage'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /codesigningaccounts/{accountName}/certificateprofiles/{certificateProfile}/sign/rootcert:
+    get:
+      operationId: CertificateProfileOperations_GetSignRootCertificate
+      summary: Gets the signing root certificate on the certificate chain for that
+        account and profile name.
+      description: The root certificate is generated as part of the initial account
+        creation and it is used to sign the bits for the profile provided.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - $ref: '#/components/parameters/SigningOptions.accountName'
+      - $ref: '#/components/parameters/SigningOptions.certificateProfile'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/x-x509-ca-cert:
+              schema:
+                type: string
+                format: binary
+            application/json:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/x-x509-ca-cert:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+servers:
+- url: '{endpoint}'
+  variables:
+    endpoint:
+      description: The Azure Trusted signing service endpoint.
+      default: none
+components:
+  parameters:
+    Azure.Core.Foundations.ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      x-ms-parameter-location: method
+      x-ms-client-name: apiVersion
+      schema:
+        type: string
+        minLength: 1
+    SigningOptions.accountName:
+      name: accountName
+      in: path
+      description: Signing account name.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    SigningOptions.certificateProfile:
+      name: certificateProfile
+      in: path
+      description: Signing Certificate profile name.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+  securitySchemes:
+    OAuth2Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/v2.0/authorize
+          scopes:
+            https://codesigning.azure.net/.default: ''
+  schemas:
+    Azure.Core.Foundations.Error:
+      type: object
+      description: The error object.
+      properties:
+        code:
+          type: string
+          description: One of a server-defined set of error codes.
+        message:
+          type: string
+          description: A human-readable representation of the error.
+        target:
+          type: string
+          description: The target of the error.
+        details:
+          type: array
+          description: An array of details about specific errors that led to this
+            reported error.
+          items:
+            $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+        innererror:
+          $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
+      required:
+      - code
+      - message
+    Azure.Core.Foundations.ErrorResponse:
+      type: object
+      description: A response containing error details.
+      properties:
+        error:
+          $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+      required:
+      - error
+    Azure.Core.Foundations.InnerError:
+      type: object
+      description: An object containing more specific information about the error.
+        As per Azure REST API guidelines - https://aka.ms/AzureRestApiGuidelines#handling-errors.
+      properties:
+        code:
+          type: string
+          description: One of a server-defined set of error codes.
+        innererror:
+          $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
+    Azure.Core.Foundations.OperationState:
+      type: string
+      description: Enum describing allowed operation states.
+      enum:
+      - NotStarted
+      - Running
+      - Succeeded
+      - Failed
+      - Canceled
+      x-ms-enum:
+        name: OperationState
+        modelAsString: true
+        values:
+        - name: NotStarted
+          value: NotStarted
+          description: The operation has not started.
+        - name: Running
+          value: Running
+          description: The operation is in progress.
+        - name: Succeeded
+          value: Succeeded
+          description: The operation has completed successfully.
+        - name: Failed
+          value: Failed
+          description: The operation has failed.
+        - name: Canceled
+          value: Canceled
+          description: The operation has been canceled by the user.
+    ExtendedKeyUsage:
+      type: object
+      description: Extended key usage object identifier that are allowable.
+      properties:
+        eku:
+          type: string
+          description: An oid string that represents an eku.
+          readOnly: true
+      required:
+      - eku
+    PagedExtendedKeyUsage:
+      type: object
+      description: Paged collection of ExtendedKeyUsage items
+      properties:
+        value:
+          type: array
+          description: The ExtendedKeyUsage items on this page
+          items:
+            $ref: '#/components/schemas/ExtendedKeyUsage'
+        nextLink:
+          type: string
+          format: uri
+          description: The link to the next page of items
+      required:
+      - value
+    SignResult:
+      type: object
+      description: The sign status model.
+      properties:
+        signature:
+          type: string
+          format: byte
+          description: Digital signature of the requested content digest.
+        signingCertificate:
+          type: string
+          format: byte
+          description: "Signing certificate corresponding to the private key used
+            to sign the requested \ndigest."
+    SignatureAlgorithm:
+      type: string
+      description: Algorithms supported for signing.
+      enum:
+      - RS256
+      - RS384
+      - RS512
+      - PS256
+      - PS384
+      - PS512
+      - ES256
+      - ES384
+      - ES512
+      - ES256K
+      x-ms-enum:
+        name: SignatureAlgorithm
+        modelAsString: true
+        values:
+        - name: RS256
+          value: RS256
+          description: RSASSA-PKCS1-v1_5 using SHA-256 hash algorithm.
+        - name: RS384
+          value: RS384
+          description: RSASSA-PKCS1-v1_5 using SHA-384 hash algorithm.
+        - name: RS512
+          value: RS512
+          description: RSASSA-PKCS1-v1_5 using SHA-512 hash algorithm.
+        - name: PS256
+          value: PS256
+          description: RSASSA-PSS using SHA-256 hash algorithm.
+        - name: PS384
+          value: PS384
+          description: RSASSA-PSS using SHA-384 hash algorithm.
+        - name: PS512
+          value: PS512
+          description: RSASSA-PSS using SHA-512 hash algorithm.
+        - name: ES256
+          value: ES256
+          description: ECDSA using P-256 and SHA-256 hash algorithm.
+        - name: ES384
+          value: ES384
+          description: ECDSA using P-384 and SHA-384 hash algorithm.
+        - name: ES512
+          value: ES512
+          description: ECDSA using P-521 and SHA-512 hash algorithm.
+        - name: ES256K
+          value: ES256K
+          description: ECDSA using secp256k1 and SHA-256 hash algorithm.
+    SigningPayloadOptions:
+      type: object
+      description: The artifact request information to be signed by the service.
+      properties:
+        signatureAlgorithm:
+          $ref: '#/components/schemas/SignatureAlgorithm'
+        digest:
+          type: string
+          format: byte
+          description: Content digest to sign.
+        fileHashList:
+          type: array
+          description: List of full file digital signatures.
+          items:
+            type: string
+            format: byte
+        authenticodeHashList:
+          type: array
+          description: List of authenticode digital signatures.
+          items:
+            type: string
+            format: byte
+      required:
+      - signatureAlgorithm
+      - digest

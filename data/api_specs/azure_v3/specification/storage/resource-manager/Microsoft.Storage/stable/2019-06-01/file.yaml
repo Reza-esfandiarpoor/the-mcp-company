@@ -1,0 +1,3726 @@
+openapi: 3.0.0
+info:
+  version: 2019-06-01
+  title: StorageManagementClient
+  description: The Azure Storage Management API.
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/fileServices
+  : get:
+      tags:
+      - FileService
+      operationId: FileServices_List
+      description: List all file services in storage accounts
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group within the user's subscription.
+          The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+          pattern: ^[-\w\._\(\)]+$
+      - name: accountName
+        in: path
+        required: true
+        description: The name of the storage account within the specified resource
+          group. Storage account names must be between 3 and 24 characters in length
+          and use numbers and lower-case letters only.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 24
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: OK -- List file services operation completed successfully.
+          content:
+            application/json:
+              schema:
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                        name:
+                          readOnly: true
+                          type: string
+                          description: The name of the resource
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                        properties:
+                          properties:
+                            cors:
+                              description: Specifies CORS rules for the File service.
+                                You can include up to five CorsRule elements in the
+                                request. If no CorsRule elements are included in the
+                                request body, all CORS rules will be deleted, and
+                                CORS will be disabled for the File service.
+                              properties:
+                                corsRules:
+                                  type: array
+                                  items:
+                                    description: 'Specifies a CORS rule for the Blob
+                                      service. '
+                                    properties:
+                                      allowedOrigins:
+                                        type: array
+                                        items:
+                                          type: string
+                                        description: Required if CorsRule element
+                                          is present. A list of origin domains that
+                                          will be allowed via CORS, or "*" to allow
+                                          all domains
+                                      allowedMethods:
+                                        type: array
+                                        items:
+                                          type: string
+                                          enum:
+                                          - DELETE
+                                          - GET
+                                          - HEAD
+                                          - MERGE
+                                          - POST
+                                          - OPTIONS
+                                          - PUT
+                                        description: Required if CorsRule element
+                                          is present. A list of HTTP methods that
+                                          are allowed to be executed by the origin.
+                                      maxAgeInSeconds:
+                                        type: integer
+                                        description: Required if CorsRule element
+                                          is present. The number of seconds that the
+                                          client/browser should cache a preflight
+                                          response.
+                                      exposedHeaders:
+                                        type: array
+                                        items:
+                                          type: string
+                                        description: Required if CorsRule element
+                                          is present. A list of response headers to
+                                          expose to CORS clients.
+                                      allowedHeaders:
+                                        type: array
+                                        items:
+                                          type: string
+                                        description: Required if CorsRule element
+                                          is present. A list of headers allowed to
+                                          be part of the cross-origin request.
+                                    required:
+                                    - allowedOrigins
+                                    - allowedMethods
+                                    - maxAgeInSeconds
+                                    - exposedHeaders
+                                    - allowedHeaders
+                                  description: 'The List of CORS rules. You can include
+                                    up to five CorsRule elements in the request. '
+                            shareDeleteRetentionPolicy:
+                              description: The file service properties for share soft
+                                delete.
+                              properties:
+                                enabled:
+                                  type: boolean
+                                  description: Indicates whether DeleteRetentionPolicy
+                                    is enabled.
+                                days:
+                                  type: integer
+                                  minimum: 1
+                                  maximum: 365
+                                  description: Indicates the number of days that the
+                                    deleted item should be retained. The minimum specified
+                                    value can be 1 and the maximum value can be 365.
+                          x-ms-client-flatten: true
+                          x-ms-client-name: FileServiceProperties
+                          description: The properties of File services in storage
+                            account.
+                        sku:
+                          readOnly: true
+                          description: Sku name and tier.
+                          properties:
+                            name:
+                              type: string
+                              description: The SKU name. Required for account creation;
+                                optional for update. Note that in older versions,
+                                SKU name was called accountType.
+                              enum:
+                              - Standard_LRS
+                              - Standard_GRS
+                              - Standard_RAGRS
+                              - Standard_ZRS
+                              - Premium_LRS
+                              - Premium_ZRS
+                              - Standard_GZRS
+                              - Standard_RAGZRS
+                              x-ms-enum:
+                                name: SkuName
+                                modelAsString: true
+                            tier:
+                              readOnly: true
+                              type: string
+                              description: The SKU tier. This is based on the SKU
+                                name.
+                              enum:
+                              - Standard
+                              - Premium
+                              x-ms-enum:
+                                name: SkuTier
+                                modelAsString: false
+                          required:
+                          - name
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                    description: List of file services returned.
+                    readOnly: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    x-ms-external: true
+                    properties:
+                      code:
+                        type: string
+                        description: An identifier for the error. Codes are invariant
+                          and are intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: A message describing the error, intended to be
+                          suitable for display in a user interface.
+                      target:
+                        type: string
+                        description: The target of the particular error. For example,
+                          the name of the property in error.
+                      details:
+                        type: array
+                        items:
+                          x-ms-external: true
+                          properties:
+                            code:
+                              type: string
+                              description: An identifier for the error. Codes are
+                                invariant and are intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: A message describing the error, intended
+                                to be suitable for display in a user interface.
+                            target:
+                              type: string
+                              description: The target of the particular error. For
+                                example, the name of the property in error.
+                            details:
+                              type: array
+                              items:
+                                x-ms-external: true
+                                properties:
+                                  code:
+                                    type: string
+                                    description: An identifier for the error. Codes
+                                      are invariant and are intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: A message describing the error, intended
+                                      to be suitable for display in a user interface.
+                                  target:
+                                    type: string
+                                    description: The target of the particular error.
+                                      For example, the name of the property in error.
+                                description: An error response from the Storage service.
+                              description: A list of additional details about the
+                                error.
+                          description: An error response from the Storage service.
+                        description: A list of additional details about the error.
+                    description: An error response from the Storage service.
+                description: An error response from the Storage service.
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/fileServices/{FileServicesName}
+  : put:
+      tags:
+      - FileService
+      operationId: FileServices_SetServiceProperties
+      description: 'Sets the properties of file services in storage accounts, including
+        CORS (Cross-Origin Resource Sharing) rules. '
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group within the user's subscription.
+          The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+          pattern: ^[-\w\._\(\)]+$
+      - name: accountName
+        in: path
+        required: true
+        description: The name of the storage account within the specified resource
+          group. Storage account names must be between 3 and 24 characters in length
+          and use numbers and lower-case letters only.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 24
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: FileServicesName
+        in: path
+        required: true
+        description: The name of the file Service within the specified storage account.
+          File Service Name must be "default"
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - default
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  readOnly: true
+                  type: string
+                  description: Fully qualified resource ID for the resource. Ex -
+                    /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                name:
+                  readOnly: true
+                  type: string
+                  description: The name of the resource
+                type:
+                  readOnly: true
+                  type: string
+                  description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                    or "Microsoft.Storage/storageAccounts"
+                properties:
+                  properties:
+                    cors:
+                      description: Specifies CORS rules for the File service. You
+                        can include up to five CorsRule elements in the request. If
+                        no CorsRule elements are included in the request body, all
+                        CORS rules will be deleted, and CORS will be disabled for
+                        the File service.
+                      properties:
+                        corsRules:
+                          type: array
+                          items:
+                            description: 'Specifies a CORS rule for the Blob service. '
+                            properties:
+                              allowedOrigins:
+                                type: array
+                                items:
+                                  type: string
+                                description: Required if CorsRule element is present.
+                                  A list of origin domains that will be allowed via
+                                  CORS, or "*" to allow all domains
+                              allowedMethods:
+                                type: array
+                                items:
+                                  type: string
+                                  enum:
+                                  - DELETE
+                                  - GET
+                                  - HEAD
+                                  - MERGE
+                                  - POST
+                                  - OPTIONS
+                                  - PUT
+                                description: Required if CorsRule element is present.
+                                  A list of HTTP methods that are allowed to be executed
+                                  by the origin.
+                              maxAgeInSeconds:
+                                type: integer
+                                description: Required if CorsRule element is present.
+                                  The number of seconds that the client/browser should
+                                  cache a preflight response.
+                              exposedHeaders:
+                                type: array
+                                items:
+                                  type: string
+                                description: Required if CorsRule element is present.
+                                  A list of response headers to expose to CORS clients.
+                              allowedHeaders:
+                                type: array
+                                items:
+                                  type: string
+                                description: Required if CorsRule element is present.
+                                  A list of headers allowed to be part of the cross-origin
+                                  request.
+                            required:
+                            - allowedOrigins
+                            - allowedMethods
+                            - maxAgeInSeconds
+                            - exposedHeaders
+                            - allowedHeaders
+                          description: 'The List of CORS rules. You can include up
+                            to five CorsRule elements in the request. '
+                    shareDeleteRetentionPolicy:
+                      description: The file service properties for share soft delete.
+                      properties:
+                        enabled:
+                          type: boolean
+                          description: Indicates whether DeleteRetentionPolicy is
+                            enabled.
+                        days:
+                          type: integer
+                          minimum: 1
+                          maximum: 365
+                          description: Indicates the number of days that the deleted
+                            item should be retained. The minimum specified value can
+                            be 1 and the maximum value can be 365.
+                  x-ms-client-flatten: true
+                  x-ms-client-name: FileServiceProperties
+                  description: The properties of File services in storage account.
+                sku:
+                  readOnly: true
+                  description: Sku name and tier.
+                  properties:
+                    name:
+                      type: string
+                      description: The SKU name. Required for account creation; optional
+                        for update. Note that in older versions, SKU name was called
+                        accountType.
+                      enum:
+                      - Standard_LRS
+                      - Standard_GRS
+                      - Standard_RAGRS
+                      - Standard_ZRS
+                      - Premium_LRS
+                      - Premium_ZRS
+                      - Standard_GZRS
+                      - Standard_RAGZRS
+                      x-ms-enum:
+                        name: SkuName
+                        modelAsString: true
+                    tier:
+                      readOnly: true
+                      type: string
+                      description: The SKU tier. This is based on the SKU name.
+                      enum:
+                      - Standard
+                      - Premium
+                      x-ms-enum:
+                        name: SkuTier
+                        modelAsString: false
+                  required:
+                  - name
+              title: Resource
+              description: Common fields that are returned in the response for all
+                Azure Resource Manager resources
+              x-ms-azure-resource: true
+        description: The properties of file services in storage accounts, including
+          CORS (Cross-Origin Resource Sharing) rules.
+        required: true
+      responses:
+        '200':
+          description: "OK -- Sets The properties of a storage account\u2019s File\
+            \ service successfully."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    properties:
+                      cors:
+                        description: Specifies CORS rules for the File service. You
+                          can include up to five CorsRule elements in the request.
+                          If no CorsRule elements are included in the request body,
+                          all CORS rules will be deleted, and CORS will be disabled
+                          for the File service.
+                        properties:
+                          corsRules:
+                            type: array
+                            items:
+                              description: 'Specifies a CORS rule for the Blob service. '
+                              properties:
+                                allowedOrigins:
+                                  type: array
+                                  items:
+                                    type: string
+                                  description: Required if CorsRule element is present.
+                                    A list of origin domains that will be allowed
+                                    via CORS, or "*" to allow all domains
+                                allowedMethods:
+                                  type: array
+                                  items:
+                                    type: string
+                                    enum:
+                                    - DELETE
+                                    - GET
+                                    - HEAD
+                                    - MERGE
+                                    - POST
+                                    - OPTIONS
+                                    - PUT
+                                  description: Required if CorsRule element is present.
+                                    A list of HTTP methods that are allowed to be
+                                    executed by the origin.
+                                maxAgeInSeconds:
+                                  type: integer
+                                  description: Required if CorsRule element is present.
+                                    The number of seconds that the client/browser
+                                    should cache a preflight response.
+                                exposedHeaders:
+                                  type: array
+                                  items:
+                                    type: string
+                                  description: Required if CorsRule element is present.
+                                    A list of response headers to expose to CORS clients.
+                                allowedHeaders:
+                                  type: array
+                                  items:
+                                    type: string
+                                  description: Required if CorsRule element is present.
+                                    A list of headers allowed to be part of the cross-origin
+                                    request.
+                              required:
+                              - allowedOrigins
+                              - allowedMethods
+                              - maxAgeInSeconds
+                              - exposedHeaders
+                              - allowedHeaders
+                            description: 'The List of CORS rules. You can include
+                              up to five CorsRule elements in the request. '
+                      shareDeleteRetentionPolicy:
+                        description: The file service properties for share soft delete.
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Indicates whether DeleteRetentionPolicy is
+                              enabled.
+                          days:
+                            type: integer
+                            minimum: 1
+                            maximum: 365
+                            description: Indicates the number of days that the deleted
+                              item should be retained. The minimum specified value
+                              can be 1 and the maximum value can be 365.
+                    x-ms-client-flatten: true
+                    x-ms-client-name: FileServiceProperties
+                    description: The properties of File services in storage account.
+                  sku:
+                    readOnly: true
+                    description: Sku name and tier.
+                    properties:
+                      name:
+                        type: string
+                        description: The SKU name. Required for account creation;
+                          optional for update. Note that in older versions, SKU name
+                          was called accountType.
+                        enum:
+                        - Standard_LRS
+                        - Standard_GRS
+                        - Standard_RAGRS
+                        - Standard_ZRS
+                        - Premium_LRS
+                        - Premium_ZRS
+                        - Standard_GZRS
+                        - Standard_RAGZRS
+                        x-ms-enum:
+                          name: SkuName
+                          modelAsString: true
+                      tier:
+                        readOnly: true
+                        type: string
+                        description: The SKU tier. This is based on the SKU name.
+                        enum:
+                        - Standard
+                        - Premium
+                        x-ms-enum:
+                          name: SkuTier
+                          modelAsString: false
+                    required:
+                    - name
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    x-ms-external: true
+                    properties:
+                      code:
+                        type: string
+                        description: An identifier for the error. Codes are invariant
+                          and are intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: A message describing the error, intended to be
+                          suitable for display in a user interface.
+                      target:
+                        type: string
+                        description: The target of the particular error. For example,
+                          the name of the property in error.
+                      details:
+                        type: array
+                        items:
+                          x-ms-external: true
+                          properties:
+                            code:
+                              type: string
+                              description: An identifier for the error. Codes are
+                                invariant and are intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: A message describing the error, intended
+                                to be suitable for display in a user interface.
+                            target:
+                              type: string
+                              description: The target of the particular error. For
+                                example, the name of the property in error.
+                            details:
+                              type: array
+                              items:
+                                x-ms-external: true
+                                properties:
+                                  code:
+                                    type: string
+                                    description: An identifier for the error. Codes
+                                      are invariant and are intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: A message describing the error, intended
+                                      to be suitable for display in a user interface.
+                                  target:
+                                    type: string
+                                    description: The target of the particular error.
+                                      For example, the name of the property in error.
+                                description: An error response from the Storage service.
+                              description: A list of additional details about the
+                                error.
+                          description: An error response from the Storage service.
+                        description: A list of additional details about the error.
+                    description: An error response from the Storage service.
+                description: An error response from the Storage service.
+    get:
+      tags:
+      - FileService
+      operationId: FileServices_GetServiceProperties
+      description: Gets the properties of file services in storage accounts, including
+        CORS (Cross-Origin Resource Sharing) rules.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group within the user's subscription.
+          The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+          pattern: ^[-\w\._\(\)]+$
+      - name: accountName
+        in: path
+        required: true
+        description: The name of the storage account within the specified resource
+          group. Storage account names must be between 3 and 24 characters in length
+          and use numbers and lower-case letters only.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 24
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: FileServicesName
+        in: path
+        required: true
+        description: The name of the file Service within the specified storage account.
+          File Service Name must be "default"
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - default
+      responses:
+        '200':
+          description: "OK -- returned the properties of a storage account\u2019s\
+            \ File service."
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    properties:
+                      cors:
+                        description: Specifies CORS rules for the File service. You
+                          can include up to five CorsRule elements in the request.
+                          If no CorsRule elements are included in the request body,
+                          all CORS rules will be deleted, and CORS will be disabled
+                          for the File service.
+                        properties:
+                          corsRules:
+                            type: array
+                            items:
+                              description: 'Specifies a CORS rule for the Blob service. '
+                              properties:
+                                allowedOrigins:
+                                  type: array
+                                  items:
+                                    type: string
+                                  description: Required if CorsRule element is present.
+                                    A list of origin domains that will be allowed
+                                    via CORS, or "*" to allow all domains
+                                allowedMethods:
+                                  type: array
+                                  items:
+                                    type: string
+                                    enum:
+                                    - DELETE
+                                    - GET
+                                    - HEAD
+                                    - MERGE
+                                    - POST
+                                    - OPTIONS
+                                    - PUT
+                                  description: Required if CorsRule element is present.
+                                    A list of HTTP methods that are allowed to be
+                                    executed by the origin.
+                                maxAgeInSeconds:
+                                  type: integer
+                                  description: Required if CorsRule element is present.
+                                    The number of seconds that the client/browser
+                                    should cache a preflight response.
+                                exposedHeaders:
+                                  type: array
+                                  items:
+                                    type: string
+                                  description: Required if CorsRule element is present.
+                                    A list of response headers to expose to CORS clients.
+                                allowedHeaders:
+                                  type: array
+                                  items:
+                                    type: string
+                                  description: Required if CorsRule element is present.
+                                    A list of headers allowed to be part of the cross-origin
+                                    request.
+                              required:
+                              - allowedOrigins
+                              - allowedMethods
+                              - maxAgeInSeconds
+                              - exposedHeaders
+                              - allowedHeaders
+                            description: 'The List of CORS rules. You can include
+                              up to five CorsRule elements in the request. '
+                      shareDeleteRetentionPolicy:
+                        description: The file service properties for share soft delete.
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: Indicates whether DeleteRetentionPolicy is
+                              enabled.
+                          days:
+                            type: integer
+                            minimum: 1
+                            maximum: 365
+                            description: Indicates the number of days that the deleted
+                              item should be retained. The minimum specified value
+                              can be 1 and the maximum value can be 365.
+                    x-ms-client-flatten: true
+                    x-ms-client-name: FileServiceProperties
+                    description: The properties of File services in storage account.
+                  sku:
+                    readOnly: true
+                    description: Sku name and tier.
+                    properties:
+                      name:
+                        type: string
+                        description: The SKU name. Required for account creation;
+                          optional for update. Note that in older versions, SKU name
+                          was called accountType.
+                        enum:
+                        - Standard_LRS
+                        - Standard_GRS
+                        - Standard_RAGRS
+                        - Standard_ZRS
+                        - Premium_LRS
+                        - Premium_ZRS
+                        - Standard_GZRS
+                        - Standard_RAGZRS
+                        x-ms-enum:
+                          name: SkuName
+                          modelAsString: true
+                      tier:
+                        readOnly: true
+                        type: string
+                        description: The SKU tier. This is based on the SKU name.
+                        enum:
+                        - Standard
+                        - Premium
+                        x-ms-enum:
+                          name: SkuTier
+                          modelAsString: false
+                    required:
+                    - name
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    x-ms-external: true
+                    properties:
+                      code:
+                        type: string
+                        description: An identifier for the error. Codes are invariant
+                          and are intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: A message describing the error, intended to be
+                          suitable for display in a user interface.
+                      target:
+                        type: string
+                        description: The target of the particular error. For example,
+                          the name of the property in error.
+                      details:
+                        type: array
+                        items:
+                          x-ms-external: true
+                          properties:
+                            code:
+                              type: string
+                              description: An identifier for the error. Codes are
+                                invariant and are intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: A message describing the error, intended
+                                to be suitable for display in a user interface.
+                            target:
+                              type: string
+                              description: The target of the particular error. For
+                                example, the name of the property in error.
+                            details:
+                              type: array
+                              items:
+                                x-ms-external: true
+                                properties:
+                                  code:
+                                    type: string
+                                    description: An identifier for the error. Codes
+                                      are invariant and are intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: A message describing the error, intended
+                                      to be suitable for display in a user interface.
+                                  target:
+                                    type: string
+                                    description: The target of the particular error.
+                                      For example, the name of the property in error.
+                                description: An error response from the Storage service.
+                              description: A list of additional details about the
+                                error.
+                          description: An error response from the Storage service.
+                        description: A list of additional details about the error.
+                    description: An error response from the Storage service.
+                description: An error response from the Storage service.
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/fileServices/default/shares
+  : get:
+      tags:
+      - FileShares
+      operationId: FileShares_List
+      description: Lists all shares.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group within the user's subscription.
+          The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+          pattern: ^[-\w\._\(\)]+$
+      - name: accountName
+        in: path
+        required: true
+        description: The name of the storage account within the specified resource
+          group. Storage account names must be between 3 and 24 characters in length
+          and use numbers and lower-case letters only.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 24
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: $maxpagesize
+        in: query
+        description: Optional. Specified maximum number of shares that can be included
+          in the list.
+        schema:
+          type: string
+      - name: $filter
+        in: query
+        description: Optional. When specified, only share names starting with the
+          filter will be listed.
+        schema:
+          type: string
+      - name: $expand
+        in: query
+        required: false
+        x-ms-enum:
+          name: ListSharesExpand
+          modelAsString: false
+        description: Optional, used to expand the properties within share's properties.
+        schema:
+          type: string
+          enum:
+          - deleted
+      responses:
+        '200':
+          description: OK -- List Shares operation completed successfully.
+          content:
+            application/json:
+              schema:
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                        name:
+                          readOnly: true
+                          type: string
+                          description: The name of the resource
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                        etag:
+                          type: string
+                          readOnly: true
+                          description: Resource Etag.
+                        properties:
+                          x-ms-client-flatten: true
+                          description: The file share properties be listed out.
+                          properties:
+                            lastModifiedTime:
+                              type: string
+                              format: date-time
+                              readOnly: true
+                              description: Returns the date and time the share was
+                                last modified.
+                            metadata:
+                              type: object
+                              additionalProperties:
+                                type: string
+                              description: A name-value pair to associate with the
+                                share as metadata.
+                            shareQuota:
+                              type: integer
+                              minimum: 1
+                              maximum: 102400
+                              description: The maximum size of the share, in gigabytes.
+                                Must be greater than 0, and less than or equal to
+                                5TB (5120). For Large File Shares, the maximum size
+                                is 102400.
+                            enabledProtocols:
+                              type: string
+                              enum:
+                              - SMB
+                              - NFS
+                              x-ms-enum:
+                                name: EnabledProtocols
+                                modelAsString: true
+                              description: The authentication protocol that is used
+                                for the file share. Can only be specified when creating
+                                a share.
+                              x-ms-mutability:
+                              - create
+                              - read
+                            rootSquash:
+                              type: string
+                              enum:
+                              - NoRootSquash
+                              - RootSquash
+                              - AllSquash
+                              x-ms-enum:
+                                name: RootSquashType
+                                modelAsString: true
+                              description: The property is for NFS share only. The
+                                default is NoRootSquash.
+                            version:
+                              type: string
+                              readOnly: true
+                              description: The version of the share.
+                            deleted:
+                              type: boolean
+                              readOnly: true
+                              description: Indicates whether the share was deleted.
+                            deletedTime:
+                              type: string
+                              format: date-time
+                              readOnly: true
+                              description: The deleted time if the share was deleted.
+                            remainingRetentionDays:
+                              type: integer
+                              readOnly: true
+                              description: Remaining retention days for share that
+                                was soft deleted.
+                            accessTier:
+                              type: string
+                              enum:
+                              - TransactionOptimized
+                              - Hot
+                              - Cool
+                              - Premium
+                              x-ms-enum:
+                                name: ShareAccessTier
+                                modelAsString: true
+                              description: Access tier for specific share. GpV2 account
+                                can choose between TransactionOptimized (default),
+                                Hot, and Cool. FileStorage account can choose Premium.
+                            accessTierChangeTime:
+                              type: string
+                              format: date-time
+                              readOnly: true
+                              description: Indicates the last modification time for
+                                share access tier.
+                            accessTierStatus:
+                              type: string
+                              readOnly: true
+                              description: Indicates if there is a pending transition
+                                for access tier.
+                            shareUsageBytes:
+                              type: integer
+                              format: int64
+                              readOnly: true
+                              description: The approximate size of the data stored
+                                on the share. Note that this value may not include
+                                all recently created or recently resized files.
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                      x-ms-client-name: AzureEntityResource
+                    description: List of file shares returned.
+                    readOnly: true
+                  nextLink:
+                    type: string
+                    description: Request URL that can be used to query next page of
+                      shares. Returned when total number of requested shares exceed
+                      maximum page size.
+                    readOnly: true
+                description: Response schema. Contains list of shares returned, and
+                  if paging is requested or required, a URL to next page of shares.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    x-ms-external: true
+                    properties:
+                      code:
+                        type: string
+                        description: An identifier for the error. Codes are invariant
+                          and are intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: A message describing the error, intended to be
+                          suitable for display in a user interface.
+                      target:
+                        type: string
+                        description: The target of the particular error. For example,
+                          the name of the property in error.
+                      details:
+                        type: array
+                        items:
+                          x-ms-external: true
+                          properties:
+                            code:
+                              type: string
+                              description: An identifier for the error. Codes are
+                                invariant and are intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: A message describing the error, intended
+                                to be suitable for display in a user interface.
+                            target:
+                              type: string
+                              description: The target of the particular error. For
+                                example, the name of the property in error.
+                            details:
+                              type: array
+                              items:
+                                x-ms-external: true
+                                properties:
+                                  code:
+                                    type: string
+                                    description: An identifier for the error. Codes
+                                      are invariant and are intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: A message describing the error, intended
+                                      to be suitable for display in a user interface.
+                                  target:
+                                    type: string
+                                    description: The target of the particular error.
+                                      For example, the name of the property in error.
+                                description: An error response from the Storage service.
+                              description: A list of additional details about the
+                                error.
+                          description: An error response from the Storage service.
+                        description: A list of additional details about the error.
+                    description: An error response from the Storage service.
+                description: An error response from the Storage service.
+      x-ms-pageable:
+        nextLinkName: nextLink
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/fileServices/default/shares/{shareName}
+  : put:
+      tags:
+      - FileShares
+      operationId: FileShares_Create
+      description: 'Creates a new share under the specified account as described by
+        request body. The share resource includes metadata and properties for that
+        share. It does not include a list of the files contained by the share. '
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group within the user's subscription.
+          The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+          pattern: ^[-\w\._\(\)]+$
+      - name: accountName
+        in: path
+        required: true
+        description: The name of the storage account within the specified resource
+          group. Storage account names must be between 3 and 24 characters in length
+          and use numbers and lower-case letters only.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 24
+      - name: shareName
+        in: path
+        required: true
+        description: The name of the file share within the specified storage account.
+          File share names must be between 3 and 63 characters in length and use numbers,
+          lower-case letters and dash (-) only. Every dash (-) character must be immediately
+          preceded and followed by a letter or number.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 63
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  readOnly: true
+                  type: string
+                  description: Fully qualified resource ID for the resource. Ex -
+                    /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                name:
+                  readOnly: true
+                  type: string
+                  description: The name of the resource
+                type:
+                  readOnly: true
+                  type: string
+                  description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                    or "Microsoft.Storage/storageAccounts"
+                etag:
+                  type: string
+                  readOnly: true
+                  description: Resource Etag.
+                properties:
+                  x-ms-client-flatten: true
+                  x-ms-client-name: FileShareProperties
+                  description: Properties of the file share.
+                  properties:
+                    lastModifiedTime:
+                      type: string
+                      format: date-time
+                      readOnly: true
+                      description: Returns the date and time the share was last modified.
+                    metadata:
+                      type: object
+                      additionalProperties:
+                        type: string
+                      description: A name-value pair to associate with the share as
+                        metadata.
+                    shareQuota:
+                      type: integer
+                      minimum: 1
+                      maximum: 102400
+                      description: The maximum size of the share, in gigabytes. Must
+                        be greater than 0, and less than or equal to 5TB (5120). For
+                        Large File Shares, the maximum size is 102400.
+                    enabledProtocols:
+                      type: string
+                      enum:
+                      - SMB
+                      - NFS
+                      x-ms-enum:
+                        name: EnabledProtocols
+                        modelAsString: true
+                      description: The authentication protocol that is used for the
+                        file share. Can only be specified when creating a share.
+                      x-ms-mutability:
+                      - create
+                      - read
+                    rootSquash:
+                      type: string
+                      enum:
+                      - NoRootSquash
+                      - RootSquash
+                      - AllSquash
+                      x-ms-enum:
+                        name: RootSquashType
+                        modelAsString: true
+                      description: The property is for NFS share only. The default
+                        is NoRootSquash.
+                    version:
+                      type: string
+                      readOnly: true
+                      description: The version of the share.
+                    deleted:
+                      type: boolean
+                      readOnly: true
+                      description: Indicates whether the share was deleted.
+                    deletedTime:
+                      type: string
+                      format: date-time
+                      readOnly: true
+                      description: The deleted time if the share was deleted.
+                    remainingRetentionDays:
+                      type: integer
+                      readOnly: true
+                      description: Remaining retention days for share that was soft
+                        deleted.
+                    accessTier:
+                      type: string
+                      enum:
+                      - TransactionOptimized
+                      - Hot
+                      - Cool
+                      - Premium
+                      x-ms-enum:
+                        name: ShareAccessTier
+                        modelAsString: true
+                      description: Access tier for specific share. GpV2 account can
+                        choose between TransactionOptimized (default), Hot, and Cool.
+                        FileStorage account can choose Premium.
+                    accessTierChangeTime:
+                      type: string
+                      format: date-time
+                      readOnly: true
+                      description: Indicates the last modification time for share
+                        access tier.
+                    accessTierStatus:
+                      type: string
+                      readOnly: true
+                      description: Indicates if there is a pending transition for
+                        access tier.
+                    shareUsageBytes:
+                      type: integer
+                      format: int64
+                      readOnly: true
+                      description: The approximate size of the data stored on the
+                        share. Note that this value may not include all recently created
+                        or recently resized files.
+              title: Resource
+              description: Common fields that are returned in the response for all
+                Azure Resource Manager resources
+              x-ms-azure-resource: true
+              x-ms-client-name: AzureEntityResource
+        description: Properties of the file share to create.
+        required: true
+      responses:
+        '200':
+          description: OK -- The Share is already created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  etag:
+                    type: string
+                    readOnly: true
+                    description: Resource Etag.
+                  properties:
+                    x-ms-client-flatten: true
+                    x-ms-client-name: FileShareProperties
+                    description: Properties of the file share.
+                    properties:
+                      lastModifiedTime:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Returns the date and time the share was last
+                          modified.
+                      metadata:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        description: A name-value pair to associate with the share
+                          as metadata.
+                      shareQuota:
+                        type: integer
+                        minimum: 1
+                        maximum: 102400
+                        description: The maximum size of the share, in gigabytes.
+                          Must be greater than 0, and less than or equal to 5TB (5120).
+                          For Large File Shares, the maximum size is 102400.
+                      enabledProtocols:
+                        type: string
+                        enum:
+                        - SMB
+                        - NFS
+                        x-ms-enum:
+                          name: EnabledProtocols
+                          modelAsString: true
+                        description: The authentication protocol that is used for
+                          the file share. Can only be specified when creating a share.
+                        x-ms-mutability:
+                        - create
+                        - read
+                      rootSquash:
+                        type: string
+                        enum:
+                        - NoRootSquash
+                        - RootSquash
+                        - AllSquash
+                        x-ms-enum:
+                          name: RootSquashType
+                          modelAsString: true
+                        description: The property is for NFS share only. The default
+                          is NoRootSquash.
+                      version:
+                        type: string
+                        readOnly: true
+                        description: The version of the share.
+                      deleted:
+                        type: boolean
+                        readOnly: true
+                        description: Indicates whether the share was deleted.
+                      deletedTime:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: The deleted time if the share was deleted.
+                      remainingRetentionDays:
+                        type: integer
+                        readOnly: true
+                        description: Remaining retention days for share that was soft
+                          deleted.
+                      accessTier:
+                        type: string
+                        enum:
+                        - TransactionOptimized
+                        - Hot
+                        - Cool
+                        - Premium
+                        x-ms-enum:
+                          name: ShareAccessTier
+                          modelAsString: true
+                        description: Access tier for specific share. GpV2 account
+                          can choose between TransactionOptimized (default), Hot,
+                          and Cool. FileStorage account can choose Premium.
+                      accessTierChangeTime:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Indicates the last modification time for share
+                          access tier.
+                      accessTierStatus:
+                        type: string
+                        readOnly: true
+                        description: Indicates if there is a pending transition for
+                          access tier.
+                      shareUsageBytes:
+                        type: integer
+                        format: int64
+                        readOnly: true
+                        description: The approximate size of the data stored on the
+                          share. Note that this value may not include all recently
+                          created or recently resized files.
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                x-ms-client-name: AzureEntityResource
+        '201':
+          description: Created -- Create Share operation completed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  etag:
+                    type: string
+                    readOnly: true
+                    description: Resource Etag.
+                  properties:
+                    x-ms-client-flatten: true
+                    x-ms-client-name: FileShareProperties
+                    description: Properties of the file share.
+                    properties:
+                      lastModifiedTime:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Returns the date and time the share was last
+                          modified.
+                      metadata:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        description: A name-value pair to associate with the share
+                          as metadata.
+                      shareQuota:
+                        type: integer
+                        minimum: 1
+                        maximum: 102400
+                        description: The maximum size of the share, in gigabytes.
+                          Must be greater than 0, and less than or equal to 5TB (5120).
+                          For Large File Shares, the maximum size is 102400.
+                      enabledProtocols:
+                        type: string
+                        enum:
+                        - SMB
+                        - NFS
+                        x-ms-enum:
+                          name: EnabledProtocols
+                          modelAsString: true
+                        description: The authentication protocol that is used for
+                          the file share. Can only be specified when creating a share.
+                        x-ms-mutability:
+                        - create
+                        - read
+                      rootSquash:
+                        type: string
+                        enum:
+                        - NoRootSquash
+                        - RootSquash
+                        - AllSquash
+                        x-ms-enum:
+                          name: RootSquashType
+                          modelAsString: true
+                        description: The property is for NFS share only. The default
+                          is NoRootSquash.
+                      version:
+                        type: string
+                        readOnly: true
+                        description: The version of the share.
+                      deleted:
+                        type: boolean
+                        readOnly: true
+                        description: Indicates whether the share was deleted.
+                      deletedTime:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: The deleted time if the share was deleted.
+                      remainingRetentionDays:
+                        type: integer
+                        readOnly: true
+                        description: Remaining retention days for share that was soft
+                          deleted.
+                      accessTier:
+                        type: string
+                        enum:
+                        - TransactionOptimized
+                        - Hot
+                        - Cool
+                        - Premium
+                        x-ms-enum:
+                          name: ShareAccessTier
+                          modelAsString: true
+                        description: Access tier for specific share. GpV2 account
+                          can choose between TransactionOptimized (default), Hot,
+                          and Cool. FileStorage account can choose Premium.
+                      accessTierChangeTime:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Indicates the last modification time for share
+                          access tier.
+                      accessTierStatus:
+                        type: string
+                        readOnly: true
+                        description: Indicates if there is a pending transition for
+                          access tier.
+                      shareUsageBytes:
+                        type: integer
+                        format: int64
+                        readOnly: true
+                        description: The approximate size of the data stored on the
+                          share. Note that this value may not include all recently
+                          created or recently resized files.
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                x-ms-client-name: AzureEntityResource
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    x-ms-external: true
+                    properties:
+                      code:
+                        type: string
+                        description: An identifier for the error. Codes are invariant
+                          and are intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: A message describing the error, intended to be
+                          suitable for display in a user interface.
+                      target:
+                        type: string
+                        description: The target of the particular error. For example,
+                          the name of the property in error.
+                      details:
+                        type: array
+                        items:
+                          x-ms-external: true
+                          properties:
+                            code:
+                              type: string
+                              description: An identifier for the error. Codes are
+                                invariant and are intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: A message describing the error, intended
+                                to be suitable for display in a user interface.
+                            target:
+                              type: string
+                              description: The target of the particular error. For
+                                example, the name of the property in error.
+                            details:
+                              type: array
+                              items:
+                                x-ms-external: true
+                                properties:
+                                  code:
+                                    type: string
+                                    description: An identifier for the error. Codes
+                                      are invariant and are intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: A message describing the error, intended
+                                      to be suitable for display in a user interface.
+                                  target:
+                                    type: string
+                                    description: The target of the particular error.
+                                      For example, the name of the property in error.
+                                description: An error response from the Storage service.
+                              description: A list of additional details about the
+                                error.
+                          description: An error response from the Storage service.
+                        description: A list of additional details about the error.
+                    description: An error response from the Storage service.
+                description: An error response from the Storage service.
+    patch:
+      tags:
+      - FileShares
+      operationId: FileShares_Update
+      description: 'Updates share properties as specified in request body. Properties
+        not mentioned in the request will not be changed. Update fails if the specified
+        share does not already exist. '
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group within the user's subscription.
+          The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+          pattern: ^[-\w\._\(\)]+$
+      - name: accountName
+        in: path
+        required: true
+        description: The name of the storage account within the specified resource
+          group. Storage account names must be between 3 and 24 characters in length
+          and use numbers and lower-case letters only.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 24
+      - name: shareName
+        in: path
+        required: true
+        description: The name of the file share within the specified storage account.
+          File share names must be between 3 and 63 characters in length and use numbers,
+          lower-case letters and dash (-) only. Every dash (-) character must be immediately
+          preceded and followed by a letter or number.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 63
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  readOnly: true
+                  type: string
+                  description: Fully qualified resource ID for the resource. Ex -
+                    /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                name:
+                  readOnly: true
+                  type: string
+                  description: The name of the resource
+                type:
+                  readOnly: true
+                  type: string
+                  description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                    or "Microsoft.Storage/storageAccounts"
+                etag:
+                  type: string
+                  readOnly: true
+                  description: Resource Etag.
+                properties:
+                  x-ms-client-flatten: true
+                  x-ms-client-name: FileShareProperties
+                  description: Properties of the file share.
+                  properties:
+                    lastModifiedTime:
+                      type: string
+                      format: date-time
+                      readOnly: true
+                      description: Returns the date and time the share was last modified.
+                    metadata:
+                      type: object
+                      additionalProperties:
+                        type: string
+                      description: A name-value pair to associate with the share as
+                        metadata.
+                    shareQuota:
+                      type: integer
+                      minimum: 1
+                      maximum: 102400
+                      description: The maximum size of the share, in gigabytes. Must
+                        be greater than 0, and less than or equal to 5TB (5120). For
+                        Large File Shares, the maximum size is 102400.
+                    enabledProtocols:
+                      type: string
+                      enum:
+                      - SMB
+                      - NFS
+                      x-ms-enum:
+                        name: EnabledProtocols
+                        modelAsString: true
+                      description: The authentication protocol that is used for the
+                        file share. Can only be specified when creating a share.
+                      x-ms-mutability:
+                      - create
+                      - read
+                    rootSquash:
+                      type: string
+                      enum:
+                      - NoRootSquash
+                      - RootSquash
+                      - AllSquash
+                      x-ms-enum:
+                        name: RootSquashType
+                        modelAsString: true
+                      description: The property is for NFS share only. The default
+                        is NoRootSquash.
+                    version:
+                      type: string
+                      readOnly: true
+                      description: The version of the share.
+                    deleted:
+                      type: boolean
+                      readOnly: true
+                      description: Indicates whether the share was deleted.
+                    deletedTime:
+                      type: string
+                      format: date-time
+                      readOnly: true
+                      description: The deleted time if the share was deleted.
+                    remainingRetentionDays:
+                      type: integer
+                      readOnly: true
+                      description: Remaining retention days for share that was soft
+                        deleted.
+                    accessTier:
+                      type: string
+                      enum:
+                      - TransactionOptimized
+                      - Hot
+                      - Cool
+                      - Premium
+                      x-ms-enum:
+                        name: ShareAccessTier
+                        modelAsString: true
+                      description: Access tier for specific share. GpV2 account can
+                        choose between TransactionOptimized (default), Hot, and Cool.
+                        FileStorage account can choose Premium.
+                    accessTierChangeTime:
+                      type: string
+                      format: date-time
+                      readOnly: true
+                      description: Indicates the last modification time for share
+                        access tier.
+                    accessTierStatus:
+                      type: string
+                      readOnly: true
+                      description: Indicates if there is a pending transition for
+                        access tier.
+                    shareUsageBytes:
+                      type: integer
+                      format: int64
+                      readOnly: true
+                      description: The approximate size of the data stored on the
+                        share. Note that this value may not include all recently created
+                        or recently resized files.
+              title: Resource
+              description: Common fields that are returned in the response for all
+                Azure Resource Manager resources
+              x-ms-azure-resource: true
+              x-ms-client-name: AzureEntityResource
+        description: Properties to update for the file share.
+        required: true
+      responses:
+        '200':
+          description: OK -- Update Share operation completed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  etag:
+                    type: string
+                    readOnly: true
+                    description: Resource Etag.
+                  properties:
+                    x-ms-client-flatten: true
+                    x-ms-client-name: FileShareProperties
+                    description: Properties of the file share.
+                    properties:
+                      lastModifiedTime:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Returns the date and time the share was last
+                          modified.
+                      metadata:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        description: A name-value pair to associate with the share
+                          as metadata.
+                      shareQuota:
+                        type: integer
+                        minimum: 1
+                        maximum: 102400
+                        description: The maximum size of the share, in gigabytes.
+                          Must be greater than 0, and less than or equal to 5TB (5120).
+                          For Large File Shares, the maximum size is 102400.
+                      enabledProtocols:
+                        type: string
+                        enum:
+                        - SMB
+                        - NFS
+                        x-ms-enum:
+                          name: EnabledProtocols
+                          modelAsString: true
+                        description: The authentication protocol that is used for
+                          the file share. Can only be specified when creating a share.
+                        x-ms-mutability:
+                        - create
+                        - read
+                      rootSquash:
+                        type: string
+                        enum:
+                        - NoRootSquash
+                        - RootSquash
+                        - AllSquash
+                        x-ms-enum:
+                          name: RootSquashType
+                          modelAsString: true
+                        description: The property is for NFS share only. The default
+                          is NoRootSquash.
+                      version:
+                        type: string
+                        readOnly: true
+                        description: The version of the share.
+                      deleted:
+                        type: boolean
+                        readOnly: true
+                        description: Indicates whether the share was deleted.
+                      deletedTime:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: The deleted time if the share was deleted.
+                      remainingRetentionDays:
+                        type: integer
+                        readOnly: true
+                        description: Remaining retention days for share that was soft
+                          deleted.
+                      accessTier:
+                        type: string
+                        enum:
+                        - TransactionOptimized
+                        - Hot
+                        - Cool
+                        - Premium
+                        x-ms-enum:
+                          name: ShareAccessTier
+                          modelAsString: true
+                        description: Access tier for specific share. GpV2 account
+                          can choose between TransactionOptimized (default), Hot,
+                          and Cool. FileStorage account can choose Premium.
+                      accessTierChangeTime:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Indicates the last modification time for share
+                          access tier.
+                      accessTierStatus:
+                        type: string
+                        readOnly: true
+                        description: Indicates if there is a pending transition for
+                          access tier.
+                      shareUsageBytes:
+                        type: integer
+                        format: int64
+                        readOnly: true
+                        description: The approximate size of the data stored on the
+                          share. Note that this value may not include all recently
+                          created or recently resized files.
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                x-ms-client-name: AzureEntityResource
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    x-ms-external: true
+                    properties:
+                      code:
+                        type: string
+                        description: An identifier for the error. Codes are invariant
+                          and are intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: A message describing the error, intended to be
+                          suitable for display in a user interface.
+                      target:
+                        type: string
+                        description: The target of the particular error. For example,
+                          the name of the property in error.
+                      details:
+                        type: array
+                        items:
+                          x-ms-external: true
+                          properties:
+                            code:
+                              type: string
+                              description: An identifier for the error. Codes are
+                                invariant and are intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: A message describing the error, intended
+                                to be suitable for display in a user interface.
+                            target:
+                              type: string
+                              description: The target of the particular error. For
+                                example, the name of the property in error.
+                            details:
+                              type: array
+                              items:
+                                x-ms-external: true
+                                properties:
+                                  code:
+                                    type: string
+                                    description: An identifier for the error. Codes
+                                      are invariant and are intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: A message describing the error, intended
+                                      to be suitable for display in a user interface.
+                                  target:
+                                    type: string
+                                    description: The target of the particular error.
+                                      For example, the name of the property in error.
+                                description: An error response from the Storage service.
+                              description: A list of additional details about the
+                                error.
+                          description: An error response from the Storage service.
+                        description: A list of additional details about the error.
+                    description: An error response from the Storage service.
+                description: An error response from the Storage service.
+    get:
+      tags:
+      - FileShares
+      operationId: FileShares_Get
+      description: Gets properties of a specified share.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group within the user's subscription.
+          The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+          pattern: ^[-\w\._\(\)]+$
+      - name: accountName
+        in: path
+        required: true
+        description: The name of the storage account within the specified resource
+          group. Storage account names must be between 3 and 24 characters in length
+          and use numbers and lower-case letters only.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 24
+      - name: shareName
+        in: path
+        required: true
+        description: The name of the file share within the specified storage account.
+          File share names must be between 3 and 63 characters in length and use numbers,
+          lower-case letters and dash (-) only. Every dash (-) character must be immediately
+          preceded and followed by a letter or number.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 63
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: $expand
+        in: query
+        required: false
+        x-ms-enum:
+          name: GetShareExpand
+          modelAsString: false
+        description: Optional, used to expand the properties within share's properties.
+        schema:
+          type: string
+          enum:
+          - stats
+      responses:
+        '200':
+          description: OK -- Get Share operation completed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  etag:
+                    type: string
+                    readOnly: true
+                    description: Resource Etag.
+                  properties:
+                    x-ms-client-flatten: true
+                    x-ms-client-name: FileShareProperties
+                    description: Properties of the file share.
+                    properties:
+                      lastModifiedTime:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Returns the date and time the share was last
+                          modified.
+                      metadata:
+                        type: object
+                        additionalProperties:
+                          type: string
+                        description: A name-value pair to associate with the share
+                          as metadata.
+                      shareQuota:
+                        type: integer
+                        minimum: 1
+                        maximum: 102400
+                        description: The maximum size of the share, in gigabytes.
+                          Must be greater than 0, and less than or equal to 5TB (5120).
+                          For Large File Shares, the maximum size is 102400.
+                      enabledProtocols:
+                        type: string
+                        enum:
+                        - SMB
+                        - NFS
+                        x-ms-enum:
+                          name: EnabledProtocols
+                          modelAsString: true
+                        description: The authentication protocol that is used for
+                          the file share. Can only be specified when creating a share.
+                        x-ms-mutability:
+                        - create
+                        - read
+                      rootSquash:
+                        type: string
+                        enum:
+                        - NoRootSquash
+                        - RootSquash
+                        - AllSquash
+                        x-ms-enum:
+                          name: RootSquashType
+                          modelAsString: true
+                        description: The property is for NFS share only. The default
+                          is NoRootSquash.
+                      version:
+                        type: string
+                        readOnly: true
+                        description: The version of the share.
+                      deleted:
+                        type: boolean
+                        readOnly: true
+                        description: Indicates whether the share was deleted.
+                      deletedTime:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: The deleted time if the share was deleted.
+                      remainingRetentionDays:
+                        type: integer
+                        readOnly: true
+                        description: Remaining retention days for share that was soft
+                          deleted.
+                      accessTier:
+                        type: string
+                        enum:
+                        - TransactionOptimized
+                        - Hot
+                        - Cool
+                        - Premium
+                        x-ms-enum:
+                          name: ShareAccessTier
+                          modelAsString: true
+                        description: Access tier for specific share. GpV2 account
+                          can choose between TransactionOptimized (default), Hot,
+                          and Cool. FileStorage account can choose Premium.
+                      accessTierChangeTime:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Indicates the last modification time for share
+                          access tier.
+                      accessTierStatus:
+                        type: string
+                        readOnly: true
+                        description: Indicates if there is a pending transition for
+                          access tier.
+                      shareUsageBytes:
+                        type: integer
+                        format: int64
+                        readOnly: true
+                        description: The approximate size of the data stored on the
+                          share. Note that this value may not include all recently
+                          created or recently resized files.
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                x-ms-client-name: AzureEntityResource
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    x-ms-external: true
+                    properties:
+                      code:
+                        type: string
+                        description: An identifier for the error. Codes are invariant
+                          and are intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: A message describing the error, intended to be
+                          suitable for display in a user interface.
+                      target:
+                        type: string
+                        description: The target of the particular error. For example,
+                          the name of the property in error.
+                      details:
+                        type: array
+                        items:
+                          x-ms-external: true
+                          properties:
+                            code:
+                              type: string
+                              description: An identifier for the error. Codes are
+                                invariant and are intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: A message describing the error, intended
+                                to be suitable for display in a user interface.
+                            target:
+                              type: string
+                              description: The target of the particular error. For
+                                example, the name of the property in error.
+                            details:
+                              type: array
+                              items:
+                                x-ms-external: true
+                                properties:
+                                  code:
+                                    type: string
+                                    description: An identifier for the error. Codes
+                                      are invariant and are intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: A message describing the error, intended
+                                      to be suitable for display in a user interface.
+                                  target:
+                                    type: string
+                                    description: The target of the particular error.
+                                      For example, the name of the property in error.
+                                description: An error response from the Storage service.
+                              description: A list of additional details about the
+                                error.
+                          description: An error response from the Storage service.
+                        description: A list of additional details about the error.
+                    description: An error response from the Storage service.
+                description: An error response from the Storage service.
+    delete:
+      tags:
+      - FileShares
+      operationId: FileShares_Delete
+      description: Deletes specified share under its account.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group within the user's subscription.
+          The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+          pattern: ^[-\w\._\(\)]+$
+      - name: accountName
+        in: path
+        required: true
+        description: The name of the storage account within the specified resource
+          group. Storage account names must be between 3 and 24 characters in length
+          and use numbers and lower-case letters only.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 24
+      - name: shareName
+        in: path
+        required: true
+        description: The name of the file share within the specified storage account.
+          File share names must be between 3 and 63 characters in length and use numbers,
+          lower-case letters and dash (-) only. Every dash (-) character must be immediately
+          preceded and followed by a letter or number.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 63
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: OK -- Delete Share operation completed successfully.
+        '204':
+          description: No Content -- The Share not exist.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    x-ms-external: true
+                    properties:
+                      code:
+                        type: string
+                        description: An identifier for the error. Codes are invariant
+                          and are intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: A message describing the error, intended to be
+                          suitable for display in a user interface.
+                      target:
+                        type: string
+                        description: The target of the particular error. For example,
+                          the name of the property in error.
+                      details:
+                        type: array
+                        items:
+                          x-ms-external: true
+                          properties:
+                            code:
+                              type: string
+                              description: An identifier for the error. Codes are
+                                invariant and are intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: A message describing the error, intended
+                                to be suitable for display in a user interface.
+                            target:
+                              type: string
+                              description: The target of the particular error. For
+                                example, the name of the property in error.
+                            details:
+                              type: array
+                              items:
+                                x-ms-external: true
+                                properties:
+                                  code:
+                                    type: string
+                                    description: An identifier for the error. Codes
+                                      are invariant and are intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: A message describing the error, intended
+                                      to be suitable for display in a user interface.
+                                  target:
+                                    type: string
+                                    description: The target of the particular error.
+                                      For example, the name of the property in error.
+                                description: An error response from the Storage service.
+                              description: A list of additional details about the
+                                error.
+                          description: An error response from the Storage service.
+                        description: A list of additional details about the error.
+                    description: An error response from the Storage service.
+                description: An error response from the Storage service.
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Storage/storageAccounts/{accountName}/fileServices/default/shares/{shareName}/restore
+  : post:
+      tags:
+      - FileShares
+      operationId: FileShares_Restore
+      description: Restore a file share within a valid retention days if share soft
+        delete is enabled
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group within the user's subscription.
+          The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+          pattern: ^[-\w\._\(\)]+$
+      - name: accountName
+        in: path
+        required: true
+        description: The name of the storage account within the specified resource
+          group. Storage account names must be between 3 and 24 characters in length
+          and use numbers and lower-case letters only.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 24
+      - name: shareName
+        in: path
+        required: true
+        description: The name of the file share within the specified storage account.
+          File share names must be between 3 and 63 characters in length and use numbers,
+          lower-case letters and dash (-) only. Every dash (-) character must be immediately
+          preceded and followed by a letter or number.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 63
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                deletedShareName:
+                  type: string
+                  description: Required. Identify the name of the deleted share that
+                    will be restored.
+                deletedShareVersion:
+                  type: string
+                  description: Required. Identify the version of the deleted share
+                    that will be restored.
+              required:
+              - deletedShareName
+              - deletedShareVersion
+              description: The deleted share to be restored.
+        required: true
+      responses:
+        '200':
+          description: OK -- The Share is successfully restored.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    x-ms-external: true
+                    properties:
+                      code:
+                        type: string
+                        description: An identifier for the error. Codes are invariant
+                          and are intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: A message describing the error, intended to be
+                          suitable for display in a user interface.
+                      target:
+                        type: string
+                        description: The target of the particular error. For example,
+                          the name of the property in error.
+                      details:
+                        type: array
+                        items:
+                          x-ms-external: true
+                          properties:
+                            code:
+                              type: string
+                              description: An identifier for the error. Codes are
+                                invariant and are intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: A message describing the error, intended
+                                to be suitable for display in a user interface.
+                            target:
+                              type: string
+                              description: The target of the particular error. For
+                                example, the name of the property in error.
+                            details:
+                              type: array
+                              items:
+                                x-ms-external: true
+                                properties:
+                                  code:
+                                    type: string
+                                    description: An identifier for the error. Codes
+                                      are invariant and are intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: A message describing the error, intended
+                                      to be suitable for display in a user interface.
+                                  target:
+                                    type: string
+                                    description: The target of the particular error.
+                                      For example, the name of the property in error.
+                                description: An error response from the Storage service.
+                              description: A list of additional details about the
+                                error.
+                          description: An error response from the Storage service.
+                        description: A list of additional details about the error.
+                    description: An error response from the Storage service.
+                description: An error response from the Storage service.
+components:
+  parameters:
+    FileServicesName:
+      name: FileServicesName
+      in: path
+      required: true
+      description: The name of the file Service within the specified storage account.
+        File Service Name must be "default"
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        enum:
+        - default
+    ShareName:
+      name: shareName
+      in: path
+      required: true
+      description: The name of the file share within the specified storage account.
+        File share names must be between 3 and 63 characters in length and use numbers,
+        lower-case letters and dash (-) only. Every dash (-) character must be immediately
+        preceded and followed by a letter or number.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 63
+    ResourceGroupName:
+      name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group within the user's subscription.
+        The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+        pattern: ^[-\w\._\(\)]+$
+    StorageAccountName:
+      name: accountName
+      in: path
+      required: true
+      description: The name of the storage account within the specified resource group.
+        Storage account names must be between 3 and 24 characters in length and use
+        numbers and lower-case letters only.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 24
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    FileServiceItems:
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+              name:
+                readOnly: true
+                type: string
+                description: The name of the resource
+              type:
+                readOnly: true
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+              properties:
+                properties:
+                  cors:
+                    description: Specifies CORS rules for the File service. You can
+                      include up to five CorsRule elements in the request. If no CorsRule
+                      elements are included in the request body, all CORS rules will
+                      be deleted, and CORS will be disabled for the File service.
+                    properties:
+                      corsRules:
+                        type: array
+                        items:
+                          description: 'Specifies a CORS rule for the Blob service. '
+                          properties:
+                            allowedOrigins:
+                              type: array
+                              items:
+                                type: string
+                              description: Required if CorsRule element is present.
+                                A list of origin domains that will be allowed via
+                                CORS, or "*" to allow all domains
+                            allowedMethods:
+                              type: array
+                              items:
+                                type: string
+                                enum:
+                                - DELETE
+                                - GET
+                                - HEAD
+                                - MERGE
+                                - POST
+                                - OPTIONS
+                                - PUT
+                              description: Required if CorsRule element is present.
+                                A list of HTTP methods that are allowed to be executed
+                                by the origin.
+                            maxAgeInSeconds:
+                              type: integer
+                              description: Required if CorsRule element is present.
+                                The number of seconds that the client/browser should
+                                cache a preflight response.
+                            exposedHeaders:
+                              type: array
+                              items:
+                                type: string
+                              description: Required if CorsRule element is present.
+                                A list of response headers to expose to CORS clients.
+                            allowedHeaders:
+                              type: array
+                              items:
+                                type: string
+                              description: Required if CorsRule element is present.
+                                A list of headers allowed to be part of the cross-origin
+                                request.
+                          required:
+                          - allowedOrigins
+                          - allowedMethods
+                          - maxAgeInSeconds
+                          - exposedHeaders
+                          - allowedHeaders
+                        description: 'The List of CORS rules. You can include up to
+                          five CorsRule elements in the request. '
+                  shareDeleteRetentionPolicy:
+                    description: The file service properties for share soft delete.
+                    properties:
+                      enabled:
+                        type: boolean
+                        description: Indicates whether DeleteRetentionPolicy is enabled.
+                      days:
+                        type: integer
+                        minimum: 1
+                        maximum: 365
+                        description: Indicates the number of days that the deleted
+                          item should be retained. The minimum specified value can
+                          be 1 and the maximum value can be 365.
+                x-ms-client-flatten: true
+                x-ms-client-name: FileServiceProperties
+                description: The properties of File services in storage account.
+              sku:
+                readOnly: true
+                description: Sku name and tier.
+                properties:
+                  name:
+                    type: string
+                    description: The SKU name. Required for account creation; optional
+                      for update. Note that in older versions, SKU name was called
+                      accountType.
+                    enum:
+                    - Standard_LRS
+                    - Standard_GRS
+                    - Standard_RAGRS
+                    - Standard_ZRS
+                    - Premium_LRS
+                    - Premium_ZRS
+                    - Standard_GZRS
+                    - Standard_RAGZRS
+                    x-ms-enum:
+                      name: SkuName
+                      modelAsString: true
+                  tier:
+                    readOnly: true
+                    type: string
+                    description: The SKU tier. This is based on the SKU name.
+                    enum:
+                    - Standard
+                    - Premium
+                    x-ms-enum:
+                      name: SkuTier
+                      modelAsString: false
+                required:
+                - name
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+          description: List of file services returned.
+          readOnly: true
+    FileServiceProperties:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        properties:
+          properties:
+            cors:
+              description: Specifies CORS rules for the File service. You can include
+                up to five CorsRule elements in the request. If no CorsRule elements
+                are included in the request body, all CORS rules will be deleted,
+                and CORS will be disabled for the File service.
+              properties:
+                corsRules:
+                  type: array
+                  items:
+                    description: 'Specifies a CORS rule for the Blob service. '
+                    properties:
+                      allowedOrigins:
+                        type: array
+                        items:
+                          type: string
+                        description: Required if CorsRule element is present. A list
+                          of origin domains that will be allowed via CORS, or "*"
+                          to allow all domains
+                      allowedMethods:
+                        type: array
+                        items:
+                          type: string
+                          enum:
+                          - DELETE
+                          - GET
+                          - HEAD
+                          - MERGE
+                          - POST
+                          - OPTIONS
+                          - PUT
+                        description: Required if CorsRule element is present. A list
+                          of HTTP methods that are allowed to be executed by the origin.
+                      maxAgeInSeconds:
+                        type: integer
+                        description: Required if CorsRule element is present. The
+                          number of seconds that the client/browser should cache a
+                          preflight response.
+                      exposedHeaders:
+                        type: array
+                        items:
+                          type: string
+                        description: Required if CorsRule element is present. A list
+                          of response headers to expose to CORS clients.
+                      allowedHeaders:
+                        type: array
+                        items:
+                          type: string
+                        description: Required if CorsRule element is present. A list
+                          of headers allowed to be part of the cross-origin request.
+                    required:
+                    - allowedOrigins
+                    - allowedMethods
+                    - maxAgeInSeconds
+                    - exposedHeaders
+                    - allowedHeaders
+                  description: 'The List of CORS rules. You can include up to five
+                    CorsRule elements in the request. '
+            shareDeleteRetentionPolicy:
+              description: The file service properties for share soft delete.
+              properties:
+                enabled:
+                  type: boolean
+                  description: Indicates whether DeleteRetentionPolicy is enabled.
+                days:
+                  type: integer
+                  minimum: 1
+                  maximum: 365
+                  description: Indicates the number of days that the deleted item
+                    should be retained. The minimum specified value can be 1 and the
+                    maximum value can be 365.
+          x-ms-client-flatten: true
+          x-ms-client-name: FileServiceProperties
+          description: The properties of File services in storage account.
+        sku:
+          readOnly: true
+          description: Sku name and tier.
+          properties:
+            name:
+              type: string
+              description: The SKU name. Required for account creation; optional for
+                update. Note that in older versions, SKU name was called accountType.
+              enum:
+              - Standard_LRS
+              - Standard_GRS
+              - Standard_RAGRS
+              - Standard_ZRS
+              - Premium_LRS
+              - Premium_ZRS
+              - Standard_GZRS
+              - Standard_RAGZRS
+              x-ms-enum:
+                name: SkuName
+                modelAsString: true
+            tier:
+              readOnly: true
+              type: string
+              description: The SKU tier. This is based on the SKU name.
+              enum:
+              - Standard
+              - Premium
+              x-ms-enum:
+                name: SkuTier
+                modelAsString: false
+          required:
+          - name
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    FileShare:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        etag:
+          type: string
+          readOnly: true
+          description: Resource Etag.
+        properties:
+          x-ms-client-flatten: true
+          x-ms-client-name: FileShareProperties
+          description: Properties of the file share.
+          properties:
+            lastModifiedTime:
+              type: string
+              format: date-time
+              readOnly: true
+              description: Returns the date and time the share was last modified.
+            metadata:
+              type: object
+              additionalProperties:
+                type: string
+              description: A name-value pair to associate with the share as metadata.
+            shareQuota:
+              type: integer
+              minimum: 1
+              maximum: 102400
+              description: The maximum size of the share, in gigabytes. Must be greater
+                than 0, and less than or equal to 5TB (5120). For Large File Shares,
+                the maximum size is 102400.
+            enabledProtocols:
+              type: string
+              enum:
+              - SMB
+              - NFS
+              x-ms-enum:
+                name: EnabledProtocols
+                modelAsString: true
+              description: The authentication protocol that is used for the file share.
+                Can only be specified when creating a share.
+              x-ms-mutability:
+              - create
+              - read
+            rootSquash:
+              type: string
+              enum:
+              - NoRootSquash
+              - RootSquash
+              - AllSquash
+              x-ms-enum:
+                name: RootSquashType
+                modelAsString: true
+              description: The property is for NFS share only. The default is NoRootSquash.
+            version:
+              type: string
+              readOnly: true
+              description: The version of the share.
+            deleted:
+              type: boolean
+              readOnly: true
+              description: Indicates whether the share was deleted.
+            deletedTime:
+              type: string
+              format: date-time
+              readOnly: true
+              description: The deleted time if the share was deleted.
+            remainingRetentionDays:
+              type: integer
+              readOnly: true
+              description: Remaining retention days for share that was soft deleted.
+            accessTier:
+              type: string
+              enum:
+              - TransactionOptimized
+              - Hot
+              - Cool
+              - Premium
+              x-ms-enum:
+                name: ShareAccessTier
+                modelAsString: true
+              description: Access tier for specific share. GpV2 account can choose
+                between TransactionOptimized (default), Hot, and Cool. FileStorage
+                account can choose Premium.
+            accessTierChangeTime:
+              type: string
+              format: date-time
+              readOnly: true
+              description: Indicates the last modification time for share access tier.
+            accessTierStatus:
+              type: string
+              readOnly: true
+              description: Indicates if there is a pending transition for access tier.
+            shareUsageBytes:
+              type: integer
+              format: int64
+              readOnly: true
+              description: The approximate size of the data stored on the share. Note
+                that this value may not include all recently created or recently resized
+                files.
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+      x-ms-client-name: AzureEntityResource
+    DeletedShare:
+      properties:
+        deletedShareName:
+          type: string
+          description: Required. Identify the name of the deleted share that will
+            be restored.
+        deletedShareVersion:
+          type: string
+          description: Required. Identify the version of the deleted share that will
+            be restored.
+      required:
+      - deletedShareName
+      - deletedShareVersion
+      description: The deleted share to be restored.
+    FileShareItem:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        etag:
+          type: string
+          readOnly: true
+          description: Resource Etag.
+        properties:
+          x-ms-client-flatten: true
+          description: The file share properties be listed out.
+          properties:
+            lastModifiedTime:
+              type: string
+              format: date-time
+              readOnly: true
+              description: Returns the date and time the share was last modified.
+            metadata:
+              type: object
+              additionalProperties:
+                type: string
+              description: A name-value pair to associate with the share as metadata.
+            shareQuota:
+              type: integer
+              minimum: 1
+              maximum: 102400
+              description: The maximum size of the share, in gigabytes. Must be greater
+                than 0, and less than or equal to 5TB (5120). For Large File Shares,
+                the maximum size is 102400.
+            enabledProtocols:
+              type: string
+              enum:
+              - SMB
+              - NFS
+              x-ms-enum:
+                name: EnabledProtocols
+                modelAsString: true
+              description: The authentication protocol that is used for the file share.
+                Can only be specified when creating a share.
+              x-ms-mutability:
+              - create
+              - read
+            rootSquash:
+              type: string
+              enum:
+              - NoRootSquash
+              - RootSquash
+              - AllSquash
+              x-ms-enum:
+                name: RootSquashType
+                modelAsString: true
+              description: The property is for NFS share only. The default is NoRootSquash.
+            version:
+              type: string
+              readOnly: true
+              description: The version of the share.
+            deleted:
+              type: boolean
+              readOnly: true
+              description: Indicates whether the share was deleted.
+            deletedTime:
+              type: string
+              format: date-time
+              readOnly: true
+              description: The deleted time if the share was deleted.
+            remainingRetentionDays:
+              type: integer
+              readOnly: true
+              description: Remaining retention days for share that was soft deleted.
+            accessTier:
+              type: string
+              enum:
+              - TransactionOptimized
+              - Hot
+              - Cool
+              - Premium
+              x-ms-enum:
+                name: ShareAccessTier
+                modelAsString: true
+              description: Access tier for specific share. GpV2 account can choose
+                between TransactionOptimized (default), Hot, and Cool. FileStorage
+                account can choose Premium.
+            accessTierChangeTime:
+              type: string
+              format: date-time
+              readOnly: true
+              description: Indicates the last modification time for share access tier.
+            accessTierStatus:
+              type: string
+              readOnly: true
+              description: Indicates if there is a pending transition for access tier.
+            shareUsageBytes:
+              type: integer
+              format: int64
+              readOnly: true
+              description: The approximate size of the data stored on the share. Note
+                that this value may not include all recently created or recently resized
+                files.
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+      x-ms-client-name: AzureEntityResource
+    FileShareItems:
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+              name:
+                readOnly: true
+                type: string
+                description: The name of the resource
+              type:
+                readOnly: true
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+              etag:
+                type: string
+                readOnly: true
+                description: Resource Etag.
+              properties:
+                x-ms-client-flatten: true
+                description: The file share properties be listed out.
+                properties:
+                  lastModifiedTime:
+                    type: string
+                    format: date-time
+                    readOnly: true
+                    description: Returns the date and time the share was last modified.
+                  metadata:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: A name-value pair to associate with the share as
+                      metadata.
+                  shareQuota:
+                    type: integer
+                    minimum: 1
+                    maximum: 102400
+                    description: The maximum size of the share, in gigabytes. Must
+                      be greater than 0, and less than or equal to 5TB (5120). For
+                      Large File Shares, the maximum size is 102400.
+                  enabledProtocols:
+                    type: string
+                    enum:
+                    - SMB
+                    - NFS
+                    x-ms-enum:
+                      name: EnabledProtocols
+                      modelAsString: true
+                    description: The authentication protocol that is used for the
+                      file share. Can only be specified when creating a share.
+                    x-ms-mutability:
+                    - create
+                    - read
+                  rootSquash:
+                    type: string
+                    enum:
+                    - NoRootSquash
+                    - RootSquash
+                    - AllSquash
+                    x-ms-enum:
+                      name: RootSquashType
+                      modelAsString: true
+                    description: The property is for NFS share only. The default is
+                      NoRootSquash.
+                  version:
+                    type: string
+                    readOnly: true
+                    description: The version of the share.
+                  deleted:
+                    type: boolean
+                    readOnly: true
+                    description: Indicates whether the share was deleted.
+                  deletedTime:
+                    type: string
+                    format: date-time
+                    readOnly: true
+                    description: The deleted time if the share was deleted.
+                  remainingRetentionDays:
+                    type: integer
+                    readOnly: true
+                    description: Remaining retention days for share that was soft
+                      deleted.
+                  accessTier:
+                    type: string
+                    enum:
+                    - TransactionOptimized
+                    - Hot
+                    - Cool
+                    - Premium
+                    x-ms-enum:
+                      name: ShareAccessTier
+                      modelAsString: true
+                    description: Access tier for specific share. GpV2 account can
+                      choose between TransactionOptimized (default), Hot, and Cool.
+                      FileStorage account can choose Premium.
+                  accessTierChangeTime:
+                    type: string
+                    format: date-time
+                    readOnly: true
+                    description: Indicates the last modification time for share access
+                      tier.
+                  accessTierStatus:
+                    type: string
+                    readOnly: true
+                    description: Indicates if there is a pending transition for access
+                      tier.
+                  shareUsageBytes:
+                    type: integer
+                    format: int64
+                    readOnly: true
+                    description: The approximate size of the data stored on the share.
+                      Note that this value may not include all recently created or
+                      recently resized files.
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+            x-ms-client-name: AzureEntityResource
+          description: List of file shares returned.
+          readOnly: true
+        nextLink:
+          type: string
+          description: Request URL that can be used to query next page of shares.
+            Returned when total number of requested shares exceed maximum page size.
+          readOnly: true
+      description: Response schema. Contains list of shares returned, and if paging
+        is requested or required, a URL to next page of shares.
+    FileShareProperties:
+      properties:
+        lastModifiedTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Returns the date and time the share was last modified.
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+          description: A name-value pair to associate with the share as metadata.
+        shareQuota:
+          type: integer
+          minimum: 1
+          maximum: 102400
+          description: The maximum size of the share, in gigabytes. Must be greater
+            than 0, and less than or equal to 5TB (5120). For Large File Shares, the
+            maximum size is 102400.
+        enabledProtocols:
+          type: string
+          enum:
+          - SMB
+          - NFS
+          x-ms-enum:
+            name: EnabledProtocols
+            modelAsString: true
+          description: The authentication protocol that is used for the file share.
+            Can only be specified when creating a share.
+          x-ms-mutability:
+          - create
+          - read
+        rootSquash:
+          type: string
+          enum:
+          - NoRootSquash
+          - RootSquash
+          - AllSquash
+          x-ms-enum:
+            name: RootSquashType
+            modelAsString: true
+          description: The property is for NFS share only. The default is NoRootSquash.
+        version:
+          type: string
+          readOnly: true
+          description: The version of the share.
+        deleted:
+          type: boolean
+          readOnly: true
+          description: Indicates whether the share was deleted.
+        deletedTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The deleted time if the share was deleted.
+        remainingRetentionDays:
+          type: integer
+          readOnly: true
+          description: Remaining retention days for share that was soft deleted.
+        accessTier:
+          type: string
+          enum:
+          - TransactionOptimized
+          - Hot
+          - Cool
+          - Premium
+          x-ms-enum:
+            name: ShareAccessTier
+            modelAsString: true
+          description: Access tier for specific share. GpV2 account can choose between
+            TransactionOptimized (default), Hot, and Cool. FileStorage account can
+            choose Premium.
+        accessTierChangeTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Indicates the last modification time for share access tier.
+        accessTierStatus:
+          type: string
+          readOnly: true
+          description: Indicates if there is a pending transition for access tier.
+        shareUsageBytes:
+          type: integer
+          format: int64
+          readOnly: true
+          description: The approximate size of the data stored on the share. Note
+            that this value may not include all recently created or recently resized
+            files.
+      description: The properties of the file share.
+    CloudError:
+      x-ms-external: true
+      properties:
+        error:
+          x-ms-external: true
+          properties:
+            code:
+              type: string
+              description: An identifier for the error. Codes are invariant and are
+                intended to be consumed programmatically.
+            message:
+              type: string
+              description: A message describing the error, intended to be suitable
+                for display in a user interface.
+            target:
+              type: string
+              description: The target of the particular error. For example, the name
+                of the property in error.
+            details:
+              type: array
+              items:
+                x-ms-external: true
+                properties:
+                  code:
+                    type: string
+                    description: An identifier for the error. Codes are invariant
+                      and are intended to be consumed programmatically.
+                  message:
+                    type: string
+                    description: A message describing the error, intended to be suitable
+                      for display in a user interface.
+                  target:
+                    type: string
+                    description: The target of the particular error. For example,
+                      the name of the property in error.
+                  details:
+                    type: array
+                    items:
+                      x-ms-external: true
+                      properties:
+                        code:
+                          type: string
+                          description: An identifier for the error. Codes are invariant
+                            and are intended to be consumed programmatically.
+                        message:
+                          type: string
+                          description: A message describing the error, intended to
+                            be suitable for display in a user interface.
+                        target:
+                          type: string
+                          description: The target of the particular error. For example,
+                            the name of the property in error.
+                      description: An error response from the Storage service.
+                    description: A list of additional details about the error.
+                description: An error response from the Storage service.
+              description: A list of additional details about the error.
+          description: An error response from the Storage service.
+      description: An error response from the Storage service.
+    CloudErrorBody:
+      x-ms-external: true
+      properties:
+        code:
+          type: string
+          description: An identifier for the error. Codes are invariant and are intended
+            to be consumed programmatically.
+        message:
+          type: string
+          description: A message describing the error, intended to be suitable for
+            display in a user interface.
+        target:
+          type: string
+          description: The target of the particular error. For example, the name of
+            the property in error.
+        details:
+          type: array
+          items:
+            x-ms-external: true
+            properties:
+              code:
+                type: string
+                description: An identifier for the error. Codes are invariant and
+                  are intended to be consumed programmatically.
+              message:
+                type: string
+                description: A message describing the error, intended to be suitable
+                  for display in a user interface.
+              target:
+                type: string
+                description: The target of the particular error. For example, the
+                  name of the property in error.
+              details:
+                type: array
+                items:
+                  x-ms-external: true
+                  properties:
+                    code:
+                      type: string
+                      description: An identifier for the error. Codes are invariant
+                        and are intended to be consumed programmatically.
+                    message:
+                      type: string
+                      description: A message describing the error, intended to be
+                        suitable for display in a user interface.
+                    target:
+                      type: string
+                      description: The target of the particular error. For example,
+                        the name of the property in error.
+                  description: An error response from the Storage service.
+                description: A list of additional details about the error.
+            description: An error response from the Storage service.
+          description: A list of additional details about the error.
+      description: An error response from the Storage service.
+    Resource:
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      x-ms-azure-resource: true
+    CorsRule:
+      properties:
+        allowedOrigins:
+          type: array
+          items:
+            type: string
+          description: Required if CorsRule element is present. A list of origin domains
+            that will be allowed via CORS, or "*" to allow all domains
+        allowedMethods:
+          type: array
+          items:
+            type: string
+            enum:
+            - DELETE
+            - GET
+            - HEAD
+            - MERGE
+            - POST
+            - OPTIONS
+            - PUT
+          description: Required if CorsRule element is present. A list of HTTP methods
+            that are allowed to be executed by the origin.
+        maxAgeInSeconds:
+          type: integer
+          description: Required if CorsRule element is present. The number of seconds
+            that the client/browser should cache a preflight response.
+        exposedHeaders:
+          type: array
+          items:
+            type: string
+          description: Required if CorsRule element is present. A list of response
+            headers to expose to CORS clients.
+        allowedHeaders:
+          type: array
+          items:
+            type: string
+          description: Required if CorsRule element is present. A list of headers
+            allowed to be part of the cross-origin request.
+      required:
+      - allowedOrigins
+      - allowedMethods
+      - maxAgeInSeconds
+      - exposedHeaders
+      - allowedHeaders
+      description: Specifies a CORS rule for the Blob service.
+    CorsRules:
+      properties:
+        corsRules:
+          type: array
+          items:
+            description: 'Specifies a CORS rule for the Blob service. '
+            properties:
+              allowedOrigins:
+                type: array
+                items:
+                  type: string
+                description: Required if CorsRule element is present. A list of origin
+                  domains that will be allowed via CORS, or "*" to allow all domains
+              allowedMethods:
+                type: array
+                items:
+                  type: string
+                  enum:
+                  - DELETE
+                  - GET
+                  - HEAD
+                  - MERGE
+                  - POST
+                  - OPTIONS
+                  - PUT
+                description: Required if CorsRule element is present. A list of HTTP
+                  methods that are allowed to be executed by the origin.
+              maxAgeInSeconds:
+                type: integer
+                description: Required if CorsRule element is present. The number of
+                  seconds that the client/browser should cache a preflight response.
+              exposedHeaders:
+                type: array
+                items:
+                  type: string
+                description: Required if CorsRule element is present. A list of response
+                  headers to expose to CORS clients.
+              allowedHeaders:
+                type: array
+                items:
+                  type: string
+                description: Required if CorsRule element is present. A list of headers
+                  allowed to be part of the cross-origin request.
+            required:
+            - allowedOrigins
+            - allowedMethods
+            - maxAgeInSeconds
+            - exposedHeaders
+            - allowedHeaders
+          description: 'The List of CORS rules. You can include up to five CorsRule
+            elements in the request. '
+      description: 'Sets the CORS rules. You can include up to five CorsRule elements
+        in the request. '
+    DeleteRetentionPolicy:
+      properties:
+        enabled:
+          type: boolean
+          description: Indicates whether DeleteRetentionPolicy is enabled.
+        days:
+          type: integer
+          minimum: 1
+          maximum: 365
+          description: Indicates the number of days that the deleted item should be
+            retained. The minimum specified value can be 1 and the maximum value can
+            be 365.
+      description: The service properties for soft delete.
+    SkuName:
+      type: string
+      description: The SKU name. Required for account creation; optional for update.
+        Note that in older versions, SKU name was called accountType.
+      enum:
+      - Standard_LRS
+      - Standard_GRS
+      - Standard_RAGRS
+      - Standard_ZRS
+      - Premium_LRS
+      - Premium_ZRS
+      - Standard_GZRS
+      - Standard_RAGZRS
+      x-ms-enum:
+        name: SkuName
+        modelAsString: true
+    Tier:
+      readOnly: true
+      type: string
+      description: The SKU tier. This is based on the SKU name.
+      enum:
+      - Standard
+      - Premium
+      x-ms-enum:
+        name: SkuTier
+        modelAsString: false
+    Sku:
+      properties:
+        name:
+          type: string
+          description: The SKU name. Required for account creation; optional for update.
+            Note that in older versions, SKU name was called accountType.
+          enum:
+          - Standard_LRS
+          - Standard_GRS
+          - Standard_RAGRS
+          - Standard_ZRS
+          - Premium_LRS
+          - Premium_ZRS
+          - Standard_GZRS
+          - Standard_RAGZRS
+          x-ms-enum:
+            name: SkuName
+            modelAsString: true
+        tier:
+          readOnly: true
+          type: string
+          description: The SKU tier. This is based on the SKU name.
+          enum:
+          - Standard
+          - Premium
+          x-ms-enum:
+            name: SkuTier
+            modelAsString: false
+      required:
+      - name
+      description: The SKU of the storage account.
+    AzureEntityResource:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        etag:
+          type: string
+          readOnly: true
+          description: Resource Etag.
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+      x-ms-client-name: AzureEntityResource

@@ -1,0 +1,1416 @@
+openapi: 3.0.0
+info:
+  version: v2.1
+  title: ApplicationInsightsClient
+  description: This document describes the protocol for client requests and responses
+    to the data collection endpoint.
+servers:
+- url: '{Host}/v2.1'
+  variables:
+    Host:
+      description: 'Breeze endpoint: https://dc.services.visualstudio.com'
+      x-ms-parameter-location: client
+      default: https://dc.services.visualstudio.com
+      x-ms-skip-url-encoding: true
+paths:
+  /track:
+    post:
+      summary: Track telemetry events
+      description: This operation sends a sequence of telemetry events that will be
+        monitored by Azure Monitor.
+      operationId: track
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                x-ms-client-name: TelemetryItem
+                description: System variables for a telemetry item.
+                type: object
+                required:
+                - name
+                - time
+                properties:
+                  ver:
+                    type: number
+                    x-ms-client-name: version
+                    format: int32
+                    default: 1
+                    description: 'Envelope version. For internal use only. By assigning
+                      this the default, it will not be serialized within the payload
+                      unless changed to a value other than #1.'
+                  name:
+                    type: string
+                    description: Type name of telemetry data item.
+                  time:
+                    type: string
+                    format: date-time
+                    description: 'Event date time when telemetry item was created.
+                      This is the wall clock time on the client when the event was
+                      generated. There is no guarantee that the client''s time is
+                      accurate. This field must be formatted in UTC ISO 8601 format,
+                      with a trailing ''Z'' character, as described publicly on https://en.wikipedia.org/wiki/ISO_8601#UTC.
+                      Note: the number of decimal seconds digits provided are variable
+                      (and unspecified). Consumers should handle this, i.e. managed
+                      code consumers should not use format ''O'' for parsing as it
+                      specifies a fixed length. Example: 2009-06-15T13:45:30.0000000Z.'
+                  sampleRate:
+                    type: number
+                    format: float
+                    default: 100
+                    description: Sampling rate used in application. This telemetry
+                      item represents 100 / sampleRate actual telemetry items.
+                  seq:
+                    type: string
+                    x-ms-client-name: sequence
+                    maxLength: 64
+                    description: Sequence field used to track absolute order of uploaded
+                      events.
+                  iKey:
+                    type: string
+                    x-ms-client-name: instrumentationKey
+                    description: The instrumentation key of the Application Insights
+                      resource.
+                  tags:
+                    type: object
+                    description: Key/value collection of context properties. See ContextTagKeys
+                      for information on available properties.
+                    additionalProperties:
+                      type: string
+                  data:
+                    description: Telemetry data item.
+                    x-ms-client-name: MonitorBase
+                    type: object
+                    properties:
+                      baseType:
+                        type: string
+                        description: Name of item (B section) if any. If telemetry
+                          data is derived straight from this, this should be null.
+                      baseData:
+                        description: The data payload for the telemetry request
+                        x-ms-client-name: MonitorDomain
+                        type: object
+                        required:
+                        - ver
+                        additionalProperties: true
+                        properties:
+                          ver:
+                            x-ms-client-name: version
+                            type: integer
+                            format: int32
+                            description: Schema version
+                            default: 2
+          x-json-stream:
+            schema:
+              type: array
+              items:
+                x-ms-client-name: TelemetryItem
+                description: System variables for a telemetry item.
+                type: object
+                required:
+                - name
+                - time
+                properties:
+                  ver:
+                    type: number
+                    x-ms-client-name: version
+                    format: int32
+                    default: 1
+                    description: 'Envelope version. For internal use only. By assigning
+                      this the default, it will not be serialized within the payload
+                      unless changed to a value other than #1.'
+                  name:
+                    type: string
+                    description: Type name of telemetry data item.
+                  time:
+                    type: string
+                    format: date-time
+                    description: 'Event date time when telemetry item was created.
+                      This is the wall clock time on the client when the event was
+                      generated. There is no guarantee that the client''s time is
+                      accurate. This field must be formatted in UTC ISO 8601 format,
+                      with a trailing ''Z'' character, as described publicly on https://en.wikipedia.org/wiki/ISO_8601#UTC.
+                      Note: the number of decimal seconds digits provided are variable
+                      (and unspecified). Consumers should handle this, i.e. managed
+                      code consumers should not use format ''O'' for parsing as it
+                      specifies a fixed length. Example: 2009-06-15T13:45:30.0000000Z.'
+                  sampleRate:
+                    type: number
+                    format: float
+                    default: 100
+                    description: Sampling rate used in application. This telemetry
+                      item represents 100 / sampleRate actual telemetry items.
+                  seq:
+                    type: string
+                    x-ms-client-name: sequence
+                    maxLength: 64
+                    description: Sequence field used to track absolute order of uploaded
+                      events.
+                  iKey:
+                    type: string
+                    x-ms-client-name: instrumentationKey
+                    description: The instrumentation key of the Application Insights
+                      resource.
+                  tags:
+                    type: object
+                    description: Key/value collection of context properties. See ContextTagKeys
+                      for information on available properties.
+                    additionalProperties:
+                      type: string
+                  data:
+                    description: Telemetry data item.
+                    x-ms-client-name: MonitorBase
+                    type: object
+                    properties:
+                      baseType:
+                        type: string
+                        description: Name of item (B section) if any. If telemetry
+                          data is derived straight from this, this should be null.
+                      baseData:
+                        description: The data payload for the telemetry request
+                        x-ms-client-name: MonitorDomain
+                        type: object
+                        required:
+                        - ver
+                        additionalProperties: true
+                        properties:
+                          ver:
+                            x-ms-client-name: version
+                            type: integer
+                            format: int32
+                            description: Schema version
+                            default: 2
+        description: The list of telemetry events to track.
+        required: true
+      responses:
+        '200':
+          description: All of the telemetry items were accepted and processed.
+          content:
+            application/json:
+              schema:
+                description: Response containing the status of each telemetry item.
+                type: object
+                properties:
+                  itemsReceived:
+                    type: number
+                    format: int32
+                    description: The number of items received.
+                  itemsAccepted:
+                    type: number
+                    format: int32
+                    description: The number of items accepted.
+                  errors:
+                    type: array
+                    description: An array of error detail objects.
+                    items:
+                      x-ms-client-name: TelemetryErrorDetails
+                      description: The error details
+                      type: object
+                      properties:
+                        index:
+                          type: number
+                          format: int32
+                          description: The index in the original payload of the item.
+                        statusCode:
+                          type: number
+                          format: int32
+                          description: The item specific [HTTP Response status code](#Response
+                            Status Codes).
+                        message:
+                          type: string
+                          description: The error message.
+        '206':
+          description: Partial success. Some of the telemetry items were accepted
+            and processed.
+          content:
+            application/json:
+              schema:
+                description: Response containing the status of each telemetry item.
+                type: object
+                properties:
+                  itemsReceived:
+                    type: number
+                    format: int32
+                    description: The number of items received.
+                  itemsAccepted:
+                    type: number
+                    format: int32
+                    description: The number of items accepted.
+                  errors:
+                    type: array
+                    description: An array of error detail objects.
+                    items:
+                      x-ms-client-name: TelemetryErrorDetails
+                      description: The error details
+                      type: object
+                      properties:
+                        index:
+                          type: number
+                          format: int32
+                          description: The index in the original payload of the item.
+                        statusCode:
+                          type: number
+                          format: int32
+                          description: The item specific [HTTP Response status code](#Response
+                            Status Codes).
+                        message:
+                          type: string
+                          description: The error message.
+        '400':
+          description: Bad Request
+          x-ms-error-response: true
+          content:
+            application/json:
+              schema:
+                description: Response containing the status of each telemetry item.
+                type: object
+                properties:
+                  itemsReceived:
+                    type: number
+                    format: int32
+                    description: The number of items received.
+                  itemsAccepted:
+                    type: number
+                    format: int32
+                    description: The number of items accepted.
+                  errors:
+                    type: array
+                    description: An array of error detail objects.
+                    items:
+                      x-ms-client-name: TelemetryErrorDetails
+                      description: The error details
+                      type: object
+                      properties:
+                        index:
+                          type: number
+                          format: int32
+                          description: The index in the original payload of the item.
+                        statusCode:
+                          type: number
+                          format: int32
+                          description: The item specific [HTTP Response status code](#Response
+                            Status Codes).
+                        message:
+                          type: string
+                          description: The error message.
+        '402':
+          description: Payment Required
+          x-ms-error-response: true
+          content:
+            application/json:
+              schema:
+                description: Response containing the status of each telemetry item.
+                type: object
+                properties:
+                  itemsReceived:
+                    type: number
+                    format: int32
+                    description: The number of items received.
+                  itemsAccepted:
+                    type: number
+                    format: int32
+                    description: The number of items accepted.
+                  errors:
+                    type: array
+                    description: An array of error detail objects.
+                    items:
+                      x-ms-client-name: TelemetryErrorDetails
+                      description: The error details
+                      type: object
+                      properties:
+                        index:
+                          type: number
+                          format: int32
+                          description: The index in the original payload of the item.
+                        statusCode:
+                          type: number
+                          format: int32
+                          description: The item specific [HTTP Response status code](#Response
+                            Status Codes).
+                        message:
+                          type: string
+                          description: The error message.
+        '429':
+          description: Too Many Requests
+          x-ms-error-response: true
+          content:
+            application/json:
+              schema:
+                description: Response containing the status of each telemetry item.
+                type: object
+                properties:
+                  itemsReceived:
+                    type: number
+                    format: int32
+                    description: The number of items received.
+                  itemsAccepted:
+                    type: number
+                    format: int32
+                    description: The number of items accepted.
+                  errors:
+                    type: array
+                    description: An array of error detail objects.
+                    items:
+                      x-ms-client-name: TelemetryErrorDetails
+                      description: The error details
+                      type: object
+                      properties:
+                        index:
+                          type: number
+                          format: int32
+                          description: The index in the original payload of the item.
+                        statusCode:
+                          type: number
+                          format: int32
+                          description: The item specific [HTTP Response status code](#Response
+                            Status Codes).
+                        message:
+                          type: string
+                          description: The error message.
+        '500':
+          description: Internal Server Error
+          x-ms-error-response: true
+          content:
+            application/json:
+              schema:
+                description: Response containing the status of each telemetry item.
+                type: object
+                properties:
+                  itemsReceived:
+                    type: number
+                    format: int32
+                    description: The number of items received.
+                  itemsAccepted:
+                    type: number
+                    format: int32
+                    description: The number of items accepted.
+                  errors:
+                    type: array
+                    description: An array of error detail objects.
+                    items:
+                      x-ms-client-name: TelemetryErrorDetails
+                      description: The error details
+                      type: object
+                      properties:
+                        index:
+                          type: number
+                          format: int32
+                          description: The index in the original payload of the item.
+                        statusCode:
+                          type: number
+                          format: int32
+                          description: The item specific [HTTP Response status code](#Response
+                            Status Codes).
+                        message:
+                          type: string
+                          description: The error message.
+        '503':
+          description: Service Unavailable
+          x-ms-error-response: true
+          content:
+            application/json:
+              schema:
+                description: Response containing the status of each telemetry item.
+                type: object
+                properties:
+                  itemsReceived:
+                    type: number
+                    format: int32
+                    description: The number of items received.
+                  itemsAccepted:
+                    type: number
+                    format: int32
+                    description: The number of items accepted.
+                  errors:
+                    type: array
+                    description: An array of error detail objects.
+                    items:
+                      x-ms-client-name: TelemetryErrorDetails
+                      description: The error details
+                      type: object
+                      properties:
+                        index:
+                          type: number
+                          format: int32
+                          description: The index in the original payload of the item.
+                        statusCode:
+                          type: number
+                          format: int32
+                          description: The item specific [HTTP Response status code](#Response
+                            Status Codes).
+                        message:
+                          type: string
+                          description: The error message.
+components:
+  parameters:
+    Host:
+      name: Host
+      description: 'Breeze endpoint: https://dc.services.visualstudio.com'
+      x-ms-parameter-location: client
+      required: true
+      in: path
+      x-ms-skip-url-encoding: true
+      schema:
+        type: string
+        default: https://dc.services.visualstudio.com
+  schemas:
+    AvailabilityData:
+      type: object
+      properties:
+        ver:
+          x-ms-client-name: version
+          type: integer
+          format: int32
+          description: Schema version
+          default: 2
+        id:
+          type: string
+          description: Identifier of a test run. Use it to correlate steps of test
+            run and telemetry generated by the service.
+          maxLength: 512
+        name:
+          type: string
+          description: Name of the test that these availability results represent.
+          maxLength: 1024
+        duration:
+          type: string
+          description: 'Duration in format: DD.HH:MM:SS.MMMMMM. Must be less than
+            1000 days.'
+        success:
+          type: boolean
+          description: Success flag.
+          nullable: false
+        runLocation:
+          type: string
+          description: Name of the location where the test was run from.
+          maxLength: 1024
+        message:
+          type: string
+          description: Diagnostic message for the result.
+          maxLength: 8192
+        properties:
+          type: object
+          description: Collection of custom properties.
+          additionalProperties:
+            type: string
+            maxLength: 8192
+        measurements:
+          type: object
+          description: Collection of custom measurements.
+          additionalProperties:
+            type: number
+            format: double
+      required:
+      - ver
+      - id
+      - name
+      - duration
+      - success
+      additionalProperties: true
+      description: The abstract common base of all domains.
+      x-ms-client-name: MonitorDomain
+    Base:
+      x-ms-client-name: MonitorBase
+      type: object
+      description: Data struct to contain only C section with custom fields.
+      properties:
+        baseType:
+          type: string
+          description: Name of item (B section) if any. If telemetry data is derived
+            straight from this, this should be null.
+        baseData:
+          description: The data payload for the telemetry request
+          x-ms-client-name: MonitorDomain
+          type: object
+          required:
+          - ver
+          additionalProperties: true
+          properties:
+            ver:
+              x-ms-client-name: version
+              type: integer
+              format: int32
+              description: Schema version
+              default: 2
+    DataPoint:
+      x-ms-client-name: MetricDataPoint
+      type: object
+      description: Metric data single measurement.
+      required:
+      - name
+      - value
+      properties:
+        ns:
+          x-ms-client-name: namespace
+          type: string
+          description: Namespace of the metric.
+          maxLength: 256
+        name:
+          type: string
+          description: Name of the metric.
+          maxLength: 1024
+        kind:
+          x-ms-client-name: dataPointType
+          description: Metric type. Single measurement or the aggregated value.
+          type: string
+          enum:
+          - Measurement
+          - Aggregation
+        value:
+          type: number
+          description: Single value for measurement. Sum of individual measurements
+            for the aggregation.
+          format: double
+        count:
+          type: number
+          format: int32
+          description: Metric weight of the aggregated metric. Should not be set for
+            a measurement.
+          nullable: true
+        min:
+          type: number
+          format: double
+          description: Minimum value of the aggregated metric. Should not be set for
+            a measurement.
+          nullable: true
+        max:
+          type: number
+          format: double
+          description: Maximum value of the aggregated metric. Should not be set for
+            a measurement.
+          nullable: true
+        stdDev:
+          type: number
+          format: double
+          description: Standard deviation of the aggregated metric. Should not be
+            set for a measurement.
+          nullable: true
+    DataPointType:
+      type: string
+      description: Type of the metric data measurement.
+      enum:
+      - Measurement
+      - Aggregation
+    Domain:
+      x-ms-client-name: MonitorDomain
+      type: object
+      description: The abstract common base of all domains.
+      required:
+      - ver
+      additionalProperties: true
+      properties:
+        ver:
+          x-ms-client-name: version
+          type: integer
+          format: int32
+          description: Schema version
+          default: 2
+    EventData:
+      type: object
+      properties:
+        ver:
+          x-ms-client-name: version
+          type: integer
+          format: int32
+          description: Schema version
+          default: 2
+        name:
+          type: string
+          description: Event name. Keep it low cardinality to allow proper grouping
+            and useful metrics.
+          maxLength: 512
+        properties:
+          type: object
+          description: Collection of custom properties.
+          additionalProperties:
+            type: string
+            maxLength: 8192
+        measurements:
+          type: object
+          description: Collection of custom measurements.
+          additionalProperties:
+            type: number
+            format: double
+      required:
+      - ver
+      - name
+      additionalProperties: true
+      description: The abstract common base of all domains.
+      x-ms-client-name: MonitorDomain
+    ExceptionData:
+      type: object
+      properties:
+        ver:
+          x-ms-client-name: version
+          type: integer
+          format: int32
+          description: Schema version
+          default: 2
+        exceptions:
+          type: array
+          description: Exception chain - list of inner exceptions.
+          items:
+            x-ms-client-name: TelemetryExceptionDetails
+            type: object
+            description: Exception details of the exception in a chain.
+            required:
+            - message
+            properties:
+              id:
+                type: number
+                format: int32
+                description: In case exception is nested (outer exception contains
+                  inner one), the id and outerId properties are used to represent
+                  the nesting.
+              outerId:
+                type: number
+                format: int32
+                description: The value of outerId is a reference to an element in
+                  ExceptionDetails that represents the outer exception
+              typeName:
+                type: string
+                description: Exception type name.
+                maxLength: 1024
+              message:
+                type: string
+                description: Exception message.
+                maxLength: 32768
+              hasFullStack:
+                type: boolean
+                default: true
+                description: Indicates if full exception stack is provided in the
+                  exception. The stack may be trimmed, such as in the case of a StackOverflow
+                  exception.
+              stack:
+                type: string
+                description: Text describing the stack. Either stack or parsedStack
+                  should have a value.
+                maxLength: 32768
+              parsedStack:
+                type: array
+                description: List of stack frames. Either stack or parsedStack should
+                  have a value.
+                items:
+                  type: object
+                  description: Stack frame information.
+                  required:
+                  - level
+                  - method
+                  properties:
+                    level:
+                      type: number
+                      format: int32
+                      description: ''
+                    method:
+                      type: string
+                      description: Method name.
+                      maxLength: 1024
+                    assembly:
+                      type: string
+                      description: Name of the assembly (dll, jar, etc.) containing
+                        this function.
+                      maxLength: 1024
+                    fileName:
+                      type: string
+                      description: File name or URL of the method implementation.
+                      maxLength: 1024
+                    line:
+                      type: number
+                      format: int32
+                      description: Line number of the code implementation.
+        severityLevel:
+          description: Severity level. Mostly used to indicate exception severity
+            level when it is reported by logging library.
+          type: string
+          enum:
+          - Verbose
+          - Information
+          - Warning
+          - Error
+          - Critical
+          nullable: true
+        problemId:
+          type: string
+          description: Identifier of where the exception was thrown in code. Used
+            for exceptions grouping. Typically a combination of exception type and
+            a function from the call stack.
+          maxLength: 1024
+        properties:
+          type: object
+          description: Collection of custom properties.
+          additionalProperties:
+            type: string
+            maxLength: 8192
+        measurements:
+          type: object
+          description: Collection of custom measurements.
+          additionalProperties:
+            type: number
+            format: double
+      required:
+      - ver
+      - exceptions
+      additionalProperties: true
+      description: The abstract common base of all domains.
+      x-ms-client-name: MonitorDomain
+    ExceptionDetails:
+      x-ms-client-name: TelemetryExceptionDetails
+      type: object
+      description: Exception details of the exception in a chain.
+      required:
+      - message
+      properties:
+        id:
+          type: number
+          format: int32
+          description: In case exception is nested (outer exception contains inner
+            one), the id and outerId properties are used to represent the nesting.
+        outerId:
+          type: number
+          format: int32
+          description: The value of outerId is a reference to an element in ExceptionDetails
+            that represents the outer exception
+        typeName:
+          type: string
+          description: Exception type name.
+          maxLength: 1024
+        message:
+          type: string
+          description: Exception message.
+          maxLength: 32768
+        hasFullStack:
+          type: boolean
+          default: true
+          description: Indicates if full exception stack is provided in the exception.
+            The stack may be trimmed, such as in the case of a StackOverflow exception.
+        stack:
+          type: string
+          description: Text describing the stack. Either stack or parsedStack should
+            have a value.
+          maxLength: 32768
+        parsedStack:
+          type: array
+          description: List of stack frames. Either stack or parsedStack should have
+            a value.
+          items:
+            type: object
+            description: Stack frame information.
+            required:
+            - level
+            - method
+            properties:
+              level:
+                type: number
+                format: int32
+                description: ''
+              method:
+                type: string
+                description: Method name.
+                maxLength: 1024
+              assembly:
+                type: string
+                description: Name of the assembly (dll, jar, etc.) containing this
+                  function.
+                maxLength: 1024
+              fileName:
+                type: string
+                description: File name or URL of the method implementation.
+                maxLength: 1024
+              line:
+                type: number
+                format: int32
+                description: Line number of the code implementation.
+    MessageData:
+      type: object
+      properties:
+        ver:
+          x-ms-client-name: version
+          type: integer
+          format: int32
+          description: Schema version
+          default: 2
+        message:
+          type: string
+          description: Trace message
+          maxLength: 32768
+        severityLevel:
+          description: Trace severity level.
+          type: string
+          enum:
+          - Verbose
+          - Information
+          - Warning
+          - Error
+          - Critical
+        properties:
+          type: object
+          description: Collection of custom properties.
+          additionalProperties:
+            type: string
+            maxLength: 8192
+        measurements:
+          type: object
+          description: Collection of custom measurements.
+          additionalProperties:
+            type: number
+            format: double
+      required:
+      - ver
+      - message
+      additionalProperties: true
+      description: The abstract common base of all domains.
+      x-ms-client-name: MonitorDomain
+    MetricsData:
+      type: object
+      properties:
+        ver:
+          x-ms-client-name: version
+          type: integer
+          format: int32
+          description: Schema version
+          default: 2
+        metrics:
+          type: array
+          description: List of metrics. Only one metric in the list is currently supported
+            by Application Insights storage. If multiple data points were sent only
+            the first one will be used.
+          items:
+            x-ms-client-name: MetricDataPoint
+            type: object
+            description: Metric data single measurement.
+            required:
+            - name
+            - value
+            properties:
+              ns:
+                x-ms-client-name: namespace
+                type: string
+                description: Namespace of the metric.
+                maxLength: 256
+              name:
+                type: string
+                description: Name of the metric.
+                maxLength: 1024
+              kind:
+                x-ms-client-name: dataPointType
+                description: Metric type. Single measurement or the aggregated value.
+                type: string
+                enum:
+                - Measurement
+                - Aggregation
+              value:
+                type: number
+                description: Single value for measurement. Sum of individual measurements
+                  for the aggregation.
+                format: double
+              count:
+                type: number
+                format: int32
+                description: Metric weight of the aggregated metric. Should not be
+                  set for a measurement.
+                nullable: true
+              min:
+                type: number
+                format: double
+                description: Minimum value of the aggregated metric. Should not be
+                  set for a measurement.
+                nullable: true
+              max:
+                type: number
+                format: double
+                description: Maximum value of the aggregated metric. Should not be
+                  set for a measurement.
+                nullable: true
+              stdDev:
+                type: number
+                format: double
+                description: Standard deviation of the aggregated metric. Should not
+                  be set for a measurement.
+                nullable: true
+        properties:
+          type: object
+          description: Collection of custom properties.
+          additionalProperties:
+            type: string
+            maxLength: 8192
+      required:
+      - ver
+      - metrics
+      additionalProperties: true
+      description: The abstract common base of all domains.
+      x-ms-client-name: MonitorDomain
+    PageViewData:
+      type: object
+      properties:
+        ver:
+          x-ms-client-name: version
+          type: integer
+          format: int32
+          description: Schema version
+          default: 2
+        id:
+          type: string
+          description: Identifier of a page view instance. Used for correlation between
+            page view and other telemetry items.
+          maxLength: 512
+        name:
+          type: string
+          description: Event name. Keep it low cardinality to allow proper grouping
+            and useful metrics.
+          maxLength: 1024
+        url:
+          type: string
+          description: Request URL with all query string parameters
+          maxLength: 2048
+        duration:
+          type: string
+          description: 'Request duration in format: DD.HH:MM:SS.MMMMMM. For a page
+            view (PageViewData), this is the duration. For a page view with performance
+            information (PageViewPerfData), this is the page load time. Must be less
+            than 1000 days.'
+        referredUri:
+          type: string
+          description: Fully qualified page URI or URL of the referring page; if unknown,
+            leave blank
+          maxLength: 2048
+        properties:
+          type: object
+          description: Collection of custom properties.
+          additionalProperties:
+            type: string
+            maxLength: 8192
+        measurements:
+          type: object
+          description: Collection of custom measurements.
+          additionalProperties:
+            type: number
+            format: double
+      required:
+      - ver
+      - id
+      - name
+      additionalProperties: true
+      description: The abstract common base of all domains.
+      x-ms-client-name: MonitorDomain
+    PageViewPerfData:
+      type: object
+      properties:
+        ver:
+          x-ms-client-name: version
+          type: integer
+          format: int32
+          description: Schema version
+          default: 2
+        id:
+          type: string
+          description: Identifier of a page view instance. Used for correlation between
+            page view and other telemetry items.
+          maxLength: 512
+        name:
+          type: string
+          description: Event name. Keep it low cardinality to allow proper grouping
+            and useful metrics.
+          maxLength: 1024
+        url:
+          type: string
+          description: Request URL with all query string parameters
+          maxLength: 2048
+        duration:
+          type: string
+          description: 'Request duration in format: DD.HH:MM:SS.MMMMMM. For a page
+            view (PageViewData), this is the duration. For a page view with performance
+            information (PageViewPerfData), this is the page load time. Must be less
+            than 1000 days.'
+        perfTotal:
+          type: string
+          description: 'Performance total in TimeSpan ''G'' (general long) format:
+            d:hh:mm:ss.fffffff'
+        networkConnect:
+          type: string
+          description: 'Network connection time in TimeSpan ''G'' (general long) format:
+            d:hh:mm:ss.fffffff'
+        sentRequest:
+          type: string
+          description: 'Sent request time in TimeSpan ''G'' (general long) format:
+            d:hh:mm:ss.fffffff'
+        receivedResponse:
+          type: string
+          description: 'Received response time in TimeSpan ''G'' (general long) format:
+            d:hh:mm:ss.fffffff'
+        domProcessing:
+          type: string
+          description: 'DOM processing time in TimeSpan ''G'' (general long) format:
+            d:hh:mm:ss.fffffff'
+        properties:
+          type: object
+          description: Collection of custom properties.
+          additionalProperties:
+            type: string
+            maxLength: 8192
+        measurements:
+          type: object
+          description: Collection of custom measurements.
+          additionalProperties:
+            type: number
+            format: double
+      required:
+      - ver
+      - id
+      - name
+      additionalProperties: true
+      description: The abstract common base of all domains.
+      x-ms-client-name: MonitorDomain
+    RemoteDependencyData:
+      type: object
+      properties:
+        ver:
+          x-ms-client-name: version
+          type: integer
+          format: int32
+          description: Schema version
+          default: 2
+        id:
+          type: string
+          description: Identifier of a dependency call instance. Used for correlation
+            with the request telemetry item corresponding to this dependency call.
+          maxLength: 512
+        name:
+          type: string
+          description: Name of the command initiated with this dependency call. Low
+            cardinality value. Examples are stored procedure name and URL path template.
+          maxLength: 1024
+        resultCode:
+          type: string
+          description: Result code of a dependency call. Examples are SQL error code
+            and HTTP status code.
+          maxLength: 1024
+        data:
+          type: string
+          description: Command initiated by this dependency call. Examples are SQL
+            statement and HTTP URL with all query parameters.
+          maxLength: 8192
+        type:
+          type: string
+          description: Dependency type name. Very low cardinality value for logical
+            grouping of dependencies and interpretation of other fields like commandName
+            and resultCode. Examples are SQL, Azure table, and HTTP.
+          maxLength: 1024
+        target:
+          type: string
+          description: Target site of a dependency call. Examples are server name,
+            host address.
+          maxLength: 1024
+        duration:
+          type: string
+          description: 'Request duration in format: DD.HH:MM:SS.MMMMMM. Must be less
+            than 1000 days.'
+        success:
+          type: boolean
+          description: Indication of successful or unsuccessful call.
+          default: true
+        properties:
+          type: object
+          description: Collection of custom properties.
+          additionalProperties:
+            type: string
+            maxLength: 8192
+        measurements:
+          type: object
+          description: Collection of custom measurements.
+          additionalProperties:
+            type: number
+            format: double
+      required:
+      - ver
+      - name
+      - duration
+      additionalProperties: true
+      description: The abstract common base of all domains.
+      x-ms-client-name: MonitorDomain
+    RequestData:
+      type: object
+      properties:
+        ver:
+          x-ms-client-name: version
+          type: integer
+          format: int32
+          description: Schema version
+          default: 2
+        id:
+          type: string
+          description: Identifier of a request call instance. Used for correlation
+            between request and other telemetry items.
+          maxLength: 512
+        name:
+          type: string
+          description: Name of the request. Represents code path taken to process
+            request. Low cardinality value to allow better grouping of requests. For
+            HTTP requests it represents the HTTP method and URL path template like
+            'GET /values/{id}'.
+          maxLength: 1024
+        duration:
+          type: string
+          description: 'Request duration in format: DD.HH:MM:SS.MMMMMM. Must be less
+            than 1000 days.'
+        success:
+          type: boolean
+          description: Indication of successful or unsuccessful call.
+          default: true
+        responseCode:
+          type: string
+          description: Result of a request execution. HTTP status code for HTTP requests.
+          maxLength: 1024
+        source:
+          type: string
+          description: Source of the request. Examples are the instrumentation key
+            of the caller or the ip address of the caller.
+          maxLength: 1024
+        url:
+          type: string
+          description: Request URL with all query string parameters.
+          maxLength: 2048
+        properties:
+          type: object
+          description: Collection of custom properties.
+          additionalProperties:
+            type: string
+            maxLength: 8192
+        measurements:
+          type: object
+          description: Collection of custom measurements.
+          additionalProperties:
+            type: number
+            format: double
+      required:
+      - ver
+      - id
+      - duration
+      - responseCode
+      - success
+      additionalProperties: true
+      description: The abstract common base of all domains.
+      x-ms-client-name: MonitorDomain
+    SeverityLevel:
+      type: string
+      description: Defines the level of severity for the event.
+      enum:
+      - Verbose
+      - Information
+      - Warning
+      - Error
+      - Critical
+    StackFrame:
+      type: object
+      description: Stack frame information.
+      required:
+      - level
+      - method
+      properties:
+        level:
+          type: number
+          format: int32
+          description: ''
+        method:
+          type: string
+          description: Method name.
+          maxLength: 1024
+        assembly:
+          type: string
+          description: Name of the assembly (dll, jar, etc.) containing this function.
+          maxLength: 1024
+        fileName:
+          type: string
+          description: File name or URL of the method implementation.
+          maxLength: 1024
+        line:
+          type: number
+          format: int32
+          description: Line number of the code implementation.
+    TrackResponse:
+      description: Response containing the status of each telemetry item.
+      type: object
+      properties:
+        itemsReceived:
+          type: number
+          format: int32
+          description: The number of items received.
+        itemsAccepted:
+          type: number
+          format: int32
+          description: The number of items accepted.
+        errors:
+          type: array
+          description: An array of error detail objects.
+          items:
+            x-ms-client-name: TelemetryErrorDetails
+            description: The error details
+            type: object
+            properties:
+              index:
+                type: number
+                format: int32
+                description: The index in the original payload of the item.
+              statusCode:
+                type: number
+                format: int32
+                description: The item specific [HTTP Response status code](#Response
+                  Status Codes).
+              message:
+                type: string
+                description: The error message.
+    ErrorDetails:
+      x-ms-client-name: TelemetryErrorDetails
+      description: The error details
+      type: object
+      properties:
+        index:
+          type: number
+          format: int32
+          description: The index in the original payload of the item.
+        statusCode:
+          type: number
+          format: int32
+          description: The item specific [HTTP Response status code](#Response Status
+            Codes).
+        message:
+          type: string
+          description: The error message.
+    TelemetryEnvelope:
+      x-ms-client-name: TelemetryItem
+      description: System variables for a telemetry item.
+      type: object
+      required:
+      - name
+      - time
+      properties:
+        ver:
+          type: number
+          x-ms-client-name: version
+          format: int32
+          default: 1
+          description: 'Envelope version. For internal use only. By assigning this
+            the default, it will not be serialized within the payload unless changed
+            to a value other than #1.'
+        name:
+          type: string
+          description: Type name of telemetry data item.
+        time:
+          type: string
+          format: date-time
+          description: 'Event date time when telemetry item was created. This is the
+            wall clock time on the client when the event was generated. There is no
+            guarantee that the client''s time is accurate. This field must be formatted
+            in UTC ISO 8601 format, with a trailing ''Z'' character, as described
+            publicly on https://en.wikipedia.org/wiki/ISO_8601#UTC. Note: the number
+            of decimal seconds digits provided are variable (and unspecified). Consumers
+            should handle this, i.e. managed code consumers should not use format
+            ''O'' for parsing as it specifies a fixed length. Example: 2009-06-15T13:45:30.0000000Z.'
+        sampleRate:
+          type: number
+          format: float
+          default: 100
+          description: Sampling rate used in application. This telemetry item represents
+            100 / sampleRate actual telemetry items.
+        seq:
+          type: string
+          x-ms-client-name: sequence
+          maxLength: 64
+          description: Sequence field used to track absolute order of uploaded events.
+        iKey:
+          type: string
+          x-ms-client-name: instrumentationKey
+          description: The instrumentation key of the Application Insights resource.
+        tags:
+          type: object
+          description: Key/value collection of context properties. See ContextTagKeys
+            for information on available properties.
+          additionalProperties:
+            type: string
+        data:
+          description: Telemetry data item.
+          x-ms-client-name: MonitorBase
+          type: object
+          properties:
+            baseType:
+              type: string
+              description: Name of item (B section) if any. If telemetry data is derived
+                straight from this, this should be null.
+            baseData:
+              description: The data payload for the telemetry request
+              x-ms-client-name: MonitorDomain
+              type: object
+              required:
+              - ver
+              additionalProperties: true
+              properties:
+                ver:
+                  x-ms-client-name: version
+                  type: integer
+                  format: int32
+                  description: Schema version
+                  default: 2
+    ContextTagKeys:
+      type: string
+      description: The context tag keys.
+      enum:
+      - ApplicationVersion
+      - DeviceId
+      - DeviceLocale
+      - DeviceModel
+      - DeviceOEMName
+      - DeviceOSVersion
+      - DeviceType
+      - LocationIp
+      - LocationCountry
+      - LocationProvince
+      - LocationCity
+      - OperationId
+      - OperationName
+      - OperationParentId
+      - OperationSyntheticSource
+      - OperationCorrelationVector
+      - SessionId
+      - SessionIsFirst
+      - UserAccountId
+      - UserId
+      - UserAuthUserId
+      - CloudRole
+      - CloudRoleVer
+      - CloudRoleInstance
+      - CloudLocation
+      - InternalSdkVersion
+      - InternalAgentVersion
+      - 'InternalNodeName  '
+      x-ms-enum:
+        name: ContextTagKeys
+        modelAsString: true
+        values:
+        - value: ai.application.ver
+        - value: ai.device.id
+        - value: ai.device.locale
+        - value: ai.device.model
+        - value: ai.device.oemName
+        - value: ai.device.osVersion
+        - value: ai.device.type
+        - value: ai.location.ip
+        - value: ai.location.country
+        - value: ai.location.province
+        - value: ai.location.city
+        - value: ai.operation.id
+        - value: ai.operation.name
+        - value: ai.operation.parentId
+        - value: ai.operation.syntheticSource
+        - value: ai.operation.correlationVector
+        - value: ai.session.id
+        - value: ai.session.isFirst
+        - value: ai.user.accountId
+        - value: ai.user.id
+        - value: ai.user.authUserId
+        - value: ai.cloud.role
+        - value: ai.cloud.roleVer
+        - value: ai.cloud.roleInstance
+        - value: ai.cloud.location
+        - value: ai.internal.sdkVersion
+        - value: ai.internal.agentVersion
+        - value: ai.internal.nodeName

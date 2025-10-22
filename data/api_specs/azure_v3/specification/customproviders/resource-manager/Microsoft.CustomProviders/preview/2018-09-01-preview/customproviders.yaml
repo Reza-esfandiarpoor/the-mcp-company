@@ -1,0 +1,2994 @@
+openapi: 3.0.0
+info:
+  version: 2018-09-01-preview
+  title: customproviders
+  description: Allows extension of ARM control plane with custom resource providers.
+  x-ms-code-generation-settings:
+    name: CustomProvidersClient
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  /providers/Microsoft.CustomProviders/operations:
+    get:
+      tags:
+      - Operations
+      operationId: Operations_List
+      x-ms-pageable:
+        nextLinkName: nextLink
+      description: The list of operations provided by Microsoft CustomProviders.
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Describe the result of a successful operation.
+          content:
+            application/json:
+              schema:
+                description: Results of the request to list operations.
+                readOnly: true
+                properties:
+                  value:
+                    type: array
+                    items:
+                      description: Supported operations of this resource provider.
+                      readOnly: true
+                      properties:
+                        name:
+                          description: Operation name, in format of {provider}/{resource}/{operation}
+                          type: string
+                        display:
+                          description: Display metadata associated with the operation.
+                          properties:
+                            provider:
+                              description: 'Resource provider: Microsoft Custom Providers.'
+                              type: string
+                            resource:
+                              description: Resource on which the operation is performed.
+                              type: string
+                            operation:
+                              description: 'Type of operation: get, read, delete,
+                                etc.'
+                              type: string
+                            description:
+                              description: Description of this operation.
+                              type: string
+                    x-ms-identifiers:
+                    - name
+                    description: List of operations supported by this resource provider.
+                  nextLink:
+                    type: string
+                    description: The URL to use for getting the next set of results.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}
+  : put:
+      tags:
+      - CustomResourceProvider
+      operationId: CustomResourceProvider_CreateOrUpdate
+      x-ms-long-running-operation: true
+      description: Creates or updates the custom resource provider.
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID. This is a GUID-formatted string (e.g.
+          00000000-0000-0000-0000-000000000000)
+        schema:
+          type: string
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: resourceProviderName
+        in: path
+        required: true
+        description: The name of the resource provider.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 64
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  readOnly: true
+                  type: string
+                  description: Resource Id
+                name:
+                  readOnly: true
+                  type: string
+                  description: Resource name
+                type:
+                  readOnly: true
+                  type: string
+                  description: Resource type
+                location:
+                  type: string
+                  description: Resource location
+                  x-ms-mutability:
+                  - read
+                  - create
+                tags:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: Resource tags
+                properties:
+                  type: object
+                  x-ms-client-flatten: true
+                  description: The manifest for the custom resource provider
+                  properties:
+                    actions:
+                      type: array
+                      description: A list of actions that the custom resource provider
+                        implements.
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: The name of the route definition. This becomes
+                              the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                          endpoint:
+                            type: string
+                            description: The route definition endpoint URI that the
+                              custom resource provider will proxy requests to. This
+                              can be in the form of a flat URI (e.g. 'https://testendpoint/')
+                              or can specify to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                            pattern: ^https://.+
+                          routingType:
+                            type: string
+                            description: The routing types that are supported for
+                              action requests.
+                            x-ms-enum:
+                              modelAsString: true
+                              name: ActionRouting
+                            enum:
+                            - Proxy
+                        required:
+                        - name
+                        - endpoint
+                        description: A route definition that defines an action or
+                          resource that can be interacted with through the custom
+                          resource provider.
+                      x-ms-identifiers:
+                      - name
+                      - endpoint
+                    resourceTypes:
+                      type: array
+                      description: A list of resource types that the custom resource
+                        provider implements.
+                      items:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: The name of the route definition. This becomes
+                              the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                          endpoint:
+                            type: string
+                            description: The route definition endpoint URI that the
+                              custom resource provider will proxy requests to. This
+                              can be in the form of a flat URI (e.g. 'https://testendpoint/')
+                              or can specify to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                            pattern: ^https://.+
+                          routingType:
+                            type: string
+                            description: The routing types that are supported for
+                              resource requests.
+                            x-ms-enum:
+                              modelAsString: true
+                              name: ResourceTypeRouting
+                            enum:
+                            - Proxy
+                            - Proxy,Cache
+                        required:
+                        - name
+                        - endpoint
+                        description: A route definition that defines an action or
+                          resource that can be interacted with through the custom
+                          resource provider.
+                      x-ms-identifiers:
+                      - name
+                      - endpoint
+                    validations:
+                      type: array
+                      description: A list of validations to run on the custom resource
+                        provider's requests.
+                      items:
+                        description: A validation to apply on custom resource provider
+                          requests.
+                        required:
+                        - specification
+                        properties:
+                          validationType:
+                            type: string
+                            description: The type of validation to run against a matching
+                              request.
+                            x-ms-enum:
+                              modelAsString: true
+                              name: ValidationType
+                            enum:
+                            - Swagger
+                          specification:
+                            type: string
+                            description: A link to the validation specification. The
+                              specification must be hosted on raw.githubusercontent.com.
+                            pattern: ^https://raw.githubusercontent.com/.+
+                      x-ms-identifiers: []
+                    provisioningState:
+                      type: string
+                      description: The provisioning state of the resource provider.
+                      readOnly: true
+                      x-ms-enum:
+                        modelAsString: true
+                        name: ProvisioningState
+                      enum:
+                      - Accepted
+                      - Deleting
+                      - Running
+                      - Succeeded
+                      - Failed
+              required:
+              - location
+              description: The resource definition.
+              x-ms-azure-resource: true
+        description: The parameters required to create or update a custom resource
+          provider definition.
+        required: true
+      responses:
+        '200':
+          description: OK response definition. Resource already exists and the changes
+            have been accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Resource Id
+                  name:
+                    readOnly: true
+                    type: string
+                    description: Resource name
+                  type:
+                    readOnly: true
+                    type: string
+                    description: Resource type
+                  location:
+                    type: string
+                    description: Resource location
+                    x-ms-mutability:
+                    - read
+                    - create
+                  tags:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: Resource tags
+                  properties:
+                    type: object
+                    x-ms-client-flatten: true
+                    description: The manifest for the custom resource provider
+                    properties:
+                      actions:
+                        type: array
+                        description: A list of actions that the custom resource provider
+                          implements.
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: The name of the route definition. This
+                                becomes the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                            endpoint:
+                              type: string
+                              description: The route definition endpoint URI that
+                                the custom resource provider will proxy requests to.
+                                This can be in the form of a flat URI (e.g. 'https://testendpoint/')
+                                or can specify to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                              pattern: ^https://.+
+                            routingType:
+                              type: string
+                              description: The routing types that are supported for
+                                action requests.
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ActionRouting
+                              enum:
+                              - Proxy
+                          required:
+                          - name
+                          - endpoint
+                          description: A route definition that defines an action or
+                            resource that can be interacted with through the custom
+                            resource provider.
+                        x-ms-identifiers:
+                        - name
+                        - endpoint
+                      resourceTypes:
+                        type: array
+                        description: A list of resource types that the custom resource
+                          provider implements.
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: The name of the route definition. This
+                                becomes the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                            endpoint:
+                              type: string
+                              description: The route definition endpoint URI that
+                                the custom resource provider will proxy requests to.
+                                This can be in the form of a flat URI (e.g. 'https://testendpoint/')
+                                or can specify to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                              pattern: ^https://.+
+                            routingType:
+                              type: string
+                              description: The routing types that are supported for
+                                resource requests.
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ResourceTypeRouting
+                              enum:
+                              - Proxy
+                              - Proxy,Cache
+                          required:
+                          - name
+                          - endpoint
+                          description: A route definition that defines an action or
+                            resource that can be interacted with through the custom
+                            resource provider.
+                        x-ms-identifiers:
+                        - name
+                        - endpoint
+                      validations:
+                        type: array
+                        description: A list of validations to run on the custom resource
+                          provider's requests.
+                        items:
+                          description: A validation to apply on custom resource provider
+                            requests.
+                          required:
+                          - specification
+                          properties:
+                            validationType:
+                              type: string
+                              description: The type of validation to run against a
+                                matching request.
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ValidationType
+                              enum:
+                              - Swagger
+                            specification:
+                              type: string
+                              description: A link to the validation specification.
+                                The specification must be hosted on raw.githubusercontent.com.
+                              pattern: ^https://raw.githubusercontent.com/.+
+                        x-ms-identifiers: []
+                      provisioningState:
+                        type: string
+                        description: The provisioning state of the resource provider.
+                        readOnly: true
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ProvisioningState
+                        enum:
+                        - Accepted
+                        - Deleting
+                        - Running
+                        - Succeeded
+                        - Failed
+                required:
+                - location
+                description: The resource definition.
+                x-ms-azure-resource: true
+        '201':
+          description: Created response definition. Resource has been created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Resource Id
+                  name:
+                    readOnly: true
+                    type: string
+                    description: Resource name
+                  type:
+                    readOnly: true
+                    type: string
+                    description: Resource type
+                  location:
+                    type: string
+                    description: Resource location
+                    x-ms-mutability:
+                    - read
+                    - create
+                  tags:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: Resource tags
+                  properties:
+                    type: object
+                    x-ms-client-flatten: true
+                    description: The manifest for the custom resource provider
+                    properties:
+                      actions:
+                        type: array
+                        description: A list of actions that the custom resource provider
+                          implements.
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: The name of the route definition. This
+                                becomes the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                            endpoint:
+                              type: string
+                              description: The route definition endpoint URI that
+                                the custom resource provider will proxy requests to.
+                                This can be in the form of a flat URI (e.g. 'https://testendpoint/')
+                                or can specify to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                              pattern: ^https://.+
+                            routingType:
+                              type: string
+                              description: The routing types that are supported for
+                                action requests.
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ActionRouting
+                              enum:
+                              - Proxy
+                          required:
+                          - name
+                          - endpoint
+                          description: A route definition that defines an action or
+                            resource that can be interacted with through the custom
+                            resource provider.
+                        x-ms-identifiers:
+                        - name
+                        - endpoint
+                      resourceTypes:
+                        type: array
+                        description: A list of resource types that the custom resource
+                          provider implements.
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: The name of the route definition. This
+                                becomes the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                            endpoint:
+                              type: string
+                              description: The route definition endpoint URI that
+                                the custom resource provider will proxy requests to.
+                                This can be in the form of a flat URI (e.g. 'https://testendpoint/')
+                                or can specify to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                              pattern: ^https://.+
+                            routingType:
+                              type: string
+                              description: The routing types that are supported for
+                                resource requests.
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ResourceTypeRouting
+                              enum:
+                              - Proxy
+                              - Proxy,Cache
+                          required:
+                          - name
+                          - endpoint
+                          description: A route definition that defines an action or
+                            resource that can be interacted with through the custom
+                            resource provider.
+                        x-ms-identifiers:
+                        - name
+                        - endpoint
+                      validations:
+                        type: array
+                        description: A list of validations to run on the custom resource
+                          provider's requests.
+                        items:
+                          description: A validation to apply on custom resource provider
+                            requests.
+                          required:
+                          - specification
+                          properties:
+                            validationType:
+                              type: string
+                              description: The type of validation to run against a
+                                matching request.
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ValidationType
+                              enum:
+                              - Swagger
+                            specification:
+                              type: string
+                              description: A link to the validation specification.
+                                The specification must be hosted on raw.githubusercontent.com.
+                              pattern: ^https://raw.githubusercontent.com/.+
+                        x-ms-identifiers: []
+                      provisioningState:
+                        type: string
+                        description: The provisioning state of the resource provider.
+                        readOnly: true
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ProvisioningState
+                        enum:
+                        - Accepted
+                        - Deleting
+                        - Running
+                        - Succeeded
+                        - Failed
+                required:
+                - location
+                description: The resource definition.
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+    delete:
+      tags:
+      - CustomResourceProvider
+      operationId: CustomResourceProvider_Delete
+      x-ms-long-running-operation: true
+      description: Deletes the custom resource provider.
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID. This is a GUID-formatted string (e.g.
+          00000000-0000-0000-0000-000000000000)
+        schema:
+          type: string
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: resourceProviderName
+        in: path
+        required: true
+        description: The name of the resource provider.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 64
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK resource deleted
+        '202':
+          description: OK resource delete has been accepted.
+        '204':
+          description: OK resource was not found.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+    get:
+      tags:
+      - CustomResourceProvider
+      operationId: CustomResourceProvider_Get
+      description: Gets the custom resource provider manifest.
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID. This is a GUID-formatted string (e.g.
+          00000000-0000-0000-0000-000000000000)
+        schema:
+          type: string
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: resourceProviderName
+        in: path
+        required: true
+        description: The name of the resource provider.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 64
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK response definition with the existing resource.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Resource Id
+                  name:
+                    readOnly: true
+                    type: string
+                    description: Resource name
+                  type:
+                    readOnly: true
+                    type: string
+                    description: Resource type
+                  location:
+                    type: string
+                    description: Resource location
+                    x-ms-mutability:
+                    - read
+                    - create
+                  tags:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: Resource tags
+                  properties:
+                    type: object
+                    x-ms-client-flatten: true
+                    description: The manifest for the custom resource provider
+                    properties:
+                      actions:
+                        type: array
+                        description: A list of actions that the custom resource provider
+                          implements.
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: The name of the route definition. This
+                                becomes the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                            endpoint:
+                              type: string
+                              description: The route definition endpoint URI that
+                                the custom resource provider will proxy requests to.
+                                This can be in the form of a flat URI (e.g. 'https://testendpoint/')
+                                or can specify to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                              pattern: ^https://.+
+                            routingType:
+                              type: string
+                              description: The routing types that are supported for
+                                action requests.
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ActionRouting
+                              enum:
+                              - Proxy
+                          required:
+                          - name
+                          - endpoint
+                          description: A route definition that defines an action or
+                            resource that can be interacted with through the custom
+                            resource provider.
+                        x-ms-identifiers:
+                        - name
+                        - endpoint
+                      resourceTypes:
+                        type: array
+                        description: A list of resource types that the custom resource
+                          provider implements.
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: The name of the route definition. This
+                                becomes the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                            endpoint:
+                              type: string
+                              description: The route definition endpoint URI that
+                                the custom resource provider will proxy requests to.
+                                This can be in the form of a flat URI (e.g. 'https://testendpoint/')
+                                or can specify to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                              pattern: ^https://.+
+                            routingType:
+                              type: string
+                              description: The routing types that are supported for
+                                resource requests.
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ResourceTypeRouting
+                              enum:
+                              - Proxy
+                              - Proxy,Cache
+                          required:
+                          - name
+                          - endpoint
+                          description: A route definition that defines an action or
+                            resource that can be interacted with through the custom
+                            resource provider.
+                        x-ms-identifiers:
+                        - name
+                        - endpoint
+                      validations:
+                        type: array
+                        description: A list of validations to run on the custom resource
+                          provider's requests.
+                        items:
+                          description: A validation to apply on custom resource provider
+                            requests.
+                          required:
+                          - specification
+                          properties:
+                            validationType:
+                              type: string
+                              description: The type of validation to run against a
+                                matching request.
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ValidationType
+                              enum:
+                              - Swagger
+                            specification:
+                              type: string
+                              description: A link to the validation specification.
+                                The specification must be hosted on raw.githubusercontent.com.
+                              pattern: ^https://raw.githubusercontent.com/.+
+                        x-ms-identifiers: []
+                      provisioningState:
+                        type: string
+                        description: The provisioning state of the resource provider.
+                        readOnly: true
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ProvisioningState
+                        enum:
+                        - Accepted
+                        - Deleting
+                        - Running
+                        - Succeeded
+                        - Failed
+                required:
+                - location
+                description: The resource definition.
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+    patch:
+      tags:
+      - CustomResourceProvider
+      operationId: CustomResourceProvider_Update
+      description: Updates an existing custom resource provider. The only value that
+        can be updated via PATCH currently is the tags.
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID. This is a GUID-formatted string (e.g.
+          00000000-0000-0000-0000-000000000000)
+        schema:
+          type: string
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: resourceProviderName
+        in: path
+        required: true
+        description: The name of the resource provider.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 64
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                tags:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: Resource tags
+              description: custom resource provider update information.
+        description: The updatable fields of a custom resource provider.
+        required: true
+      responses:
+        '200':
+          description: OK response. The resource has been updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Resource Id
+                  name:
+                    readOnly: true
+                    type: string
+                    description: Resource name
+                  type:
+                    readOnly: true
+                    type: string
+                    description: Resource type
+                  location:
+                    type: string
+                    description: Resource location
+                    x-ms-mutability:
+                    - read
+                    - create
+                  tags:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: Resource tags
+                  properties:
+                    type: object
+                    x-ms-client-flatten: true
+                    description: The manifest for the custom resource provider
+                    properties:
+                      actions:
+                        type: array
+                        description: A list of actions that the custom resource provider
+                          implements.
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: The name of the route definition. This
+                                becomes the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                            endpoint:
+                              type: string
+                              description: The route definition endpoint URI that
+                                the custom resource provider will proxy requests to.
+                                This can be in the form of a flat URI (e.g. 'https://testendpoint/')
+                                or can specify to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                              pattern: ^https://.+
+                            routingType:
+                              type: string
+                              description: The routing types that are supported for
+                                action requests.
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ActionRouting
+                              enum:
+                              - Proxy
+                          required:
+                          - name
+                          - endpoint
+                          description: A route definition that defines an action or
+                            resource that can be interacted with through the custom
+                            resource provider.
+                        x-ms-identifiers:
+                        - name
+                        - endpoint
+                      resourceTypes:
+                        type: array
+                        description: A list of resource types that the custom resource
+                          provider implements.
+                        items:
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: The name of the route definition. This
+                                becomes the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                            endpoint:
+                              type: string
+                              description: The route definition endpoint URI that
+                                the custom resource provider will proxy requests to.
+                                This can be in the form of a flat URI (e.g. 'https://testendpoint/')
+                                or can specify to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                              pattern: ^https://.+
+                            routingType:
+                              type: string
+                              description: The routing types that are supported for
+                                resource requests.
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ResourceTypeRouting
+                              enum:
+                              - Proxy
+                              - Proxy,Cache
+                          required:
+                          - name
+                          - endpoint
+                          description: A route definition that defines an action or
+                            resource that can be interacted with through the custom
+                            resource provider.
+                        x-ms-identifiers:
+                        - name
+                        - endpoint
+                      validations:
+                        type: array
+                        description: A list of validations to run on the custom resource
+                          provider's requests.
+                        items:
+                          description: A validation to apply on custom resource provider
+                            requests.
+                          required:
+                          - specification
+                          properties:
+                            validationType:
+                              type: string
+                              description: The type of validation to run against a
+                                matching request.
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ValidationType
+                              enum:
+                              - Swagger
+                            specification:
+                              type: string
+                              description: A link to the validation specification.
+                                The specification must be hosted on raw.githubusercontent.com.
+                              pattern: ^https://raw.githubusercontent.com/.+
+                        x-ms-identifiers: []
+                      provisioningState:
+                        type: string
+                        description: The provisioning state of the resource provider.
+                        readOnly: true
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ProvisioningState
+                        enum:
+                        - Accepted
+                        - Deleting
+                        - Running
+                        - Succeeded
+                        - Failed
+                required:
+                - location
+                description: The resource definition.
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders:
+    get:
+      tags:
+      - CustomResourceProvider
+      operationId: CustomResourceProvider_ListByResourceGroup
+      x-ms-pageable:
+        nextLinkName: nextLink
+      description: Gets all the custom resource providers within a resource group.
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID. This is a GUID-formatted string (e.g.
+          00000000-0000-0000-0000-000000000000)
+        schema:
+          type: string
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK - Returns an array of custom resource providers.
+          content:
+            application/json:
+              schema:
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Resource Id
+                        name:
+                          readOnly: true
+                          type: string
+                          description: Resource name
+                        type:
+                          readOnly: true
+                          type: string
+                          description: Resource type
+                        location:
+                          type: string
+                          description: Resource location
+                          x-ms-mutability:
+                          - read
+                          - create
+                        tags:
+                          type: object
+                          additionalProperties:
+                            type: string
+                          description: Resource tags
+                        properties:
+                          type: object
+                          x-ms-client-flatten: true
+                          description: The manifest for the custom resource provider
+                          properties:
+                            actions:
+                              type: array
+                              description: A list of actions that the custom resource
+                                provider implements.
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                    description: The name of the route definition.
+                                      This becomes the name for the ARM extension
+                                      (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                                  endpoint:
+                                    type: string
+                                    description: The route definition endpoint URI
+                                      that the custom resource provider will proxy
+                                      requests to. This can be in the form of a flat
+                                      URI (e.g. 'https://testendpoint/') or can specify
+                                      to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                                    pattern: ^https://.+
+                                  routingType:
+                                    type: string
+                                    description: The routing types that are supported
+                                      for action requests.
+                                    x-ms-enum:
+                                      modelAsString: true
+                                      name: ActionRouting
+                                    enum:
+                                    - Proxy
+                                required:
+                                - name
+                                - endpoint
+                                description: A route definition that defines an action
+                                  or resource that can be interacted with through
+                                  the custom resource provider.
+                              x-ms-identifiers:
+                              - name
+                              - endpoint
+                            resourceTypes:
+                              type: array
+                              description: A list of resource types that the custom
+                                resource provider implements.
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                    description: The name of the route definition.
+                                      This becomes the name for the ARM extension
+                                      (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                                  endpoint:
+                                    type: string
+                                    description: The route definition endpoint URI
+                                      that the custom resource provider will proxy
+                                      requests to. This can be in the form of a flat
+                                      URI (e.g. 'https://testendpoint/') or can specify
+                                      to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                                    pattern: ^https://.+
+                                  routingType:
+                                    type: string
+                                    description: The routing types that are supported
+                                      for resource requests.
+                                    x-ms-enum:
+                                      modelAsString: true
+                                      name: ResourceTypeRouting
+                                    enum:
+                                    - Proxy
+                                    - Proxy,Cache
+                                required:
+                                - name
+                                - endpoint
+                                description: A route definition that defines an action
+                                  or resource that can be interacted with through
+                                  the custom resource provider.
+                              x-ms-identifiers:
+                              - name
+                              - endpoint
+                            validations:
+                              type: array
+                              description: A list of validations to run on the custom
+                                resource provider's requests.
+                              items:
+                                description: A validation to apply on custom resource
+                                  provider requests.
+                                required:
+                                - specification
+                                properties:
+                                  validationType:
+                                    type: string
+                                    description: The type of validation to run against
+                                      a matching request.
+                                    x-ms-enum:
+                                      modelAsString: true
+                                      name: ValidationType
+                                    enum:
+                                    - Swagger
+                                  specification:
+                                    type: string
+                                    description: A link to the validation specification.
+                                      The specification must be hosted on raw.githubusercontent.com.
+                                    pattern: ^https://raw.githubusercontent.com/.+
+                              x-ms-identifiers: []
+                            provisioningState:
+                              type: string
+                              description: The provisioning state of the resource
+                                provider.
+                              readOnly: true
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ProvisioningState
+                              enum:
+                              - Accepted
+                              - Deleting
+                              - Running
+                              - Succeeded
+                              - Failed
+                      required:
+                      - location
+                      description: The resource definition.
+                      x-ms-azure-resource: true
+                    description: The array of custom resource provider manifests.
+                  nextLink:
+                    type: string
+                    description: The URL to use for getting the next set of results.
+                description: List of custom resource providers.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+  /subscriptions/{subscriptionId}/providers/Microsoft.CustomProviders/resourceProviders:
+    get:
+      tags:
+      - CustomResourceProvider
+      operationId: CustomResourceProvider_ListBySubscription
+      x-ms-pageable:
+        nextLinkName: nextLink
+      description: Gets all the custom resource providers within a subscription.
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID. This is a GUID-formatted string (e.g.
+          00000000-0000-0000-0000-000000000000)
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK - Returns an array of custom resource providers.
+          content:
+            application/json:
+              schema:
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Resource Id
+                        name:
+                          readOnly: true
+                          type: string
+                          description: Resource name
+                        type:
+                          readOnly: true
+                          type: string
+                          description: Resource type
+                        location:
+                          type: string
+                          description: Resource location
+                          x-ms-mutability:
+                          - read
+                          - create
+                        tags:
+                          type: object
+                          additionalProperties:
+                            type: string
+                          description: Resource tags
+                        properties:
+                          type: object
+                          x-ms-client-flatten: true
+                          description: The manifest for the custom resource provider
+                          properties:
+                            actions:
+                              type: array
+                              description: A list of actions that the custom resource
+                                provider implements.
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                    description: The name of the route definition.
+                                      This becomes the name for the ARM extension
+                                      (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                                  endpoint:
+                                    type: string
+                                    description: The route definition endpoint URI
+                                      that the custom resource provider will proxy
+                                      requests to. This can be in the form of a flat
+                                      URI (e.g. 'https://testendpoint/') or can specify
+                                      to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                                    pattern: ^https://.+
+                                  routingType:
+                                    type: string
+                                    description: The routing types that are supported
+                                      for action requests.
+                                    x-ms-enum:
+                                      modelAsString: true
+                                      name: ActionRouting
+                                    enum:
+                                    - Proxy
+                                required:
+                                - name
+                                - endpoint
+                                description: A route definition that defines an action
+                                  or resource that can be interacted with through
+                                  the custom resource provider.
+                              x-ms-identifiers:
+                              - name
+                              - endpoint
+                            resourceTypes:
+                              type: array
+                              description: A list of resource types that the custom
+                                resource provider implements.
+                              items:
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                    description: The name of the route definition.
+                                      This becomes the name for the ARM extension
+                                      (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                                  endpoint:
+                                    type: string
+                                    description: The route definition endpoint URI
+                                      that the custom resource provider will proxy
+                                      requests to. This can be in the form of a flat
+                                      URI (e.g. 'https://testendpoint/') or can specify
+                                      to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                                    pattern: ^https://.+
+                                  routingType:
+                                    type: string
+                                    description: The routing types that are supported
+                                      for resource requests.
+                                    x-ms-enum:
+                                      modelAsString: true
+                                      name: ResourceTypeRouting
+                                    enum:
+                                    - Proxy
+                                    - Proxy,Cache
+                                required:
+                                - name
+                                - endpoint
+                                description: A route definition that defines an action
+                                  or resource that can be interacted with through
+                                  the custom resource provider.
+                              x-ms-identifiers:
+                              - name
+                              - endpoint
+                            validations:
+                              type: array
+                              description: A list of validations to run on the custom
+                                resource provider's requests.
+                              items:
+                                description: A validation to apply on custom resource
+                                  provider requests.
+                                required:
+                                - specification
+                                properties:
+                                  validationType:
+                                    type: string
+                                    description: The type of validation to run against
+                                      a matching request.
+                                    x-ms-enum:
+                                      modelAsString: true
+                                      name: ValidationType
+                                    enum:
+                                    - Swagger
+                                  specification:
+                                    type: string
+                                    description: A link to the validation specification.
+                                      The specification must be hosted on raw.githubusercontent.com.
+                                    pattern: ^https://raw.githubusercontent.com/.+
+                              x-ms-identifiers: []
+                            provisioningState:
+                              type: string
+                              description: The provisioning state of the resource
+                                provider.
+                              readOnly: true
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ProvisioningState
+                              enum:
+                              - Accepted
+                              - Deleting
+                              - Running
+                              - Succeeded
+                              - Failed
+                      required:
+                      - location
+                      description: The resource definition.
+                      x-ms-azure-resource: true
+                    description: The array of custom resource provider manifests.
+                  nextLink:
+                    type: string
+                    description: The URL to use for getting the next set of results.
+                description: List of custom resource providers.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+  /{scope}/providers/Microsoft.CustomProviders/associations/{associationName}:
+    put:
+      tags:
+      - Associations
+      operationId: Associations_CreateOrUpdate
+      x-ms-long-running-operation: true
+      description: Create or update an association.
+      parameters:
+      - name: scope
+        in: path
+        required: true
+        description: The scope of the association. The scope can be any valid REST
+          resource instance. For example, use '/subscriptions/{subscription-id}/resourceGroups/{resource-group-name}/providers/Microsoft.Compute/virtualMachines/{vm-name}'
+          for a virtual machine resource.
+        x-ms-skip-url-encoding: true
+        schema:
+          type: string
+      - name: associationName
+        in: path
+        required: true
+        description: The name of the association.
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              x-ms-azure-resource: true
+              x-ms-client-flatten: true
+              description: The resource definition of this association.
+              properties:
+                id:
+                  type: string
+                  readOnly: true
+                  description: The association id.
+                name:
+                  type: string
+                  readOnly: true
+                  description: The association name.
+                type:
+                  type: string
+                  readOnly: true
+                  description: The association type.
+                properties:
+                  type: object
+                  description: The properties of the association.
+                  x-ms-client-flatten: true
+                  properties:
+                    targetResourceId:
+                      type: string
+                      description: The REST resource instance of the target resource
+                        for this association.
+                    provisioningState:
+                      type: string
+                      description: The provisioning state of the association.
+                      readOnly: true
+                      x-ms-enum:
+                        modelAsString: true
+                        name: ProvisioningState
+                      enum:
+                      - Accepted
+                      - Deleting
+                      - Running
+                      - Succeeded
+                      - Failed
+        description: The parameters required to create or update an association.
+        required: true
+      responses:
+        '200':
+          description: OK. Association already exists and the changes have been accepted.
+          content:
+            application/json:
+              schema:
+                x-ms-azure-resource: true
+                x-ms-client-flatten: true
+                description: The resource definition of this association.
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                    description: The association id.
+                  name:
+                    type: string
+                    readOnly: true
+                    description: The association name.
+                  type:
+                    type: string
+                    readOnly: true
+                    description: The association type.
+                  properties:
+                    type: object
+                    description: The properties of the association.
+                    x-ms-client-flatten: true
+                    properties:
+                      targetResourceId:
+                        type: string
+                        description: The REST resource instance of the target resource
+                          for this association.
+                      provisioningState:
+                        type: string
+                        description: The provisioning state of the association.
+                        readOnly: true
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ProvisioningState
+                        enum:
+                        - Accepted
+                        - Deleting
+                        - Running
+                        - Succeeded
+                        - Failed
+        '201':
+          description: Created. Association has been created.
+          content:
+            application/json:
+              schema:
+                x-ms-azure-resource: true
+                x-ms-client-flatten: true
+                description: The resource definition of this association.
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                    description: The association id.
+                  name:
+                    type: string
+                    readOnly: true
+                    description: The association name.
+                  type:
+                    type: string
+                    readOnly: true
+                    description: The association type.
+                  properties:
+                    type: object
+                    description: The properties of the association.
+                    x-ms-client-flatten: true
+                    properties:
+                      targetResourceId:
+                        type: string
+                        description: The REST resource instance of the target resource
+                          for this association.
+                      provisioningState:
+                        type: string
+                        description: The provisioning state of the association.
+                        readOnly: true
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ProvisioningState
+                        enum:
+                        - Accepted
+                        - Deleting
+                        - Running
+                        - Succeeded
+                        - Failed
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+    delete:
+      tags:
+      - Associations
+      operationId: Associations_Delete
+      x-ms-long-running-operation: true
+      description: Delete an association.
+      parameters:
+      - name: scope
+        in: path
+        required: true
+        description: The scope of the association.
+        x-ms-skip-url-encoding: true
+        schema:
+          type: string
+      - name: associationName
+        in: path
+        required: true
+        description: The name of the association.
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK. Association deleted.
+        '202':
+          description: Accepted. Association delete has been accepted.
+        '204':
+          description: No Content. Association was not found.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+    get:
+      tags:
+      - Associations
+      operationId: Associations_Get
+      description: Get an association.
+      parameters:
+      - name: scope
+        in: path
+        required: true
+        description: The scope of the association.
+        x-ms-skip-url-encoding: true
+        schema:
+          type: string
+      - name: associationName
+        in: path
+        required: true
+        description: The name of the association.
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK. Returns association.
+          content:
+            application/json:
+              schema:
+                x-ms-azure-resource: true
+                x-ms-client-flatten: true
+                description: The resource definition of this association.
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                    description: The association id.
+                  name:
+                    type: string
+                    readOnly: true
+                    description: The association name.
+                  type:
+                    type: string
+                    readOnly: true
+                    description: The association type.
+                  properties:
+                    type: object
+                    description: The properties of the association.
+                    x-ms-client-flatten: true
+                    properties:
+                      targetResourceId:
+                        type: string
+                        description: The REST resource instance of the target resource
+                          for this association.
+                      provisioningState:
+                        type: string
+                        description: The provisioning state of the association.
+                        readOnly: true
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ProvisioningState
+                        enum:
+                        - Accepted
+                        - Deleting
+                        - Running
+                        - Succeeded
+                        - Failed
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+  /{scope}/providers/Microsoft.CustomProviders/associations:
+    get:
+      tags:
+      - Associations
+      operationId: Associations_ListAll
+      description: Gets all association for the given scope.
+      x-ms-pageable:
+        nextLinkName: nextLink
+      parameters:
+      - name: scope
+        in: path
+        required: true
+        description: The scope of the association.
+        x-ms-skip-url-encoding: true
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK. Returns all associations for the given scope.
+          content:
+            application/json:
+              schema:
+                description: List of associations.
+                properties:
+                  value:
+                    type: array
+                    items:
+                      x-ms-azure-resource: true
+                      x-ms-client-flatten: true
+                      description: The resource definition of this association.
+                      properties:
+                        id:
+                          type: string
+                          readOnly: true
+                          description: The association id.
+                        name:
+                          type: string
+                          readOnly: true
+                          description: The association name.
+                        type:
+                          type: string
+                          readOnly: true
+                          description: The association type.
+                        properties:
+                          type: object
+                          description: The properties of the association.
+                          x-ms-client-flatten: true
+                          properties:
+                            targetResourceId:
+                              type: string
+                              description: The REST resource instance of the target
+                                resource for this association.
+                            provisioningState:
+                              type: string
+                              description: The provisioning state of the association.
+                              readOnly: true
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ProvisioningState
+                              enum:
+                              - Accepted
+                              - Deleting
+                              - Running
+                              - Succeeded
+                              - Failed
+                    description: The array of associations.
+                  nextLink:
+                    type: string
+                    description: The URL to use for getting the next set of results.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+components:
+  parameters:
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      required: true
+      description: The Azure subscription ID. This is a GUID-formatted string (e.g.
+        00000000-0000-0000-0000-000000000000)
+      schema:
+        type: string
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    ResourceProviderNameParameter:
+      name: resourceProviderName
+      in: path
+      required: true
+      description: The name of the resource provider.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 64
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to be used with the HTTP request.
+      schema:
+        type: string
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    ListByCustomRPManifest:
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: Resource Id
+              name:
+                readOnly: true
+                type: string
+                description: Resource name
+              type:
+                readOnly: true
+                type: string
+                description: Resource type
+              location:
+                type: string
+                description: Resource location
+                x-ms-mutability:
+                - read
+                - create
+              tags:
+                type: object
+                additionalProperties:
+                  type: string
+                description: Resource tags
+              properties:
+                type: object
+                x-ms-client-flatten: true
+                description: The manifest for the custom resource provider
+                properties:
+                  actions:
+                    type: array
+                    description: A list of actions that the custom resource provider
+                      implements.
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: The name of the route definition. This becomes
+                            the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                        endpoint:
+                          type: string
+                          description: The route definition endpoint URI that the
+                            custom resource provider will proxy requests to. This
+                            can be in the form of a flat URI (e.g. 'https://testendpoint/')
+                            or can specify to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                          pattern: ^https://.+
+                        routingType:
+                          type: string
+                          description: The routing types that are supported for action
+                            requests.
+                          x-ms-enum:
+                            modelAsString: true
+                            name: ActionRouting
+                          enum:
+                          - Proxy
+                      required:
+                      - name
+                      - endpoint
+                      description: A route definition that defines an action or resource
+                        that can be interacted with through the custom resource provider.
+                    x-ms-identifiers:
+                    - name
+                    - endpoint
+                  resourceTypes:
+                    type: array
+                    description: A list of resource types that the custom resource
+                      provider implements.
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: The name of the route definition. This becomes
+                            the name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                        endpoint:
+                          type: string
+                          description: The route definition endpoint URI that the
+                            custom resource provider will proxy requests to. This
+                            can be in the form of a flat URI (e.g. 'https://testendpoint/')
+                            or can specify to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                          pattern: ^https://.+
+                        routingType:
+                          type: string
+                          description: The routing types that are supported for resource
+                            requests.
+                          x-ms-enum:
+                            modelAsString: true
+                            name: ResourceTypeRouting
+                          enum:
+                          - Proxy
+                          - Proxy,Cache
+                      required:
+                      - name
+                      - endpoint
+                      description: A route definition that defines an action or resource
+                        that can be interacted with through the custom resource provider.
+                    x-ms-identifiers:
+                    - name
+                    - endpoint
+                  validations:
+                    type: array
+                    description: A list of validations to run on the custom resource
+                      provider's requests.
+                    items:
+                      description: A validation to apply on custom resource provider
+                        requests.
+                      required:
+                      - specification
+                      properties:
+                        validationType:
+                          type: string
+                          description: The type of validation to run against a matching
+                            request.
+                          x-ms-enum:
+                            modelAsString: true
+                            name: ValidationType
+                          enum:
+                          - Swagger
+                        specification:
+                          type: string
+                          description: A link to the validation specification. The
+                            specification must be hosted on raw.githubusercontent.com.
+                          pattern: ^https://raw.githubusercontent.com/.+
+                    x-ms-identifiers: []
+                  provisioningState:
+                    type: string
+                    description: The provisioning state of the resource provider.
+                    readOnly: true
+                    x-ms-enum:
+                      modelAsString: true
+                      name: ProvisioningState
+                    enum:
+                    - Accepted
+                    - Deleting
+                    - Running
+                    - Succeeded
+                    - Failed
+            required:
+            - location
+            description: The resource definition.
+            x-ms-azure-resource: true
+          description: The array of custom resource provider manifests.
+        nextLink:
+          type: string
+          description: The URL to use for getting the next set of results.
+      description: List of custom resource providers.
+    CustomRPRouteDefinition:
+      description: A route definition that defines an action or resource that can
+        be interacted with through the custom resource provider.
+      required:
+      - name
+      - endpoint
+      properties:
+        name:
+          type: string
+          description: The name of the route definition. This becomes the name for
+            the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+        endpoint:
+          type: string
+          description: The route definition endpoint URI that the custom resource
+            provider will proxy requests to. This can be in the form of a flat URI
+            (e.g. 'https://testendpoint/') or can specify to route via a path (e.g.
+            'https://testendpoint/{requestPath}')
+          pattern: ^https://.+
+    CustomRPActionRouteDefinition:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the route definition. This becomes the name for
+            the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+        endpoint:
+          type: string
+          description: The route definition endpoint URI that the custom resource
+            provider will proxy requests to. This can be in the form of a flat URI
+            (e.g. 'https://testendpoint/') or can specify to route via a path (e.g.
+            'https://testendpoint/{requestPath}')
+          pattern: ^https://.+
+        routingType:
+          type: string
+          description: The routing types that are supported for action requests.
+          x-ms-enum:
+            modelAsString: true
+            name: ActionRouting
+          enum:
+          - Proxy
+      required:
+      - name
+      - endpoint
+      description: A route definition that defines an action or resource that can
+        be interacted with through the custom resource provider.
+    CustomRPResourceTypeRouteDefinition:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the route definition. This becomes the name for
+            the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+        endpoint:
+          type: string
+          description: The route definition endpoint URI that the custom resource
+            provider will proxy requests to. This can be in the form of a flat URI
+            (e.g. 'https://testendpoint/') or can specify to route via a path (e.g.
+            'https://testendpoint/{requestPath}')
+          pattern: ^https://.+
+        routingType:
+          type: string
+          description: The routing types that are supported for resource requests.
+          x-ms-enum:
+            modelAsString: true
+            name: ResourceTypeRouting
+          enum:
+          - Proxy
+          - Proxy,Cache
+      required:
+      - name
+      - endpoint
+      description: A route definition that defines an action or resource that can
+        be interacted with through the custom resource provider.
+    CustomRPValidations:
+      description: A validation to apply on custom resource provider requests.
+      required:
+      - specification
+      properties:
+        validationType:
+          type: string
+          description: The type of validation to run against a matching request.
+          x-ms-enum:
+            modelAsString: true
+            name: ValidationType
+          enum:
+          - Swagger
+        specification:
+          type: string
+          description: A link to the validation specification. The specification must
+            be hosted on raw.githubusercontent.com.
+          pattern: ^https://raw.githubusercontent.com/.+
+    CustomRPManifest:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Resource Id
+        name:
+          readOnly: true
+          type: string
+          description: Resource name
+        type:
+          readOnly: true
+          type: string
+          description: Resource type
+        location:
+          type: string
+          description: Resource location
+          x-ms-mutability:
+          - read
+          - create
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Resource tags
+        properties:
+          type: object
+          x-ms-client-flatten: true
+          description: The manifest for the custom resource provider
+          properties:
+            actions:
+              type: array
+              description: A list of actions that the custom resource provider implements.
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the route definition. This becomes the
+                      name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                  endpoint:
+                    type: string
+                    description: The route definition endpoint URI that the custom
+                      resource provider will proxy requests to. This can be in the
+                      form of a flat URI (e.g. 'https://testendpoint/') or can specify
+                      to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                    pattern: ^https://.+
+                  routingType:
+                    type: string
+                    description: The routing types that are supported for action requests.
+                    x-ms-enum:
+                      modelAsString: true
+                      name: ActionRouting
+                    enum:
+                    - Proxy
+                required:
+                - name
+                - endpoint
+                description: A route definition that defines an action or resource
+                  that can be interacted with through the custom resource provider.
+              x-ms-identifiers:
+              - name
+              - endpoint
+            resourceTypes:
+              type: array
+              description: A list of resource types that the custom resource provider
+                implements.
+              items:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the route definition. This becomes the
+                      name for the ARM extension (e.g. '/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.CustomProviders/resourceProviders/{resourceProviderName}/{name}')
+                  endpoint:
+                    type: string
+                    description: The route definition endpoint URI that the custom
+                      resource provider will proxy requests to. This can be in the
+                      form of a flat URI (e.g. 'https://testendpoint/') or can specify
+                      to route via a path (e.g. 'https://testendpoint/{requestPath}')
+                    pattern: ^https://.+
+                  routingType:
+                    type: string
+                    description: The routing types that are supported for resource
+                      requests.
+                    x-ms-enum:
+                      modelAsString: true
+                      name: ResourceTypeRouting
+                    enum:
+                    - Proxy
+                    - Proxy,Cache
+                required:
+                - name
+                - endpoint
+                description: A route definition that defines an action or resource
+                  that can be interacted with through the custom resource provider.
+              x-ms-identifiers:
+              - name
+              - endpoint
+            validations:
+              type: array
+              description: A list of validations to run on the custom resource provider's
+                requests.
+              items:
+                description: A validation to apply on custom resource provider requests.
+                required:
+                - specification
+                properties:
+                  validationType:
+                    type: string
+                    description: The type of validation to run against a matching
+                      request.
+                    x-ms-enum:
+                      modelAsString: true
+                      name: ValidationType
+                    enum:
+                    - Swagger
+                  specification:
+                    type: string
+                    description: A link to the validation specification. The specification
+                      must be hosted on raw.githubusercontent.com.
+                    pattern: ^https://raw.githubusercontent.com/.+
+              x-ms-identifiers: []
+            provisioningState:
+              type: string
+              description: The provisioning state of the resource provider.
+              readOnly: true
+              x-ms-enum:
+                modelAsString: true
+                name: ProvisioningState
+              enum:
+              - Accepted
+              - Deleting
+              - Running
+              - Succeeded
+              - Failed
+      required:
+      - location
+      description: The resource definition.
+      x-ms-azure-resource: true
+    ResourceProviderOperationList:
+      description: Results of the request to list operations.
+      readOnly: true
+      properties:
+        value:
+          type: array
+          items:
+            description: Supported operations of this resource provider.
+            readOnly: true
+            properties:
+              name:
+                description: Operation name, in format of {provider}/{resource}/{operation}
+                type: string
+              display:
+                description: Display metadata associated with the operation.
+                properties:
+                  provider:
+                    description: 'Resource provider: Microsoft Custom Providers.'
+                    type: string
+                  resource:
+                    description: Resource on which the operation is performed.
+                    type: string
+                  operation:
+                    description: 'Type of operation: get, read, delete, etc.'
+                    type: string
+                  description:
+                    description: Description of this operation.
+                    type: string
+          x-ms-identifiers:
+          - name
+          description: List of operations supported by this resource provider.
+        nextLink:
+          type: string
+          description: The URL to use for getting the next set of results.
+    ResourceProviderOperation:
+      description: Supported operations of this resource provider.
+      readOnly: true
+      properties:
+        name:
+          description: Operation name, in format of {provider}/{resource}/{operation}
+          type: string
+        display:
+          description: Display metadata associated with the operation.
+          properties:
+            provider:
+              description: 'Resource provider: Microsoft Custom Providers.'
+              type: string
+            resource:
+              description: Resource on which the operation is performed.
+              type: string
+            operation:
+              description: 'Type of operation: get, read, delete, etc.'
+              type: string
+            description:
+              description: Description of this operation.
+              type: string
+    Association:
+      x-ms-azure-resource: true
+      x-ms-client-flatten: true
+      description: The resource definition of this association.
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: The association id.
+        name:
+          type: string
+          readOnly: true
+          description: The association name.
+        type:
+          type: string
+          readOnly: true
+          description: The association type.
+        properties:
+          type: object
+          description: The properties of the association.
+          x-ms-client-flatten: true
+          properties:
+            targetResourceId:
+              type: string
+              description: The REST resource instance of the target resource for this
+                association.
+            provisioningState:
+              type: string
+              description: The provisioning state of the association.
+              readOnly: true
+              x-ms-enum:
+                modelAsString: true
+                name: ProvisioningState
+              enum:
+              - Accepted
+              - Deleting
+              - Running
+              - Succeeded
+              - Failed
+    AssociationsList:
+      description: List of associations.
+      properties:
+        value:
+          type: array
+          items:
+            x-ms-azure-resource: true
+            x-ms-client-flatten: true
+            description: The resource definition of this association.
+            properties:
+              id:
+                type: string
+                readOnly: true
+                description: The association id.
+              name:
+                type: string
+                readOnly: true
+                description: The association name.
+              type:
+                type: string
+                readOnly: true
+                description: The association type.
+              properties:
+                type: object
+                description: The properties of the association.
+                x-ms-client-flatten: true
+                properties:
+                  targetResourceId:
+                    type: string
+                    description: The REST resource instance of the target resource
+                      for this association.
+                  provisioningState:
+                    type: string
+                    description: The provisioning state of the association.
+                    readOnly: true
+                    x-ms-enum:
+                      modelAsString: true
+                      name: ProvisioningState
+                    enum:
+                    - Accepted
+                    - Deleting
+                    - Running
+                    - Succeeded
+                    - Failed
+          description: The array of associations.
+        nextLink:
+          type: string
+          description: The URL to use for getting the next set of results.
+    Resource:
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Resource Id
+        name:
+          readOnly: true
+          type: string
+          description: Resource name
+        type:
+          readOnly: true
+          type: string
+          description: Resource type
+        location:
+          type: string
+          description: Resource location
+          x-ms-mutability:
+          - read
+          - create
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Resource tags
+      required:
+      - location
+      description: The resource definition.
+      x-ms-azure-resource: true
+    ResourceProvidersUpdate:
+      properties:
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Resource tags
+      description: custom resource provider update information.
+    ErrorResponse:
+      description: Error response.
+      properties:
+        error:
+          description: The error details.
+          properties:
+            code:
+              description: Service specific error code which serves as the substatus
+                for the HTTP error code.
+              type: string
+              readOnly: true
+            message:
+              description: Description of the error.
+              type: string
+              readOnly: true
+            details:
+              description: Internal error details.
+              type: array
+              items:
+                description: Error definition.
+                properties:
+                  code:
+                    description: Service specific error code which serves as the substatus
+                      for the HTTP error code.
+                    type: string
+                    readOnly: true
+                  message:
+                    description: Description of the error.
+                    type: string
+                    readOnly: true
+                  details:
+                    description: Internal error details.
+                    type: array
+                    items:
+                      description: Error definition.
+                      properties:
+                        code:
+                          description: Service specific error code which serves as
+                            the substatus for the HTTP error code.
+                          type: string
+                          readOnly: true
+                        message:
+                          description: Description of the error.
+                          type: string
+                          readOnly: true
+                    x-ms-identifiers: []
+                    readOnly: true
+              x-ms-identifiers: []
+              readOnly: true
+    ErrorDefinition:
+      description: Error definition.
+      properties:
+        code:
+          description: Service specific error code which serves as the substatus for
+            the HTTP error code.
+          type: string
+          readOnly: true
+        message:
+          description: Description of the error.
+          type: string
+          readOnly: true
+        details:
+          description: Internal error details.
+          type: array
+          items:
+            description: Error definition.
+            properties:
+              code:
+                description: Service specific error code which serves as the substatus
+                  for the HTTP error code.
+                type: string
+                readOnly: true
+              message:
+                description: Description of the error.
+                type: string
+                readOnly: true
+              details:
+                description: Internal error details.
+                type: array
+                items:
+                  description: Error definition.
+                  properties:
+                    code:
+                      description: Service specific error code which serves as the
+                        substatus for the HTTP error code.
+                      type: string
+                      readOnly: true
+                    message:
+                      description: Description of the error.
+                      type: string
+                      readOnly: true
+                x-ms-identifiers: []
+                readOnly: true
+          x-ms-identifiers: []
+          readOnly: true

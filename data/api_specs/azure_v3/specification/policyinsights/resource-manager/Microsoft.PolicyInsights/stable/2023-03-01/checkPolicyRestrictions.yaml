@@ -1,0 +1,2157 @@
+openapi: 3.0.0
+info:
+  title: CheckPolicyRestrictionsClient
+  version: 2023-03-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  /subscriptions/{subscriptionId}/providers/Microsoft.PolicyInsights/checkPolicyRestrictions:
+    post:
+      operationId: PolicyRestrictions_CheckAtSubscriptionScope
+      description: Checks what restrictions Azure Policy will place on a resource
+        within a subscription.
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: The check policy restrictions parameters describing the
+                resource that is being evaluated.
+              properties:
+                resourceDetails:
+                  description: The information about the resource that will be evaluated.
+                  properties:
+                    resourceContent:
+                      description: The resource content. This should include whatever
+                        properties are already known and can be a partial set of all
+                        resource properties.
+                      type: object
+                    apiVersion:
+                      description: The api-version of the resource content.
+                      type: string
+                    scope:
+                      description: The scope where the resource is being created.
+                        For example, if the resource is a child resource this would
+                        be the parent resource's resource ID.
+                      type: string
+                  required:
+                  - resourceContent
+                pendingFields:
+                  description: The list of fields and values that should be evaluated
+                    for potential restrictions.
+                  type: array
+                  items:
+                    description: A field that should be evaluated against Azure Policy
+                      to determine restrictions.
+                    properties:
+                      field:
+                        description: The name of the field. This can be a top-level
+                          property like 'name' or 'type' or an Azure Policy field
+                          alias.
+                        type: string
+                      values:
+                        description: The list of potential values for the field that
+                          should be evaluated against Azure Policy.
+                        type: array
+                        items:
+                          type: string
+                    required:
+                    - field
+                includeAuditEffect:
+                  description: Whether to include policies with the 'audit' effect
+                    in the results. Defaults to false.
+                  type: boolean
+                  default: false
+              required:
+              - resourceDetails
+        description: The check policy restrictions parameters.
+        required: true
+      responses:
+        '200':
+          description: The restrictions that will be placed on the resource by Azure
+            Policy.
+          content:
+            application/json:
+              schema:
+                description: The result of a check policy restrictions evaluation
+                  on a resource.
+                properties:
+                  fieldRestrictions:
+                    description: The restrictions that will be placed on various fields
+                      in the resource by policy.
+                    type: array
+                    items:
+                      description: The restrictions that will be placed on a field
+                        in the resource by policy.
+                      properties:
+                        field:
+                          description: The name of the field. This can be a top-level
+                            property like 'name' or 'type' or an Azure Policy field
+                            alias.
+                          type: string
+                          readOnly: true
+                        restrictions:
+                          description: The restrictions placed on that field by policy.
+                          type: array
+                          items:
+                            description: The restrictions on a field imposed by a
+                              specific policy.
+                            properties:
+                              result:
+                                description: The type of restriction that is imposed
+                                  on the field.
+                                type: string
+                                enum:
+                                - Required
+                                - Removed
+                                - Deny
+                                - Audit
+                                x-ms-enum:
+                                  name: FieldRestrictionResult
+                                  modelAsString: true
+                                  values:
+                                  - value: Required
+                                    description: The field and/or values are required
+                                      by policy.
+                                  - value: Removed
+                                    description: The field will be removed by policy.
+                                  - value: Deny
+                                    description: The field and/or values will be denied
+                                      by policy.
+                                  - value: Audit
+                                    description: The field and/or values will be audited
+                                      by policy.
+                                readOnly: true
+                              defaultValue:
+                                description: The value that policy will set for the
+                                  field if the user does not provide a value.
+                                type: string
+                                readOnly: true
+                              values:
+                                description: The values that policy either requires
+                                  or denies for the field.
+                                type: array
+                                items:
+                                  type: string
+                                readOnly: true
+                              policy:
+                                description: The details of the policy that is causing
+                                  the field restriction.
+                                readOnly: true
+                                properties:
+                                  policyDefinitionId:
+                                    description: The resource identifier of the policy
+                                      definition.
+                                    type: string
+                                    readOnly: true
+                                  policySetDefinitionId:
+                                    description: The resource identifier of the policy
+                                      set definition.
+                                    type: string
+                                    readOnly: true
+                                  policyDefinitionReferenceId:
+                                    description: The reference identifier of a specific
+                                      policy definition within a policy set definition.
+                                    type: string
+                                    readOnly: true
+                                  policyAssignmentId:
+                                    description: The resource identifier of the policy
+                                      assignment.
+                                    type: string
+                                    readOnly: true
+                              policyEffect:
+                                description: The effect of the policy that is causing
+                                  the field restriction. http://aka.ms/policyeffects
+                                type: string
+                                readOnly: true
+                              reason:
+                                description: The reason for the restriction.
+                                type: string
+                                readOnly: true
+                    readOnly: true
+                  contentEvaluationResult:
+                    description: Evaluation results for the provided partial resource
+                      content.
+                    properties:
+                      policyEvaluations:
+                        description: Policy evaluation results against the given resource
+                          content. This will indicate if the partial content that
+                          was provided will be denied as-is.
+                        type: array
+                        items:
+                          description: The result of a non-compliant policy evaluation
+                            against the given resource content.
+                          properties:
+                            policyInfo:
+                              description: The details of the policy that was evaluated.
+                              readOnly: true
+                              properties:
+                                policyDefinitionId:
+                                  description: The resource identifier of the policy
+                                    definition.
+                                  type: string
+                                  readOnly: true
+                                policySetDefinitionId:
+                                  description: The resource identifier of the policy
+                                    set definition.
+                                  type: string
+                                  readOnly: true
+                                policyDefinitionReferenceId:
+                                  description: The reference identifier of a specific
+                                    policy definition within a policy set definition.
+                                  type: string
+                                  readOnly: true
+                                policyAssignmentId:
+                                  description: The resource identifier of the policy
+                                    assignment.
+                                  type: string
+                                  readOnly: true
+                            evaluationResult:
+                              description: The result of the policy evaluation against
+                                the resource. This will typically be 'NonCompliant'
+                                but may contain other values if errors were encountered.
+                              type: string
+                              readOnly: true
+                            evaluationDetails:
+                              description: The detailed results of the policy expressions
+                                and values that were evaluated.
+                              readOnly: true
+                              type: object
+                              properties:
+                                evaluatedExpressions:
+                                  description: Details of the evaluated expressions.
+                                  type: array
+                                  items:
+                                    type: object
+                                    description: Evaluation details of policy language
+                                      expressions.
+                                    properties:
+                                      result:
+                                        description: Evaluation result.
+                                        type: string
+                                      expression:
+                                        description: Expression evaluated.
+                                        type: string
+                                      expressionKind:
+                                        description: The kind of expression that was
+                                          evaluated.
+                                        type: string
+                                        readOnly: true
+                                      path:
+                                        description: Property path if the expression
+                                          is a field or an alias.
+                                        type: string
+                                      expressionValue:
+                                        description: Value of the expression.
+                                        type: object
+                                      targetValue:
+                                        description: Target value to be compared with
+                                          the expression value.
+                                        type: object
+                                      operator:
+                                        description: Operator to compare the expression
+                                          value and the target value.
+                                        type: string
+                                  x-ms-identifiers: []
+                                ifNotExistsDetails:
+                                  description: Evaluation details of IfNotExists effect.
+                                  type: object
+                                  properties:
+                                    resourceId:
+                                      description: ID of the last evaluated resource
+                                        for IfNotExists effect.
+                                      type: string
+                                    totalResources:
+                                      description: Total number of resources to which
+                                        the existence condition is applicable.
+                                      type: integer
+                                reason:
+                                  description: The reason for the evaluation result.
+                                  type: string
+                                  readOnly: true
+                            effectDetails:
+                              description: The details of the effect that was applied
+                                to the resource.
+                              readOnly: true
+                              type: object
+                              properties:
+                                policyEffect:
+                                  description: The effect that was applied to the
+                                    resource. http://aka.ms/policyeffects
+                                  type: string
+                                  readOnly: true
+                    readOnly: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      target:
+                        description: The target of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            target:
+                              description: The target of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                                  target:
+                                    description: The target of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                            additionalInfo:
+                              description: Additional scenario specific error details.
+                              type: array
+                              items:
+                                description: Scenario specific error details.
+                                properties:
+                                  type:
+                                    description: The type of included error details.
+                                    type: string
+                                    readOnly: true
+                                  info:
+                                    description: The scenario specific error details.
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+                      additionalInfo:
+                        description: Additional scenario specific error details.
+                        type: array
+                        items:
+                          description: Scenario specific error details.
+                          properties:
+                            type:
+                              description: The type of included error details.
+                              type: string
+                              readOnly: true
+                            info:
+                              description: The scenario specific error details.
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.PolicyInsights/checkPolicyRestrictions
+  : post:
+      operationId: PolicyRestrictions_CheckAtResourceGroupScope
+      description: Checks what restrictions Azure Policy will place on a resource
+        within a resource group. Use this when the resource group the resource will
+        be created in is already known.
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group. The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: The check policy restrictions parameters describing the
+                resource that is being evaluated.
+              properties:
+                resourceDetails:
+                  description: The information about the resource that will be evaluated.
+                  properties:
+                    resourceContent:
+                      description: The resource content. This should include whatever
+                        properties are already known and can be a partial set of all
+                        resource properties.
+                      type: object
+                    apiVersion:
+                      description: The api-version of the resource content.
+                      type: string
+                    scope:
+                      description: The scope where the resource is being created.
+                        For example, if the resource is a child resource this would
+                        be the parent resource's resource ID.
+                      type: string
+                  required:
+                  - resourceContent
+                pendingFields:
+                  description: The list of fields and values that should be evaluated
+                    for potential restrictions.
+                  type: array
+                  items:
+                    description: A field that should be evaluated against Azure Policy
+                      to determine restrictions.
+                    properties:
+                      field:
+                        description: The name of the field. This can be a top-level
+                          property like 'name' or 'type' or an Azure Policy field
+                          alias.
+                        type: string
+                      values:
+                        description: The list of potential values for the field that
+                          should be evaluated against Azure Policy.
+                        type: array
+                        items:
+                          type: string
+                    required:
+                    - field
+                includeAuditEffect:
+                  description: Whether to include policies with the 'audit' effect
+                    in the results. Defaults to false.
+                  type: boolean
+                  default: false
+              required:
+              - resourceDetails
+        description: The check policy restrictions parameters.
+        required: true
+      responses:
+        '200':
+          description: The restrictions that will be placed on the resource by Azure
+            Policy.
+          content:
+            application/json:
+              schema:
+                description: The result of a check policy restrictions evaluation
+                  on a resource.
+                properties:
+                  fieldRestrictions:
+                    description: The restrictions that will be placed on various fields
+                      in the resource by policy.
+                    type: array
+                    items:
+                      description: The restrictions that will be placed on a field
+                        in the resource by policy.
+                      properties:
+                        field:
+                          description: The name of the field. This can be a top-level
+                            property like 'name' or 'type' or an Azure Policy field
+                            alias.
+                          type: string
+                          readOnly: true
+                        restrictions:
+                          description: The restrictions placed on that field by policy.
+                          type: array
+                          items:
+                            description: The restrictions on a field imposed by a
+                              specific policy.
+                            properties:
+                              result:
+                                description: The type of restriction that is imposed
+                                  on the field.
+                                type: string
+                                enum:
+                                - Required
+                                - Removed
+                                - Deny
+                                - Audit
+                                x-ms-enum:
+                                  name: FieldRestrictionResult
+                                  modelAsString: true
+                                  values:
+                                  - value: Required
+                                    description: The field and/or values are required
+                                      by policy.
+                                  - value: Removed
+                                    description: The field will be removed by policy.
+                                  - value: Deny
+                                    description: The field and/or values will be denied
+                                      by policy.
+                                  - value: Audit
+                                    description: The field and/or values will be audited
+                                      by policy.
+                                readOnly: true
+                              defaultValue:
+                                description: The value that policy will set for the
+                                  field if the user does not provide a value.
+                                type: string
+                                readOnly: true
+                              values:
+                                description: The values that policy either requires
+                                  or denies for the field.
+                                type: array
+                                items:
+                                  type: string
+                                readOnly: true
+                              policy:
+                                description: The details of the policy that is causing
+                                  the field restriction.
+                                readOnly: true
+                                properties:
+                                  policyDefinitionId:
+                                    description: The resource identifier of the policy
+                                      definition.
+                                    type: string
+                                    readOnly: true
+                                  policySetDefinitionId:
+                                    description: The resource identifier of the policy
+                                      set definition.
+                                    type: string
+                                    readOnly: true
+                                  policyDefinitionReferenceId:
+                                    description: The reference identifier of a specific
+                                      policy definition within a policy set definition.
+                                    type: string
+                                    readOnly: true
+                                  policyAssignmentId:
+                                    description: The resource identifier of the policy
+                                      assignment.
+                                    type: string
+                                    readOnly: true
+                              policyEffect:
+                                description: The effect of the policy that is causing
+                                  the field restriction. http://aka.ms/policyeffects
+                                type: string
+                                readOnly: true
+                              reason:
+                                description: The reason for the restriction.
+                                type: string
+                                readOnly: true
+                    readOnly: true
+                  contentEvaluationResult:
+                    description: Evaluation results for the provided partial resource
+                      content.
+                    properties:
+                      policyEvaluations:
+                        description: Policy evaluation results against the given resource
+                          content. This will indicate if the partial content that
+                          was provided will be denied as-is.
+                        type: array
+                        items:
+                          description: The result of a non-compliant policy evaluation
+                            against the given resource content.
+                          properties:
+                            policyInfo:
+                              description: The details of the policy that was evaluated.
+                              readOnly: true
+                              properties:
+                                policyDefinitionId:
+                                  description: The resource identifier of the policy
+                                    definition.
+                                  type: string
+                                  readOnly: true
+                                policySetDefinitionId:
+                                  description: The resource identifier of the policy
+                                    set definition.
+                                  type: string
+                                  readOnly: true
+                                policyDefinitionReferenceId:
+                                  description: The reference identifier of a specific
+                                    policy definition within a policy set definition.
+                                  type: string
+                                  readOnly: true
+                                policyAssignmentId:
+                                  description: The resource identifier of the policy
+                                    assignment.
+                                  type: string
+                                  readOnly: true
+                            evaluationResult:
+                              description: The result of the policy evaluation against
+                                the resource. This will typically be 'NonCompliant'
+                                but may contain other values if errors were encountered.
+                              type: string
+                              readOnly: true
+                            evaluationDetails:
+                              description: The detailed results of the policy expressions
+                                and values that were evaluated.
+                              readOnly: true
+                              type: object
+                              properties:
+                                evaluatedExpressions:
+                                  description: Details of the evaluated expressions.
+                                  type: array
+                                  items:
+                                    type: object
+                                    description: Evaluation details of policy language
+                                      expressions.
+                                    properties:
+                                      result:
+                                        description: Evaluation result.
+                                        type: string
+                                      expression:
+                                        description: Expression evaluated.
+                                        type: string
+                                      expressionKind:
+                                        description: The kind of expression that was
+                                          evaluated.
+                                        type: string
+                                        readOnly: true
+                                      path:
+                                        description: Property path if the expression
+                                          is a field or an alias.
+                                        type: string
+                                      expressionValue:
+                                        description: Value of the expression.
+                                        type: object
+                                      targetValue:
+                                        description: Target value to be compared with
+                                          the expression value.
+                                        type: object
+                                      operator:
+                                        description: Operator to compare the expression
+                                          value and the target value.
+                                        type: string
+                                  x-ms-identifiers: []
+                                ifNotExistsDetails:
+                                  description: Evaluation details of IfNotExists effect.
+                                  type: object
+                                  properties:
+                                    resourceId:
+                                      description: ID of the last evaluated resource
+                                        for IfNotExists effect.
+                                      type: string
+                                    totalResources:
+                                      description: Total number of resources to which
+                                        the existence condition is applicable.
+                                      type: integer
+                                reason:
+                                  description: The reason for the evaluation result.
+                                  type: string
+                                  readOnly: true
+                            effectDetails:
+                              description: The details of the effect that was applied
+                                to the resource.
+                              readOnly: true
+                              type: object
+                              properties:
+                                policyEffect:
+                                  description: The effect that was applied to the
+                                    resource. http://aka.ms/policyeffects
+                                  type: string
+                                  readOnly: true
+                    readOnly: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      target:
+                        description: The target of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            target:
+                              description: The target of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                                  target:
+                                    description: The target of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                            additionalInfo:
+                              description: Additional scenario specific error details.
+                              type: array
+                              items:
+                                description: Scenario specific error details.
+                                properties:
+                                  type:
+                                    description: The type of included error details.
+                                    type: string
+                                    readOnly: true
+                                  info:
+                                    description: The scenario specific error details.
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+                      additionalInfo:
+                        description: Additional scenario specific error details.
+                        type: array
+                        items:
+                          description: Scenario specific error details.
+                          properties:
+                            type:
+                              description: The type of included error details.
+                              type: string
+                              readOnly: true
+                            info:
+                              description: The scenario specific error details.
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+  ? /providers/{managementGroupsNamespace}/managementGroups/{managementGroupId}/providers/Microsoft.PolicyInsights/checkPolicyRestrictions
+  : post:
+      operationId: PolicyRestrictions_CheckAtManagementGroupScope
+      description: Checks what restrictions Azure Policy will place on resources within
+        a management group.
+      parameters:
+      - name: managementGroupsNamespace
+        in: path
+        required: true
+        x-ms-enum:
+          name: ManagementGroupsNamespaceType
+          modelAsString: false
+        description: The namespace for Microsoft Management RP; only "Microsoft.Management"
+          is allowed.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - Microsoft.Management
+      - name: managementGroupId
+        in: path
+        required: true
+        description: Management group ID.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: The check policy restrictions parameters describing the
+                resource that is being evaluated.
+              properties:
+                resourceDetails:
+                  description: The information about the resource that will be evaluated.
+                  properties:
+                    resourceContent:
+                      description: The resource content. This should include whatever
+                        properties are already known and can be a partial set of all
+                        resource properties.
+                      type: object
+                    apiVersion:
+                      description: The api-version of the resource content.
+                      type: string
+                    scope:
+                      description: The scope where the resource is being created.
+                        For example, if the resource is a child resource this would
+                        be the parent resource's resource ID.
+                      type: string
+                  required:
+                  - resourceContent
+                pendingFields:
+                  description: The list of fields and values that should be evaluated
+                    for potential restrictions.
+                  type: array
+                  items:
+                    description: A field that should be evaluated against Azure Policy
+                      to determine restrictions.
+                    properties:
+                      field:
+                        description: The name of the field. This can be a top-level
+                          property like 'name' or 'type' or an Azure Policy field
+                          alias.
+                        type: string
+                      values:
+                        description: The list of potential values for the field that
+                          should be evaluated against Azure Policy.
+                        type: array
+                        items:
+                          type: string
+                    required:
+                    - field
+                  x-ms-identifiers: []
+        description: The check policy restrictions parameters.
+        required: true
+      responses:
+        '200':
+          description: The restrictions that will be placed on the resource by Azure
+            Policy.
+          content:
+            application/json:
+              schema:
+                description: The result of a check policy restrictions evaluation
+                  on a resource.
+                properties:
+                  fieldRestrictions:
+                    description: The restrictions that will be placed on various fields
+                      in the resource by policy.
+                    type: array
+                    items:
+                      description: The restrictions that will be placed on a field
+                        in the resource by policy.
+                      properties:
+                        field:
+                          description: The name of the field. This can be a top-level
+                            property like 'name' or 'type' or an Azure Policy field
+                            alias.
+                          type: string
+                          readOnly: true
+                        restrictions:
+                          description: The restrictions placed on that field by policy.
+                          type: array
+                          items:
+                            description: The restrictions on a field imposed by a
+                              specific policy.
+                            properties:
+                              result:
+                                description: The type of restriction that is imposed
+                                  on the field.
+                                type: string
+                                enum:
+                                - Required
+                                - Removed
+                                - Deny
+                                - Audit
+                                x-ms-enum:
+                                  name: FieldRestrictionResult
+                                  modelAsString: true
+                                  values:
+                                  - value: Required
+                                    description: The field and/or values are required
+                                      by policy.
+                                  - value: Removed
+                                    description: The field will be removed by policy.
+                                  - value: Deny
+                                    description: The field and/or values will be denied
+                                      by policy.
+                                  - value: Audit
+                                    description: The field and/or values will be audited
+                                      by policy.
+                                readOnly: true
+                              defaultValue:
+                                description: The value that policy will set for the
+                                  field if the user does not provide a value.
+                                type: string
+                                readOnly: true
+                              values:
+                                description: The values that policy either requires
+                                  or denies for the field.
+                                type: array
+                                items:
+                                  type: string
+                                readOnly: true
+                              policy:
+                                description: The details of the policy that is causing
+                                  the field restriction.
+                                readOnly: true
+                                properties:
+                                  policyDefinitionId:
+                                    description: The resource identifier of the policy
+                                      definition.
+                                    type: string
+                                    readOnly: true
+                                  policySetDefinitionId:
+                                    description: The resource identifier of the policy
+                                      set definition.
+                                    type: string
+                                    readOnly: true
+                                  policyDefinitionReferenceId:
+                                    description: The reference identifier of a specific
+                                      policy definition within a policy set definition.
+                                    type: string
+                                    readOnly: true
+                                  policyAssignmentId:
+                                    description: The resource identifier of the policy
+                                      assignment.
+                                    type: string
+                                    readOnly: true
+                              policyEffect:
+                                description: The effect of the policy that is causing
+                                  the field restriction. http://aka.ms/policyeffects
+                                type: string
+                                readOnly: true
+                              reason:
+                                description: The reason for the restriction.
+                                type: string
+                                readOnly: true
+                    readOnly: true
+                  contentEvaluationResult:
+                    description: Evaluation results for the provided partial resource
+                      content.
+                    properties:
+                      policyEvaluations:
+                        description: Policy evaluation results against the given resource
+                          content. This will indicate if the partial content that
+                          was provided will be denied as-is.
+                        type: array
+                        items:
+                          description: The result of a non-compliant policy evaluation
+                            against the given resource content.
+                          properties:
+                            policyInfo:
+                              description: The details of the policy that was evaluated.
+                              readOnly: true
+                              properties:
+                                policyDefinitionId:
+                                  description: The resource identifier of the policy
+                                    definition.
+                                  type: string
+                                  readOnly: true
+                                policySetDefinitionId:
+                                  description: The resource identifier of the policy
+                                    set definition.
+                                  type: string
+                                  readOnly: true
+                                policyDefinitionReferenceId:
+                                  description: The reference identifier of a specific
+                                    policy definition within a policy set definition.
+                                  type: string
+                                  readOnly: true
+                                policyAssignmentId:
+                                  description: The resource identifier of the policy
+                                    assignment.
+                                  type: string
+                                  readOnly: true
+                            evaluationResult:
+                              description: The result of the policy evaluation against
+                                the resource. This will typically be 'NonCompliant'
+                                but may contain other values if errors were encountered.
+                              type: string
+                              readOnly: true
+                            evaluationDetails:
+                              description: The detailed results of the policy expressions
+                                and values that were evaluated.
+                              readOnly: true
+                              type: object
+                              properties:
+                                evaluatedExpressions:
+                                  description: Details of the evaluated expressions.
+                                  type: array
+                                  items:
+                                    type: object
+                                    description: Evaluation details of policy language
+                                      expressions.
+                                    properties:
+                                      result:
+                                        description: Evaluation result.
+                                        type: string
+                                      expression:
+                                        description: Expression evaluated.
+                                        type: string
+                                      expressionKind:
+                                        description: The kind of expression that was
+                                          evaluated.
+                                        type: string
+                                        readOnly: true
+                                      path:
+                                        description: Property path if the expression
+                                          is a field or an alias.
+                                        type: string
+                                      expressionValue:
+                                        description: Value of the expression.
+                                        type: object
+                                      targetValue:
+                                        description: Target value to be compared with
+                                          the expression value.
+                                        type: object
+                                      operator:
+                                        description: Operator to compare the expression
+                                          value and the target value.
+                                        type: string
+                                  x-ms-identifiers: []
+                                ifNotExistsDetails:
+                                  description: Evaluation details of IfNotExists effect.
+                                  type: object
+                                  properties:
+                                    resourceId:
+                                      description: ID of the last evaluated resource
+                                        for IfNotExists effect.
+                                      type: string
+                                    totalResources:
+                                      description: Total number of resources to which
+                                        the existence condition is applicable.
+                                      type: integer
+                                reason:
+                                  description: The reason for the evaluation result.
+                                  type: string
+                                  readOnly: true
+                            effectDetails:
+                              description: The details of the effect that was applied
+                                to the resource.
+                              readOnly: true
+                              type: object
+                              properties:
+                                policyEffect:
+                                  description: The effect that was applied to the
+                                    resource. http://aka.ms/policyeffects
+                                  type: string
+                                  readOnly: true
+                    readOnly: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: The error details.
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      target:
+                        description: The target of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            target:
+                              description: The target of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                                  target:
+                                    description: The target of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                            additionalInfo:
+                              description: Additional scenario specific error details.
+                              type: array
+                              items:
+                                description: Scenario specific error details.
+                                properties:
+                                  type:
+                                    description: The type of included error details.
+                                    type: string
+                                    readOnly: true
+                                  info:
+                                    description: The scenario specific error details.
+                                    readOnly: true
+                              x-ms-identifiers: []
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+                      additionalInfo:
+                        description: Additional scenario specific error details.
+                        type: array
+                        items:
+                          description: Scenario specific error details.
+                          properties:
+                            type:
+                              description: The type of included error details.
+                              type: string
+                              readOnly: true
+                            info:
+                              description: The scenario specific error details.
+                              readOnly: true
+                        x-ms-identifiers: []
+                        readOnly: true
+components:
+  parameters:
+    managementGroupsNamespaceParameter:
+      name: managementGroupsNamespace
+      in: path
+      required: true
+      x-ms-enum:
+        name: ManagementGroupsNamespaceType
+        modelAsString: false
+      description: The namespace for Microsoft Management RP; only "Microsoft.Management"
+        is allowed.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        enum:
+        - Microsoft.Management
+    managementGroupIdParameter:
+      name: managementGroupId
+      in: path
+      required: true
+      description: Management group ID.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+  requestBodies:
+    PolicyRestrictions_CheckAtSubscriptionScopeParameters:
+      content:
+        application/json:
+          schema:
+            description: The check policy restrictions parameters describing the resource
+              that is being evaluated.
+            properties:
+              resourceDetails:
+                description: The information about the resource that will be evaluated.
+                properties:
+                  resourceContent:
+                    description: The resource content. This should include whatever
+                      properties are already known and can be a partial set of all
+                      resource properties.
+                    type: object
+                  apiVersion:
+                    description: The api-version of the resource content.
+                    type: string
+                  scope:
+                    description: The scope where the resource is being created. For
+                      example, if the resource is a child resource this would be the
+                      parent resource's resource ID.
+                    type: string
+                required:
+                - resourceContent
+              pendingFields:
+                description: The list of fields and values that should be evaluated
+                  for potential restrictions.
+                type: array
+                items:
+                  description: A field that should be evaluated against Azure Policy
+                    to determine restrictions.
+                  properties:
+                    field:
+                      description: The name of the field. This can be a top-level
+                        property like 'name' or 'type' or an Azure Policy field alias.
+                      type: string
+                    values:
+                      description: The list of potential values for the field that
+                        should be evaluated against Azure Policy.
+                      type: array
+                      items:
+                        type: string
+                  required:
+                  - field
+              includeAuditEffect:
+                description: Whether to include policies with the 'audit' effect in
+                  the results. Defaults to false.
+                type: boolean
+                default: false
+            required:
+            - resourceDetails
+      description: The check policy restrictions parameters.
+      required: true
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    CheckRestrictionsRequest:
+      description: The check policy restrictions parameters describing the resource
+        that is being evaluated.
+      properties:
+        resourceDetails:
+          description: The information about the resource that will be evaluated.
+          properties:
+            resourceContent:
+              description: The resource content. This should include whatever properties
+                are already known and can be a partial set of all resource properties.
+              type: object
+            apiVersion:
+              description: The api-version of the resource content.
+              type: string
+            scope:
+              description: The scope where the resource is being created. For example,
+                if the resource is a child resource this would be the parent resource's
+                resource ID.
+              type: string
+          required:
+          - resourceContent
+        pendingFields:
+          description: The list of fields and values that should be evaluated for
+            potential restrictions.
+          type: array
+          items:
+            description: A field that should be evaluated against Azure Policy to
+              determine restrictions.
+            properties:
+              field:
+                description: The name of the field. This can be a top-level property
+                  like 'name' or 'type' or an Azure Policy field alias.
+                type: string
+              values:
+                description: The list of potential values for the field that should
+                  be evaluated against Azure Policy.
+                type: array
+                items:
+                  type: string
+            required:
+            - field
+        includeAuditEffect:
+          description: Whether to include policies with the 'audit' effect in the
+            results. Defaults to false.
+          type: boolean
+          default: false
+      required:
+      - resourceDetails
+    CheckManagementGroupRestrictionsRequest:
+      type: object
+      description: The check policy restrictions parameters describing the resource
+        that is being evaluated.
+      properties:
+        resourceDetails:
+          description: The information about the resource that will be evaluated.
+          properties:
+            resourceContent:
+              description: The resource content. This should include whatever properties
+                are already known and can be a partial set of all resource properties.
+              type: object
+            apiVersion:
+              description: The api-version of the resource content.
+              type: string
+            scope:
+              description: The scope where the resource is being created. For example,
+                if the resource is a child resource this would be the parent resource's
+                resource ID.
+              type: string
+          required:
+          - resourceContent
+        pendingFields:
+          description: The list of fields and values that should be evaluated for
+            potential restrictions.
+          type: array
+          items:
+            description: A field that should be evaluated against Azure Policy to
+              determine restrictions.
+            properties:
+              field:
+                description: The name of the field. This can be a top-level property
+                  like 'name' or 'type' or an Azure Policy field alias.
+                type: string
+              values:
+                description: The list of potential values for the field that should
+                  be evaluated against Azure Policy.
+                type: array
+                items:
+                  type: string
+            required:
+            - field
+          x-ms-identifiers: []
+    CheckRestrictionsResourceDetails:
+      description: The information about the resource that will be evaluated.
+      properties:
+        resourceContent:
+          description: The resource content. This should include whatever properties
+            are already known and can be a partial set of all resource properties.
+          type: object
+        apiVersion:
+          description: The api-version of the resource content.
+          type: string
+        scope:
+          description: The scope where the resource is being created. For example,
+            if the resource is a child resource this would be the parent resource's
+            resource ID.
+          type: string
+      required:
+      - resourceContent
+    PendingField:
+      description: A field that should be evaluated against Azure Policy to determine
+        restrictions.
+      properties:
+        field:
+          description: The name of the field. This can be a top-level property like
+            'name' or 'type' or an Azure Policy field alias.
+          type: string
+        values:
+          description: The list of potential values for the field that should be evaluated
+            against Azure Policy.
+          type: array
+          items:
+            type: string
+      required:
+      - field
+    CheckRestrictionsResult:
+      description: The result of a check policy restrictions evaluation on a resource.
+      properties:
+        fieldRestrictions:
+          description: The restrictions that will be placed on various fields in the
+            resource by policy.
+          type: array
+          items:
+            description: The restrictions that will be placed on a field in the resource
+              by policy.
+            properties:
+              field:
+                description: The name of the field. This can be a top-level property
+                  like 'name' or 'type' or an Azure Policy field alias.
+                type: string
+                readOnly: true
+              restrictions:
+                description: The restrictions placed on that field by policy.
+                type: array
+                items:
+                  description: The restrictions on a field imposed by a specific policy.
+                  properties:
+                    result:
+                      description: The type of restriction that is imposed on the
+                        field.
+                      type: string
+                      enum:
+                      - Required
+                      - Removed
+                      - Deny
+                      - Audit
+                      x-ms-enum:
+                        name: FieldRestrictionResult
+                        modelAsString: true
+                        values:
+                        - value: Required
+                          description: The field and/or values are required by policy.
+                        - value: Removed
+                          description: The field will be removed by policy.
+                        - value: Deny
+                          description: The field and/or values will be denied by policy.
+                        - value: Audit
+                          description: The field and/or values will be audited by
+                            policy.
+                      readOnly: true
+                    defaultValue:
+                      description: The value that policy will set for the field if
+                        the user does not provide a value.
+                      type: string
+                      readOnly: true
+                    values:
+                      description: The values that policy either requires or denies
+                        for the field.
+                      type: array
+                      items:
+                        type: string
+                      readOnly: true
+                    policy:
+                      description: The details of the policy that is causing the field
+                        restriction.
+                      readOnly: true
+                      properties:
+                        policyDefinitionId:
+                          description: The resource identifier of the policy definition.
+                          type: string
+                          readOnly: true
+                        policySetDefinitionId:
+                          description: The resource identifier of the policy set definition.
+                          type: string
+                          readOnly: true
+                        policyDefinitionReferenceId:
+                          description: The reference identifier of a specific policy
+                            definition within a policy set definition.
+                          type: string
+                          readOnly: true
+                        policyAssignmentId:
+                          description: The resource identifier of the policy assignment.
+                          type: string
+                          readOnly: true
+                    policyEffect:
+                      description: The effect of the policy that is causing the field
+                        restriction. http://aka.ms/policyeffects
+                      type: string
+                      readOnly: true
+                    reason:
+                      description: The reason for the restriction.
+                      type: string
+                      readOnly: true
+          readOnly: true
+        contentEvaluationResult:
+          description: Evaluation results for the provided partial resource content.
+          properties:
+            policyEvaluations:
+              description: Policy evaluation results against the given resource content.
+                This will indicate if the partial content that was provided will be
+                denied as-is.
+              type: array
+              items:
+                description: The result of a non-compliant policy evaluation against
+                  the given resource content.
+                properties:
+                  policyInfo:
+                    description: The details of the policy that was evaluated.
+                    readOnly: true
+                    properties:
+                      policyDefinitionId:
+                        description: The resource identifier of the policy definition.
+                        type: string
+                        readOnly: true
+                      policySetDefinitionId:
+                        description: The resource identifier of the policy set definition.
+                        type: string
+                        readOnly: true
+                      policyDefinitionReferenceId:
+                        description: The reference identifier of a specific policy
+                          definition within a policy set definition.
+                        type: string
+                        readOnly: true
+                      policyAssignmentId:
+                        description: The resource identifier of the policy assignment.
+                        type: string
+                        readOnly: true
+                  evaluationResult:
+                    description: The result of the policy evaluation against the resource.
+                      This will typically be 'NonCompliant' but may contain other
+                      values if errors were encountered.
+                    type: string
+                    readOnly: true
+                  evaluationDetails:
+                    description: The detailed results of the policy expressions and
+                      values that were evaluated.
+                    readOnly: true
+                    type: object
+                    properties:
+                      evaluatedExpressions:
+                        description: Details of the evaluated expressions.
+                        type: array
+                        items:
+                          type: object
+                          description: Evaluation details of policy language expressions.
+                          properties:
+                            result:
+                              description: Evaluation result.
+                              type: string
+                            expression:
+                              description: Expression evaluated.
+                              type: string
+                            expressionKind:
+                              description: The kind of expression that was evaluated.
+                              type: string
+                              readOnly: true
+                            path:
+                              description: Property path if the expression is a field
+                                or an alias.
+                              type: string
+                            expressionValue:
+                              description: Value of the expression.
+                              type: object
+                            targetValue:
+                              description: Target value to be compared with the expression
+                                value.
+                              type: object
+                            operator:
+                              description: Operator to compare the expression value
+                                and the target value.
+                              type: string
+                        x-ms-identifiers: []
+                      ifNotExistsDetails:
+                        description: Evaluation details of IfNotExists effect.
+                        type: object
+                        properties:
+                          resourceId:
+                            description: ID of the last evaluated resource for IfNotExists
+                              effect.
+                            type: string
+                          totalResources:
+                            description: Total number of resources to which the existence
+                              condition is applicable.
+                            type: integer
+                      reason:
+                        description: The reason for the evaluation result.
+                        type: string
+                        readOnly: true
+                  effectDetails:
+                    description: The details of the effect that was applied to the
+                      resource.
+                    readOnly: true
+                    type: object
+                    properties:
+                      policyEffect:
+                        description: The effect that was applied to the resource.
+                          http://aka.ms/policyeffects
+                        type: string
+                        readOnly: true
+          readOnly: true
+    FieldRestrictions:
+      description: The restrictions that will be placed on a field in the resource
+        by policy.
+      properties:
+        field:
+          description: The name of the field. This can be a top-level property like
+            'name' or 'type' or an Azure Policy field alias.
+          type: string
+          readOnly: true
+        restrictions:
+          description: The restrictions placed on that field by policy.
+          type: array
+          items:
+            description: The restrictions on a field imposed by a specific policy.
+            properties:
+              result:
+                description: The type of restriction that is imposed on the field.
+                type: string
+                enum:
+                - Required
+                - Removed
+                - Deny
+                - Audit
+                x-ms-enum:
+                  name: FieldRestrictionResult
+                  modelAsString: true
+                  values:
+                  - value: Required
+                    description: The field and/or values are required by policy.
+                  - value: Removed
+                    description: The field will be removed by policy.
+                  - value: Deny
+                    description: The field and/or values will be denied by policy.
+                  - value: Audit
+                    description: The field and/or values will be audited by policy.
+                readOnly: true
+              defaultValue:
+                description: The value that policy will set for the field if the user
+                  does not provide a value.
+                type: string
+                readOnly: true
+              values:
+                description: The values that policy either requires or denies for
+                  the field.
+                type: array
+                items:
+                  type: string
+                readOnly: true
+              policy:
+                description: The details of the policy that is causing the field restriction.
+                readOnly: true
+                properties:
+                  policyDefinitionId:
+                    description: The resource identifier of the policy definition.
+                    type: string
+                    readOnly: true
+                  policySetDefinitionId:
+                    description: The resource identifier of the policy set definition.
+                    type: string
+                    readOnly: true
+                  policyDefinitionReferenceId:
+                    description: The reference identifier of a specific policy definition
+                      within a policy set definition.
+                    type: string
+                    readOnly: true
+                  policyAssignmentId:
+                    description: The resource identifier of the policy assignment.
+                    type: string
+                    readOnly: true
+              policyEffect:
+                description: The effect of the policy that is causing the field restriction.
+                  http://aka.ms/policyeffects
+                type: string
+                readOnly: true
+              reason:
+                description: The reason for the restriction.
+                type: string
+                readOnly: true
+    FieldRestriction:
+      description: The restrictions on a field imposed by a specific policy.
+      properties:
+        result:
+          description: The type of restriction that is imposed on the field.
+          type: string
+          enum:
+          - Required
+          - Removed
+          - Deny
+          - Audit
+          x-ms-enum:
+            name: FieldRestrictionResult
+            modelAsString: true
+            values:
+            - value: Required
+              description: The field and/or values are required by policy.
+            - value: Removed
+              description: The field will be removed by policy.
+            - value: Deny
+              description: The field and/or values will be denied by policy.
+            - value: Audit
+              description: The field and/or values will be audited by policy.
+          readOnly: true
+        defaultValue:
+          description: The value that policy will set for the field if the user does
+            not provide a value.
+          type: string
+          readOnly: true
+        values:
+          description: The values that policy either requires or denies for the field.
+          type: array
+          items:
+            type: string
+          readOnly: true
+        policy:
+          description: The details of the policy that is causing the field restriction.
+          readOnly: true
+          properties:
+            policyDefinitionId:
+              description: The resource identifier of the policy definition.
+              type: string
+              readOnly: true
+            policySetDefinitionId:
+              description: The resource identifier of the policy set definition.
+              type: string
+              readOnly: true
+            policyDefinitionReferenceId:
+              description: The reference identifier of a specific policy definition
+                within a policy set definition.
+              type: string
+              readOnly: true
+            policyAssignmentId:
+              description: The resource identifier of the policy assignment.
+              type: string
+              readOnly: true
+        policyEffect:
+          description: The effect of the policy that is causing the field restriction.
+            http://aka.ms/policyeffects
+          type: string
+          readOnly: true
+        reason:
+          description: The reason for the restriction.
+          type: string
+          readOnly: true
+    PolicyEvaluationResult:
+      description: The result of a non-compliant policy evaluation against the given
+        resource content.
+      properties:
+        policyInfo:
+          description: The details of the policy that was evaluated.
+          readOnly: true
+          properties:
+            policyDefinitionId:
+              description: The resource identifier of the policy definition.
+              type: string
+              readOnly: true
+            policySetDefinitionId:
+              description: The resource identifier of the policy set definition.
+              type: string
+              readOnly: true
+            policyDefinitionReferenceId:
+              description: The reference identifier of a specific policy definition
+                within a policy set definition.
+              type: string
+              readOnly: true
+            policyAssignmentId:
+              description: The resource identifier of the policy assignment.
+              type: string
+              readOnly: true
+        evaluationResult:
+          description: The result of the policy evaluation against the resource. This
+            will typically be 'NonCompliant' but may contain other values if errors
+            were encountered.
+          type: string
+          readOnly: true
+        evaluationDetails:
+          description: The detailed results of the policy expressions and values that
+            were evaluated.
+          readOnly: true
+          type: object
+          properties:
+            evaluatedExpressions:
+              description: Details of the evaluated expressions.
+              type: array
+              items:
+                type: object
+                description: Evaluation details of policy language expressions.
+                properties:
+                  result:
+                    description: Evaluation result.
+                    type: string
+                  expression:
+                    description: Expression evaluated.
+                    type: string
+                  expressionKind:
+                    description: The kind of expression that was evaluated.
+                    type: string
+                    readOnly: true
+                  path:
+                    description: Property path if the expression is a field or an
+                      alias.
+                    type: string
+                  expressionValue:
+                    description: Value of the expression.
+                    type: object
+                  targetValue:
+                    description: Target value to be compared with the expression value.
+                    type: object
+                  operator:
+                    description: Operator to compare the expression value and the
+                      target value.
+                    type: string
+              x-ms-identifiers: []
+            ifNotExistsDetails:
+              description: Evaluation details of IfNotExists effect.
+              type: object
+              properties:
+                resourceId:
+                  description: ID of the last evaluated resource for IfNotExists effect.
+                  type: string
+                totalResources:
+                  description: Total number of resources to which the existence condition
+                    is applicable.
+                  type: integer
+            reason:
+              description: The reason for the evaluation result.
+              type: string
+              readOnly: true
+        effectDetails:
+          description: The details of the effect that was applied to the resource.
+          readOnly: true
+          type: object
+          properties:
+            policyEffect:
+              description: The effect that was applied to the resource. http://aka.ms/policyeffects
+              type: string
+              readOnly: true
+    PolicyReference:
+      description: Resource identifiers for a policy.
+      properties:
+        policyDefinitionId:
+          description: The resource identifier of the policy definition.
+          type: string
+          readOnly: true
+        policySetDefinitionId:
+          description: The resource identifier of the policy set definition.
+          type: string
+          readOnly: true
+        policyDefinitionReferenceId:
+          description: The reference identifier of a specific policy definition within
+            a policy set definition.
+          type: string
+          readOnly: true
+        policyAssignmentId:
+          description: The resource identifier of the policy assignment.
+          type: string
+          readOnly: true
+    PolicyEffectDetails:
+      type: object
+      description: The details of the effect that was applied to the resource.
+      properties:
+        policyEffect:
+          description: The effect that was applied to the resource. http://aka.ms/policyeffects
+          type: string
+          readOnly: true
+    CheckRestrictionEvaluationDetails:
+      type: object
+      description: Policy evaluation details.
+      properties:
+        evaluatedExpressions:
+          description: Details of the evaluated expressions.
+          type: array
+          items:
+            type: object
+            description: Evaluation details of policy language expressions.
+            properties:
+              result:
+                description: Evaluation result.
+                type: string
+              expression:
+                description: Expression evaluated.
+                type: string
+              expressionKind:
+                description: The kind of expression that was evaluated.
+                type: string
+                readOnly: true
+              path:
+                description: Property path if the expression is a field or an alias.
+                type: string
+              expressionValue:
+                description: Value of the expression.
+                type: object
+              targetValue:
+                description: Target value to be compared with the expression value.
+                type: object
+              operator:
+                description: Operator to compare the expression value and the target
+                  value.
+                type: string
+          x-ms-identifiers: []
+        ifNotExistsDetails:
+          description: Evaluation details of IfNotExists effect.
+          type: object
+          properties:
+            resourceId:
+              description: ID of the last evaluated resource for IfNotExists effect.
+              type: string
+            totalResources:
+              description: Total number of resources to which the existence condition
+                is applicable.
+              type: integer
+        reason:
+          description: The reason for the evaluation result.
+          type: string
+          readOnly: true
+    ErrorDefinition:
+      description: Error definition.
+      properties:
+        code:
+          description: Service specific error code which serves as the substatus for
+            the HTTP error code.
+          type: string
+          readOnly: true
+        message:
+          description: Description of the error.
+          type: string
+          readOnly: true
+        target:
+          description: The target of the error.
+          type: string
+          readOnly: true
+        details:
+          description: Internal error details.
+          type: array
+          items:
+            description: Error definition.
+            properties:
+              code:
+                description: Service specific error code which serves as the substatus
+                  for the HTTP error code.
+                type: string
+                readOnly: true
+              message:
+                description: Description of the error.
+                type: string
+                readOnly: true
+              target:
+                description: The target of the error.
+                type: string
+                readOnly: true
+              details:
+                description: Internal error details.
+                type: array
+                items:
+                  description: Error definition.
+                  properties:
+                    code:
+                      description: Service specific error code which serves as the
+                        substatus for the HTTP error code.
+                      type: string
+                      readOnly: true
+                    message:
+                      description: Description of the error.
+                      type: string
+                      readOnly: true
+                    target:
+                      description: The target of the error.
+                      type: string
+                      readOnly: true
+                x-ms-identifiers: []
+                readOnly: true
+              additionalInfo:
+                description: Additional scenario specific error details.
+                type: array
+                items:
+                  description: Scenario specific error details.
+                  properties:
+                    type:
+                      description: The type of included error details.
+                      type: string
+                      readOnly: true
+                    info:
+                      description: The scenario specific error details.
+                      readOnly: true
+                x-ms-identifiers: []
+                readOnly: true
+          x-ms-identifiers: []
+          readOnly: true
+        additionalInfo:
+          description: Additional scenario specific error details.
+          type: array
+          items:
+            description: Scenario specific error details.
+            properties:
+              type:
+                description: The type of included error details.
+                type: string
+                readOnly: true
+              info:
+                description: The scenario specific error details.
+                readOnly: true
+          x-ms-identifiers: []
+          readOnly: true
+    TypedErrorInfo:
+      description: Scenario specific error details.
+      properties:
+        type:
+          description: The type of included error details.
+          type: string
+          readOnly: true
+        info:
+          description: The scenario specific error details.
+          readOnly: true
+    ErrorResponse:
+      description: Error response.
+      properties:
+        error:
+          description: The error details.
+          properties:
+            code:
+              description: Service specific error code which serves as the substatus
+                for the HTTP error code.
+              type: string
+              readOnly: true
+            message:
+              description: Description of the error.
+              type: string
+              readOnly: true
+            target:
+              description: The target of the error.
+              type: string
+              readOnly: true
+            details:
+              description: Internal error details.
+              type: array
+              items:
+                description: Error definition.
+                properties:
+                  code:
+                    description: Service specific error code which serves as the substatus
+                      for the HTTP error code.
+                    type: string
+                    readOnly: true
+                  message:
+                    description: Description of the error.
+                    type: string
+                    readOnly: true
+                  target:
+                    description: The target of the error.
+                    type: string
+                    readOnly: true
+                  details:
+                    description: Internal error details.
+                    type: array
+                    items:
+                      description: Error definition.
+                      properties:
+                        code:
+                          description: Service specific error code which serves as
+                            the substatus for the HTTP error code.
+                          type: string
+                          readOnly: true
+                        message:
+                          description: Description of the error.
+                          type: string
+                          readOnly: true
+                        target:
+                          description: The target of the error.
+                          type: string
+                          readOnly: true
+                    x-ms-identifiers: []
+                    readOnly: true
+                  additionalInfo:
+                    description: Additional scenario specific error details.
+                    type: array
+                    items:
+                      description: Scenario specific error details.
+                      properties:
+                        type:
+                          description: The type of included error details.
+                          type: string
+                          readOnly: true
+                        info:
+                          description: The scenario specific error details.
+                          readOnly: true
+                    x-ms-identifiers: []
+                    readOnly: true
+              x-ms-identifiers: []
+              readOnly: true
+            additionalInfo:
+              description: Additional scenario specific error details.
+              type: array
+              items:
+                description: Scenario specific error details.
+                properties:
+                  type:
+                    description: The type of included error details.
+                    type: string
+                    readOnly: true
+                  info:
+                    description: The scenario specific error details.
+                    readOnly: true
+              x-ms-identifiers: []
+              readOnly: true
+    ExpressionEvaluationDetails:
+      type: object
+      description: Evaluation details of policy language expressions.
+      properties:
+        result:
+          description: Evaluation result.
+          type: string
+        expression:
+          description: Expression evaluated.
+          type: string
+        expressionKind:
+          description: The kind of expression that was evaluated.
+          type: string
+          readOnly: true
+        path:
+          description: Property path if the expression is a field or an alias.
+          type: string
+        expressionValue:
+          description: Value of the expression.
+          type: object
+        targetValue:
+          description: Target value to be compared with the expression value.
+          type: object
+        operator:
+          description: Operator to compare the expression value and the target value.
+          type: string
+    IfNotExistsEvaluationDetails:
+      type: object
+      description: Evaluation details of IfNotExists effect.
+      properties:
+        resourceId:
+          description: ID of the last evaluated resource for IfNotExists effect.
+          type: string
+        totalResources:
+          description: Total number of resources to which the existence condition
+            is applicable.
+          type: integer

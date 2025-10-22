@@ -1,0 +1,1 @@
+Your organization has instituted a new policy that forbids key-based access to storage accounts. You need to disable key-based access on all storage accounts in the subscription. You also need to update any resources in the subscription that were using key-based auth to access storage to use RBAC-based authentication instead.

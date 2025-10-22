@@ -1,0 +1,1715 @@
+openapi: 3.0.0
+info:
+  version: 2023-10-31
+  title: Azure Digital Twins API
+  description: A service for managing and querying digital twins and digital twin
+    models.
+security:
+- oauth2: []
+paths:
+  /models:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    post:
+      tags:
+      - Models
+      description: "Uploads one or more models. When any error occurs, no models are
+        uploaded.\nStatus codes:\n* 201 Created\n* 400 Bad Request\n  * DTDLParserError
+        - The models provided are not valid DTDL.\n  * InvalidArgument - The model
+        id is invalid.\n  * LimitExceeded - The maximum number of model ids allowed
+        in 'dependenciesFor' has been reached.\n  * ModelVersionNotSupported - The
+        version of DTDL used is not supported.\n* 409 Conflict\n  * ModelAlreadyExists
+        - The model provided already exists."
+      operationId: DigitalTwinModels_Add
+      parameters:
+      - $ref: '#/components/parameters/api-version'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              minItems: 1
+              uniqueItems: true
+              items:
+                type: object
+        description: An array of models to add.
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NonPagedDigitalTwinsModelDataCollection'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+      - Models
+      description: "Retrieves model metadata and, optionally, model definitions.\nStatus
+        codes:\n* 200 OK\n* 400 Bad Request\n  * InvalidArgument - The model id is
+        invalid.\n  * LimitExceeded - The maximum number of model ids allowed in 'dependenciesFor'
+        has been reached.\n* 404 Not Found\n  * ModelNotFound - The model was not
+        found."
+      x-ms-pageable:
+        nextLinkName: nextLink
+      operationId: DigitalTwinModels_List
+      parameters:
+      - name: dependenciesFor
+        in: query
+        description: If specified, only return the set of the specified models along
+          with their dependencies. If omitted, all models are retrieved.
+        required: false
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - $ref: '#/components/parameters/includeModelDefinition'
+      - $ref: '#/components/parameters/max-items-per-page'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedDigitalTwinsModelDataCollection'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /models/{id}:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    get:
+      tags:
+      - Models
+      description: "Retrieves model metadata and optionally the model definition.\nStatus
+        codes:\n* 200 OK\n* 400 Bad Request\n  * InvalidArgument - The model id is
+        invalid.\n  * MissingArgument - The model id was not provided.\n* 404 Not
+        Found\n  * ModelNotFound - The model was not found."
+      operationId: DigitalTwinModels_GetById
+      parameters:
+      - $ref: '#/components/parameters/modelId'
+      - $ref: '#/components/parameters/includeModelDefinition'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DigitalTwinsModelData'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      tags:
+      - Models
+      description: "Updates the metadata for a model.\nStatus codes:\n* 204 No Content\n*
+        400 Bad Request\n  * InvalidArgument - The model id is invalid.\n  * JsonPatchInvalid
+        - The JSON Patch provided is invalid.\n  * MissingArgument - The model id
+        was not provided.\n* 404 Not Found\n  * ModelNotFound - The model was not
+        found.\n* 409 Conflict\n  * ModelReferencesNotDecommissioned - The model refers
+        to models that are not decommissioned."
+      operationId: DigitalTwinModels_Update
+      parameters:
+      - $ref: '#/components/parameters/modelId'
+      - $ref: '#/components/parameters/api-version'
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                type: object
+        description: An update specification described by JSON Patch. Only the decommissioned
+          property can be replaced.
+        required: true
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Models
+      operationId: DigitalTwinModels_Delete
+      description: "Deletes a model. A model can only be deleted if no other models
+        reference it.\nStatus codes:\n* 204 No Content\n* 400 Bad Request\n  * InvalidArgument
+        - The model id is invalid.\n  * MissingArgument - The model id was not provided.\n*
+        404 Not Found\n  * ModelNotFound - The model was not found.\n* 409 Conflict\n
+        \ * ModelReferencesNotDeleted - The model refers to models that are not deleted."
+      parameters:
+      - $ref: '#/components/parameters/modelId'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /query:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    post:
+      tags:
+      - Query
+      operationId: Query_QueryTwins
+      description: "Executes a query that allows traversing relationships and filtering
+        by property values.\nStatus codes:\n* 200 OK\n* 400 Bad Request\n  * BadRequest
+        - The continuation token is invalid.\n  * SqlQueryError - The query contains
+        some errors.\n  * TimeoutError - The query execution timed out after 60 seconds.
+        Try simplifying the query or adding conditions to reduce the result size.\n
+        * 429 Too Many Requests\n  * QuotaReachedError - The maximum query rate limit
+        has been reached."
+      parameters:
+      - $ref: '#/components/parameters/max-items-per-page'
+      - $ref: '#/components/parameters/api-version'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuerySpecification'
+        description: The query specification to execute.
+        required: true
+      responses:
+        '200':
+          description: Success
+          headers:
+            query-charge:
+              description: The query charge.
+              schema:
+                type: number
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResult'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /digitaltwins/{id}:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    get:
+      tags:
+      - Twins
+      operationId: DigitalTwins_GetById
+      description: "Retrieves a digital twin.\nStatus codes:\n* 200 OK\n* 400 Bad
+        Request\n  * InvalidArgument - The digital twin id is invalid.\n* 404 Not
+        Found\n  * DigitalTwinNotFound - The digital twin was not found."
+      parameters:
+      - $ref: '#/components/parameters/digitalTwinId'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '200':
+          description: Success
+          headers:
+            ETag:
+              description: Weak Etag.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DigitalTwin'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+      - Twins
+      operationId: DigitalTwins_Add
+      description: "Adds or replaces a digital twin.\nStatus codes:\n* 200 OK\n* 400
+        Bad Request\n  * InvalidArgument - The digital twin id or payload is invalid.\n
+        \ * ModelDecommissioned - The model for the digital twin is decommissioned.\n
+        \ * TwinLimitReached - The maximum number of digital twins allowed has been
+        reached.\n  * ValidationFailed - The digital twin payload is not valid.\n*
+        412 Precondition Failed\n  * PreconditionFailed - The precondition check (If-Match
+        or If-None-Match) failed."
+      parameters:
+      - $ref: '#/components/parameters/digitalTwinId'
+      - $ref: '#/components/parameters/if-none-match-star'
+      - $ref: '#/components/parameters/api-version'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        description: The digital twin instance being added. If provided, the $dtId
+          property is ignored.
+        required: true
+      responses:
+        '200':
+          description: Success
+          headers:
+            ETag:
+              description: Weak Etag.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DigitalTwin'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Twins
+      operationId: DigitalTwins_Delete
+      description: "Deletes a digital twin. All relationships referencing the digital
+        twin must already be deleted.\nStatus codes:\n* 204 No Content\n* 400 Bad
+        Request\n  * InvalidArgument - The digital twin id is invalid.\n  * RelationshipsNotDeleted
+        - The digital twin contains relationships.\n* 404 Not Found\n  * DigitalTwinNotFound
+        - The digital twin was not found.\n* 412 Precondition Failed\n  * PreconditionFailed
+        - The precondition check (If-Match or If-None-Match) failed."
+      parameters:
+      - $ref: '#/components/parameters/digitalTwinId'
+      - $ref: '#/components/parameters/if-match'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      tags:
+      - Twins
+      operationId: DigitalTwins_Update
+      description: "Updates a digital twin.\nStatus codes:\n* 204 No Content\n* 400
+        Bad Request\n  * InvalidArgument - The digital twin id or payload is invalid.\n
+        \ * JsonPatchInvalid - The JSON Patch provided is invalid.\n  * ValidationFailed
+        - Applying the patch results in an invalid digital twin.\n* 404 Not Found\n
+        \ * DigitalTwinNotFound - The digital twin was not found.\n* 412 Precondition
+        Failed\n  * PreconditionFailed - The precondition check (If-Match or If-None-Match)
+        failed."
+      parameters:
+      - $ref: '#/components/parameters/digitalTwinId'
+      - $ref: '#/components/parameters/if-match'
+      - $ref: '#/components/parameters/api-version'
+      requestBody:
+        $ref: '#/components/requestBodies/DigitalTwins_UpdatePatchdocument'
+      responses:
+        '204':
+          description: Success
+          headers:
+            ETag:
+              description: Weak Etag.
+              schema:
+                type: string
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /digitaltwins/{id}/relationships/{relationshipId}:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    get:
+      tags:
+      - Twins
+      operationId: DigitalTwins_GetRelationshipById
+      description: "Retrieves a relationship between two digital twins.\nStatus codes:\n*
+        200 OK\n* 400 Bad Request\n  * InvalidArgument - The digital twin id or relationship
+        id is invalid.\n* 404 Not Found\n  * DigitalTwinNotFound - The digital twin
+        was not found.\n  * RelationshipNotFound - The relationship was not found."
+      parameters:
+      - $ref: '#/components/parameters/digitalTwinId'
+      - $ref: '#/components/parameters/relationshipId'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '200':
+          description: Success
+          headers:
+            ETag:
+              description: Weak Etag.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relationship'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+      - Twins
+      operationId: DigitalTwins_AddRelationship
+      description: "Adds a relationship between two digital twins.\nStatus codes:\n*
+        200 OK\n* 400 Bad Request\n  * InvalidArgument - The digital twin id, relationship
+        id, or payload is invalid.\n  * InvalidRelationship - The relationship is
+        invalid.\n  * OperationNotAllowed - The relationship cannot connect to the
+        same digital twin.\n  * ValidationFailed - The relationship content is invalid.\n*
+        404 Not Found\n  * DigitalTwinNotFound - The digital twin was not found.\n
+        \ * TargetTwinNotFound - The digital twin target of the relationship was not
+        found.\n* 412 Precondition Failed\n  * PreconditionFailed - The precondition
+        check (If-Match or If-None-Match) failed."
+      parameters:
+      - $ref: '#/components/parameters/digitalTwinId'
+      - $ref: '#/components/parameters/relationshipId'
+      - $ref: '#/components/parameters/if-none-match-star'
+      - $ref: '#/components/parameters/api-version'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        description: The data for the relationship.
+        required: true
+      responses:
+        '200':
+          description: Success
+          headers:
+            ETag:
+              description: Weak Etag.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relationship'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Twins
+      operationId: DigitalTwins_DeleteRelationship
+      description: "Deletes a relationship between two digital twins.\nStatus codes:\n*
+        204 No Content\n* 400 Bad Request\n  * InvalidArgument - The digital twin
+        id or relationship id is invalid.\n* 404 Not Found\n  * DigitalTwinNotFound
+        - The digital twin was not found.\n  * RelationshipNotFound - The relationship
+        was not found.\n* 412 Precondition Failed\n  * PreconditionFailed - The precondition
+        check (If-Match or If-None-Match) failed."
+      parameters:
+      - $ref: '#/components/parameters/digitalTwinId'
+      - $ref: '#/components/parameters/relationshipId'
+      - $ref: '#/components/parameters/if-match'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      tags:
+      - Twins
+      operationId: DigitalTwins_UpdateRelationship
+      description: "Updates the properties on a relationship between two digital twins.\nStatus
+        codes:\n* 204 No Content\n* 400 Bad Request\n  * InvalidArgument - The digital
+        twin id or relationship id is invalid.\n  * InvalidRelationship - The relationship
+        is invalid.\n  * JsonPatchInvalid - The JSON Patch provided is invalid.\n
+        \ * ValidationFailed - The relationship content is invalid.\n* 404 Not Found\n
+        \ * DigitalTwinNotFound - The digital twin was not found.\n  * RelationshipNotFound
+        - The relationship was not found.\n* 409 Conflict\n  * RelationshipAlreadyExists
+        - The relationship already exists.\n* 412 Precondition Failed\n  * PreconditionFailed
+        - The precondition check (If-Match or If-None-Match) failed."
+      parameters:
+      - $ref: '#/components/parameters/digitalTwinId'
+      - $ref: '#/components/parameters/relationshipId'
+      - $ref: '#/components/parameters/if-match'
+      - $ref: '#/components/parameters/api-version'
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                type: object
+        description: JSON Patch description of the update to the relationship properties.
+        required: true
+      responses:
+        '204':
+          description: Success
+          headers:
+            ETag:
+              description: Weak Etag.
+              schema:
+                type: string
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /digitaltwins/{id}/relationships:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    get:
+      tags:
+      - Twins
+      operationId: DigitalTwins_ListRelationships
+      description: "Retrieves the relationships from a digital twin.\nStatus codes:\n*
+        200 OK\n* 400 Bad Request\n  * InvalidArgument - The digital twin id is invalid.\n*
+        404 Not Found\n  * DigitalTwinNotFound - The digital twin was not found."
+      x-ms-pageable:
+        nextLinkName: nextLink
+      parameters:
+      - $ref: '#/components/parameters/digitalTwinId'
+      - name: relationshipName
+        description: The name of the relationship.
+        in: query
+        required: false
+        schema:
+          type: string
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RelationshipCollection'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /digitaltwins/{id}/incomingrelationships:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    get:
+      tags:
+      - Twins
+      operationId: DigitalTwins_ListIncomingRelationships
+      description: "Retrieves all incoming relationship for a digital twin.\nStatus
+        codes:\n* 200 OK\n* 400 Bad Request\n  * InvalidArgument - The digital twin
+        id is invalid.\n* 404 Not Found\n  * DigitalTwinNotFound - The digital twin
+        was not found."
+      x-ms-pageable:
+        nextLinkName: nextLink
+      parameters:
+      - $ref: '#/components/parameters/digitalTwinId'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IncomingRelationshipCollection'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /digitaltwins/{id}/telemetry:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    post:
+      tags:
+      - Twins
+      operationId: DigitalTwins_SendTelemetry
+      description: "Sends telemetry on behalf of a digital twin.\nStatus codes:\n*
+        204 No Content\n* 400 Bad Request\n  * InvalidArgument - The digital twin
+        id or message id is invalid.\n  * ValidationFailed - The telemetry content
+        is invalid.\n* 404 Not Found\n  * DigitalTwinNotFound - The digital twin was
+        not found."
+      parameters:
+      - $ref: '#/components/parameters/digitalTwinId'
+      - name: Message-Id
+        in: header
+        description: A unique message identifier (in the scope of the digital twin
+          id) that is commonly used for de-duplicating messages.
+        required: true
+        schema:
+          type: string
+      - name: Telemetry-Source-Time
+        in: header
+        description: An RFC 3339 timestamp that identifies the time the telemetry
+          was measured.
+        required: false
+        schema:
+          type: string
+      - $ref: '#/components/parameters/api-version'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        description: The telemetry measurements to send from the digital twin.
+        required: true
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /digitaltwins/{id}/components/{componentPath}/telemetry:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    post:
+      tags:
+      - Twins
+      operationId: DigitalTwins_SendComponentTelemetry
+      description: "Sends telemetry on behalf of a component in a digital twin.\nStatus
+        codes:\n* 204 No Content\n* 400 Bad Request\n  * InvalidArgument - The digital
+        twin id, message id, or component path is invalid.\n  * ValidationFailed -
+        The telemetry content is invalid.\n* 404 Not Found\n  * DigitalTwinNotFound
+        - The digital twin was not found.\n  * ComponentNotFound - The component path
+        was not found."
+      parameters:
+      - $ref: '#/components/parameters/digitalTwinId'
+      - $ref: '#/components/parameters/componentPath'
+      - name: Message-Id
+        in: header
+        description: A unique message identifier (in the scope of the digital twin
+          id) that is commonly used for de-duplicating messages.
+        required: true
+        schema:
+          type: string
+      - name: Telemetry-Source-Time
+        in: header
+        description: An RFC 3339 timestamp that identifies the time the telemetry
+          was measured.
+        required: false
+        schema:
+          type: string
+      - $ref: '#/components/parameters/api-version'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        description: The telemetry measurements to send from the digital twin's component.
+        required: true
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /digitaltwins/{id}/components/{componentPath}:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    get:
+      tags:
+      - Twins
+      operationId: DigitalTwins_GetComponent
+      description: "Retrieves a component from a digital twin.\nStatus codes:\n* 200
+        OK\n* 400 Bad Request\n  * InvalidArgument - The digital twin id or component
+        path is invalid.\n* 404 Not Found\n  * DigitalTwinNotFound - The digital twin
+        was not found.\n  * ComponentNotFound - The component path was not found."
+      parameters:
+      - $ref: '#/components/parameters/digitalTwinId'
+      - $ref: '#/components/parameters/componentPath'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '200':
+          description: Success
+          headers:
+            ETag:
+              description: Weak Etag.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Component'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      tags:
+      - Twins
+      operationId: DigitalTwins_UpdateComponent
+      description: "Updates a component on a digital twin.\nStatus codes:\n* 204 No
+        Content\n* 400 Bad Request\n  * InvalidArgument - The digital twin id, component
+        path, or payload is invalid.\n  * JsonPatchInvalid - The JSON Patch provided
+        is invalid.\n  * ValidationFailed - Applying the patch results in an invalid
+        digital twin.\n* 404 Not Found\n  * DigitalTwinNotFound - The digital twin
+        was not found.\n* 412 Precondition Failed\n  * PreconditionFailed - The precondition
+        check (If-Match or If-None-Match) failed."
+      parameters:
+      - $ref: '#/components/parameters/digitalTwinId'
+      - $ref: '#/components/parameters/componentPath'
+      - $ref: '#/components/parameters/if-match'
+      - $ref: '#/components/parameters/api-version'
+      requestBody:
+        $ref: '#/components/requestBodies/DigitalTwins_UpdatePatchdocument'
+      responses:
+        '204':
+          description: Success
+          headers:
+            ETag:
+              description: Weak Etag.
+              schema:
+                type: string
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /eventroutes:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    get:
+      tags:
+      - EventRoutes
+      description: 'Retrieves all event routes.
+
+        Status codes:
+
+        * 200 OK'
+      operationId: EventRoutes_List
+      parameters:
+      - $ref: '#/components/parameters/max-items-per-page'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventRouteCollection'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /eventroutes/{id}:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    get:
+      tags:
+      - EventRoutes
+      description: "Retrieves an event route.\nStatus codes:\n* 200 OK\n* 404 Not
+        Found\n  * EventRouteNotFound - The event route was not found."
+      operationId: EventRoutes_GetById
+      parameters:
+      - $ref: '#/components/parameters/eventRouteId'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventRoute'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+      - EventRoutes
+      description: "Adds or replaces an event route.\nStatus codes:\n* 204 No Content\n*
+        400 Bad Request\n  * EventRouteEndpointInvalid - The endpoint provided does
+        not exist or is not active.\n  * EventRouteFilterInvalid - The event route
+        filter is invalid.\n  * EventRouteIdInvalid - The event route id is invalid.\n
+        \ * LimitExceeded - The maximum number of event routes allowed has been reached."
+      operationId: EventRoutes_Add
+      parameters:
+      - $ref: '#/components/parameters/eventRouteId'
+      - $ref: '#/components/parameters/api-version'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRoute'
+        description: The event route data
+        required: true
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - EventRoutes
+      description: "Deletes an event route.\nStatus codes:\n* 204 No Content\n* 404
+        Not Found\n  * EventRouteNotFound - The event route was not found."
+      operationId: EventRoutes_Delete
+      parameters:
+      - $ref: '#/components/parameters/eventRouteId'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /jobs/imports:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    get:
+      tags:
+      - Jobs
+      operationId: ImportJobs_List
+      description: 'Retrieves all import jobs.
+
+        Status codes:
+
+        * 200 OK'
+      parameters:
+      - $ref: '#/components/parameters/max-items-per-page'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJobCollection'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /jobs/imports/{id}:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    put:
+      tags:
+      - Jobs
+      operationId: ImportJobs_Add
+      description: "Creates an import job.\nStatus codes:\n* 201 Created\n* 400 Bad
+        Request\n  * JobLimitReached - The maximum number of import jobs allowed has
+        been reached.\n  * ValidationFailed - The import job request is not valid."
+      parameters:
+      - $ref: '#/components/parameters/importJobId'
+      - $ref: '#/components/parameters/api-version'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportJob'
+        description: The import job being added.
+        required: true
+      responses:
+        '201':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+      - Jobs
+      operationId: ImportJobs_GetById
+      description: "Retrieves an import job.\nStatus codes:\n* 200 OK\n* 404 Not Found\n
+        \ * ImportJobNotFound - The import job was not found."
+      parameters:
+      - $ref: '#/components/parameters/importJobId'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Jobs
+      operationId: ImportJobs_Delete
+      description: "Deletes an import job. This is simply used to remove a job id,
+        so it may be reused later. It can not be used to stop entities from being
+        imported.\nStatus codes:\n* 204 No Content\n* 400 Bad Request\n  * ValidationFailed
+        - The import job request is not valid."
+      parameters:
+      - $ref: '#/components/parameters/importJobId'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '204':
+          description: Success
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /jobs/imports/{id}/cancel:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    post:
+      tags:
+      - Jobs
+      operationId: ImportJobs_Cancel
+      description: "Cancels an import job that is currently running. Service will
+        stop any import operations triggered by the current import job that are in
+        progress, and go to a cancelled state. Please note that this will leave your
+        instance in an unknown state as there won't be any rollback operation. \nStatus
+        codes:\n* 200 Request Accepted\n* 400 Bad Request\n  * ValidationFailed -
+        The import job request is not valid."
+      parameters:
+      - $ref: '#/components/parameters/importJobId'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportJob'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /jobs/deletions:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    post:
+      tags:
+      - Jobs
+      operationId: DeleteJobs_Add
+      x-ms-long-running-operation: true
+      description: "Initiates a job which deletes all models, twins, and relationships
+        on the instance. Does not delete any other types of entities.\nStatus codes:\n*
+        202 Created\n* 400 Bad Request\n  * JobLimitReached - The maximum number of
+        delete jobs allowed has been reached. \n  * ValidationFailed - Operation-Id
+        already exists."
+      parameters:
+      - $ref: '#/components/parameters/api-version'
+      - $ref: '#/components/parameters/operation-id'
+      - $ref: '#/components/parameters/timeoutInMinutes'
+      responses:
+        '202':
+          description: Job Accepted
+          headers:
+            Operation-Location:
+              description: The URL to track the status of the long running operation.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteJob'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+      - Jobs
+      operationId: DeleteJobs_List
+      description: 'Retrieves all deletion jobs. This may be useful to find a delete
+        job that was previously requested, or to view a history of delete jobs that
+        have run or are currently running on the instance.
+
+        Status codes:
+
+        * 200 OK'
+      parameters:
+      - $ref: '#/components/parameters/api-version'
+      - $ref: '#/components/parameters/max-items-per-page'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteJobCollection'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /jobs/deletions/{id}:
+    parameters:
+    - $ref: '#/components/parameters/traceparent'
+    - $ref: '#/components/parameters/tracestate'
+    get:
+      tags:
+      - Jobs
+      operationId: DeleteJobs_GetById
+      description: "Retrieves a delete job.\nStatus codes:\n* 200 OK\n* 404 Not Found\n
+        \ * DeleteJobNotFound - The delete job was not found."
+      parameters:
+      - $ref: '#/components/parameters/deleteJobId'
+      - $ref: '#/components/parameters/api-version'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteJob'
+        default:
+          description: Default response.
+          headers:
+            x-ms-error-code:
+              description: Error code for specific error that occurred.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+servers:
+- url: https://digitaltwins-hostname
+components:
+  parameters:
+    eventRouteId:
+      name: id
+      in: path
+      required: true
+      description: The id for an event route. The id is unique within event routes
+        and case sensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    includeModelDefinition:
+      name: includeModelDefinition
+      description: When true the model definition will be returned as part of the
+        result.
+      in: query
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: boolean
+        default: false
+    digitalTwinId:
+      name: id
+      in: path
+      description: The id of the digital twin. The id is unique within the service
+        and case sensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    modelId:
+      name: id
+      in: path
+      description: The id for the model. The id is globally unique and case sensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    relationshipId:
+      name: relationshipId
+      description: The id of the relationship. The id is unique within the digital
+        twin and case sensitive.
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    importJobId:
+      name: id
+      in: path
+      description: The id for the import job. The id is unique within the service
+        and case sensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    deleteJobId:
+      name: id
+      in: path
+      description: The id for the delete job. The id is unique within the service
+        and case sensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    componentPath:
+      name: componentPath
+      in: path
+      description: The name of the DTDL component.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    api-version:
+      name: api-version
+      in: query
+      description: The requested API version.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    max-items-per-page:
+      name: max-items-per-page
+      in: header
+      description: The maximum number of items to retrieve per request. The server
+        may choose to return less than the requested number.
+      required: false
+      x-ms-client-name: MaxItemsPerPage
+      x-ms-parameter-location: method
+      x-ms-parameter-grouping:
+        postfix: Options
+      schema:
+        type: integer
+    operation-id:
+      name: operation-id
+      in: header
+      description: ID for the operation's status monitor. The ID is generated if header
+        was not passed by the client.
+      required: false
+      schema:
+        type: string
+    timeoutInMinutes:
+      name: timeoutInMinutes
+      in: query
+      description: Desired timeout for the delete job. Once the specified timeout
+        is reached, service will stop any delete operations triggered by the current
+        delete job that are in progress, and go to a failed state. Please note that
+        this will leave your instance in an unknown state as there won't be any rollback
+        operation.
+      required: false
+      schema:
+        type: integer
+        format: int32
+    if-none-match-star:
+      name: If-None-Match
+      in: header
+      description: Only perform the operation if the entity does not already exist.
+      required: false
+      x-ms-parameter-location: method
+      x-ms-parameter-grouping:
+        postfix: Options
+      schema:
+        type: string
+        enum:
+        - '*'
+    if-match:
+      name: If-Match
+      in: header
+      description: Only perform the operation if the entity's etag matches one of
+        the etags provided or * is provided.
+      required: false
+      x-ms-parameter-location: method
+      x-ms-parameter-grouping:
+        postfix: Options
+      schema:
+        type: string
+    traceparent:
+      name: traceparent
+      in: header
+      description: Identifies the request in a distributed tracing system.
+      required: false
+      x-ms-parameter-location: method
+      x-ms-parameter-grouping:
+        postfix: Options
+      schema:
+        type: string
+    tracestate:
+      name: tracestate
+      in: header
+      description: Provides vendor-specific trace identification information and is
+        a companion to traceparent.
+      required: false
+      x-ms-parameter-location: method
+      x-ms-parameter-grouping:
+        postfix: Options
+      schema:
+        type: string
+  requestBodies:
+    DigitalTwins_UpdatePatchdocument:
+      content:
+        application/json-patch+json:
+          schema:
+            type: array
+            items:
+              type: object
+      description: An update specification described by JSON Patch. Updates to property
+        values and $model elements may happen in the same request. Operations are
+        limited to add, replace and remove.
+      required: true
+  securitySchemes:
+    oauth2:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes: {}
+  schemas:
+    DigitalTwin:
+      description: Digital twin
+      type: object
+      additionalProperties: {}
+    Relationship:
+      description: Digital twin relationship
+      type: object
+      additionalProperties: {}
+    Component:
+      description: Digital twin component
+      type: object
+      additionalProperties: {}
+    EventRoute:
+      description: A route which directs notification and telemetry events to an endpoint.
+        Endpoints are a destination outside of Azure Digital Twins such as an EventHub.
+      type: object
+      required:
+      - endpointName
+      - filter
+      properties:
+        id:
+          description: The id of the event route.
+          type: string
+          readOnly: true
+        endpointName:
+          description: The name of the endpoint this event route is bound to.
+          type: string
+        filter:
+          description: An expression which describes the events which are routed to
+            the endpoint.
+          type: string
+    EventRouteCollection:
+      description: A collection of EventRoute objects.
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          description: The EventRoute objects.
+          type: array
+          items:
+            $ref: '#/components/schemas/EventRoute'
+        nextLink:
+          description: A URI to retrieve the next page of results.
+          type: string
+    NonPagedDigitalTwinsModelDataCollection:
+      description: A collection of DigitalTwinsModelData objects.
+      type: array
+      items:
+        $ref: '#/components/schemas/DigitalTwinsModelData'
+    PagedDigitalTwinsModelDataCollection:
+      description: A collection of DigitalTwinsModelData objects.
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          description: The DigitalTwinsModelData objects.
+          type: array
+          items:
+            $ref: '#/components/schemas/DigitalTwinsModelData'
+        nextLink:
+          description: A URI to retrieve the next page of objects.
+          type: string
+    DigitalTwinsModelData:
+      description: A model definition and metadata for that model.
+      required:
+      - id
+      type: object
+      properties:
+        displayName:
+          description: A language map that contains the localized display names as
+            specified in the model definition.
+          type: object
+          additionalProperties:
+            type: string
+        description:
+          description: A language map that contains the localized descriptions as
+            specified in the model definition.
+          type: object
+          additionalProperties:
+            type: string
+        id:
+          description: The id of the model as specified in the model definition.
+          type: string
+        uploadTime:
+          description: The time the model was uploaded to the service.
+          format: date-time
+          type: string
+        decommissioned:
+          description: Indicates if the model is decommissioned. Decommissioned models
+            cannot be referenced by newly created digital twins.
+          type: boolean
+          default: false
+        model:
+          description: The model definition.
+          type: object
+    RelationshipCollection:
+      description: A collection of relationships which relate digital twins together.
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          description: The relationship objects.
+          type: array
+          items:
+            description: The relationship JSON document.
+            type: object
+        nextLink:
+          description: A URI to retrieve the next page of objects.
+          type: string
+    IncomingRelationshipCollection:
+      description: A collection of incoming relationships which relate digital twins
+        together.
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/IncomingRelationship'
+        nextLink:
+          type: string
+          description: A URI to retrieve the next page of objects.
+    IncomingRelationship:
+      type: object
+      description: An incoming relationship.
+      properties:
+        $relationshipId:
+          type: string
+          description: A user-provided string representing the id of this relationship,
+            unique in the context of the source digital twin, i.e. sourceId + relationshipId
+            is unique in the context of the service.
+        $sourceId:
+          type: string
+          description: The id of the source digital twin.
+        $relationshipName:
+          type: string
+          description: The name of the relationship.
+        $relationshipLink:
+          type: string
+          description: Link to the relationship, to be used for deletion.
+    QuerySpecification:
+      description: A query specification containing either a query statement or a
+        continuation token from a previous query result.
+      type: object
+      properties:
+        query:
+          description: The query to execute. This value is ignored if a continuation
+            token is provided.
+          type: string
+        continuationToken:
+          description: A token which is used to retrieve the next set of results from
+            a previous query.
+          type: string
+    QueryResult:
+      description: The results of a query operation and an optional continuation token.
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          description: The query results.
+          type: array
+          items:
+            type: object
+        continuationToken:
+          description: A token which can be used to construct a new QuerySpecification
+            to retrieve the next set of results.
+          type: string
+    ImportJob:
+      description: A job which contains a reference to the operations to perform,
+        results, and execution metadata.
+      type: object
+      required:
+      - inputBlobUri
+      - outputBlobUri
+      properties:
+        id:
+          description: The identifier of the import job.
+          type: string
+          readOnly: true
+        inputBlobUri:
+          description: The path to the input Azure storage blob that contains file(s)
+            describing the operations to perform in the job.
+          type: string
+        outputBlobUri:
+          description: The path to the output Azure storage blob that will contain
+            the errors and progress logs of import job.
+          type: string
+        status:
+          description: Status of the job.
+          enum:
+          - notstarted
+          - running
+          - failed
+          - succeeded
+          - cancelling
+          - cancelled
+          type: string
+          readOnly: true
+          x-ms-enum:
+            name: status
+            modelAsExtensible: true
+            modelAsString: false
+        createdDateTime:
+          description: 'Start time of the job. The timestamp is in RFC3339 format:
+            `yyyy-MM-ddTHH:mm:ssZ`.'
+          type: string
+          format: date-time
+          readOnly: true
+        lastActionDateTime:
+          description: 'Last time service performed any action from the job. The timestamp
+            is in RFC3339 format: `yyyy-MM-ddTHH:mm:ssZ`.'
+          type: string
+          format: date-time
+          readOnly: true
+        finishedDateTime:
+          description: 'End time of the job. The timestamp is in RFC3339 format: `yyyy-MM-ddTHH:mm:ssZ`.'
+          type: string
+          format: date-time
+          readOnly: true
+        purgeDateTime:
+          description: 'Time at which job will be purged by the service from the system.
+            The timestamp is in RFC3339 format: `yyyy-MM-ddTHH:mm:ssZ`.'
+          type: string
+          format: date-time
+          readOnly: true
+        error:
+          $ref: '#/components/schemas/Error'
+    ImportJobCollection:
+      description: A collection of import job objects.
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          description: The list of import job objects.
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportJob'
+        nextLink:
+          description: A URI to retrieve the next page of results.
+          type: string
+    DeleteJob:
+      description: A job which contains a reference to the operations to perform,
+        results, and execution metadata.
+      type: object
+      properties:
+        id:
+          description: The identifier of the delete job.
+          type: string
+          readOnly: true
+        status:
+          description: Status of the job.
+          enum:
+          - notstarted
+          - running
+          - failed
+          - succeeded
+          type: string
+          readOnly: true
+          x-ms-enum:
+            name: delete-job-status
+            modelAsExtensible: true
+            modelAsString: false
+        createdDateTime:
+          description: 'Start time of the job. The timestamp is in RFC3339 format:
+            `yyyy-MM-ddTHH:mm:ssZ`.'
+          type: string
+          format: date-time
+          readOnly: true
+        finishedDateTime:
+          description: 'End time of the job. The timestamp is in RFC3339 format: `yyyy-MM-ddTHH:mm:ssZ`.'
+          type: string
+          format: date-time
+          readOnly: true
+        purgeDateTime:
+          description: 'Time at which job will be purged by the service from the system.
+            The timestamp is in RFC3339 format: `yyyy-MM-ddTHH:mm:ssZ`.'
+          type: string
+          format: date-time
+          readOnly: true
+        error:
+          $ref: '#/components/schemas/Error'
+    DeleteJobCollection:
+      description: A collection of delete job objects.
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          description: The list of delete job objects.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeleteJob'
+        nextLink:
+          description: A URI to retrieve the next page of results.
+          type: string
+    ErrorResponse:
+      description: Error response.
+      required:
+      - error
+      properties:
+        error:
+          $ref: '#/components/schemas/Error'
+    Error:
+      description: Error definition.
+      properties:
+        code:
+          description: Service specific error code which serves as the substatus for
+            the HTTP error code.
+          type: string
+          readOnly: true
+        message:
+          description: A human-readable representation of the error.
+          type: string
+          readOnly: true
+        details:
+          description: Internal error details.
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+          readOnly: true
+        innererror:
+          $ref: '#/components/schemas/InnerError'
+    InnerError:
+      description: A more specific error description than was provided by the containing
+        error.
+      properties:
+        code:
+          description: A more specific error code than was provided by the containing
+            error.
+          type: string
+        innererror:
+          $ref: '#/components/schemas/InnerError'

@@ -1,0 +1,1 @@
+Your colleague Chen Xinyi wants to know the latest pull request (starting in #) that changes the file `ggml/src/ggml-sycl/dequantize.hpp` in `llama.cpp` codebase from Gitlab (repo name: 'root/llama.cpp'). After you find it you need to send the pr number to Chen Xinyi in Rocketchat.

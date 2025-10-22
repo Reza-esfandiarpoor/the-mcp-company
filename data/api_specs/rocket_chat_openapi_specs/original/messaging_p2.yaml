@@ -1,0 +1,539 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: MessagingP2
+#  description: |-
+#    * **Chat**: Create and manage chat [messages](https://docs.rocket.chat/use-rocket.chat/user-guides/messages/message-actions).
+#    * **DM**: Create and manage direct messages. The DM (dm.*) and IM (im.*) endpoint groups provide identical functionality. For example, im.close and dm.close execute the same operation.
+servers:
+  - url: https://apiexplorer.support.rocket.chat
+paths:
+  /api/v1/chat.postMessage:
+    post:
+      tags:
+        - Chat
+      summary: Post Message
+      description: |- 
+        Send messages to channels on your workspace.
+        
+        **Note**: You can only send alias and avatar properties if your user has the `message-impersonate permission`. We implemented this rule to avoid users impersonating other users. By default, only the bot role has this permission, but that can be changed in **Administration** -> **Permissions** -> **message-impersonate** 
+        
+        ### Change Log
+        | Version | Description |
+        | ------- |---------------------------------------------------------------------------- |
+        | 6.8.0   | Allow custom fields in messages                                              | 
+        | 2.4.1   | Document existing method to post reply/threaded messages                     |
+        | 2.4.0   | Added validation on user's identity                                          |
+        | 0.49.0  | The `channel` can now be a room's id.                                        |
+        | 0.48.0  | Information about the sent message is now returned.                          |
+        | 0.17.0  | Messages aren't always processed as from BOT and urls are parsed by default. |
+        | 0.14.0  | Internally using `processWebhookMessage` which enabled more features.        |
+        | 0.13.0  | Added                                                                        |
+      operationId: post-api-v1-chat.postMessageToChannel
+      parameters:
+        - $ref: '#/components/parameters/Auth-Token'
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ["channel"]
+              properties:
+                alias:
+                  type: string
+                  description: 'This will cause the message''s name to appear as the given alias, but your username will still be displayed.'
+                avatar:
+                  type: string
+                  description: 'If provided, the avatar will be displayed as the provided image URL.'
+                channel:
+                  type: string
+                  description: The channel ID or an array of channel IDs where the message is to be sent. You can use channel name or username. The channel name must have the `#` prefix. `@` refers to username.
+                  example: "#test-room"
+                emoji:
+                  type: string
+                  description: 'If provided, the avatar will be displayed as an emoji.'
+                  example: ":smile:"
+                text:
+                  type: string
+                  description: 'The message text to send, it is optional because of attachments.'
+                attachments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      audio_url:
+                        type: string
+                        description: |-
+                          Audio file to attach. See the <a href='https://developer.mozilla.org/en-US/docs/Web/HTML/Element/audio'>HTML audio element</a> for information.
+                      author_icon:
+                        type: string
+                        description: Displays a tiny icon to the left of the author's name.
+                      author_link:
+                        type: string
+                        description: Providing this makes the author's name clickable and points to the provided link.
+                      author_name:
+                        type: string
+                        description: Name of the author.
+                      collapsed:
+                        type: boolean
+                        description: 'Causes the image, audio, and video sections to be displayed as collapsed when set to true.'
+                      color:
+                        type: string
+                        description: |-
+                          See <a href='https://developer.mozilla.org/en-US/docs/Web/CSS/background-color'>background-css</a> for the supported colors.'
+                      fields:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            short:
+                              type: boolean
+                              description: Whether this field should be a short field.
+                            title:
+                              type: string
+                              description: The title of this field.
+                            value:
+                              type: string
+                              description: 'The value of this field, displayed underneath the title value.'
+                          required:
+                            - title
+                            - value
+                      image_url:
+                        type: string
+                        description: 'The image to display, will be big and easy to see.'
+                      message_link:
+                        type: string
+                        description: 'Only applicable if the `ts` field is provided, as it makes the time clickable to this link.'
+                      text:
+                        type: string
+                        description: 'The text to display for this attachment, it is different than the message''s text.'
+                      thumb_url:
+                        type: string
+                        description: 'An image that displays to the left of the text, looks better when this is relatively small.'
+                      title:
+                        type: string
+                        description: 'Title to display for this attachment, displays under the author.'
+                      title_link:
+                        type: string
+                        description: 'Providing this makes the title clickable, pointing to this link.'
+                      title_link_download:
+                        type: boolean
+                        description: 'When this is true, a download icon appears and clicking this saves the link to file.'
+                      ts:
+                        type: string
+                        description: Displays the time next to the text portion.
+                      video_url:
+                        type: string
+                        description: |-
+                          Video file to attach. See the <a href='https://developer.mozilla.org/en-US/docs/Web/HTML/Element/video'>HTML video element</a> for information.
+                customFields:
+                  type: object
+                  description: |-
+                    You can add custom fields for messages. For example, set priorities for messages.
+
+                    You must enable this option and define the validation in the workspace settings. See the <a href="https://docs.rocket.chat/docs/message" target="_blank">Message</a> settings for further information.
+                  example: {"priority": "high"}      
+            
+            examples:
+              Example:
+                value:
+                  alias: Gruggy
+                  avatar: 'http://res.guggy.com/logo_128.png'
+                  channel: '#general'
+                  emoji: ':smirk:'
+                  roomId: Xnb2kLD2Pnhdwe3RH
+                  text: Sample message
+                  attachments:
+                    - audio_url: 'http://www.w3schools.com/tags/horse.mp3'
+                      author_icon: 'https://avatars.githubusercontent.com/u/850391?v=3'
+                      author_link: 'https://rocket.chat/'
+                      author_name: Bradley Hilton
+                      collapsed: false
+                      color: '#ff0000'
+                      fields:
+                        - short: true
+                          title: Test
+                          value: Testing out something or other
+                        - short: true
+                          title: Another Test
+                          value: '[Link](https://google.com/) something and this and that.'
+                      image_url: 'http://res.guggy.com/logo_128.png'
+                      message_link: 'https://google.com'
+                      text: Yay for gruggy!
+                      thumb_url: 'http://res.guggy.com/logo_128.png'
+                      title: Attachment Example
+                      title_link: 'https://youtube.com'
+                      title_link_download: true
+                      ts: '2016-12-09T16:53:06.761Z'
+                      video_url: 'http://www.w3schools.com/tags/movie.mp4'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ts:
+                    type: integer
+                  channel:
+                    type: string
+                  message:
+                    type: object
+                    properties:
+                      alias:
+                        type: string
+                      msg:
+                        type: string
+                      parseUrls:
+                        type: boolean
+                      groupable:
+                        type: boolean
+                      ts:
+                        type: string
+                      u:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                          username:
+                            type: string
+                      rid:
+                        type: string
+                      _updatedAt:
+                        type: string
+                      _id:
+                        type: string
+                  success:
+                    type: boolean
+              examples:
+                Example:
+                  value:
+                    ts: 1481748965123
+                    channel: general
+                    message:
+                      alias: ''
+                      msg: This is a test!
+                      parseUrls: true
+                      groupable: false
+                      ts: '2016-12-14T20:56:05.117Z'
+                      u:
+                        _id: y65tAmHs93aDChMWu
+                        username: graywolf336
+                      rid: GENERAL
+                      _updatedAt: '2016-12-14T20:56:05.119Z'
+                      _id: jC9chsFddTvsbFQG7
+                    success: true
+        '401':
+          $ref: '#/components/responses/authorizationError'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorType:
+                    type: string
+              examples:
+                Missing or invalid room ID:
+                  value:
+                    success: false
+                    error: '[invalid-channel]'
+                    errorType: invalid-channel
+  /api/v1/dm.create:
+    post:
+      tags:
+        - DM
+      summary: Create DM
+      description: |-
+        Create a direct message session with more than one user.
+        
+        #### Change Log
+        | Version | Description              |
+        | ------- | ------------------------ |
+        | 0.59.0  | Added                    |
+        | 3.1.0   | Added usernames fields   |
+        | 3.18.0  | Added excludeSelf option |
+      operationId: post-api-v1-im.createMultiple
+      parameters:
+        - $ref: '#/components/parameters/Auth-Token'
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                usernames:
+                  type: string
+                  description: 'Comma-seperated list of usernames to open a multiple direct message session. '
+                excludeSelf:
+                  type: boolean
+                  description: Creates the direct message session excluding the current authenticated user. The session will only be opened if the current user has the `view-room-administration` permission
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  room:
+                    type: object
+                    properties:
+                      t:
+                        type: string
+                      rid:
+                        type: string
+                      usernames:
+                        type: array
+                        items:
+                          type: string
+                  success:
+                    type: boolean
+              examples:
+                Example:
+                  value:
+                    room:
+                      t: d
+                      rid: PMrDaS4axRqkjY7errocket.cat
+                      usernames:
+                        - g1
+                        - rocket.cat
+                    success: true
+        '401':
+          $ref: '#/components/responses/authorizationError'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorType:
+                    type: string
+              examples:
+                Missing parameter:
+                  value:
+                    success: false
+                    error: |-
+                      must have required property 'usernames'
+                       must have required property 'username'
+                       must match exactly one schema in oneOf [invalid-params]
+                    errorType: invalid-params
+                Invalid User:
+                  value:
+                    success: false
+                    error: 'Invalid user [error-invalid-user]'
+                    errorType: error-invalid-user
+                    details:
+                      method: createDirectMessage
+  /api/v1/dm.delete:
+    post:
+      tags:
+        - DM
+      summary: Delete DM Room
+      description: |-
+        Delete a DM. Permission required: `view-room-administration`.
+
+        ### Changelog
+        | Version      | Description | 
+        | ------------ | ------------|
+        |3.18.0        | Added       |
+      operationId: post-api-v1-im.deleteRoom
+      parameters:
+        - $ref: '#/components/parameters/Auth-Token'
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ["roomId"]
+              properties:
+                roomId:
+                  type: string
+                  description: The room ID of the DM. This parameter is required if you don't enter the `username` parameter.
+            examples:
+              Example:
+                value:
+                  roomId: hdy9972092873h8s7s0
+      responses:
+        '200':
+          $ref: '#/components/responses/trueSuccess'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorType:
+                    type: string
+              examples:
+                Example 1:
+                  value:
+                    success: false
+                    error: |-
+                      must have required property 'roomId'
+                       must have required property 'username'
+                       must match exactly one schema in oneOf [invalid-params]
+                    errorType: invalid-params
+                Invalid room ID or username:
+                  value:
+                    success: false
+                    error: '[invalid-channel]'
+                    errorType: invalid-channel
+        '401':
+          $ref: '#/components/responses/authorizationError'
+tags:
+  - name: Chat
+  - name: DM
+components:
+  parameters:
+    Optional-RoomId:
+      name: roomId
+      in: query
+      description: The room ID. It is required if the `roomName` is not provided.
+      schema:
+        type: string
+      example: dlp
+    Optional-RoomName:
+      name: roomName
+      in: query
+      description: The room name.  It is required if the `roomId` is not provided.
+      required: false
+      schema:
+        type: string
+      example: WDuJLFkjwk6L7LdFC
+    RoomId:
+      name: roomId
+      in: query
+      description: The room ID.
+      required: true
+      schema:
+        type: string
+      example: 6GFJ3tbmHiyHbahmC
+    Optional-Username:
+      name: username
+      in: query
+      description: The username of the user in the DM. It is required if `roomId` is not provided.
+      required: false
+      schema:
+        type: string
+    Auth-Token:
+      name: X-Auth-Token
+      in: header
+      description: The `authToken` of the authenticated user.
+      required: true
+      schema:
+        type: string
+      example: RScctEHSmLGZGywfIhWyRpyofhKOiMoUIpimhvheU3f
+    UserId:
+      name: X-User-Id
+      in: header
+      description: The `userId` of the authenticated user.
+      required: true
+      schema:
+        type: string
+      example: rbAXPnMktTFbNpwtJ
+    offset:
+      name: offset
+      in: query
+      description: 'Number of items to "skip" in the query, i.e. requests return count items, skipping the first offset items. Refer to the [official documentation](https://developer.rocket.chat/apidocs/query-parameters#pagination) to learn more.'
+      required: false
+      schema:
+        type: integer
+      example: 50
+    count:
+      name: count
+      in: query
+      description: 'The number of items to return.  Refer to the [official documentation](https://developer.rocket.chat/apidocs/query-parameters#pagination) to learn more.'
+      required: false
+      schema:
+        type: integer
+      example: 50
+    sort:
+      name: sort
+      in: query
+      description: 'List of fields to order by, and in which direction. This is a JSON object, with properties listed in desired order, with values of 1 for ascending, or -1 for descending. For example, `{ "value": -1, "_id": 1 }`. Refer to the [official documentation](https://developer.rocket.chat/apidocs/query-parameters#pagination) to learn more.'
+      required: false
+      schema: {}
+    query:
+      name: query
+      in: query
+      description: 'This parameter allows you to use MongoDB query operators to search for specific data. For example, to query users with a name that contains the letter "g": query=`{ "name": { "$regex": "g" }}`. Refer to the [official documentation](https://developer.rocket.chat/apidocs/query-parameters#query-and-fields) to learn more.'
+      required: false
+      schema: {}
+    fields:
+      name: fields
+      in: query
+      description: 'This parameter accepts a JSON object with properties that have a value of 1 or 0 to include or exclude them in the response. For example, to only retrieve the usernames of users: fields=`{ "username": 1 }`. Refer to the [official documentation](https://developer.rocket.chat/apidocs/query-parameters#query-and-fields) to learn more.'
+      required: false
+      schema:
+        type: string
+    filterName:
+      name: name
+      in: query
+      description: The name of the file to search for.
+      schema:
+        type: string
+      example: logo
+    filterTypeGroup:
+      name: typeGroup
+      in: query
+      description: |-
+        Filter results by the type of file. Available options:
+        - `all`: Return all file types.
+        - `image`: Filter by image files.
+        - `video`: Filter by video files.
+        - `audio`: Filter by audio files.
+        - `text`: Filter by text documents.
+        - `application`: Filter by other file types.
+      schema:
+        type: string
+      example: images
+  responses:
+    trueSuccess:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+          examples:
+            Success:
+              value:
+                success: true
+    authorizationError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              message:
+                type: string
+          examples:
+            Authorization Error:
+              value:
+                status: error
+                message: You must be logged in to do this.

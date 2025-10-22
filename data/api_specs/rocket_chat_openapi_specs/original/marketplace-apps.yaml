@@ -1,0 +1,924 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Marketplace Apps
+#  description: |- 
+#    The following marketplace apps endpoints are available:
+#    * **WhatsApp**: Send a template [WhatsApp](https://docs.rocket.chat/extend-rocket.chat-capabilities/rocket.chat-marketplace/rocket.chat-public-apps-guides/omnichannel-apps/whatsapp) message.
+#    * **Rasa**: Close a [Rasa](https://docs.rocket.chat/extend-rocket.chat-capabilities/rocket.chat-marketplace/rocket.chat-public-apps-guides/omnichannel-apps/rasa-app) app chat or perform handover.
+servers:
+  - url: https://apiexplorer.support.rocket.chat
+paths:
+  '/api/apps/public/{app-id}/incoming':
+    parameters:
+      - schema:
+          type: string
+        name: app-id
+        in: path
+        required: true
+        description: The app id. Navigate to App Info > Details > APIs > POST incoming to get the complete URL for this endpoint.
+    post:
+      summary: Close Chat or Perform Handover
+      tags:
+        - Rasa App
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: string
+              examples:
+                Close chat:
+                  value:
+                    msg: ' Close chat request handled successfully'
+                Perform handover:
+                  value:
+                    msg: ' Perform Handover request handled successfully'
+        '401':
+          $ref: '#/components/responses/authorizationError'
+      operationId: post-api-apps-public-app-id-incoming
+      description: |-
+        Close a chat session or perform handover. The appropriate endpoint URL including the `appId` for  closing chat or perfoming handover in your workspace is displayed under **App Info > Details > APIs > POST incoming** section of the Rasa app.
+
+        ### Changelog
+        | Version      | Description |
+        | ---------------- | ------------|
+        |5.0.0     | Added       |
+      parameters:
+        - $ref: '#/components/parameters/Auth-Token'
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - action
+                - sessionId
+              properties:
+                action:
+                  type: string
+                  description: 'The action can either be `handover` or `close-chat`. '
+                sessionId:
+                  type: string
+                  description: The ID of the Rasa session.
+                actionData:
+                  type: object
+                  properties:
+                    targetDepartment:
+                      type: string
+                      description: The targeted department.
+            examples:
+              Example:
+                value:
+                  action: close-chat
+                  sessionId: 2Sfq8wXw4fYPMf6r4
+  '/api/apps/public/{appId}/templateMessage':
+    post:
+      tags:
+        - WhatsApp
+      summary: Send a WhatsApp Template Message
+      description: |-
+        Use this endpoint to send WhatsApp template messages directly to specified contacts from your workspace.
+
+        1. Navigate to **Administration > Apps > Marketplace**.
+        2. Locate your preferred <a href="https://docs.rocket.chat/docs/whatsapp-apps" target="_blank">WhatsApp App</a>.
+        3. Go to *App Info > Details > APIs* and find the `POST templateMessage` section.
+        4. Copy the `POST templateMessage` endpoint URL for your WhatsApp app from the provided curl example. This URL includes the required `appId`. Send a template message request using this URL as the endpoint.
+        
+        Before sending template messages from Rocket.Chat through any <a href="https://docs.rocket.chat/docs/whatsapp-apps" target="_blank">WhatsApp App</a>, ensure that you have set up the templates in respective WhatsApp provider account. Refer to the official guide for details on <a href="https://developer.rocket.chat/docs/whatsapp-business-template-messages#set-up-template-messages-on-whatsapp" target="_blank">configuring template messages for each WhatsApp app</a>.
+      operationId: post-api-apps-public-app_id-templateMessage
+      parameters:
+        - name: appId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 'We strongly recommend including the + prefix for all phone numbers in the payload. While you can submit numbers without the leading + sign, we have encountered cases where WhatsApp will return an invalid response despite the number being in use.'
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                phoneNumbers:
+                  type: array
+                  description: 'Recipient WhatsApp IDs where you want to send the template message. You can validate a WhatsApp id from <a href="https://developers.facebook.com/docs/whatsapp/on-premises/reference/contacts" target="_blank">here</a>.'
+                  items:
+                    type: string
+                connectedWhatsAppNo:
+                  type: string
+                  description: The WhatsApp Number from which you want to send this template message. The WhatsApp number connected to your workspace via the app.
+                targetAgent:
+                  type: string
+                  description: Username of the agent you want to transfer the chat to when the WhatsApp user replies.
+                targetDepartment:
+                  type: string
+                  description: Department name or ID where you want to transfer the chat to when the WhatsApp user replies.
+                template:
+                  type: object
+                  description: |-
+                    Provide the details of the template message you want to send. The structure of the template object may differ depending on the template defined within your WhatsApp provider account. For further clarification, refer to the official guide on <a href="https://developer.rocket.chat/docs/whatsapp-business-template-messages#api-endpoint" target="_blank">sending template messages via API in Rocket.Chat</a>. The example template object provided here is based on the configuration outlined in the official guide for the <a href="https://developer.rocket.chat/docs/whatsapp-business-template-messages#whatsapp-cloud" target="_blank">WhatsApp Cloud App</a>.
+                    
+                    If your template message includes parameters, make sure to replace all of them with the appropriate information before sending. Failure to do so may lead to an error.
+                  properties:
+                    namespace:
+                      type: string
+                    name:
+                      type: string
+                    language:
+                      type: object
+                      properties:
+                        code:
+                          type: string
+                        policy:
+                          type: string
+                    components:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          type:
+                            type: string
+                          parameters:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                type:
+                                  type: string
+                                text:
+                                  type: string
+              required:
+                - phoneNumbers
+                - connectedWhatsAppNo
+                - template
+            examples:
+              WhatsApp Cloud:
+                value:
+                  phoneNumbers:
+                    - '2368106035555'
+                  connectedWhatsAppNo: '104920685899299'
+                  template:
+                    name: ship
+                    language:
+                      code: en
+                      policy: deterministic
+                    components:
+                      - type: body
+                        parameters:
+                          - type: text
+                            text: '20' 
+              WhatsApp 360Dialog (Cloud API):
+                value:                            
+                  phoneNumbers:
+                    - "xxxxxxxxxxxxx"
+                  connectedWhatsAppNo: "555195251xxx"
+                  template:
+                    name: "boarding_pass"
+                    language:
+                      code: "en"
+                      policy: "deterministic"
+                    components:
+                      - type: "header"
+                        parameters:
+                          - type: "text"
+                            text: "halo"
+                      - type: "body"
+                        parameters:
+                          - type: "text"
+                            text: "abc"
+                          - type: "text"
+                            text: "xyz"
+              Whatsapp Sandbox:
+                value:
+                  phoneNumbers:
+                    - "50364357612"
+                  template:
+                    name: "first_welcome_messsage"
+                    language:
+                      code: "en"
+                    components:
+                      - type: "body"
+                        parameters:
+                          - type: "text"
+                            text: "Your name goes here"
+      responses:
+        '200':
+          $ref: '#/components/responses/trueSuccess'
+        '401':
+          $ref: '#/components/responses/authorizationError'
+        '403':
+          $ref: '#/components/responses/forbiddenError'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+              examples:
+                Too many phone numbers:
+                  value:
+                    success: false
+                    error: Too many phone numbers! Please make sure that phoneNumbers are <= 250
+                Agent Not Found:
+                  value:
+                    success: false
+                    error: No Agent found with username abc98
+                Department Not Found:
+                  value:
+                    success: false
+                    error: No Department found with id/Name SalesDepartment
+                Invalid WhatsApp Contact:
+                  value:
+                    success: false
+                    error: Connected WhatsApp Number (connectedWhatsAppNo) i.e. 565412001234 is not a valid WhatsApp contact. Contact Status is invalid
+                Invalid Connected WhatsApp Number:
+                  value:
+                    success: false
+                    error: 'Error! Connected WhatsApp Number (connectedWhatsAppNo) i.e. 565412001234 has not been registered yet on Rocket.Chat. Please goto #omnichannel-whatsapp-setup channel and connect this WhatsApp number first there before sending this request again.'
+  /api/apps:
+    post:
+      summary: Install Private Apps
+      description: |- 
+        Install a <a href="https://docs.rocket.chat/docs/rocketchat-marketplace#private-apps" target="_blank">private app</a> via URL. <a href="https://docs.rocket.chat/docs/permissions" target="_blank">Permission</a> required: `manage-apps`
+
+        ### Changelog
+        | Version      | Description |
+        | ---------------- | ------------|
+        |3.1.0     | Added       |
+      operationId: post-api-apps
+      parameters:
+        - $ref: '#/components/parameters/Auth-Token'
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  description: The app URL where the zip file is located.
+                app:
+                  type: string
+                  format: binary
+                  description: The zip file containing the app.
+                permissions:
+                  type: array
+                  description: An array of the [permissions](https://developer.rocket.chat/docs/app-permission-system) required for your app. This is required if permissions are defined in your `app.json` file.
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+            examples:
+              Example:
+                value:
+                  url: 'https://github.com/RocketChat/Apps.RocketChat.Tester/blob/master/dist/appsrocketchattester_0.0.5.zip?raw=true'
+                  app: 'path to the zip file'
+        description: You can use either the `app` or `url` parameter to upload the file.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  app:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      version:
+                        type: string
+                      requiredApiVersion:
+                        type: string
+                      iconFile:
+                        type: string
+                      author:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                          homepage:
+                            type: string
+                          support:
+                            type: string
+                      name:
+                        type: string
+                      nameSlug:
+                        type: string
+                      classFile:
+                        type: string
+                      description:
+                        type: string
+                      implements:
+                        type: array
+                        items:
+                          type: object
+                      iconFileContent:
+                        type: string
+                      status:
+                        type: string
+                  implemented:
+                    type: object
+                    properties:
+                      IPreMessageSentPrevent:
+                        type: boolean
+                      IPreMessageSentExtend:
+                        type: boolean
+                      IPreMessageSentModify:
+                        type: boolean
+                      IPostMessageSent:
+                        type: boolean
+                      IPreMessageDeletePrevent:
+                        type: boolean
+                      IPostMessageDeleted:
+                        type: boolean
+                      IPreMessageUpdatedPrevent:
+                        type: boolean
+                      IPreMessageUpdatedExtend:
+                        type: boolean
+                      IPreMessageUpdatedModify:
+                        type: boolean
+                      IPostMessageUpdated:
+                        type: boolean
+                      IPostMessageReacted:
+                        type: boolean
+                      IPostMessageFollowed:
+                        type: boolean
+                      IPostMessagePinned:
+                        type: boolean
+                      IPostMessageStarred:
+                        type: boolean
+                      IPostMessageReported:
+                        type: boolean
+                      IPreRoomCreatePrevent:
+                        type: boolean
+                      IPreRoomCreateExtend:
+                        type: boolean
+                      IPreRoomCreateModify:
+                        type: boolean
+                      IPostRoomCreate:
+                        type: boolean
+                      IPreRoomDeletePrevent:
+                        type: boolean
+                      IPostRoomDeleted:
+                        type: boolean
+                      IPreRoomUserJoined:
+                        type: boolean
+                      IPostRoomUserJoined:
+                        type: boolean
+                      IPreRoomUserLeave:
+                        type: boolean
+                      IPostRoomUserLeave:
+                        type: boolean
+                      IPostExternalComponentOpened:
+                        type: boolean
+                      IPostExternalComponentClosed:
+                        type: boolean
+                      IUIKitInteractionHandler:
+                        type: boolean
+                      IUIKitLivechatInteractionHandler:
+                        type: boolean
+                      IPostLivechatRoomStarted:
+                        type: boolean
+                      IPostLivechatRoomClosed:
+                        type: boolean
+                      ILivechatRoomClosedHandler:
+                        type: boolean
+                      IPostLivechatAgentAssigned:
+                        type: boolean
+                      IPostLivechatAgentUnassigned:
+                        type: boolean
+                      IPostLivechatRoomTransferred:
+                        type: boolean
+                      IPostLivechatGuestSaved:
+                        type: boolean
+                      IPostLivechatRoomSaved:
+                        type: boolean
+                      IPreFileUpload:
+                        type: boolean
+                      IPreEmailSent:
+                        type: boolean
+                      IPostUserCreated:
+                        type: boolean
+                      IPostUserUpdated:
+                        type: boolean
+                      IPostUserDeleted:
+                        type: boolean
+                      IPostUserLoggedIn:
+                        type: boolean
+                      IPostUserLoggedOut:
+                        type: boolean
+                      IPostUserStatusChanged:
+                        type: boolean
+                  licenseValidation:
+                    type: object
+                    properties:
+                      errors:
+                        type: object
+                      warnings:
+                        type: object
+                  success:
+                    type: boolean
+              examples:
+                Success:
+                  value:
+                    app:
+                      id: bc4dd4a1-bf9b-408e-83a4-aba7eba0bf02
+                      version: 0.0.5
+                      requiredApiVersion: ^1.33.0
+                      iconFile: icon.png
+                      author:
+                        name: Rocket.Chat
+                        homepage: 'https://github.com/RocketChat'
+                        support: a
+                      name: Apps.RocketChat.Tester
+                      nameSlug: appsrocketchattester
+                      classFile: AppsRocketChatTesterApp.js
+                      description: An app that provides endpoints to test Apps integration to Rocket.Chat
+                      implements: []
+                      iconFileContent: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAlgAAAGQBAMAAACAGwOrAAAAG1BMVEUAAAD///9fX19/f38/Pz+fn5/f398fHx+/v7F+DAse5zMkkE4D1Jf6exKnYRje4LriXRQ0JzTVP2t7hLNtFWODfxNqiaa6VE8tGjFCxXyc1HHsTisiQ0rijg4mTvyAAAElFTkSuQmCC'
+                      status: auto_enabled
+                    implemented:
+                      IPreMessageSentPrevent: false
+                      IPreMessageSentExtend: false
+                      IPreMessageSentModify: false
+                      IPostMessageSent: false
+                      IPreMessageDeletePrevent: false
+                      IPostMessageDeleted: false
+                      IPreMessageUpdatedPrevent: false
+                      IPreMessageUpdatedExtend: false
+                      IPreMessageUpdatedModify: false
+                      IPostMessageUpdated: false
+                      IPostMessageReacted: false
+                      IPostMessageFollowed: false
+                      IPostMessagePinned: false
+                      IPostMessageStarred: false
+                      IPostMessageReported: false
+                      IPreRoomCreatePrevent: false
+                      IPreRoomCreateExtend: false
+                      IPreRoomCreateModify: false
+                      IPostRoomCreate: false
+                      IPreRoomDeletePrevent: false
+                      IPostRoomDeleted: false
+                      IPreRoomUserJoined: false
+                      IPostRoomUserJoined: false
+                      IPreRoomUserLeave: false
+                      IPostRoomUserLeave: false
+                      IPostExternalComponentOpened: false
+                      IPostExternalComponentClosed: false
+                      IUIKitInteractionHandler: false
+                      IUIKitLivechatInteractionHandler: false
+                      IPostLivechatRoomStarted: false
+                      IPostLivechatRoomClosed: false
+                      ILivechatRoomClosedHandler: false
+                      IPostLivechatAgentAssigned: false
+                      IPostLivechatAgentUnassigned: false
+                      IPostLivechatRoomTransferred: false
+                      IPostLivechatGuestSaved: false
+                      IPostLivechatRoomSaved: false
+                      IPreFileUpload: false
+                      IPreEmailSent: false
+                      IPostUserCreated: false
+                      IPostUserUpdated: false
+                      IPostUserDeleted: false
+                      IPostUserLoggedIn: false
+                      IPostUserLoggedOut: false
+                      IPostUserStatusChanged: false
+                    licenseValidation:
+                      errors: {}
+                      warnings: {}
+                    success: true
+        '401':
+          $ref: '#/components/responses/authorizationError'
+          
+  /api/apps/logs:
+    get:
+      summary: Get All Apps Logs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  offset:
+                    type: integer
+                  logs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        appId:
+                          type: string
+                        method:
+                          type: string
+                        entries:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              caller:
+                                type: string
+                              severity:
+                                type: string
+                              method:
+                                type: string
+                              timestamp:
+                                type: string
+                              args:
+                                type: array
+                                items:
+                                  type: string
+                        startTime:
+                          type: string
+                        endTime:
+                          type: string
+                        totalTime:
+                          type: integer
+                        _createdAt:
+                          type: string
+                        instanceId:
+                          type: string
+                        _updatedAt:
+                          type: string
+                  count:
+                    type: integer
+                  total:
+                    type: integer
+                  success:
+                    type: boolean
+              examples:
+                Example 1:
+                  value:
+                    offset: 0
+                    logs:
+                      - _id: 68341684d387e3d7509267f6
+                        appId: 30d2e4bf-2402-4197-b844-e7082b07dc65
+                        method: 'scheduler:registration.auto.renew.scheduler'
+                        entries:
+                          - caller: anonymous OR constructor -> handleScheduler
+                            severity: debug
+                            method: 'scheduler:registration.auto.renew.scheduler'
+                            timestamp: '2025-05-26T07:21:40.283Z'
+                            args:
+                              - Job processor registration.auto.renew.scheduler is being executed...
+                          - caller: anonymous OR constructor -> handleScheduler
+                            severity: debug
+                            method: 'scheduler:registration.auto.renew.scheduler'
+                            timestamp: '2025-05-26T07:21:40.295Z'
+                            args:
+                              - Job processor registration.auto.renew.scheduler was successfully executed
+                        startTime: '2025-05-26T07:21:40.283Z'
+                        endTime: '2025-05-26T07:21:40.295Z'
+                        totalTime: 12
+                        _createdAt: '2025-05-26T07:21:40.295Z'
+                        instanceId: ad219c7b-84a5-4077-9ede-f6f9d7c4d3bd
+                        _updatedAt: '2025-05-26T07:21:40.296Z'
+                      - _id: 68340f7cd387e3d7509267f5
+                        appId: 30d2e4bf-2402-4197-b844-e7082b07dc65
+                        method: 'scheduler:registration.auto.renew.scheduler'
+                        entries:
+                          - caller: anonymous OR constructor -> handleScheduler
+                            severity: debug
+                            method: 'scheduler:registration.auto.renew.scheduler'
+                            timestamp: '2025-05-26T06:51:40.284Z'
+                            args:
+                              - Job processor registration.auto.renew.scheduler is being executed...
+                          - caller: anonymous OR constructor -> handleScheduler
+                            severity: debug
+                            method: 'scheduler:registration.auto.renew.scheduler'
+                            timestamp: '2025-05-26T06:51:40.294Z'
+                            args:
+                              - Job processor registration.auto.renew.scheduler was successfully executed
+                        startTime: '2025-05-26T06:51:40.284Z'
+                        endTime: '2025-05-26T06:51:40.294Z'
+                        totalTime: 10
+                        _createdAt: '2025-05-26T06:51:40.294Z'
+                        instanceId: ad219c7b-84a5-4077-9ede-f6f9d7c4d3bd
+                        _updatedAt: '2025-05-26T06:51:40.295Z'
+                    count: 2
+                    total: 3916
+                    success: true
+        '400':
+          $ref: '#/components/responses/forbiddenError'
+        '401':
+          $ref: '#/components/responses/authorizationError'
+      operationId: get-api-apps-logs
+      description: |-
+       Use this endpoint to get the list of apps' logs for your workspace.
+       Permission required: `manage-apps`
+       
+       ### Changelog
+       | Version      | Description |
+       | ---------------- | ------------|
+       |7.7.0             | Added       |
+      parameters:
+        - $ref: '#/components/parameters/UserId'
+        - $ref: '#/components/parameters/Auth-Token'
+        - schema:
+            type: string
+            example: 4406213d-8624-4355-9641-29e65bf3e3bc
+          in: query
+          name: appId
+          description: Enter the app ID for which you want to view logs.
+        - $ref: '#/components/parameters/logLevel'
+        - $ref: '#/components/parameters/method'
+        - $ref: '#/components/parameters/startDate'
+        - $ref: '#/components/parameters/endDate'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/sort'
+        
+  '/app/{id}/logs':
+    get:
+      summary: Get an App's Logs
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  offset:
+                    type: integer
+                  logs:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                        appId:
+                          type: string
+                        method:
+                          type: string
+                        entries:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              caller:
+                                type: string
+                              severity:
+                                type: string
+                              method:
+                                type: string
+                              timestamp:
+                                type: string
+                              args:
+                                type: array
+                                items:
+                                  type: string
+                        startTime:
+                          type: string
+                        endTime:
+                          type: string
+                        totalTime:
+                          type: integer
+                        _createdAt:
+                          type: string
+                        instanceId:
+                          type: string
+                        _updatedAt:
+                          type: string
+                  count:
+                    type: integer
+                  total:
+                    type: integer
+                  success:
+                    type: boolean
+              examples:
+                Example 1:
+                  value:
+                    offset: 0
+                    logs:
+                      - _id: 68341684d387e3d7509267f6
+                        appId: 30d2e4bf-2402-4197-b844-e7082b07dc65
+                        method: 'scheduler:registration.auto.renew.scheduler'
+                        entries:
+                          - caller: anonymous OR constructor -> handleScheduler
+                            severity: debug
+                            method: 'scheduler:registration.auto.renew.scheduler'
+                            timestamp: '2025-05-26T07:21:40.283Z'
+                            args:
+                              - Job processor registration.auto.renew.scheduler is being executed...
+                          - caller: anonymous OR constructor -> handleScheduler
+                            severity: debug
+                            method: 'scheduler:registration.auto.renew.scheduler'
+                            timestamp: '2025-05-26T07:21:40.295Z'
+                            args:
+                              - Job processor registration.auto.renew.scheduler was successfully executed
+                        startTime: '2025-05-26T07:21:40.283Z'
+                        endTime: '2025-05-26T07:21:40.295Z'
+                        totalTime: 12
+                        _createdAt: '2025-05-26T07:21:40.295Z'
+                        instanceId: ad219c7b-84a5-4077-9ede-f6f9d7c4d3bd
+                        _updatedAt: '2025-05-26T07:21:40.296Z'
+                      - _id: 68340f7cd387e3d7509267f5
+                        appId: 30d2e4bf-2402-4197-b844-e7082b07dc65
+                        method: 'scheduler:registration.auto.renew.scheduler'
+                        entries:
+                          - caller: anonymous OR constructor -> handleScheduler
+                            severity: debug
+                            method: 'scheduler:registration.auto.renew.scheduler'
+                            timestamp: '2025-05-26T06:51:40.284Z'
+                            args:
+                              - Job processor registration.auto.renew.scheduler is being executed...
+                          - caller: anonymous OR constructor -> handleScheduler
+                            severity: debug
+                            method: 'scheduler:registration.auto.renew.scheduler'
+                            timestamp: '2025-05-26T06:51:40.294Z'
+                            args:
+                              - Job processor registration.auto.renew.scheduler was successfully executed
+                        startTime: '2025-05-26T06:51:40.284Z'
+                        endTime: '2025-05-26T06:51:40.294Z'
+                        totalTime: 10
+                        _createdAt: '2025-05-26T06:51:40.294Z'
+                        instanceId: ad219c7b-84a5-4077-9ede-f6f9d7c4d3bd
+                        _updatedAt: '2025-05-26T06:51:40.295Z'
+                    count: 2
+                    total: 3916
+                    success: true
+        '400':
+          $ref: '#/components/responses/forbiddenError'
+        '401':
+          $ref: '#/components/responses/authorizationError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+              examples:
+                Example 1:
+                  value:
+                    success: false
+                    error: 'No App found by the id of: :id'
+      operationId: 'get-app-:id-logs'
+      description: |-
+        Use this endpoint to get a specific app's logs for your workspace.
+        Permission required: `manage-apps`
+      parameters:
+        - $ref: '#/components/parameters/Auth-Token'
+        - $ref: '#/components/parameters/UserId'
+        - schema:
+            type: string
+            example: fc96e832-5472-49e4-aace-1521a7ebeaa6
+          name: id
+          in: path
+          required: true
+          description: Enter the app ID for which you want to view the logs results.
+        - $ref: '#/components/parameters/method'
+        - $ref: '#/components/parameters/logLevel'
+        - $ref: '#/components/parameters/startDate'
+        - $ref: '#/components/parameters/endDate'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/count'
+        - $ref: '#/components/parameters/sort'
+  
+components:
+  schemas: {}
+  parameters:
+    Auth-Token:
+      name: X-Auth-Token
+      in: header
+      description: The `authToken` of the authenticated user.
+      required: true
+      schema:
+        type: string
+      example: RScctEHSmLGZGywfIhWyRpyofhKOiMoUIpimhvheU3f
+    UserId:
+      name: X-User-Id
+      in: header
+      description: The `userId` of the authenticated user.
+      required: true
+      schema:
+        type: string
+      example: rbAXPnMktTFbNpwtJ
+    offset:
+      name: offset
+      in: query
+      required: false
+      schema:
+        type: number
+        example: 50
+      description: 'Number of items to "skip" in the query, i.e. requests return count items, skipping the first offset items. Refer to the [official documentation](https://developer.rocket.chat/apidocs/query-parameters#pagination) to learn more.'
+    count:
+      name: count
+      in: query
+      required: false
+      schema:
+        type: number
+        example: 10
+      description: 'The number of items to return.  Refer to the [official documentation](https://developer.rocket.chat/apidocs/query-parameters#pagination) to learn more.'
+    sort:
+      name: sort
+      in: query
+      required: false
+      schema:
+        type: string
+      description: 'List of fields to order by, and in which direction. This is a JSON object, with properties listed in desired order, with values of 1 for ascending, or -1 for descending. For example, `{ "value": -1, "_id": 1 }`. Refer to the [official documentation](https://developer.rocket.chat/apidocs/query-parameters#pagination) to learn more.'
+    startDate:
+      name: startDate
+      in: query
+      required: false
+      schema:
+        type: string
+        example: '2025-05-25T06:06:45.954Z'
+      description: Enter the start date from which you want the logs results. The format is ISO string.
+    endDate:
+      name: endDate
+      in: query
+      required: false
+      schema:
+        type: string
+        example: '2025-05-25T06:06:45.954Z'
+      description: Enter the end date till which you want to view the logs. The format is ISO string.
+    method:
+      name: method
+      in: query
+      required: false
+      schema:
+        type: string
+        example: 'app:construct'
+      description: 'An app lifecycle has many phases which you can view from the **Logs** section of an app''s **App Info** page. These phases are the methods that are are invoked by an app depending on its settings and user interactions. '
+    logLevel:
+      name: logLevel
+      in: query
+      required: false
+      schema:
+        type: string
+        example: '1'
+      description: 'The log level refers to the type of logs you want to view. Enter `0` to view errors, `1` for errors and information, and `2` for errors, information, and debugging details. '
+  responses:
+    trueSuccess:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+          examples:
+            Success:
+              value:
+                success: true
+    authorizationError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              message:
+                type: string
+          examples:
+            Authorization Error:
+              value:
+                status: error
+                message: You must be logged in to do this.
+    forbiddenError:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              error:
+                type: string
+          examples:
+            Permission Error:
+              value:
+                success: false
+                error: 'User does not have the permissions required for this action [error-unauthorized]'
+tags:
+  - name: Rasa App
+  - name: WhatsApp

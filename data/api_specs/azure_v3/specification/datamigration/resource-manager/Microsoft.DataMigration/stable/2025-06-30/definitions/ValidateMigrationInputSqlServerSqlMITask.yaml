@@ -1,0 +1,706 @@
+openapi: 3.0.0
+info:
+  title: Azure Database Migration Service (classic) Resource Provider
+  version: 2025-06-30
+paths: {}
+components:
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    ValidateMigrationInputSqlServerSqlMITaskInput:
+      type: object
+      description: Input for task that validates migration input for SQL to Azure
+        SQL Managed Instance
+      properties:
+        sourceConnectionInfo:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of connection info
+            userName:
+              type: string
+              description: User name
+            password:
+              type: string
+              description: Password credential.
+            dataSource:
+              type: string
+              description: Data source in the format Protocol:MachineName\SQLServerInstanceName,PortNumber
+            serverName:
+              type: string
+              description: name of the server
+            port:
+              type: integer
+              description: Port for Server
+            serverVersion:
+              type: string
+              description: server version
+            serverBrandVersion:
+              type: string
+              description: server brand version
+            resourceId:
+              type: string
+              description: Represents the ID of an HTTP resource represented by an
+                Azure resource provider.
+            authentication:
+              description: Authentication type to use for connection
+              type: string
+              enum:
+              - None
+              - WindowsAuthentication
+              - SqlAuthentication
+              - ActiveDirectoryIntegrated
+              - ActiveDirectoryPassword
+              x-ms-enum:
+                name: AuthenticationType
+                modelAsString: true
+            encryptConnection:
+              type: boolean
+              description: Whether to encrypt the connection
+              default: true
+            additionalSettings:
+              type: string
+              description: Additional connection settings
+            trustServerCertificate:
+              type: boolean
+              description: Whether to trust the server certificate
+              default: false
+            platform:
+              description: Server platform type for connection
+              type: string
+              enum:
+              - SqlOnPrem
+              x-ms-enum:
+                name: SqlSourcePlatform
+                modelAsString: true
+          required:
+          - type
+          - dataSource
+          description: Defines the connection properties of a server
+          discriminator:
+            propertyName: type
+          x-ms-discriminator-value: SqlConnectionInfo
+        targetConnectionInfo:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of connection info
+            userName:
+              type: string
+              description: User name
+            password:
+              type: string
+              description: Password credential.
+            dataSource:
+              type: string
+              description: Data source in the format Protocol:MachineName\SQLServerInstanceName,PortNumber
+            serverName:
+              type: string
+              description: name of the server
+            port:
+              type: integer
+              description: Port for Server
+            serverVersion:
+              type: string
+              description: server version
+            serverBrandVersion:
+              type: string
+              description: server brand version
+            resourceId:
+              type: string
+              description: Represents the ID of an HTTP resource represented by an
+                Azure resource provider.
+            authentication:
+              description: Authentication type to use for connection
+              type: string
+              enum:
+              - None
+              - WindowsAuthentication
+              - SqlAuthentication
+              - ActiveDirectoryIntegrated
+              - ActiveDirectoryPassword
+              x-ms-enum:
+                name: AuthenticationType
+                modelAsString: true
+            encryptConnection:
+              type: boolean
+              description: Whether to encrypt the connection
+              default: true
+            additionalSettings:
+              type: string
+              description: Additional connection settings
+            trustServerCertificate:
+              type: boolean
+              description: Whether to trust the server certificate
+              default: false
+            platform:
+              description: Server platform type for connection
+              type: string
+              enum:
+              - SqlOnPrem
+              x-ms-enum:
+                name: SqlSourcePlatform
+                modelAsString: true
+          required:
+          - type
+          - dataSource
+          description: Defines the connection properties of a server
+          discriminator:
+            propertyName: type
+          x-ms-discriminator-value: SqlConnectionInfo
+        selectedDatabases:
+          type: array
+          description: Databases to migrate
+          items:
+            type: object
+            description: Database specific information for SQL to Azure SQL DB Managed
+              Instance migration task inputs
+            properties:
+              name:
+                type: string
+                description: Name of the database
+              restoreDatabaseName:
+                type: string
+                description: Name of the database at destination
+              backupFileShare:
+                description: Backup file share information for backing up this database.
+                type: object
+                properties:
+                  userName:
+                    type: string
+                    description: User name credential to connect to the share location
+                  password:
+                    type: string
+                    description: Password credential used to connect to the share
+                      location.
+                  path:
+                    type: string
+                    description: The folder path for this share.
+                required:
+                - path
+              backupFilePaths:
+                type: array
+                description: The list of backup files to be used in case of existing
+                  backups.
+                items:
+                  type: string
+              id:
+                type: string
+                description: id of the database
+            required:
+            - name
+            - restoreDatabaseName
+        selectedLogins:
+          type: array
+          description: Logins to migrate
+          items:
+            type: string
+        backupFileShare:
+          description: Backup file share information for all selected databases.
+          type: object
+          properties:
+            userName:
+              type: string
+              description: User name credential to connect to the share location
+            password:
+              type: string
+              description: Password credential used to connect to the share location.
+            path:
+              type: string
+              description: The folder path for this share.
+          required:
+          - path
+        backupBlobShare:
+          description: SAS URI of Azure Storage Account Container to be used for storing
+            backup files.
+          type: object
+          properties:
+            sasUri:
+              type: string
+              description: SAS URI of Azure Storage Account Container.
+        backupMode:
+          description: Backup Mode to specify whether to use existing backup or create
+            new backup.
+          type: string
+          enum:
+          - CreateBackup
+          - ExistingBackup
+          x-ms-enum:
+            name: BackupMode
+            modelAsString: true
+      required:
+      - sourceConnectionInfo
+      - targetConnectionInfo
+      - selectedDatabases
+      - backupBlobShare
+    ValidateMigrationInputSqlServerSqlMITaskOutput:
+      type: object
+      description: Output for task that validates migration input for SQL to Azure
+        SQL Managed Instance migrations
+      properties:
+        id:
+          type: string
+          description: Result identifier
+          readOnly: true
+        name:
+          type: string
+          description: Name of database
+          readOnly: true
+        restoreDatabaseNameErrors:
+          description: Errors associated with the RestoreDatabaseName
+          type: array
+          items:
+            type: object
+            description: Exception object for all custom exceptions
+            properties:
+              message:
+                type: string
+                description: Error message
+              actionableMessage:
+                type: string
+                description: Actionable steps for this exception
+              filePath:
+                type: string
+                description: The path to the file where exception occurred
+              lineNumber:
+                type: string
+                description: The line number where exception occurred
+              hResult:
+                type: integer
+                description: Coded numerical value that is assigned to a specific
+                  exception
+              stackTrace:
+                type: string
+                description: Stack trace
+          readOnly: true
+        backupFolderErrors:
+          description: Errors associated with the BackupFolder path
+          type: array
+          items:
+            type: object
+            description: Exception object for all custom exceptions
+            properties:
+              message:
+                type: string
+                description: Error message
+              actionableMessage:
+                type: string
+                description: Actionable steps for this exception
+              filePath:
+                type: string
+                description: The path to the file where exception occurred
+              lineNumber:
+                type: string
+                description: The line number where exception occurred
+              hResult:
+                type: integer
+                description: Coded numerical value that is assigned to a specific
+                  exception
+              stackTrace:
+                type: string
+                description: Stack trace
+          readOnly: true
+        backupShareCredentialsErrors:
+          description: Errors associated with backup share user name and password
+            credentials
+          type: array
+          items:
+            type: object
+            description: Exception object for all custom exceptions
+            properties:
+              message:
+                type: string
+                description: Error message
+              actionableMessage:
+                type: string
+                description: Actionable steps for this exception
+              filePath:
+                type: string
+                description: The path to the file where exception occurred
+              lineNumber:
+                type: string
+                description: The line number where exception occurred
+              hResult:
+                type: integer
+                description: Coded numerical value that is assigned to a specific
+                  exception
+              stackTrace:
+                type: string
+                description: Stack trace
+          readOnly: true
+        backupStorageAccountErrors:
+          description: Errors associated with the storage account provided.
+          type: array
+          items:
+            type: object
+            description: Exception object for all custom exceptions
+            properties:
+              message:
+                type: string
+                description: Error message
+              actionableMessage:
+                type: string
+                description: Actionable steps for this exception
+              filePath:
+                type: string
+                description: The path to the file where exception occurred
+              lineNumber:
+                type: string
+                description: The line number where exception occurred
+              hResult:
+                type: integer
+                description: Coded numerical value that is assigned to a specific
+                  exception
+              stackTrace:
+                type: string
+                description: Stack trace
+          readOnly: true
+        existingBackupErrors:
+          description: Errors associated with existing backup files.
+          type: array
+          items:
+            type: object
+            description: Exception object for all custom exceptions
+            properties:
+              message:
+                type: string
+                description: Error message
+              actionableMessage:
+                type: string
+                description: Actionable steps for this exception
+              filePath:
+                type: string
+                description: The path to the file where exception occurred
+              lineNumber:
+                type: string
+                description: The line number where exception occurred
+              hResult:
+                type: integer
+                description: Coded numerical value that is assigned to a specific
+                  exception
+              stackTrace:
+                type: string
+                description: Stack trace
+          readOnly: true
+        databaseBackupInfo:
+          description: Information about backup files when existing backup mode is
+            used.
+          type: object
+          properties:
+            databaseName:
+              type: string
+              description: Database name.
+              readOnly: true
+            backupType:
+              description: Backup Type.
+              readOnly: true
+              type: string
+              enum:
+              - Database
+              - TransactionLog
+              - File
+              - DifferentialDatabase
+              - DifferentialFile
+              - Partial
+              - DifferentialPartial
+              x-ms-enum:
+                name: BackupType
+                modelAsString: true
+            backupFiles:
+              type: array
+              description: The list of backup files for the current database.
+              items:
+                type: string
+              readOnly: true
+            position:
+              description: Position of current database backup in the file.
+              type: integer
+              readOnly: true
+            isDamaged:
+              type: boolean
+              description: Database was damaged when backed up, but the backup operation
+                was requested to continue despite errors.
+              readOnly: true
+            isCompressed:
+              type: boolean
+              description: Whether the backup set is compressed
+              readOnly: true
+            familyCount:
+              type: integer
+              description: Number of files in the backup set.
+              readOnly: true
+            backupFinishDate:
+              type: string
+              format: date-time
+              description: Date and time when the backup operation finished.
+              readOnly: true
+    ConnectionInfo:
+      type: object
+      description: Defines the connection properties of a server
+      properties:
+        type:
+          type: string
+          description: Type of connection info
+        userName:
+          type: string
+          description: User name
+        password:
+          type: string
+          description: Password credential.
+      required:
+      - type
+      discriminator:
+        propertyName: type
+    AuthenticationType:
+      type: string
+      description: An enumeration of possible authentication types when connecting
+      enum:
+      - None
+      - WindowsAuthentication
+      - SqlAuthentication
+      - ActiveDirectoryIntegrated
+      - ActiveDirectoryPassword
+      x-ms-enum:
+        name: AuthenticationType
+        modelAsString: true
+    SqlServerSourcePlatform:
+      type: string
+      description: An enumeration of source platform types
+      enum:
+      - SqlOnPrem
+      x-ms-enum:
+        name: SqlSourcePlatform
+        modelAsString: true
+    SqlConnectionInfo:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of connection info
+        userName:
+          type: string
+          description: User name
+        password:
+          type: string
+          description: Password credential.
+        dataSource:
+          type: string
+          description: Data source in the format Protocol:MachineName\SQLServerInstanceName,PortNumber
+        serverName:
+          type: string
+          description: name of the server
+        port:
+          type: integer
+          description: Port for Server
+        serverVersion:
+          type: string
+          description: server version
+        serverBrandVersion:
+          type: string
+          description: server brand version
+        resourceId:
+          type: string
+          description: Represents the ID of an HTTP resource represented by an Azure
+            resource provider.
+        authentication:
+          description: Authentication type to use for connection
+          type: string
+          enum:
+          - None
+          - WindowsAuthentication
+          - SqlAuthentication
+          - ActiveDirectoryIntegrated
+          - ActiveDirectoryPassword
+          x-ms-enum:
+            name: AuthenticationType
+            modelAsString: true
+        encryptConnection:
+          type: boolean
+          description: Whether to encrypt the connection
+          default: true
+        additionalSettings:
+          type: string
+          description: Additional connection settings
+        trustServerCertificate:
+          type: boolean
+          description: Whether to trust the server certificate
+          default: false
+        platform:
+          description: Server platform type for connection
+          type: string
+          enum:
+          - SqlOnPrem
+          x-ms-enum:
+            name: SqlSourcePlatform
+            modelAsString: true
+      required:
+      - type
+      - dataSource
+      description: Defines the connection properties of a server
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: SqlConnectionInfo
+    FileShare:
+      type: object
+      description: File share information with Path, Username, and Password.
+      properties:
+        userName:
+          type: string
+          description: User name credential to connect to the share location
+        password:
+          type: string
+          description: Password credential used to connect to the share location.
+        path:
+          type: string
+          description: The folder path for this share.
+      required:
+      - path
+    MigrateSqlServerSqlMIDatabaseInput:
+      type: object
+      description: Database specific information for SQL to Azure SQL DB Managed Instance
+        migration task inputs
+      properties:
+        name:
+          type: string
+          description: Name of the database
+        restoreDatabaseName:
+          type: string
+          description: Name of the database at destination
+        backupFileShare:
+          description: Backup file share information for backing up this database.
+          type: object
+          properties:
+            userName:
+              type: string
+              description: User name credential to connect to the share location
+            password:
+              type: string
+              description: Password credential used to connect to the share location.
+            path:
+              type: string
+              description: The folder path for this share.
+          required:
+          - path
+        backupFilePaths:
+          type: array
+          description: The list of backup files to be used in case of existing backups.
+          items:
+            type: string
+        id:
+          type: string
+          description: id of the database
+      required:
+      - name
+      - restoreDatabaseName
+    BlobShare:
+      type: object
+      description: Blob container storage information.
+      properties:
+        sasUri:
+          type: string
+          description: SAS URI of Azure Storage Account Container.
+    BackupMode:
+      type: string
+      description: An enumeration of backup modes
+      enum:
+      - CreateBackup
+      - ExistingBackup
+      x-ms-enum:
+        name: BackupMode
+        modelAsString: true
+    ReportableException:
+      type: object
+      description: Exception object for all custom exceptions
+      properties:
+        message:
+          type: string
+          description: Error message
+        actionableMessage:
+          type: string
+          description: Actionable steps for this exception
+        filePath:
+          type: string
+          description: The path to the file where exception occurred
+        lineNumber:
+          type: string
+          description: The line number where exception occurred
+        hResult:
+          type: integer
+          description: Coded numerical value that is assigned to a specific exception
+        stackTrace:
+          type: string
+          description: Stack trace
+    BackupType:
+      type: string
+      description: Enum of the different backup types.
+      enum:
+      - Database
+      - TransactionLog
+      - File
+      - DifferentialDatabase
+      - DifferentialFile
+      - Partial
+      - DifferentialPartial
+      x-ms-enum:
+        name: BackupType
+        modelAsString: true
+    DatabaseBackupInfo:
+      type: object
+      description: Information about backup files when existing backup mode is used.
+      properties:
+        databaseName:
+          type: string
+          description: Database name.
+          readOnly: true
+        backupType:
+          description: Backup Type.
+          readOnly: true
+          type: string
+          enum:
+          - Database
+          - TransactionLog
+          - File
+          - DifferentialDatabase
+          - DifferentialFile
+          - Partial
+          - DifferentialPartial
+          x-ms-enum:
+            name: BackupType
+            modelAsString: true
+        backupFiles:
+          type: array
+          description: The list of backup files for the current database.
+          items:
+            type: string
+          readOnly: true
+        position:
+          description: Position of current database backup in the file.
+          type: integer
+          readOnly: true
+        isDamaged:
+          type: boolean
+          description: Database was damaged when backed up, but the backup operation
+            was requested to continue despite errors.
+          readOnly: true
+        isCompressed:
+          type: boolean
+          description: Whether the backup set is compressed
+          readOnly: true
+        familyCount:
+          type: integer
+          description: Number of files in the backup set.
+          readOnly: true
+        backupFinishDate:
+          type: string
+          format: date-time
+          description: Date and time when the backup operation finished.
+          readOnly: true

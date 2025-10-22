@@ -1,0 +1,166 @@
+openapi: 3.0.0
+info:
+  title: CommunicationNetworkTraversalClient
+  description: Azure Communication Network Traversal Service
+  version: 2022-03-01-preview
+paths:
+  /networkTraversal/:issueRelayConfiguration:
+    post:
+      tags:
+      - Turn
+      summary: Issue a configuration for an STUN/TURN server.
+      operationId: CommunicationNetworkTraversal_IssueRelayConfiguration
+      parameters:
+      - $ref: '#/components/parameters/ApiVersionParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunicationRelayConfigurationRequest'
+        description: Optional request for providing the id and/or route type for the
+          returned relay configuration.
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationRelayConfiguration'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationErrorResponse'
+servers:
+- url: '{endpoint}'
+  variables:
+    endpoint:
+      description: The communication resource, for example https://my-resource.communication.azure.com
+      x-ms-skip-url-encoding: true
+      x-ms-parameter-location: client
+      default: none
+components:
+  parameters:
+    ApiVersionParameter:
+      in: query
+      name: api-version
+      description: Version of API to invoke.
+      required: true
+      schema:
+        type: string
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    CommunicationRelayConfigurationRequest:
+      description: Request for a CommunicationRelayConfiguration.
+      type: object
+      properties:
+        id:
+          description: An identity to be associated with telemetry for data relayed
+            using the returned credentials. Must be an existing ACS user identity.
+            If not provided, the telemetry will not contain an associated identity
+            value.
+          type: string
+        routeType:
+          $ref: '#/components/schemas/RouteType'
+        ttl:
+          type: integer
+          format: int32
+          description: The credential Time-To-Live (TTL), in seconds. The default
+            value will be used if given value exceeds it.
+          minimum: 0
+          maximum: 172800
+          default: 172800
+    CommunicationIceServer:
+      description: An instance of a STUN/TURN server with credentials to be used for
+        ICE negotiation.
+      required:
+      - credential
+      - urls
+      - username
+      - routeType
+      type: object
+      properties:
+        urls:
+          description: List of STUN/TURN server URLs.
+          type: array
+          items:
+            type: string
+        username:
+          description: User account name which uniquely identifies the credentials.
+          type: string
+        credential:
+          description: Credential for the server.
+          type: string
+        routeType:
+          $ref: '#/components/schemas/RouteType'
+    CommunicationRelayConfiguration:
+      description: A relay configuration containing the STUN/TURN URLs and credentials.
+      required:
+      - expiresOn
+      - iceServers
+      type: object
+      properties:
+        expiresOn:
+          format: date-time
+          description: The date for which the username and credentials are not longer
+            valid. Will be 48 hours from request time.
+          type: string
+        iceServers:
+          description: An array representing the credentials and the STUN/TURN server
+            URLs for use in ICE negotiations.
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunicationIceServer'
+    RouteType:
+      description: The routing methodology to where the ICE server will be located
+        from the client. "any" will have higher reliability while "nearest" will have
+        lower latency. It is recommended to default to use the "any" routing method
+        unless there are specific scenarios which minimizing latency is critical.
+      enum:
+      - any
+      - nearest
+      type: string
+      x-ms-enum:
+        name: RouteType
+        modelAsString: true
+    CommunicationError:
+      description: The Communication Services error.
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: The error code.
+        message:
+          type: string
+          description: The error message.
+        target:
+          type: string
+          readOnly: true
+          description: The error target.
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunicationError'
+          readOnly: true
+          description: Further details about specific errors that led to this error.
+        innererror:
+          $ref: '#/components/schemas/CommunicationError'
+    CommunicationErrorResponse:
+      description: The Communication Services error.
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          $ref: '#/components/schemas/CommunicationError'

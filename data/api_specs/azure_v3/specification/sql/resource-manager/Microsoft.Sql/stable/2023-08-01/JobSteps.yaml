@@ -1,0 +1,2921 @@
+openapi: 3.0.0
+info:
+  version: 2023-08-01
+  title: SqlManagementClient
+  description: The Azure SQL Database management API provides a RESTful set of web
+    APIs that interact with Azure SQL Database services to manage your databases.
+    The API enables users to create, retrieve, update, and delete databases, servers,
+    and other entities.
+servers:
+- url: https://management.azure.com
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/jobAgents/{jobAgentName}/jobs/{jobName}/steps
+  : get:
+      tags:
+      - JobSteps
+      description: Gets all job steps for a job's current version.
+      operationId: JobSteps_ListByJob
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group that contains the resource. You
+          can obtain this value from the Azure Resource Manager API or the portal.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: serverName
+        in: path
+        description: The name of the server.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: jobAgentName
+        in: path
+        description: The name of the job agent.
+        required: true
+        schema:
+          type: string
+      - name: jobName
+        in: path
+        description: The name of the job to get.
+        required: true
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        description: The subscription ID that identifies an Azure subscription.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for the request.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved the list of job steps.
+          content:
+            application/json:
+              schema:
+                description: A list of job steps.
+                type: object
+                properties:
+                  value:
+                    description: Array of results.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          description: Resource ID.
+                          type: string
+                          readOnly: true
+                        name:
+                          description: Resource name.
+                          type: string
+                          readOnly: true
+                        type:
+                          description: Resource type.
+                          type: string
+                          readOnly: true
+                        properties:
+                          description: Resource properties.
+                          x-ms-client-flatten: true
+                          required:
+                          - targetGroup
+                          - action
+                          type: object
+                          properties:
+                            stepId:
+                              format: int32
+                              description: The job step's index within the job. If
+                                not specified when creating the job step, it will
+                                be created as the last step. If not specified when
+                                updating the job step, the step id is not modified.
+                              type: integer
+                            targetGroup:
+                              description: The resource ID of the target group that
+                                the job step will be executed on.
+                              type: string
+                            credential:
+                              description: The resource ID of the job credential that
+                                will be used to connect to the targets.
+                              type: string
+                            action:
+                              description: The action payload of the job step.
+                              required:
+                              - value
+                              type: object
+                              properties:
+                                type:
+                                  description: Type of action being executed by the
+                                    job step.
+                                  default: TSql
+                                  enum:
+                                  - TSql
+                                  type: string
+                                  x-ms-enum:
+                                    name: JobStepActionType
+                                    modelAsString: true
+                                source:
+                                  description: The source of the action to execute.
+                                  default: Inline
+                                  enum:
+                                  - Inline
+                                  type: string
+                                  x-ms-enum:
+                                    name: JobStepActionSource
+                                    modelAsString: true
+                                value:
+                                  description: The action value, for example the text
+                                    of the T-SQL script to execute.
+                                  type: string
+                            output:
+                              description: Output destination properties of the job
+                                step.
+                              required:
+                              - serverName
+                              - databaseName
+                              - tableName
+                              type: object
+                              properties:
+                                type:
+                                  description: The output destination type.
+                                  default: SqlDatabase
+                                  enum:
+                                  - SqlDatabase
+                                  type: string
+                                  x-ms-enum:
+                                    name: JobStepOutputType
+                                    modelAsString: true
+                                subscriptionId:
+                                  format: uuid
+                                  description: The output destination subscription
+                                    id.
+                                  type: string
+                                resourceGroupName:
+                                  description: The output destination resource group.
+                                  type: string
+                                serverName:
+                                  description: The output destination server name.
+                                  type: string
+                                databaseName:
+                                  description: The output destination database.
+                                  type: string
+                                schemaName:
+                                  description: The output destination schema.
+                                  default: dbo
+                                  type: string
+                                tableName:
+                                  description: The output destination table.
+                                  type: string
+                                credential:
+                                  description: The resource ID of the credential to
+                                    use to connect to the output destination.
+                                  type: string
+                            executionOptions:
+                              description: Execution options for the job step.
+                              type: object
+                              properties:
+                                timeoutSeconds:
+                                  format: int32
+                                  description: Execution timeout for the job step.
+                                  default: 43200
+                                  type: integer
+                                retryAttempts:
+                                  format: int32
+                                  description: Maximum number of times the job step
+                                    will be reattempted if the first attempt fails.
+                                  default: 10
+                                  type: integer
+                                initialRetryIntervalSeconds:
+                                  format: int32
+                                  description: Initial delay between retries for job
+                                    step execution.
+                                  default: 1
+                                  type: integer
+                                maximumRetryIntervalSeconds:
+                                  format: int32
+                                  description: The maximum amount of time to wait
+                                    between retries for job step execution.
+                                  default: 120
+                                  type: integer
+                                retryIntervalBackoffMultiplier:
+                                  format: float
+                                  description: The backoff multiplier for the time
+                                    between retries.
+                                  default: 2
+                                  type: number
+                      description: ARM resource.
+                      x-ms-azure-resource: true
+                    readOnly: true
+                  nextLink:
+                    description: Link to retrieve next page of results.
+                    type: string
+                    readOnly: true
+        default:
+          description: "*** Error Responses: ***\n\n * 400 ManagedInstanceStoppingOrStopped\
+            \ - Conflicting operation submitted while instance is in stopping/stopped\
+            \ state\n\n * 400 ManagedInstanceStarting - Conflicting operation submitted\
+            \ while instance is in starting state\n\n * 404 JobAgentNotFound - Specified\
+            \ job agent does not exist in the specified logical server.\n\n * 404\
+            \ ResourceNotFound - The requested resource was not found.\n\n * 404 ServerNotInSubscriptionResourceGroup\
+            \ - Specified server does not exist in the specified resource group and\
+            \ subscription.\n\n * 404 SubscriptionDoesNotHaveServer - The requested\
+            \ server was not found"
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/jobAgents/{jobAgentName}/jobs/{jobName}/steps/{stepName}
+  : get:
+      tags:
+      - JobSteps
+      description: Gets a job step in a job's current version.
+      operationId: JobSteps_Get
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group that contains the resource. You
+          can obtain this value from the Azure Resource Manager API or the portal.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: serverName
+        in: path
+        description: The name of the server.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: jobAgentName
+        in: path
+        description: The name of the job agent.
+        required: true
+        schema:
+          type: string
+      - name: jobName
+        in: path
+        description: The name of the job.
+        required: true
+        schema:
+          type: string
+      - name: stepName
+        in: path
+        description: The name of the job step.
+        required: true
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        description: The subscription ID that identifies an Azure subscription.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for the request.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved the job step.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: Resource ID.
+                    type: string
+                    readOnly: true
+                  name:
+                    description: Resource name.
+                    type: string
+                    readOnly: true
+                  type:
+                    description: Resource type.
+                    type: string
+                    readOnly: true
+                  properties:
+                    description: Resource properties.
+                    x-ms-client-flatten: true
+                    required:
+                    - targetGroup
+                    - action
+                    type: object
+                    properties:
+                      stepId:
+                        format: int32
+                        description: The job step's index within the job. If not specified
+                          when creating the job step, it will be created as the last
+                          step. If not specified when updating the job step, the step
+                          id is not modified.
+                        type: integer
+                      targetGroup:
+                        description: The resource ID of the target group that the
+                          job step will be executed on.
+                        type: string
+                      credential:
+                        description: The resource ID of the job credential that will
+                          be used to connect to the targets.
+                        type: string
+                      action:
+                        description: The action payload of the job step.
+                        required:
+                        - value
+                        type: object
+                        properties:
+                          type:
+                            description: Type of action being executed by the job
+                              step.
+                            default: TSql
+                            enum:
+                            - TSql
+                            type: string
+                            x-ms-enum:
+                              name: JobStepActionType
+                              modelAsString: true
+                          source:
+                            description: The source of the action to execute.
+                            default: Inline
+                            enum:
+                            - Inline
+                            type: string
+                            x-ms-enum:
+                              name: JobStepActionSource
+                              modelAsString: true
+                          value:
+                            description: The action value, for example the text of
+                              the T-SQL script to execute.
+                            type: string
+                      output:
+                        description: Output destination properties of the job step.
+                        required:
+                        - serverName
+                        - databaseName
+                        - tableName
+                        type: object
+                        properties:
+                          type:
+                            description: The output destination type.
+                            default: SqlDatabase
+                            enum:
+                            - SqlDatabase
+                            type: string
+                            x-ms-enum:
+                              name: JobStepOutputType
+                              modelAsString: true
+                          subscriptionId:
+                            format: uuid
+                            description: The output destination subscription id.
+                            type: string
+                          resourceGroupName:
+                            description: The output destination resource group.
+                            type: string
+                          serverName:
+                            description: The output destination server name.
+                            type: string
+                          databaseName:
+                            description: The output destination database.
+                            type: string
+                          schemaName:
+                            description: The output destination schema.
+                            default: dbo
+                            type: string
+                          tableName:
+                            description: The output destination table.
+                            type: string
+                          credential:
+                            description: The resource ID of the credential to use
+                              to connect to the output destination.
+                            type: string
+                      executionOptions:
+                        description: Execution options for the job step.
+                        type: object
+                        properties:
+                          timeoutSeconds:
+                            format: int32
+                            description: Execution timeout for the job step.
+                            default: 43200
+                            type: integer
+                          retryAttempts:
+                            format: int32
+                            description: Maximum number of times the job step will
+                              be reattempted if the first attempt fails.
+                            default: 10
+                            type: integer
+                          initialRetryIntervalSeconds:
+                            format: int32
+                            description: Initial delay between retries for job step
+                              execution.
+                            default: 1
+                            type: integer
+                          maximumRetryIntervalSeconds:
+                            format: int32
+                            description: The maximum amount of time to wait between
+                              retries for job step execution.
+                            default: 120
+                            type: integer
+                          retryIntervalBackoffMultiplier:
+                            format: float
+                            description: The backoff multiplier for the time between
+                              retries.
+                            default: 2
+                            type: number
+                description: ARM resource.
+                x-ms-azure-resource: true
+        default:
+          description: "*** Error Responses: ***\n\n * 400 ManagedInstanceStoppingOrStopped\
+            \ - Conflicting operation submitted while instance is in stopping/stopped\
+            \ state\n\n * 400 ManagedInstanceStarting - Conflicting operation submitted\
+            \ while instance is in starting state\n\n * 404 JobAgentNotFound - Specified\
+            \ job agent does not exist in the specified logical server.\n\n * 404\
+            \ ResourceNotFound - The requested resource was not found.\n\n * 404 ServerNotInSubscriptionResourceGroup\
+            \ - Specified server does not exist in the specified resource group and\
+            \ subscription.\n\n * 404 SubscriptionDoesNotHaveServer - The requested\
+            \ server was not found"
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    put:
+      tags:
+      - JobSteps
+      description: Creates or updates a job step. This will implicitly create a new
+        job version.
+      operationId: JobSteps_CreateOrUpdate
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group that contains the resource. You
+          can obtain this value from the Azure Resource Manager API or the portal.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: serverName
+        in: path
+        description: The name of the server.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: jobAgentName
+        in: path
+        description: The name of the job agent.
+        required: true
+        schema:
+          type: string
+      - name: jobName
+        in: path
+        description: The name of the job.
+        required: true
+        schema:
+          type: string
+      - name: stepName
+        in: path
+        description: The name of the job step.
+        required: true
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        description: The subscription ID that identifies an Azure subscription.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for the request.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  description: Resource ID.
+                  type: string
+                  readOnly: true
+                name:
+                  description: Resource name.
+                  type: string
+                  readOnly: true
+                type:
+                  description: Resource type.
+                  type: string
+                  readOnly: true
+                properties:
+                  description: Resource properties.
+                  x-ms-client-flatten: true
+                  required:
+                  - targetGroup
+                  - action
+                  type: object
+                  properties:
+                    stepId:
+                      format: int32
+                      description: The job step's index within the job. If not specified
+                        when creating the job step, it will be created as the last
+                        step. If not specified when updating the job step, the step
+                        id is not modified.
+                      type: integer
+                    targetGroup:
+                      description: The resource ID of the target group that the job
+                        step will be executed on.
+                      type: string
+                    credential:
+                      description: The resource ID of the job credential that will
+                        be used to connect to the targets.
+                      type: string
+                    action:
+                      description: The action payload of the job step.
+                      required:
+                      - value
+                      type: object
+                      properties:
+                        type:
+                          description: Type of action being executed by the job step.
+                          default: TSql
+                          enum:
+                          - TSql
+                          type: string
+                          x-ms-enum:
+                            name: JobStepActionType
+                            modelAsString: true
+                        source:
+                          description: The source of the action to execute.
+                          default: Inline
+                          enum:
+                          - Inline
+                          type: string
+                          x-ms-enum:
+                            name: JobStepActionSource
+                            modelAsString: true
+                        value:
+                          description: The action value, for example the text of the
+                            T-SQL script to execute.
+                          type: string
+                    output:
+                      description: Output destination properties of the job step.
+                      required:
+                      - serverName
+                      - databaseName
+                      - tableName
+                      type: object
+                      properties:
+                        type:
+                          description: The output destination type.
+                          default: SqlDatabase
+                          enum:
+                          - SqlDatabase
+                          type: string
+                          x-ms-enum:
+                            name: JobStepOutputType
+                            modelAsString: true
+                        subscriptionId:
+                          format: uuid
+                          description: The output destination subscription id.
+                          type: string
+                        resourceGroupName:
+                          description: The output destination resource group.
+                          type: string
+                        serverName:
+                          description: The output destination server name.
+                          type: string
+                        databaseName:
+                          description: The output destination database.
+                          type: string
+                        schemaName:
+                          description: The output destination schema.
+                          default: dbo
+                          type: string
+                        tableName:
+                          description: The output destination table.
+                          type: string
+                        credential:
+                          description: The resource ID of the credential to use to
+                            connect to the output destination.
+                          type: string
+                    executionOptions:
+                      description: Execution options for the job step.
+                      type: object
+                      properties:
+                        timeoutSeconds:
+                          format: int32
+                          description: Execution timeout for the job step.
+                          default: 43200
+                          type: integer
+                        retryAttempts:
+                          format: int32
+                          description: Maximum number of times the job step will be
+                            reattempted if the first attempt fails.
+                          default: 10
+                          type: integer
+                        initialRetryIntervalSeconds:
+                          format: int32
+                          description: Initial delay between retries for job step
+                            execution.
+                          default: 1
+                          type: integer
+                        maximumRetryIntervalSeconds:
+                          format: int32
+                          description: The maximum amount of time to wait between
+                            retries for job step execution.
+                          default: 120
+                          type: integer
+                        retryIntervalBackoffMultiplier:
+                          format: float
+                          description: The backoff multiplier for the time between
+                            retries.
+                          default: 2
+                          type: number
+              description: ARM resource.
+              x-ms-azure-resource: true
+        description: The requested state of the job step.
+        required: true
+      responses:
+        '200':
+          description: Successfully updated the job step.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: Resource ID.
+                    type: string
+                    readOnly: true
+                  name:
+                    description: Resource name.
+                    type: string
+                    readOnly: true
+                  type:
+                    description: Resource type.
+                    type: string
+                    readOnly: true
+                  properties:
+                    description: Resource properties.
+                    x-ms-client-flatten: true
+                    required:
+                    - targetGroup
+                    - action
+                    type: object
+                    properties:
+                      stepId:
+                        format: int32
+                        description: The job step's index within the job. If not specified
+                          when creating the job step, it will be created as the last
+                          step. If not specified when updating the job step, the step
+                          id is not modified.
+                        type: integer
+                      targetGroup:
+                        description: The resource ID of the target group that the
+                          job step will be executed on.
+                        type: string
+                      credential:
+                        description: The resource ID of the job credential that will
+                          be used to connect to the targets.
+                        type: string
+                      action:
+                        description: The action payload of the job step.
+                        required:
+                        - value
+                        type: object
+                        properties:
+                          type:
+                            description: Type of action being executed by the job
+                              step.
+                            default: TSql
+                            enum:
+                            - TSql
+                            type: string
+                            x-ms-enum:
+                              name: JobStepActionType
+                              modelAsString: true
+                          source:
+                            description: The source of the action to execute.
+                            default: Inline
+                            enum:
+                            - Inline
+                            type: string
+                            x-ms-enum:
+                              name: JobStepActionSource
+                              modelAsString: true
+                          value:
+                            description: The action value, for example the text of
+                              the T-SQL script to execute.
+                            type: string
+                      output:
+                        description: Output destination properties of the job step.
+                        required:
+                        - serverName
+                        - databaseName
+                        - tableName
+                        type: object
+                        properties:
+                          type:
+                            description: The output destination type.
+                            default: SqlDatabase
+                            enum:
+                            - SqlDatabase
+                            type: string
+                            x-ms-enum:
+                              name: JobStepOutputType
+                              modelAsString: true
+                          subscriptionId:
+                            format: uuid
+                            description: The output destination subscription id.
+                            type: string
+                          resourceGroupName:
+                            description: The output destination resource group.
+                            type: string
+                          serverName:
+                            description: The output destination server name.
+                            type: string
+                          databaseName:
+                            description: The output destination database.
+                            type: string
+                          schemaName:
+                            description: The output destination schema.
+                            default: dbo
+                            type: string
+                          tableName:
+                            description: The output destination table.
+                            type: string
+                          credential:
+                            description: The resource ID of the credential to use
+                              to connect to the output destination.
+                            type: string
+                      executionOptions:
+                        description: Execution options for the job step.
+                        type: object
+                        properties:
+                          timeoutSeconds:
+                            format: int32
+                            description: Execution timeout for the job step.
+                            default: 43200
+                            type: integer
+                          retryAttempts:
+                            format: int32
+                            description: Maximum number of times the job step will
+                              be reattempted if the first attempt fails.
+                            default: 10
+                            type: integer
+                          initialRetryIntervalSeconds:
+                            format: int32
+                            description: Initial delay between retries for job step
+                              execution.
+                            default: 1
+                            type: integer
+                          maximumRetryIntervalSeconds:
+                            format: int32
+                            description: The maximum amount of time to wait between
+                              retries for job step execution.
+                            default: 120
+                            type: integer
+                          retryIntervalBackoffMultiplier:
+                            format: float
+                            description: The backoff multiplier for the time between
+                              retries.
+                            default: 2
+                            type: number
+                description: ARM resource.
+                x-ms-azure-resource: true
+        '201':
+          description: Successfully added the job step.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: Resource ID.
+                    type: string
+                    readOnly: true
+                  name:
+                    description: Resource name.
+                    type: string
+                    readOnly: true
+                  type:
+                    description: Resource type.
+                    type: string
+                    readOnly: true
+                  properties:
+                    description: Resource properties.
+                    x-ms-client-flatten: true
+                    required:
+                    - targetGroup
+                    - action
+                    type: object
+                    properties:
+                      stepId:
+                        format: int32
+                        description: The job step's index within the job. If not specified
+                          when creating the job step, it will be created as the last
+                          step. If not specified when updating the job step, the step
+                          id is not modified.
+                        type: integer
+                      targetGroup:
+                        description: The resource ID of the target group that the
+                          job step will be executed on.
+                        type: string
+                      credential:
+                        description: The resource ID of the job credential that will
+                          be used to connect to the targets.
+                        type: string
+                      action:
+                        description: The action payload of the job step.
+                        required:
+                        - value
+                        type: object
+                        properties:
+                          type:
+                            description: Type of action being executed by the job
+                              step.
+                            default: TSql
+                            enum:
+                            - TSql
+                            type: string
+                            x-ms-enum:
+                              name: JobStepActionType
+                              modelAsString: true
+                          source:
+                            description: The source of the action to execute.
+                            default: Inline
+                            enum:
+                            - Inline
+                            type: string
+                            x-ms-enum:
+                              name: JobStepActionSource
+                              modelAsString: true
+                          value:
+                            description: The action value, for example the text of
+                              the T-SQL script to execute.
+                            type: string
+                      output:
+                        description: Output destination properties of the job step.
+                        required:
+                        - serverName
+                        - databaseName
+                        - tableName
+                        type: object
+                        properties:
+                          type:
+                            description: The output destination type.
+                            default: SqlDatabase
+                            enum:
+                            - SqlDatabase
+                            type: string
+                            x-ms-enum:
+                              name: JobStepOutputType
+                              modelAsString: true
+                          subscriptionId:
+                            format: uuid
+                            description: The output destination subscription id.
+                            type: string
+                          resourceGroupName:
+                            description: The output destination resource group.
+                            type: string
+                          serverName:
+                            description: The output destination server name.
+                            type: string
+                          databaseName:
+                            description: The output destination database.
+                            type: string
+                          schemaName:
+                            description: The output destination schema.
+                            default: dbo
+                            type: string
+                          tableName:
+                            description: The output destination table.
+                            type: string
+                          credential:
+                            description: The resource ID of the credential to use
+                              to connect to the output destination.
+                            type: string
+                      executionOptions:
+                        description: Execution options for the job step.
+                        type: object
+                        properties:
+                          timeoutSeconds:
+                            format: int32
+                            description: Execution timeout for the job step.
+                            default: 43200
+                            type: integer
+                          retryAttempts:
+                            format: int32
+                            description: Maximum number of times the job step will
+                              be reattempted if the first attempt fails.
+                            default: 10
+                            type: integer
+                          initialRetryIntervalSeconds:
+                            format: int32
+                            description: Initial delay between retries for job step
+                              execution.
+                            default: 1
+                            type: integer
+                          maximumRetryIntervalSeconds:
+                            format: int32
+                            description: The maximum amount of time to wait between
+                              retries for job step execution.
+                            default: 120
+                            type: integer
+                          retryIntervalBackoffMultiplier:
+                            format: float
+                            description: The backoff multiplier for the time between
+                              retries.
+                            default: 2
+                            type: number
+                description: ARM resource.
+                x-ms-azure-resource: true
+        default:
+          description: "*** Error Responses: ***\n\n * 400 ManagedInstanceStoppingOrStopped\
+            \ - Conflicting operation submitted while instance is in stopping/stopped\
+            \ state\n\n * 400 ManagedInstanceStarting - Conflicting operation submitted\
+            \ while instance is in starting state\n\n * 400 JobStepIdMismatch - Step\
+            \ Id in the specified Job Step URI does not match step id in provided\
+            \ Job Step Resource.\n\n * 400 InvalidResourceRequestBody - The resource\
+            \ or resource properties in the request body is empty or invalid.\n\n\
+            \ * 400 InvalidResourceId - Invalid resource identifier.\n\n * 400 MismatchingSubscriptionWithUrl\
+            \ - The provided subscription did not match the subscription in the Url.\n\
+            \n * 400 MismatchingResourceGroupNameWithUrl - The provided resource group\
+            \ name did not match the name in the Url.\n\n * 400 MismatchingServerNameWithUrl\
+            \ - The provided server name did not match the name in the Url.\n\n *\
+            \ 400 MismatchingJobAccountNameWithUrl - The provided job account name\
+            \ did not match the name in the Url.\n\n * 400 ElasticJobsOperationFailed\
+            \ - Elastic jobs management operation failed.\n\n * 400 ElasticJobsOperationFailed\
+            \ - Elastic jobs management operation failed.\n\n * 400 ElasticJobsOperationFailed\
+            \ - Elastic jobs management operation failed.\n\n * 404 JobAgentNotFound\
+            \ - Specified job agent does not exist in the specified logical server.\n\
+            \n * 404 ResourceNotFound - The requested resource was not found.\n\n\
+            \ * 404 ServerNotInSubscriptionResourceGroup - Specified server does not\
+            \ exist in the specified resource group and subscription.\n\n * 404 SubscriptionDoesNotHaveServer\
+            \ - The requested server was not found"
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    delete:
+      tags:
+      - JobSteps
+      description: Deletes a job step. This will implicitly create a new job version.
+      operationId: JobSteps_Delete
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group that contains the resource. You
+          can obtain this value from the Azure Resource Manager API or the portal.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: serverName
+        in: path
+        description: The name of the server.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: jobAgentName
+        in: path
+        description: The name of the job agent.
+        required: true
+        schema:
+          type: string
+      - name: jobName
+        in: path
+        description: The name of the job.
+        required: true
+        schema:
+          type: string
+      - name: stepName
+        in: path
+        description: The name of the job step to delete.
+        required: true
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        description: The subscription ID that identifies an Azure subscription.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for the request.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully deleted the job step.
+        '204':
+          description: The specified job step does not exist.
+        default:
+          description: "*** Error Responses: ***\n\n * 400 ManagedInstanceStoppingOrStopped\
+            \ - Conflicting operation submitted while instance is in stopping/stopped\
+            \ state\n\n * 400 ManagedInstanceStarting - Conflicting operation submitted\
+            \ while instance is in starting state\n\n * 400 ElasticJobsOperationFailed\
+            \ - Elastic jobs management operation failed.\n\n * 400 ElasticJobsOperationFailed\
+            \ - Elastic jobs management operation failed.\n\n * 404 JobAgentNotFound\
+            \ - Specified job agent does not exist in the specified logical server.\n\
+            \n * 404 ResourceNotFound - The requested resource was not found.\n\n\
+            \ * 404 ServerNotInSubscriptionResourceGroup - Specified server does not\
+            \ exist in the specified resource group and subscription.\n\n * 404 SubscriptionDoesNotHaveServer\
+            \ - The requested server was not found\n\n * 404 ResourceNotFound - The\
+            \ requested resource was not found."
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/jobAgents/{jobAgentName}/jobs/{jobName}/versions/{jobVersion}/steps
+  : get:
+      tags:
+      - JobSteps
+      description: Gets all job steps in the specified job version.
+      operationId: JobSteps_ListByVersion
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group that contains the resource. You
+          can obtain this value from the Azure Resource Manager API or the portal.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: serverName
+        in: path
+        description: The name of the server.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: jobAgentName
+        in: path
+        description: The name of the job agent.
+        required: true
+        schema:
+          type: string
+      - name: jobName
+        in: path
+        description: The name of the job to get.
+        required: true
+        schema:
+          type: string
+      - name: jobVersion
+        in: path
+        description: The version of the job to get.
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: subscriptionId
+        in: path
+        description: The subscription ID that identifies an Azure subscription.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for the request.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved the list of job steps.
+          content:
+            application/json:
+              schema:
+                description: A list of job steps.
+                type: object
+                properties:
+                  value:
+                    description: Array of results.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          description: Resource ID.
+                          type: string
+                          readOnly: true
+                        name:
+                          description: Resource name.
+                          type: string
+                          readOnly: true
+                        type:
+                          description: Resource type.
+                          type: string
+                          readOnly: true
+                        properties:
+                          description: Resource properties.
+                          x-ms-client-flatten: true
+                          required:
+                          - targetGroup
+                          - action
+                          type: object
+                          properties:
+                            stepId:
+                              format: int32
+                              description: The job step's index within the job. If
+                                not specified when creating the job step, it will
+                                be created as the last step. If not specified when
+                                updating the job step, the step id is not modified.
+                              type: integer
+                            targetGroup:
+                              description: The resource ID of the target group that
+                                the job step will be executed on.
+                              type: string
+                            credential:
+                              description: The resource ID of the job credential that
+                                will be used to connect to the targets.
+                              type: string
+                            action:
+                              description: The action payload of the job step.
+                              required:
+                              - value
+                              type: object
+                              properties:
+                                type:
+                                  description: Type of action being executed by the
+                                    job step.
+                                  default: TSql
+                                  enum:
+                                  - TSql
+                                  type: string
+                                  x-ms-enum:
+                                    name: JobStepActionType
+                                    modelAsString: true
+                                source:
+                                  description: The source of the action to execute.
+                                  default: Inline
+                                  enum:
+                                  - Inline
+                                  type: string
+                                  x-ms-enum:
+                                    name: JobStepActionSource
+                                    modelAsString: true
+                                value:
+                                  description: The action value, for example the text
+                                    of the T-SQL script to execute.
+                                  type: string
+                            output:
+                              description: Output destination properties of the job
+                                step.
+                              required:
+                              - serverName
+                              - databaseName
+                              - tableName
+                              type: object
+                              properties:
+                                type:
+                                  description: The output destination type.
+                                  default: SqlDatabase
+                                  enum:
+                                  - SqlDatabase
+                                  type: string
+                                  x-ms-enum:
+                                    name: JobStepOutputType
+                                    modelAsString: true
+                                subscriptionId:
+                                  format: uuid
+                                  description: The output destination subscription
+                                    id.
+                                  type: string
+                                resourceGroupName:
+                                  description: The output destination resource group.
+                                  type: string
+                                serverName:
+                                  description: The output destination server name.
+                                  type: string
+                                databaseName:
+                                  description: The output destination database.
+                                  type: string
+                                schemaName:
+                                  description: The output destination schema.
+                                  default: dbo
+                                  type: string
+                                tableName:
+                                  description: The output destination table.
+                                  type: string
+                                credential:
+                                  description: The resource ID of the credential to
+                                    use to connect to the output destination.
+                                  type: string
+                            executionOptions:
+                              description: Execution options for the job step.
+                              type: object
+                              properties:
+                                timeoutSeconds:
+                                  format: int32
+                                  description: Execution timeout for the job step.
+                                  default: 43200
+                                  type: integer
+                                retryAttempts:
+                                  format: int32
+                                  description: Maximum number of times the job step
+                                    will be reattempted if the first attempt fails.
+                                  default: 10
+                                  type: integer
+                                initialRetryIntervalSeconds:
+                                  format: int32
+                                  description: Initial delay between retries for job
+                                    step execution.
+                                  default: 1
+                                  type: integer
+                                maximumRetryIntervalSeconds:
+                                  format: int32
+                                  description: The maximum amount of time to wait
+                                    between retries for job step execution.
+                                  default: 120
+                                  type: integer
+                                retryIntervalBackoffMultiplier:
+                                  format: float
+                                  description: The backoff multiplier for the time
+                                    between retries.
+                                  default: 2
+                                  type: number
+                      description: ARM resource.
+                      x-ms-azure-resource: true
+                    readOnly: true
+                  nextLink:
+                    description: Link to retrieve next page of results.
+                    type: string
+                    readOnly: true
+        default:
+          description: "*** Error Responses: ***\n\n * 400 ManagedInstanceStoppingOrStopped\
+            \ - Conflicting operation submitted while instance is in stopping/stopped\
+            \ state\n\n * 400 ManagedInstanceStarting - Conflicting operation submitted\
+            \ while instance is in starting state\n\n * 404 JobAgentNotFound - Specified\
+            \ job agent does not exist in the specified logical server.\n\n * 404\
+            \ ResourceNotFound - The requested resource was not found.\n\n * 404 ServerNotInSubscriptionResourceGroup\
+            \ - Specified server does not exist in the specified resource group and\
+            \ subscription.\n\n * 404 SubscriptionDoesNotHaveServer - The requested\
+            \ server was not found"
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Sql/servers/{serverName}/jobAgents/{jobAgentName}/jobs/{jobName}/versions/{jobVersion}/steps/{stepName}
+  : get:
+      tags:
+      - JobSteps
+      description: Gets the specified version of a job step.
+      operationId: JobSteps_GetByVersion
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group that contains the resource. You
+          can obtain this value from the Azure Resource Manager API or the portal.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: serverName
+        in: path
+        description: The name of the server.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: jobAgentName
+        in: path
+        description: The name of the job agent.
+        required: true
+        schema:
+          type: string
+      - name: jobName
+        in: path
+        description: The name of the job.
+        required: true
+        schema:
+          type: string
+      - name: jobVersion
+        in: path
+        description: The version of the job to get.
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: stepName
+        in: path
+        description: The name of the job step.
+        required: true
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        description: The subscription ID that identifies an Azure subscription.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for the request.
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved the job step.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    description: Resource ID.
+                    type: string
+                    readOnly: true
+                  name:
+                    description: Resource name.
+                    type: string
+                    readOnly: true
+                  type:
+                    description: Resource type.
+                    type: string
+                    readOnly: true
+                  properties:
+                    description: Resource properties.
+                    x-ms-client-flatten: true
+                    required:
+                    - targetGroup
+                    - action
+                    type: object
+                    properties:
+                      stepId:
+                        format: int32
+                        description: The job step's index within the job. If not specified
+                          when creating the job step, it will be created as the last
+                          step. If not specified when updating the job step, the step
+                          id is not modified.
+                        type: integer
+                      targetGroup:
+                        description: The resource ID of the target group that the
+                          job step will be executed on.
+                        type: string
+                      credential:
+                        description: The resource ID of the job credential that will
+                          be used to connect to the targets.
+                        type: string
+                      action:
+                        description: The action payload of the job step.
+                        required:
+                        - value
+                        type: object
+                        properties:
+                          type:
+                            description: Type of action being executed by the job
+                              step.
+                            default: TSql
+                            enum:
+                            - TSql
+                            type: string
+                            x-ms-enum:
+                              name: JobStepActionType
+                              modelAsString: true
+                          source:
+                            description: The source of the action to execute.
+                            default: Inline
+                            enum:
+                            - Inline
+                            type: string
+                            x-ms-enum:
+                              name: JobStepActionSource
+                              modelAsString: true
+                          value:
+                            description: The action value, for example the text of
+                              the T-SQL script to execute.
+                            type: string
+                      output:
+                        description: Output destination properties of the job step.
+                        required:
+                        - serverName
+                        - databaseName
+                        - tableName
+                        type: object
+                        properties:
+                          type:
+                            description: The output destination type.
+                            default: SqlDatabase
+                            enum:
+                            - SqlDatabase
+                            type: string
+                            x-ms-enum:
+                              name: JobStepOutputType
+                              modelAsString: true
+                          subscriptionId:
+                            format: uuid
+                            description: The output destination subscription id.
+                            type: string
+                          resourceGroupName:
+                            description: The output destination resource group.
+                            type: string
+                          serverName:
+                            description: The output destination server name.
+                            type: string
+                          databaseName:
+                            description: The output destination database.
+                            type: string
+                          schemaName:
+                            description: The output destination schema.
+                            default: dbo
+                            type: string
+                          tableName:
+                            description: The output destination table.
+                            type: string
+                          credential:
+                            description: The resource ID of the credential to use
+                              to connect to the output destination.
+                            type: string
+                      executionOptions:
+                        description: Execution options for the job step.
+                        type: object
+                        properties:
+                          timeoutSeconds:
+                            format: int32
+                            description: Execution timeout for the job step.
+                            default: 43200
+                            type: integer
+                          retryAttempts:
+                            format: int32
+                            description: Maximum number of times the job step will
+                              be reattempted if the first attempt fails.
+                            default: 10
+                            type: integer
+                          initialRetryIntervalSeconds:
+                            format: int32
+                            description: Initial delay between retries for job step
+                              execution.
+                            default: 1
+                            type: integer
+                          maximumRetryIntervalSeconds:
+                            format: int32
+                            description: The maximum amount of time to wait between
+                              retries for job step execution.
+                            default: 120
+                            type: integer
+                          retryIntervalBackoffMultiplier:
+                            format: float
+                            description: The backoff multiplier for the time between
+                              retries.
+                            default: 2
+                            type: number
+                description: ARM resource.
+                x-ms-azure-resource: true
+        default:
+          description: "*** Error Responses: ***\n\n * 400 ManagedInstanceStoppingOrStopped\
+            \ - Conflicting operation submitted while instance is in stopping/stopped\
+            \ state\n\n * 400 ManagedInstanceStarting - Conflicting operation submitted\
+            \ while instance is in starting state\n\n * 404 JobAgentNotFound - Specified\
+            \ job agent does not exist in the specified logical server.\n\n * 404\
+            \ ResourceNotFound - The requested resource was not found.\n\n * 404 ServerNotInSubscriptionResourceGroup\
+            \ - Specified server does not exist in the specified resource group and\
+            \ subscription.\n\n * 404 SubscriptionDoesNotHaveServer - The requested\
+            \ server was not found"
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+components:
+  parameters:
+    ServerNameParameter:
+      name: serverName
+      in: path
+      description: The name of the server.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    ResourceGroupParameter:
+      name: resourceGroupName
+      in: path
+      description: The name of the resource group that contains the resource. You
+        can obtain this value from the Azure Resource Manager API or the portal.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The subscription ID that identifies an Azure subscription.
+      required: true
+      x-ms-parameter-location: client
+      schema:
+        type: string
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for the request.
+      required: true
+      x-ms-parameter-location: client
+      schema:
+        type: string
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    JobStep:
+      type: object
+      properties:
+        id:
+          description: Resource ID.
+          type: string
+          readOnly: true
+        name:
+          description: Resource name.
+          type: string
+          readOnly: true
+        type:
+          description: Resource type.
+          type: string
+          readOnly: true
+        properties:
+          description: Resource properties.
+          x-ms-client-flatten: true
+          required:
+          - targetGroup
+          - action
+          type: object
+          properties:
+            stepId:
+              format: int32
+              description: The job step's index within the job. If not specified when
+                creating the job step, it will be created as the last step. If not
+                specified when updating the job step, the step id is not modified.
+              type: integer
+            targetGroup:
+              description: The resource ID of the target group that the job step will
+                be executed on.
+              type: string
+            credential:
+              description: The resource ID of the job credential that will be used
+                to connect to the targets.
+              type: string
+            action:
+              description: The action payload of the job step.
+              required:
+              - value
+              type: object
+              properties:
+                type:
+                  description: Type of action being executed by the job step.
+                  default: TSql
+                  enum:
+                  - TSql
+                  type: string
+                  x-ms-enum:
+                    name: JobStepActionType
+                    modelAsString: true
+                source:
+                  description: The source of the action to execute.
+                  default: Inline
+                  enum:
+                  - Inline
+                  type: string
+                  x-ms-enum:
+                    name: JobStepActionSource
+                    modelAsString: true
+                value:
+                  description: The action value, for example the text of the T-SQL
+                    script to execute.
+                  type: string
+            output:
+              description: Output destination properties of the job step.
+              required:
+              - serverName
+              - databaseName
+              - tableName
+              type: object
+              properties:
+                type:
+                  description: The output destination type.
+                  default: SqlDatabase
+                  enum:
+                  - SqlDatabase
+                  type: string
+                  x-ms-enum:
+                    name: JobStepOutputType
+                    modelAsString: true
+                subscriptionId:
+                  format: uuid
+                  description: The output destination subscription id.
+                  type: string
+                resourceGroupName:
+                  description: The output destination resource group.
+                  type: string
+                serverName:
+                  description: The output destination server name.
+                  type: string
+                databaseName:
+                  description: The output destination database.
+                  type: string
+                schemaName:
+                  description: The output destination schema.
+                  default: dbo
+                  type: string
+                tableName:
+                  description: The output destination table.
+                  type: string
+                credential:
+                  description: The resource ID of the credential to use to connect
+                    to the output destination.
+                  type: string
+            executionOptions:
+              description: Execution options for the job step.
+              type: object
+              properties:
+                timeoutSeconds:
+                  format: int32
+                  description: Execution timeout for the job step.
+                  default: 43200
+                  type: integer
+                retryAttempts:
+                  format: int32
+                  description: Maximum number of times the job step will be reattempted
+                    if the first attempt fails.
+                  default: 10
+                  type: integer
+                initialRetryIntervalSeconds:
+                  format: int32
+                  description: Initial delay between retries for job step execution.
+                  default: 1
+                  type: integer
+                maximumRetryIntervalSeconds:
+                  format: int32
+                  description: The maximum amount of time to wait between retries
+                    for job step execution.
+                  default: 120
+                  type: integer
+                retryIntervalBackoffMultiplier:
+                  format: float
+                  description: The backoff multiplier for the time between retries.
+                  default: 2
+                  type: number
+      description: ARM resource.
+      x-ms-azure-resource: true
+    JobStepAction:
+      description: The action to be executed by a job step.
+      required:
+      - value
+      type: object
+      properties:
+        type:
+          description: Type of action being executed by the job step.
+          default: TSql
+          enum:
+          - TSql
+          type: string
+          x-ms-enum:
+            name: JobStepActionType
+            modelAsString: true
+        source:
+          description: The source of the action to execute.
+          default: Inline
+          enum:
+          - Inline
+          type: string
+          x-ms-enum:
+            name: JobStepActionSource
+            modelAsString: true
+        value:
+          description: The action value, for example the text of the T-SQL script
+            to execute.
+          type: string
+    JobStepExecutionOptions:
+      description: The execution options of a job step.
+      type: object
+      properties:
+        timeoutSeconds:
+          format: int32
+          description: Execution timeout for the job step.
+          default: 43200
+          type: integer
+        retryAttempts:
+          format: int32
+          description: Maximum number of times the job step will be reattempted if
+            the first attempt fails.
+          default: 10
+          type: integer
+        initialRetryIntervalSeconds:
+          format: int32
+          description: Initial delay between retries for job step execution.
+          default: 1
+          type: integer
+        maximumRetryIntervalSeconds:
+          format: int32
+          description: The maximum amount of time to wait between retries for job
+            step execution.
+          default: 120
+          type: integer
+        retryIntervalBackoffMultiplier:
+          format: float
+          description: The backoff multiplier for the time between retries.
+          default: 2
+          type: number
+    JobStepListResult:
+      description: A list of job steps.
+      type: object
+      properties:
+        value:
+          description: Array of results.
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                description: Resource ID.
+                type: string
+                readOnly: true
+              name:
+                description: Resource name.
+                type: string
+                readOnly: true
+              type:
+                description: Resource type.
+                type: string
+                readOnly: true
+              properties:
+                description: Resource properties.
+                x-ms-client-flatten: true
+                required:
+                - targetGroup
+                - action
+                type: object
+                properties:
+                  stepId:
+                    format: int32
+                    description: The job step's index within the job. If not specified
+                      when creating the job step, it will be created as the last step.
+                      If not specified when updating the job step, the step id is
+                      not modified.
+                    type: integer
+                  targetGroup:
+                    description: The resource ID of the target group that the job
+                      step will be executed on.
+                    type: string
+                  credential:
+                    description: The resource ID of the job credential that will be
+                      used to connect to the targets.
+                    type: string
+                  action:
+                    description: The action payload of the job step.
+                    required:
+                    - value
+                    type: object
+                    properties:
+                      type:
+                        description: Type of action being executed by the job step.
+                        default: TSql
+                        enum:
+                        - TSql
+                        type: string
+                        x-ms-enum:
+                          name: JobStepActionType
+                          modelAsString: true
+                      source:
+                        description: The source of the action to execute.
+                        default: Inline
+                        enum:
+                        - Inline
+                        type: string
+                        x-ms-enum:
+                          name: JobStepActionSource
+                          modelAsString: true
+                      value:
+                        description: The action value, for example the text of the
+                          T-SQL script to execute.
+                        type: string
+                  output:
+                    description: Output destination properties of the job step.
+                    required:
+                    - serverName
+                    - databaseName
+                    - tableName
+                    type: object
+                    properties:
+                      type:
+                        description: The output destination type.
+                        default: SqlDatabase
+                        enum:
+                        - SqlDatabase
+                        type: string
+                        x-ms-enum:
+                          name: JobStepOutputType
+                          modelAsString: true
+                      subscriptionId:
+                        format: uuid
+                        description: The output destination subscription id.
+                        type: string
+                      resourceGroupName:
+                        description: The output destination resource group.
+                        type: string
+                      serverName:
+                        description: The output destination server name.
+                        type: string
+                      databaseName:
+                        description: The output destination database.
+                        type: string
+                      schemaName:
+                        description: The output destination schema.
+                        default: dbo
+                        type: string
+                      tableName:
+                        description: The output destination table.
+                        type: string
+                      credential:
+                        description: The resource ID of the credential to use to connect
+                          to the output destination.
+                        type: string
+                  executionOptions:
+                    description: Execution options for the job step.
+                    type: object
+                    properties:
+                      timeoutSeconds:
+                        format: int32
+                        description: Execution timeout for the job step.
+                        default: 43200
+                        type: integer
+                      retryAttempts:
+                        format: int32
+                        description: Maximum number of times the job step will be
+                          reattempted if the first attempt fails.
+                        default: 10
+                        type: integer
+                      initialRetryIntervalSeconds:
+                        format: int32
+                        description: Initial delay between retries for job step execution.
+                        default: 1
+                        type: integer
+                      maximumRetryIntervalSeconds:
+                        format: int32
+                        description: The maximum amount of time to wait between retries
+                          for job step execution.
+                        default: 120
+                        type: integer
+                      retryIntervalBackoffMultiplier:
+                        format: float
+                        description: The backoff multiplier for the time between retries.
+                        default: 2
+                        type: number
+            description: ARM resource.
+            x-ms-azure-resource: true
+          readOnly: true
+        nextLink:
+          description: Link to retrieve next page of results.
+          type: string
+          readOnly: true
+    JobStepOutput:
+      description: The output configuration of a job step.
+      required:
+      - serverName
+      - databaseName
+      - tableName
+      type: object
+      properties:
+        type:
+          description: The output destination type.
+          default: SqlDatabase
+          enum:
+          - SqlDatabase
+          type: string
+          x-ms-enum:
+            name: JobStepOutputType
+            modelAsString: true
+        subscriptionId:
+          format: uuid
+          description: The output destination subscription id.
+          type: string
+        resourceGroupName:
+          description: The output destination resource group.
+          type: string
+        serverName:
+          description: The output destination server name.
+          type: string
+        databaseName:
+          description: The output destination database.
+          type: string
+        schemaName:
+          description: The output destination schema.
+          default: dbo
+          type: string
+        tableName:
+          description: The output destination table.
+          type: string
+        credential:
+          description: The resource ID of the credential to use to connect to the
+            output destination.
+          type: string
+    JobStepProperties:
+      description: Properties of a job step.
+      required:
+      - targetGroup
+      - action
+      type: object
+      properties:
+        stepId:
+          format: int32
+          description: The job step's index within the job. If not specified when
+            creating the job step, it will be created as the last step. If not specified
+            when updating the job step, the step id is not modified.
+          type: integer
+        targetGroup:
+          description: The resource ID of the target group that the job step will
+            be executed on.
+          type: string
+        credential:
+          description: The resource ID of the job credential that will be used to
+            connect to the targets.
+          type: string
+        action:
+          description: The action payload of the job step.
+          required:
+          - value
+          type: object
+          properties:
+            type:
+              description: Type of action being executed by the job step.
+              default: TSql
+              enum:
+              - TSql
+              type: string
+              x-ms-enum:
+                name: JobStepActionType
+                modelAsString: true
+            source:
+              description: The source of the action to execute.
+              default: Inline
+              enum:
+              - Inline
+              type: string
+              x-ms-enum:
+                name: JobStepActionSource
+                modelAsString: true
+            value:
+              description: The action value, for example the text of the T-SQL script
+                to execute.
+              type: string
+        output:
+          description: Output destination properties of the job step.
+          required:
+          - serverName
+          - databaseName
+          - tableName
+          type: object
+          properties:
+            type:
+              description: The output destination type.
+              default: SqlDatabase
+              enum:
+              - SqlDatabase
+              type: string
+              x-ms-enum:
+                name: JobStepOutputType
+                modelAsString: true
+            subscriptionId:
+              format: uuid
+              description: The output destination subscription id.
+              type: string
+            resourceGroupName:
+              description: The output destination resource group.
+              type: string
+            serverName:
+              description: The output destination server name.
+              type: string
+            databaseName:
+              description: The output destination database.
+              type: string
+            schemaName:
+              description: The output destination schema.
+              default: dbo
+              type: string
+            tableName:
+              description: The output destination table.
+              type: string
+            credential:
+              description: The resource ID of the credential to use to connect to
+                the output destination.
+              type: string
+        executionOptions:
+          description: Execution options for the job step.
+          type: object
+          properties:
+            timeoutSeconds:
+              format: int32
+              description: Execution timeout for the job step.
+              default: 43200
+              type: integer
+            retryAttempts:
+              format: int32
+              description: Maximum number of times the job step will be reattempted
+                if the first attempt fails.
+              default: 10
+              type: integer
+            initialRetryIntervalSeconds:
+              format: int32
+              description: Initial delay between retries for job step execution.
+              default: 1
+              type: integer
+            maximumRetryIntervalSeconds:
+              format: int32
+              description: The maximum amount of time to wait between retries for
+                job step execution.
+              default: 120
+              type: integer
+            retryIntervalBackoffMultiplier:
+              format: float
+              description: The backoff multiplier for the time between retries.
+              default: 2
+              type: number
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+    Resource:
+      description: ARM resource.
+      type: object
+      properties:
+        id:
+          description: Resource ID.
+          type: string
+          readOnly: true
+        name:
+          description: Resource name.
+          type: string
+          readOnly: true
+        type:
+          description: Resource type.
+          type: string
+          readOnly: true
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          description: Resource ID.
+          type: string
+          readOnly: true
+        name:
+          description: Resource name.
+          type: string
+          readOnly: true
+        type:
+          description: Resource type.
+          type: string
+          readOnly: true
+      description: ARM resource.
+      x-ms-azure-resource: true

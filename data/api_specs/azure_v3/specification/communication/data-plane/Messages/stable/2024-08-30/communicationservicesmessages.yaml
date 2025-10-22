@@ -1,0 +1,813 @@
+openapi: 3.0.0
+info:
+  title: CommunicationMessagesClient
+  version: 2024-08-30
+  description: Azure Communication Messages Service
+  x-typespec-generated:
+  - emitter: '@azure-tools/typespec-autorest'
+security:
+- AadOauth2Auth:
+  - https://communication.azure.com/.default
+- ApiKeyAuth: []
+tags:
+- name: Template
+- name: Notifications
+- name: Stream
+paths:
+  /messages/channels/{channelId}/templates:
+    get:
+      operationId: TemplateOperations_ListTemplates
+      tags:
+      - Template
+      description: List all templates for given Azure Communication Services channel
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: channelId
+        in: path
+        description: The registration ID of the channel.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: maxpagesize
+        in: query
+        description: Number of objects to return per page.
+        required: false
+        schema:
+          type: integer
+          format: int32
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedMessageTemplateItem'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /messages/notifications:send:
+    post:
+      operationId: NotificationMessagesOperations_Send
+      tags:
+      - Notifications
+      description: Sends a notification message from Business to User.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - $ref: '#/components/parameters/Azure.Core.RepeatabilityRequestHeaders.repeatabilityRequestId'
+      - $ref: '#/components/parameters/Azure.Core.RepeatabilityRequestHeaders.repeatabilityFirstSent'
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NotificationContent'
+        description: Details of the message to send.
+        required: true
+        x-ms-parameter-location: method
+      responses:
+        '202':
+          description: The request has been accepted for processing, but processing
+            has not yet completed.
+          headers:
+            Repeatability-Result:
+              description: Indicates whether the repeatable request was accepted or
+                rejected.
+              x-ms-enum:
+                name: RepeatabilityResult
+                modelAsString: false
+                values:
+                - name: accepted
+                  value: accepted
+                  description: If the request was accepted and the server guarantees
+                    that the server state reflects a single execution of the operation.
+                - name: rejected
+                  value: rejected
+                  description: 'If the request was rejected because the combination
+                    of Repeatability-First-Sent and Repeatability-Request-ID were
+                    invalid
+
+                    or because the Repeatability-First-Sent value was outside the
+                    range of values held by the server.'
+              schema:
+                type: string
+                enum:
+                - accepted
+                - rejected
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendMessageResult'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /messages/streams/{id}:
+    get:
+      operationId: StreamOperations_GetMedia
+      tags:
+      - Stream
+      description: Download the Media payload from a User to Business message.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: id
+        in: path
+        description: The stream ID.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/Azure.Core.ClientRequestIdHeader'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-client-request-id:
+              description: An opaque, globally-unique, client-generated string identifier
+                for the request.
+              schema:
+                type: string
+                format: uuid
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            application/json:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+servers:
+- url: '{endpoint}'
+  variables:
+    endpoint:
+      description: The communication resource, for example https://my-resource.communication.azure.com
+      format: uri
+      x-ms-skip-url-encoding: true
+      default: none
+components:
+  parameters:
+    Azure.Core.ClientRequestIdHeader:
+      name: x-ms-client-request-id
+      in: header
+      description: An opaque, globally-unique, client-generated string identifier
+        for the request.
+      required: false
+      x-ms-parameter-location: method
+      x-ms-client-name: clientRequestId
+      schema:
+        type: string
+        format: uuid
+    Azure.Core.Foundations.ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      x-ms-parameter-location: method
+      x-ms-client-name: apiVersion
+      schema:
+        type: string
+        minLength: 1
+    Azure.Core.RepeatabilityRequestHeaders.repeatabilityFirstSent:
+      name: Repeatability-First-Sent
+      in: header
+      description: Specifies the date and time at which the request was first created.
+      required: false
+      x-ms-parameter-location: method
+      x-ms-client-name: repeatabilityFirstSent
+      schema:
+        type: string
+        format: date-time
+    Azure.Core.RepeatabilityRequestHeaders.repeatabilityRequestId:
+      name: Repeatability-Request-ID
+      in: header
+      description: An opaque, globally-unique, client-generated string identifier
+        for the request.
+      required: false
+      x-ms-parameter-location: method
+      x-ms-client-name: repeatabilityRequestId
+      schema:
+        type: string
+  securitySchemes:
+    AadOauth2Auth:
+      type: oauth2
+      description: The Azure Active Directory OAuth2 Flow
+      flows:
+        authorizationCode:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          tokenUrl: https://login.microsoftonline.com/common/oauth2/token
+          scopes:
+            https://communication.azure.com/.default: ''
+    ApiKeyAuth:
+      type: apiKey
+      name: Authorization
+      in: header
+  schemas:
+    AudioNotificationContent:
+      $ref: '#/components/schemas/NotificationContent'
+      type: object
+      properties:
+        mediaUri:
+          type: string
+          format: uri
+          description: A media url for the file. Required if the type is one of the
+            supported media types, e.g. image
+      required:
+      - mediaUri
+      description: A request to send an audio notification.
+      x-ms-discriminator-value: audio
+    Azure.Core.Foundations.Error:
+      type: object
+      description: The error object.
+      properties:
+        code:
+          type: string
+          description: One of a server-defined set of error codes.
+        message:
+          type: string
+          description: A human-readable representation of the error.
+        target:
+          type: string
+          description: The target of the error.
+        details:
+          type: array
+          description: An array of details about specific errors that led to this
+            reported error.
+          items:
+            $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+        innererror:
+          $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
+      required:
+      - code
+      - message
+    Azure.Core.Foundations.ErrorResponse:
+      type: object
+      description: A response containing error details.
+      properties:
+        error:
+          $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+      required:
+      - error
+    Azure.Core.Foundations.InnerError:
+      type: object
+      description: An object containing more specific information about the error.
+        As per Azure REST API guidelines - https://aka.ms/AzureRestApiGuidelines#handling-errors.
+      properties:
+        code:
+          type: string
+          description: One of a server-defined set of error codes.
+        innererror:
+          $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
+    Azure.Core.uuid:
+      type: string
+      format: uuid
+      description: Universally Unique Identifier
+    CommunicationMessageKind:
+      type: string
+      description: The type of message.
+      enum:
+      - text
+      - image
+      - image_v0
+      - document
+      - video
+      - audio
+      - template
+      x-ms-enum:
+        name: CommunicationMessageKind
+        modelAsString: true
+        values:
+        - name: text
+          value: text
+          description: Text message type.
+        - name: image
+          value: image
+          description: Image message type.
+        - name: image_v0
+          value: image_v0
+          description: Image message type. Legacy image type for `MediaNotificationContent`
+            which is being deprecated
+        - name: document
+          value: document
+          description: Document message type.
+        - name: video
+          value: video
+          description: Video message type.
+        - name: audio
+          value: audio
+          description: Audio message type.
+        - name: template
+          value: template
+          description: Template message type.
+    CommunicationMessagesChannel:
+      type: string
+      description: The type of the communication messages channel.
+      enum:
+      - whatsApp
+      x-ms-enum:
+        name: CommunicationMessagesChannel
+        modelAsString: true
+        values:
+        - name: whatsApp
+          value: whatsApp
+          description: The WhatsApp communication messages channel type.
+    DocumentNotificationContent:
+      $ref: '#/components/schemas/NotificationContent'
+      type: object
+      properties:
+        caption:
+          type: string
+          description: Optional text content.
+        fileName:
+          type: string
+          description: Optional name for the file.
+        mediaUri:
+          type: string
+          format: uri
+          description: A media url for the file. Required if the type is one of the
+            supported media types, e.g. image
+      required:
+      - mediaUri
+      description: A request to send a document notification.
+      x-ms-discriminator-value: document
+    ImageNotificationContent:
+      $ref: '#/components/schemas/NotificationContent'
+      type: object
+      properties:
+        caption:
+          type: string
+          description: Optional text content.
+        mediaUri:
+          type: string
+          format: uri
+          description: A media url for the file. Required if the type is one of the
+            supported media types, e.g. image
+      required:
+      - mediaUri
+      description: A request to send an image notification.
+      x-ms-discriminator-value: image
+    MediaNotificationContent:
+      $ref: '#/components/schemas/NotificationContent'
+      type: object
+      properties:
+        content:
+          type: string
+          description: Optional text content.
+        mediaUri:
+          type: string
+          format: uri
+          description: A media url for the file. Required if the type is one of the
+            supported media types, e.g. image
+      required:
+      - mediaUri
+      description: '@deprecated A request to send an image notification.'
+      x-ms-discriminator-value: image_v0
+    MessageReceipt:
+      type: object
+      description: Receipt of the sending one message.
+      properties:
+        messageId:
+          type: string
+          description: The message id.
+        to:
+          type: string
+          description: The native external platform user identifier of the recipient.
+      required:
+      - messageId
+      - to
+    MessageTemplate:
+      type: object
+      description: The template object used to create templates.
+      properties:
+        name:
+          type: string
+          description: Name of the template.
+        language:
+          type: string
+          description: The template's language, in the ISO 639 format, consist of
+            a two-letter language code followed by an optional two-letter country
+            code, e.g., 'en' or 'en_US'.
+        values:
+          type: array
+          description: The template values.
+          items:
+            $ref: '#/components/schemas/MessageTemplateValue'
+        bindings:
+          $ref: '#/components/schemas/MessageTemplateBindings'
+      required:
+      - name
+      - language
+    MessageTemplateBindings:
+      type: object
+      description: The binding object to link values to the template specific locations
+      properties:
+        kind:
+          $ref: '#/components/schemas/MessageTemplateBindingsKind'
+      discriminator:
+        propertyName: kind
+      required:
+      - kind
+    MessageTemplateBindingsKind:
+      type: string
+      description: The type of the message template.
+      enum:
+      - whatsApp
+      x-ms-enum:
+        name: MessageTemplateBindingsKind
+        modelAsString: true
+        values:
+        - name: whatsApp
+          value: whatsApp
+          description: The WhatsApp template type.
+    MessageTemplateDocument:
+      $ref: '#/components/schemas/MessageTemplateValue'
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: The (public) URL of the media.
+        caption:
+          type: string
+          description: The [optional] caption of the media object.
+        fileName:
+          type: string
+          description: The [optional] filename of the media file.
+      required:
+      - url
+      description: The message template's document value information.
+      x-ms-discriminator-value: document
+    MessageTemplateImage:
+      $ref: '#/components/schemas/MessageTemplateValue'
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: The (public) URL of the media.
+        caption:
+          type: string
+          description: The [optional] caption of the media object.
+        fileName:
+          type: string
+          description: The [optional] filename of the media file.
+      required:
+      - url
+      description: The message template's image value information.
+      x-ms-discriminator-value: image
+    MessageTemplateItem:
+      type: object
+      description: The message template as returned from the service.
+      properties:
+        name:
+          type: string
+          description: The template's name.
+          readOnly: true
+        language:
+          type: string
+          description: The template's language, in the ISO 639 format, consist of
+            a two-letter language code followed by an optional two-letter country
+            code, e.g., 'en' or 'en_US'.
+        status:
+          $ref: '#/components/schemas/MessageTemplateStatus'
+        kind:
+          $ref: '#/components/schemas/CommunicationMessagesChannel'
+      discriminator:
+        propertyName: kind
+      required:
+      - name
+      - language
+      - status
+      - kind
+    MessageTemplateLocation:
+      $ref: '#/components/schemas/MessageTemplateValue'
+      type: object
+      properties:
+        locationName:
+          type: string
+          description: The [Optional] name of the location.
+        address:
+          type: string
+          description: The [Optional] address of the location.
+        latitude:
+          type: number
+          format: double
+          description: The latitude of the location.
+        longitude:
+          type: number
+          format: double
+          description: The longitude of the location.
+      required:
+      - latitude
+      - longitude
+      description: The message template's location value information.
+      x-ms-discriminator-value: location
+    MessageTemplateQuickAction:
+      $ref: '#/components/schemas/MessageTemplateValue'
+      type: object
+      properties:
+        text:
+          type: string
+          description: The [Optional] quick action text
+        payload:
+          type: string
+          description: The [Optional] quick action payload
+      description: The message template's quick action value information.
+      x-ms-discriminator-value: quickAction
+    MessageTemplateStatus:
+      type: string
+      description: The aggregated template status.
+      enum:
+      - approved
+      - rejected
+      - pending
+      - paused
+      x-ms-enum:
+        name: MessageTemplateStatus
+        modelAsString: true
+        values:
+        - name: approved
+          value: approved
+          description: Message template is approved.
+        - name: rejected
+          value: rejected
+          description: Message template is rejected.
+        - name: pending
+          value: pending
+          description: Message template is pending.
+        - name: paused
+          value: paused
+          description: Message template is paused.
+    MessageTemplateText:
+      $ref: '#/components/schemas/MessageTemplateValue'
+      type: object
+      properties:
+        text:
+          type: string
+          description: The text value.
+      required:
+      - text
+      description: The message template's text value information.
+      x-ms-discriminator-value: text
+    MessageTemplateValue:
+      type: object
+      description: The class describes a parameter of a template.
+      properties:
+        name:
+          type: string
+          description: Template binding reference name
+        kind:
+          $ref: '#/components/schemas/MessageTemplateValueKind'
+      discriminator:
+        propertyName: kind
+      required:
+      - name
+      - kind
+    MessageTemplateValueKind:
+      type: string
+      description: The type of the template parameter.
+      enum:
+      - text
+      - image
+      - document
+      - video
+      - location
+      - quickAction
+      x-ms-enum:
+        name: MessageTemplateValueKind
+        modelAsString: true
+        values:
+        - name: text
+          value: text
+          description: The text template parameter type.
+        - name: image
+          value: image
+          description: The image template parameter type.
+        - name: document
+          value: document
+          description: The document template parameter type.
+        - name: video
+          value: video
+          description: The video template parameter type.
+        - name: location
+          value: location
+          description: The location template parameter type.
+        - name: quickAction
+          value: quickAction
+          description: The quick action template parameter type.
+    MessageTemplateVideo:
+      $ref: '#/components/schemas/MessageTemplateValue'
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: The (public) URL of the media.
+        caption:
+          type: string
+          description: The [optional] caption of the media object.
+        fileName:
+          type: string
+          description: The [optional] filename of the media file.
+      required:
+      - url
+      description: The message template's video value information.
+      x-ms-discriminator-value: video
+    NotificationContent:
+      type: object
+      description: Details of the message to send.
+      properties:
+        channelRegistrationId:
+          $ref: '#/components/schemas/Azure.Core.uuid'
+        to:
+          type: array
+          description: The native external platform user identifiers of the recipient.
+          items:
+            type: string
+        kind:
+          $ref: '#/components/schemas/CommunicationMessageKind'
+      discriminator:
+        propertyName: kind
+      required:
+      - channelRegistrationId
+      - to
+      - kind
+    PagedMessageTemplateItem:
+      type: object
+      description: Paged collection of MessageTemplateItem items
+      properties:
+        value:
+          type: array
+          description: The MessageTemplateItem items on this page
+          items:
+            $ref: '#/components/schemas/MessageTemplateItem'
+        nextLink:
+          type: string
+          format: uri
+          description: The link to the next page of items
+      required:
+      - value
+    SendMessageResult:
+      type: object
+      description: Result of the send message operation.
+      properties:
+        receipts:
+          type: array
+          description: Receipts of the send message operation.
+          items:
+            $ref: '#/components/schemas/MessageReceipt'
+      required:
+      - receipts
+    TemplateNotificationContent:
+      $ref: '#/components/schemas/NotificationContent'
+      type: object
+      properties:
+        template:
+          $ref: '#/components/schemas/MessageTemplate'
+      required:
+      - template
+      description: A request to send a template notification.
+      x-ms-discriminator-value: template
+    TextNotificationContent:
+      $ref: '#/components/schemas/NotificationContent'
+      type: object
+      properties:
+        content:
+          type: string
+          description: Message content.
+      required:
+      - content
+      description: A request to send a text notification.
+      x-ms-discriminator-value: text
+    VideoNotificationContent:
+      $ref: '#/components/schemas/NotificationContent'
+      type: object
+      properties:
+        caption:
+          type: string
+          description: Optional text content.
+        mediaUri:
+          type: string
+          format: uri
+          description: A media url for the file. Required if the type is one of the
+            supported media types, e.g. image
+      required:
+      - mediaUri
+      description: A request to send a video notification.
+      x-ms-discriminator-value: video
+    WhatsAppMessageButtonSubType:
+      type: string
+      description: The WhatsApp button sub type.
+      enum:
+      - quickReply
+      - url
+      x-ms-enum:
+        name: WhatsAppMessageButtonSubType
+        modelAsString: true
+        values:
+        - name: quickReply
+          value: quickReply
+          description: The WhatsApp button sub type is quick reply.
+        - name: url
+          value: url
+          description: The WhatsApp button sub type is url.
+    WhatsAppMessageTemplateBindings:
+      $ref: '#/components/schemas/MessageTemplateBindings'
+      type: object
+      properties:
+        header:
+          type: array
+          description: The header template bindings
+          items:
+            $ref: '#/components/schemas/WhatsAppMessageTemplateBindingsComponent'
+        body:
+          type: array
+          description: The body template bindings
+          items:
+            $ref: '#/components/schemas/WhatsAppMessageTemplateBindingsComponent'
+        footer:
+          type: array
+          description: The footer template bindings
+          items:
+            $ref: '#/components/schemas/WhatsAppMessageTemplateBindingsComponent'
+        buttons:
+          type: array
+          description: The button template bindings
+          items:
+            $ref: '#/components/schemas/WhatsAppMessageTemplateBindingsButton'
+      description: The template bindings for WhatsApp
+      x-ms-discriminator-value: whatsApp
+    WhatsAppMessageTemplateBindingsButton:
+      type: object
+      description: The template bindings component button for WhatsApp
+      properties:
+        subType:
+          $ref: '#/components/schemas/WhatsAppMessageButtonSubType'
+        refValue:
+          type: string
+          description: The name of the referenced item in the template values.
+      required:
+      - subType
+      - refValue
+    WhatsAppMessageTemplateBindingsComponent:
+      type: object
+      description: The template bindings component for WhatsApp
+      properties:
+        refValue:
+          type: string
+          description: The name of the referenced item in the template values.
+      required:
+      - refValue
+    WhatsAppMessageTemplateItem:
+      $ref: '#/components/schemas/MessageTemplateItem'
+      type: object
+      properties:
+        content:
+          description: WhatsApp platform's template content. This is the payload returned
+            from WhatsApp API.
+      description: The WhatsApp-specific template response contract
+      x-ms-discriminator-value: whatsApp

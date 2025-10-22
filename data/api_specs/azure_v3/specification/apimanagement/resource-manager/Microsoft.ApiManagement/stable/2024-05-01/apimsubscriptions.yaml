@@ -1,0 +1,3525 @@
+openapi: 3.0.0
+info:
+  title: ApiManagementClient
+  description: "Use these REST APIs for performing operations on Subscription entity\
+    \ associated with your Azure API Management deployment. The Subscription entity\
+    \ represents the association between a user and a product in API Management. Products\
+    \ contain one or more APIs, and once a product is published, developers can subscribe\
+    \ to the product and begin to use the product\u2019s APIs."
+  version: 2024-05-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/subscriptions
+  : get:
+      tags:
+      - Subscription
+      operationId: Subscription_List
+      description: Lists all subscriptions of the API Management service instance.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: $filter
+        in: query
+        required: false
+        description: '|     Field     |     Usage     |     Supported operators     |     Supported
+          functions     |</br>|-------------|-------------|-------------|-------------|</br>|
+          name | filter | ge, le, eq, ne, gt, lt | substringof, contains, startswith,
+          endswith |</br>| displayName | filter | ge, le, eq, ne, gt, lt | substringof,
+          contains, startswith, endswith |</br>| stateComment | filter | ge, le, eq,
+          ne, gt, lt | substringof, contains, startswith, endswith |</br>| ownerId
+          | filter | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith
+          |</br>| scope | filter | ge, le, eq, ne, gt, lt | substringof, contains,
+          startswith, endswith |</br>| userId | filter | ge, le, eq, ne, gt, lt |
+          substringof, contains, startswith, endswith |</br>| productId | filter |
+          ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |</br>|
+          state | filter | eq |     |</br>| user | expand |     |     |</br>'
+        schema:
+          type: string
+      - name: $top
+        in: query
+        required: false
+        description: Number of records to return.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - name: $skip
+        in: query
+        required: false
+        description: Number of records to skip.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: A collection of the Subscription entities for the specified
+            API Management service instance.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                        name:
+                          readOnly: true
+                          type: string
+                          description: The name of the resource
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                        properties:
+                          x-ms-client-flatten: true
+                          description: Subscription contract properties.
+                          type: object
+                          properties:
+                            ownerId:
+                              type: string
+                              description: The user resource identifier of the subscription
+                                owner. The value is a valid relative URL in the format
+                                of /users/{userId} where {userId} is a user identifier.
+                            scope:
+                              type: string
+                              description: Scope like /products/{productId} or /apis
+                                or /apis/{apiId}.
+                            displayName:
+                              type: string
+                              description: The name of the subscription, or null if
+                                the subscription has no name.
+                              minLength: 0
+                              maxLength: 100
+                            state:
+                              type: string
+                              description: "Subscription state. Possible states are\
+                                \ * active \u2013 the subscription is active, * suspended\
+                                \ \u2013 the subscription is blocked, and the subscriber\
+                                \ cannot call any APIs of the product, * submitted\
+                                \ \u2013 the subscription request has been made by\
+                                \ the developer, but has not yet been approved or\
+                                \ rejected, * rejected \u2013 the subscription request\
+                                \ has been denied by an administrator, * cancelled\
+                                \ \u2013 the subscription has been cancelled by the\
+                                \ developer or administrator, * expired \u2013 the\
+                                \ subscription reached its expiration date and was\
+                                \ deactivated."
+                              enum:
+                              - suspended
+                              - active
+                              - expired
+                              - submitted
+                              - rejected
+                              - cancelled
+                              x-ms-enum:
+                                name: SubscriptionState
+                                modelAsString: false
+                            createdDate:
+                              type: string
+                              format: date-time
+                              description: 'Subscription creation date. The date conforms
+                                to the following format: `yyyy-MM-ddTHH:mm:ssZ` as
+                                specified by the ISO 8601 standard.
+
+                                '
+                              readOnly: true
+                            startDate:
+                              type: string
+                              format: date-time
+                              description: 'Subscription activation date. The setting
+                                is for audit purposes only and the subscription is
+                                not automatically activated. The subscription lifecycle
+                                can be managed by using the `state` property. The
+                                date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                                as specified by the ISO 8601 standard.
+
+                                '
+                            expirationDate:
+                              type: string
+                              format: date-time
+                              description: 'Subscription expiration date. The setting
+                                is for audit purposes only and the subscription is
+                                not automatically expired. The subscription lifecycle
+                                can be managed by using the `state` property. The
+                                date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                                as specified by the ISO 8601 standard.
+
+                                '
+                            endDate:
+                              type: string
+                              format: date-time
+                              description: 'Date when subscription was cancelled or
+                                expired. The setting is for audit purposes only and
+                                the subscription is not automatically cancelled. The
+                                subscription lifecycle can be managed by using the
+                                `state` property. The date conforms to the following
+                                format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the
+                                ISO 8601 standard.
+
+                                '
+                            notificationDate:
+                              type: string
+                              format: date-time
+                              description: 'Upcoming subscription expiration notification
+                                date. The date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                                as specified by the ISO 8601 standard.
+
+                                '
+                            primaryKey:
+                              x-ms-secret: true
+                              type: string
+                              description: Subscription primary key. This property
+                                will not be filled on 'GET' operations! Use '/listSecrets'
+                                POST request to get the value.
+                              minLength: 1
+                              maxLength: 256
+                            secondaryKey:
+                              x-ms-secret: true
+                              type: string
+                              description: Subscription secondary key. This property
+                                will not be filled on 'GET' operations! Use '/listSecrets'
+                                POST request to get the value.
+                              minLength: 1
+                              maxLength: 256
+                            stateComment:
+                              type: string
+                              description: Optional subscription comment added by
+                                an administrator when the state is changed to the
+                                'rejected'.
+                            allowTracing:
+                              type: boolean
+                              description: Determines whether tracing is enabled
+                              x-apim-code-nillable: true
+                          required:
+                          - scope
+                          - state
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                    description: Page values.
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                  nextLink:
+                    type: string
+                    description: Next page link if any.
+                description: Paged Subscriptions list representation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+      x-ms-odata: ./definitions.json#/definitions/SubscriptionContract
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/subscriptions/{sid}
+  : head:
+      tags:
+      - Subscription
+      operationId: Subscription_GetEntityTag
+      description: Gets the entity state (Etag) version of the apimanagement subscription
+        specified by its identifier.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: sid
+        in: path
+        required: true
+        description: Subscription entity Identifier. The entity represents the association
+          between a user and a product in API Management.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 256
+          pattern: ^[^*#&+:<>?]+$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Specified apimanagement subscription entity exists and current
+            entity state version is present in the ETag header.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    get:
+      tags:
+      - Subscription
+      operationId: Subscription_Get
+      description: Gets the specified Subscription entity.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: sid
+        in: path
+        required: true
+        description: Subscription entity Identifier. The entity represents the association
+          between a user and a product in API Management.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 256
+          pattern: ^[^*#&+:<>?]+$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The response body contains the specified Subscription entity.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Subscription contract properties.
+                    type: object
+                    properties:
+                      ownerId:
+                        type: string
+                        description: The user resource identifier of the subscription
+                          owner. The value is a valid relative URL in the format of
+                          /users/{userId} where {userId} is a user identifier.
+                      scope:
+                        type: string
+                        description: Scope like /products/{productId} or /apis or
+                          /apis/{apiId}.
+                      displayName:
+                        type: string
+                        description: The name of the subscription, or null if the
+                          subscription has no name.
+                        minLength: 0
+                        maxLength: 100
+                      state:
+                        type: string
+                        description: "Subscription state. Possible states are * active\
+                          \ \u2013 the subscription is active, * suspended \u2013\
+                          \ the subscription is blocked, and the subscriber cannot\
+                          \ call any APIs of the product, * submitted \u2013 the subscription\
+                          \ request has been made by the developer, but has not yet\
+                          \ been approved or rejected, * rejected \u2013 the subscription\
+                          \ request has been denied by an administrator, * cancelled\
+                          \ \u2013 the subscription has been cancelled by the developer\
+                          \ or administrator, * expired \u2013 the subscription reached\
+                          \ its expiration date and was deactivated."
+                        enum:
+                        - suspended
+                        - active
+                        - expired
+                        - submitted
+                        - rejected
+                        - cancelled
+                        x-ms-enum:
+                          name: SubscriptionState
+                          modelAsString: false
+                      createdDate:
+                        type: string
+                        format: date-time
+                        description: 'Subscription creation date. The date conforms
+                          to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                          by the ISO 8601 standard.
+
+                          '
+                        readOnly: true
+                      startDate:
+                        type: string
+                        format: date-time
+                        description: 'Subscription activation date. The setting is
+                          for audit purposes only and the subscription is not automatically
+                          activated. The subscription lifecycle can be managed by
+                          using the `state` property. The date conforms to the following
+                          format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601
+                          standard.
+
+                          '
+                      expirationDate:
+                        type: string
+                        format: date-time
+                        description: 'Subscription expiration date. The setting is
+                          for audit purposes only and the subscription is not automatically
+                          expired. The subscription lifecycle can be managed by using
+                          the `state` property. The date conforms to the following
+                          format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601
+                          standard.
+
+                          '
+                      endDate:
+                        type: string
+                        format: date-time
+                        description: 'Date when subscription was cancelled or expired.
+                          The setting is for audit purposes only and the subscription
+                          is not automatically cancelled. The subscription lifecycle
+                          can be managed by using the `state` property. The date conforms
+                          to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                          by the ISO 8601 standard.
+
+                          '
+                      notificationDate:
+                        type: string
+                        format: date-time
+                        description: 'Upcoming subscription expiration notification
+                          date. The date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                          as specified by the ISO 8601 standard.
+
+                          '
+                      primaryKey:
+                        x-ms-secret: true
+                        type: string
+                        description: Subscription primary key. This property will
+                          not be filled on 'GET' operations! Use '/listSecrets' POST
+                          request to get the value.
+                        minLength: 1
+                        maxLength: 256
+                      secondaryKey:
+                        x-ms-secret: true
+                        type: string
+                        description: Subscription secondary key. This property will
+                          not be filled on 'GET' operations! Use '/listSecrets' POST
+                          request to get the value.
+                        minLength: 1
+                        maxLength: 256
+                      stateComment:
+                        type: string
+                        description: Optional subscription comment added by an administrator
+                          when the state is changed to the 'rejected'.
+                      allowTracing:
+                        type: boolean
+                        description: Determines whether tracing is enabled
+                        x-apim-code-nillable: true
+                    required:
+                    - scope
+                    - state
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    put:
+      tags:
+      - Subscription
+      operationId: Subscription_CreateOrUpdate
+      description: Creates or updates the subscription of specified user to the specified
+        product.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: sid
+        in: path
+        required: true
+        description: Subscription entity Identifier. The entity represents the association
+          between a user and a product in API Management.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 256
+          pattern: ^[^*#&+:<>?]+$
+      - name: notify
+        in: query
+        required: false
+        description: "Notify change in Subscription State. \n - If false, do not send\
+          \ any email notification for change of state of subscription \n - If true,\
+          \ send email notification of change of state of subscription "
+        x-ms-parameter-location: method
+        schema:
+          type: boolean
+      - name: If-Match
+        in: header
+        required: false
+        description: ETag of the Entity. Not required when creating an entity, but
+          required when updating an entity.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: appType
+        in: query
+        required: false
+        description: Determines the type of application which send the create user
+          request. Default is legacy publisher portal.
+        x-ms-enum:
+          name: AppType
+          modelAsString: true
+          values:
+          - value: portal
+            description: User create request was sent by legacy developer portal.
+          - value: developerPortal
+            description: User create request was sent by new developer portal.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - portal
+          - developerPortal
+          default: portal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                properties:
+                  x-ms-client-flatten: true
+                  description: Subscription contract properties.
+                  type: object
+                  properties:
+                    ownerId:
+                      type: string
+                      description: User (user id path) for whom subscription is being
+                        created in form /users/{userId}
+                    scope:
+                      type: string
+                      description: Scope like /products/{productId} or /apis or /apis/{apiId}.
+                    displayName:
+                      type: string
+                      description: Subscription name.
+                      minLength: 1
+                      maxLength: 100
+                    primaryKey:
+                      type: string
+                      description: Primary subscription key. If not specified during
+                        request key will be generated automatically.
+                      minLength: 1
+                      maxLength: 256
+                    secondaryKey:
+                      type: string
+                      description: Secondary subscription key. If not specified during
+                        request key will be generated automatically.
+                      minLength: 1
+                      maxLength: 256
+                    state:
+                      type: string
+                      description: "Initial subscription state. If no value is specified,\
+                        \ subscription is created with Submitted state. Possible states\
+                        \ are * active \u2013 the subscription is active, * suspended\
+                        \ \u2013 the subscription is blocked, and the subscriber cannot\
+                        \ call any APIs of the product, * submitted \u2013 the subscription\
+                        \ request has been made by the developer, but has not yet\
+                        \ been approved or rejected, * rejected \u2013 the subscription\
+                        \ request has been denied by an administrator, * cancelled\
+                        \ \u2013 the subscription has been cancelled by the developer\
+                        \ or administrator, * expired \u2013 the subscription reached\
+                        \ its expiration date and was deactivated."
+                      enum:
+                      - suspended
+                      - active
+                      - expired
+                      - submitted
+                      - rejected
+                      - cancelled
+                      x-ms-enum:
+                        name: SubscriptionState
+                        modelAsString: false
+                    allowTracing:
+                      type: boolean
+                      description: Determines whether tracing can be enabled
+                  required:
+                  - scope
+                  - displayName
+              description: Subscription create details.
+        description: Create parameters.
+        required: true
+      responses:
+        '200':
+          description: The user already subscribed to the product.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Subscription contract properties.
+                    type: object
+                    properties:
+                      ownerId:
+                        type: string
+                        description: The user resource identifier of the subscription
+                          owner. The value is a valid relative URL in the format of
+                          /users/{userId} where {userId} is a user identifier.
+                      scope:
+                        type: string
+                        description: Scope like /products/{productId} or /apis or
+                          /apis/{apiId}.
+                      displayName:
+                        type: string
+                        description: The name of the subscription, or null if the
+                          subscription has no name.
+                        minLength: 0
+                        maxLength: 100
+                      state:
+                        type: string
+                        description: "Subscription state. Possible states are * active\
+                          \ \u2013 the subscription is active, * suspended \u2013\
+                          \ the subscription is blocked, and the subscriber cannot\
+                          \ call any APIs of the product, * submitted \u2013 the subscription\
+                          \ request has been made by the developer, but has not yet\
+                          \ been approved or rejected, * rejected \u2013 the subscription\
+                          \ request has been denied by an administrator, * cancelled\
+                          \ \u2013 the subscription has been cancelled by the developer\
+                          \ or administrator, * expired \u2013 the subscription reached\
+                          \ its expiration date and was deactivated."
+                        enum:
+                        - suspended
+                        - active
+                        - expired
+                        - submitted
+                        - rejected
+                        - cancelled
+                        x-ms-enum:
+                          name: SubscriptionState
+                          modelAsString: false
+                      createdDate:
+                        type: string
+                        format: date-time
+                        description: 'Subscription creation date. The date conforms
+                          to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                          by the ISO 8601 standard.
+
+                          '
+                        readOnly: true
+                      startDate:
+                        type: string
+                        format: date-time
+                        description: 'Subscription activation date. The setting is
+                          for audit purposes only and the subscription is not automatically
+                          activated. The subscription lifecycle can be managed by
+                          using the `state` property. The date conforms to the following
+                          format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601
+                          standard.
+
+                          '
+                      expirationDate:
+                        type: string
+                        format: date-time
+                        description: 'Subscription expiration date. The setting is
+                          for audit purposes only and the subscription is not automatically
+                          expired. The subscription lifecycle can be managed by using
+                          the `state` property. The date conforms to the following
+                          format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601
+                          standard.
+
+                          '
+                      endDate:
+                        type: string
+                        format: date-time
+                        description: 'Date when subscription was cancelled or expired.
+                          The setting is for audit purposes only and the subscription
+                          is not automatically cancelled. The subscription lifecycle
+                          can be managed by using the `state` property. The date conforms
+                          to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                          by the ISO 8601 standard.
+
+                          '
+                      notificationDate:
+                        type: string
+                        format: date-time
+                        description: 'Upcoming subscription expiration notification
+                          date. The date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                          as specified by the ISO 8601 standard.
+
+                          '
+                      primaryKey:
+                        x-ms-secret: true
+                        type: string
+                        description: Subscription primary key. This property will
+                          not be filled on 'GET' operations! Use '/listSecrets' POST
+                          request to get the value.
+                        minLength: 1
+                        maxLength: 256
+                      secondaryKey:
+                        x-ms-secret: true
+                        type: string
+                        description: Subscription secondary key. This property will
+                          not be filled on 'GET' operations! Use '/listSecrets' POST
+                          request to get the value.
+                        minLength: 1
+                        maxLength: 256
+                      stateComment:
+                        type: string
+                        description: Optional subscription comment added by an administrator
+                          when the state is changed to the 'rejected'.
+                      allowTracing:
+                        type: boolean
+                        description: Determines whether tracing is enabled
+                        x-apim-code-nillable: true
+                    required:
+                    - scope
+                    - state
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        '201':
+          description: The user was successfully subscribed to the product.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Subscription contract properties.
+                    type: object
+                    properties:
+                      ownerId:
+                        type: string
+                        description: The user resource identifier of the subscription
+                          owner. The value is a valid relative URL in the format of
+                          /users/{userId} where {userId} is a user identifier.
+                      scope:
+                        type: string
+                        description: Scope like /products/{productId} or /apis or
+                          /apis/{apiId}.
+                      displayName:
+                        type: string
+                        description: The name of the subscription, or null if the
+                          subscription has no name.
+                        minLength: 0
+                        maxLength: 100
+                      state:
+                        type: string
+                        description: "Subscription state. Possible states are * active\
+                          \ \u2013 the subscription is active, * suspended \u2013\
+                          \ the subscription is blocked, and the subscriber cannot\
+                          \ call any APIs of the product, * submitted \u2013 the subscription\
+                          \ request has been made by the developer, but has not yet\
+                          \ been approved or rejected, * rejected \u2013 the subscription\
+                          \ request has been denied by an administrator, * cancelled\
+                          \ \u2013 the subscription has been cancelled by the developer\
+                          \ or administrator, * expired \u2013 the subscription reached\
+                          \ its expiration date and was deactivated."
+                        enum:
+                        - suspended
+                        - active
+                        - expired
+                        - submitted
+                        - rejected
+                        - cancelled
+                        x-ms-enum:
+                          name: SubscriptionState
+                          modelAsString: false
+                      createdDate:
+                        type: string
+                        format: date-time
+                        description: 'Subscription creation date. The date conforms
+                          to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                          by the ISO 8601 standard.
+
+                          '
+                        readOnly: true
+                      startDate:
+                        type: string
+                        format: date-time
+                        description: 'Subscription activation date. The setting is
+                          for audit purposes only and the subscription is not automatically
+                          activated. The subscription lifecycle can be managed by
+                          using the `state` property. The date conforms to the following
+                          format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601
+                          standard.
+
+                          '
+                      expirationDate:
+                        type: string
+                        format: date-time
+                        description: 'Subscription expiration date. The setting is
+                          for audit purposes only and the subscription is not automatically
+                          expired. The subscription lifecycle can be managed by using
+                          the `state` property. The date conforms to the following
+                          format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601
+                          standard.
+
+                          '
+                      endDate:
+                        type: string
+                        format: date-time
+                        description: 'Date when subscription was cancelled or expired.
+                          The setting is for audit purposes only and the subscription
+                          is not automatically cancelled. The subscription lifecycle
+                          can be managed by using the `state` property. The date conforms
+                          to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                          by the ISO 8601 standard.
+
+                          '
+                      notificationDate:
+                        type: string
+                        format: date-time
+                        description: 'Upcoming subscription expiration notification
+                          date. The date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                          as specified by the ISO 8601 standard.
+
+                          '
+                      primaryKey:
+                        x-ms-secret: true
+                        type: string
+                        description: Subscription primary key. This property will
+                          not be filled on 'GET' operations! Use '/listSecrets' POST
+                          request to get the value.
+                        minLength: 1
+                        maxLength: 256
+                      secondaryKey:
+                        x-ms-secret: true
+                        type: string
+                        description: Subscription secondary key. This property will
+                          not be filled on 'GET' operations! Use '/listSecrets' POST
+                          request to get the value.
+                        minLength: 1
+                        maxLength: 256
+                      stateComment:
+                        type: string
+                        description: Optional subscription comment added by an administrator
+                          when the state is changed to the 'rejected'.
+                      allowTracing:
+                        type: boolean
+                        description: Determines whether tracing is enabled
+                        x-apim-code-nillable: true
+                    required:
+                    - scope
+                    - state
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    patch:
+      tags:
+      - Subscription
+      operationId: Subscription_Update
+      description: Updates the details of a subscription specified by its identifier.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: sid
+        in: path
+        required: true
+        description: Subscription entity Identifier. The entity represents the association
+          between a user and a product in API Management.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 256
+          pattern: ^[^*#&+:<>?]+$
+      - name: notify
+        in: query
+        required: false
+        description: "Notify change in Subscription State. \n - If false, do not send\
+          \ any email notification for change of state of subscription \n - If true,\
+          \ send email notification of change of state of subscription "
+        x-ms-parameter-location: method
+        schema:
+          type: boolean
+      - name: If-Match
+        in: header
+        required: true
+        description: ETag of the Entity. ETag should match the current entity state
+          from the header response of the GET request or it should be * for unconditional
+          update.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: appType
+        in: query
+        required: false
+        description: Determines the type of application which send the create user
+          request. Default is legacy publisher portal.
+        x-ms-enum:
+          name: AppType
+          modelAsString: true
+          values:
+          - value: portal
+            description: User create request was sent by legacy developer portal.
+          - value: developerPortal
+            description: User create request was sent by new developer portal.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - portal
+          - developerPortal
+          default: portal
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                properties:
+                  x-ms-client-flatten: true
+                  description: Subscription Update contract properties.
+                  type: object
+                  properties:
+                    ownerId:
+                      type: string
+                      description: 'User identifier path: /users/{userId}'
+                    scope:
+                      type: string
+                      description: Scope like /products/{productId} or /apis or /apis/{apiId}
+                    expirationDate:
+                      type: string
+                      format: date-time
+                      description: 'Subscription expiration date. The setting is for
+                        audit purposes only and the subscription is not automatically
+                        expired. The subscription lifecycle can be managed by using
+                        the `state` property. The date conforms to the following format:
+                        `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601 standard.'
+                    displayName:
+                      type: string
+                      description: Subscription name.
+                    primaryKey:
+                      type: string
+                      description: Primary subscription key.
+                      minLength: 1
+                      maxLength: 256
+                    secondaryKey:
+                      type: string
+                      description: Secondary subscription key.
+                      minLength: 1
+                      maxLength: 256
+                    state:
+                      type: string
+                      description: "Subscription state. Possible states are * active\
+                        \ \u2013 the subscription is active, * suspended \u2013 the\
+                        \ subscription is blocked, and the subscriber cannot call\
+                        \ any APIs of the product, * submitted \u2013 the subscription\
+                        \ request has been made by the developer, but has not yet\
+                        \ been approved or rejected, * rejected \u2013 the subscription\
+                        \ request has been denied by an administrator, * cancelled\
+                        \ \u2013 the subscription has been cancelled by the developer\
+                        \ or administrator, * expired \u2013 the subscription reached\
+                        \ its expiration date and was deactivated."
+                      enum:
+                      - suspended
+                      - active
+                      - expired
+                      - submitted
+                      - rejected
+                      - cancelled
+                      x-ms-enum:
+                        name: SubscriptionState
+                        modelAsString: false
+                    stateComment:
+                      type: string
+                      description: Comments describing subscription state change by
+                        the administrator when the state is changed to the 'rejected'.
+                    allowTracing:
+                      type: boolean
+                      description: Determines whether tracing can be enabled
+              description: Subscription update details.
+        description: Update parameters.
+        required: true
+      responses:
+        '200':
+          description: The subscription details were successfully updated.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Subscription contract properties.
+                    type: object
+                    properties:
+                      ownerId:
+                        type: string
+                        description: The user resource identifier of the subscription
+                          owner. The value is a valid relative URL in the format of
+                          /users/{userId} where {userId} is a user identifier.
+                      scope:
+                        type: string
+                        description: Scope like /products/{productId} or /apis or
+                          /apis/{apiId}.
+                      displayName:
+                        type: string
+                        description: The name of the subscription, or null if the
+                          subscription has no name.
+                        minLength: 0
+                        maxLength: 100
+                      state:
+                        type: string
+                        description: "Subscription state. Possible states are * active\
+                          \ \u2013 the subscription is active, * suspended \u2013\
+                          \ the subscription is blocked, and the subscriber cannot\
+                          \ call any APIs of the product, * submitted \u2013 the subscription\
+                          \ request has been made by the developer, but has not yet\
+                          \ been approved or rejected, * rejected \u2013 the subscription\
+                          \ request has been denied by an administrator, * cancelled\
+                          \ \u2013 the subscription has been cancelled by the developer\
+                          \ or administrator, * expired \u2013 the subscription reached\
+                          \ its expiration date and was deactivated."
+                        enum:
+                        - suspended
+                        - active
+                        - expired
+                        - submitted
+                        - rejected
+                        - cancelled
+                        x-ms-enum:
+                          name: SubscriptionState
+                          modelAsString: false
+                      createdDate:
+                        type: string
+                        format: date-time
+                        description: 'Subscription creation date. The date conforms
+                          to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                          by the ISO 8601 standard.
+
+                          '
+                        readOnly: true
+                      startDate:
+                        type: string
+                        format: date-time
+                        description: 'Subscription activation date. The setting is
+                          for audit purposes only and the subscription is not automatically
+                          activated. The subscription lifecycle can be managed by
+                          using the `state` property. The date conforms to the following
+                          format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601
+                          standard.
+
+                          '
+                      expirationDate:
+                        type: string
+                        format: date-time
+                        description: 'Subscription expiration date. The setting is
+                          for audit purposes only and the subscription is not automatically
+                          expired. The subscription lifecycle can be managed by using
+                          the `state` property. The date conforms to the following
+                          format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601
+                          standard.
+
+                          '
+                      endDate:
+                        type: string
+                        format: date-time
+                        description: 'Date when subscription was cancelled or expired.
+                          The setting is for audit purposes only and the subscription
+                          is not automatically cancelled. The subscription lifecycle
+                          can be managed by using the `state` property. The date conforms
+                          to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                          by the ISO 8601 standard.
+
+                          '
+                      notificationDate:
+                        type: string
+                        format: date-time
+                        description: 'Upcoming subscription expiration notification
+                          date. The date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                          as specified by the ISO 8601 standard.
+
+                          '
+                      primaryKey:
+                        x-ms-secret: true
+                        type: string
+                        description: Subscription primary key. This property will
+                          not be filled on 'GET' operations! Use '/listSecrets' POST
+                          request to get the value.
+                        minLength: 1
+                        maxLength: 256
+                      secondaryKey:
+                        x-ms-secret: true
+                        type: string
+                        description: Subscription secondary key. This property will
+                          not be filled on 'GET' operations! Use '/listSecrets' POST
+                          request to get the value.
+                        minLength: 1
+                        maxLength: 256
+                      stateComment:
+                        type: string
+                        description: Optional subscription comment added by an administrator
+                          when the state is changed to the 'rejected'.
+                      allowTracing:
+                        type: boolean
+                        description: Determines whether tracing is enabled
+                        x-apim-code-nillable: true
+                    required:
+                    - scope
+                    - state
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    delete:
+      tags:
+      - Subscription
+      operationId: Subscription_Delete
+      description: Deletes the specified subscription.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: sid
+        in: path
+        required: true
+        description: Subscription entity Identifier. The entity represents the association
+          between a user and a product in API Management.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 256
+          pattern: ^[^*#&+:<>?]+$
+      - name: If-Match
+        in: header
+        required: true
+        description: ETag of the Entity. ETag should match the current entity state
+          from the header response of the GET request or it should be * for unconditional
+          update.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The subscription details were successfully deleted.
+        '204':
+          description: The subscription details were successfully deleted.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/subscriptions/{sid}/regeneratePrimaryKey
+  : post:
+      tags:
+      - Subscription
+      operationId: Subscription_RegeneratePrimaryKey
+      description: Regenerates primary key of existing subscription of the API Management
+        service instance.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: sid
+        in: path
+        required: true
+        description: Subscription entity Identifier. The entity represents the association
+          between a user and a product in API Management.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 256
+          pattern: ^[^*#&+:<>?]+$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: The primary key was successfully regenerated.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/subscriptions/{sid}/regenerateSecondaryKey
+  : post:
+      tags:
+      - Subscription
+      operationId: Subscription_RegenerateSecondaryKey
+      description: Regenerates secondary key of existing subscription of the API Management
+        service instance.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: sid
+        in: path
+        required: true
+        description: Subscription entity Identifier. The entity represents the association
+          between a user and a product in API Management.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 256
+          pattern: ^[^*#&+:<>?]+$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: The secondary key was successfully regenerated.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/subscriptions/{sid}/listSecrets
+  : post:
+      tags:
+      - Subscription
+      operationId: Subscription_ListSecrets
+      description: Gets the specified Subscription keys.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: sid
+        in: path
+        required: true
+        description: Subscription entity Identifier. The entity represents the association
+          between a user and a product in API Management.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 256
+          pattern: ^[^*#&+:<>?]+$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The response body contains subscription keys.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  primaryKey:
+                    type: string
+                    description: Subscription primary key.
+                    minLength: 1
+                    maxLength: 256
+                  secondaryKey:
+                    type: string
+                    description: Subscription secondary key.
+                    minLength: 1
+                    maxLength: 256
+                description: Subscription keys.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+components:
+  parameters:
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      description: The name of the resource group. The name is case insensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    ServiceNameParameter:
+      name: serviceName
+      in: path
+      required: true
+      description: The name of the API Management service.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 50
+        pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+    TopQueryParameter:
+      name: $top
+      in: query
+      required: false
+      description: Number of records to return.
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+    SkipQueryParameter:
+      name: $skip
+      in: query
+      required: false
+      description: Number of records to skip.
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription. The value must be an UUID.
+      required: true
+      schema:
+        type: string
+        format: uuid
+    SubscriptionEntityIdParameter:
+      name: sid
+      in: path
+      required: true
+      description: Subscription entity Identifier. The entity represents the association
+        between a user and a product in API Management.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        maxLength: 256
+        pattern: ^[^*#&+:<>?]+$
+    NotifySubscriptionStateChangeParameter:
+      name: notify
+      in: query
+      required: false
+      description: "Notify change in Subscription State. \n - If false, do not send\
+        \ any email notification for change of state of subscription \n - If true,\
+        \ send email notification of change of state of subscription "
+      x-ms-parameter-location: method
+      schema:
+        type: boolean
+    IfMatchOptionalParameter:
+      name: If-Match
+      in: header
+      required: false
+      description: ETag of the Entity. Not required when creating an entity, but required
+        when updating an entity.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    AppTypeParameter:
+      name: appType
+      in: query
+      required: false
+      description: Determines the type of application which send the create user request.
+        Default is legacy publisher portal.
+      x-ms-enum:
+        name: AppType
+        modelAsString: true
+        values:
+        - value: portal
+          description: User create request was sent by legacy developer portal.
+        - value: developerPortal
+          description: User create request was sent by new developer portal.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        enum:
+        - portal
+        - developerPortal
+        default: portal
+    IfMatchRequiredParameter:
+      name: If-Match
+      in: header
+      required: true
+      description: ETag of the Entity. ETag should match the current entity state
+        from the header response of the GET request or it should be * for unconditional
+        update.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+    Resource:
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    SubscriptionContractProperties:
+      type: object
+      properties:
+        ownerId:
+          type: string
+          description: The user resource identifier of the subscription owner. The
+            value is a valid relative URL in the format of /users/{userId} where {userId}
+            is a user identifier.
+        scope:
+          type: string
+          description: Scope like /products/{productId} or /apis or /apis/{apiId}.
+        displayName:
+          type: string
+          description: The name of the subscription, or null if the subscription has
+            no name.
+          minLength: 0
+          maxLength: 100
+        state:
+          type: string
+          description: "Subscription state. Possible states are * active \u2013 the\
+            \ subscription is active, * suspended \u2013 the subscription is blocked,\
+            \ and the subscriber cannot call any APIs of the product, * submitted\
+            \ \u2013 the subscription request has been made by the developer, but\
+            \ has not yet been approved or rejected, * rejected \u2013 the subscription\
+            \ request has been denied by an administrator, * cancelled \u2013 the\
+            \ subscription has been cancelled by the developer or administrator, *\
+            \ expired \u2013 the subscription reached its expiration date and was\
+            \ deactivated."
+          enum:
+          - suspended
+          - active
+          - expired
+          - submitted
+          - rejected
+          - cancelled
+          x-ms-enum:
+            name: SubscriptionState
+            modelAsString: false
+        createdDate:
+          type: string
+          format: date-time
+          description: 'Subscription creation date. The date conforms to the following
+            format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601 standard.
+
+            '
+          readOnly: true
+        startDate:
+          type: string
+          format: date-time
+          description: 'Subscription activation date. The setting is for audit purposes
+            only and the subscription is not automatically activated. The subscription
+            lifecycle can be managed by using the `state` property. The date conforms
+            to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO
+            8601 standard.
+
+            '
+        expirationDate:
+          type: string
+          format: date-time
+          description: 'Subscription expiration date. The setting is for audit purposes
+            only and the subscription is not automatically expired. The subscription
+            lifecycle can be managed by using the `state` property. The date conforms
+            to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO
+            8601 standard.
+
+            '
+        endDate:
+          type: string
+          format: date-time
+          description: 'Date when subscription was cancelled or expired. The setting
+            is for audit purposes only and the subscription is not automatically cancelled.
+            The subscription lifecycle can be managed by using the `state` property.
+            The date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+            by the ISO 8601 standard.
+
+            '
+        notificationDate:
+          type: string
+          format: date-time
+          description: 'Upcoming subscription expiration notification date. The date
+            conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+            by the ISO 8601 standard.
+
+            '
+        primaryKey:
+          x-ms-secret: true
+          type: string
+          description: Subscription primary key. This property will not be filled
+            on 'GET' operations! Use '/listSecrets' POST request to get the value.
+          minLength: 1
+          maxLength: 256
+        secondaryKey:
+          x-ms-secret: true
+          type: string
+          description: Subscription secondary key. This property will not be filled
+            on 'GET' operations! Use '/listSecrets' POST request to get the value.
+          minLength: 1
+          maxLength: 256
+        stateComment:
+          type: string
+          description: Optional subscription comment added by an administrator when
+            the state is changed to the 'rejected'.
+        allowTracing:
+          type: boolean
+          description: Determines whether tracing is enabled
+          x-apim-code-nillable: true
+      required:
+      - scope
+      - state
+      description: Subscription details.
+    SubscriptionContract:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        properties:
+          x-ms-client-flatten: true
+          description: Subscription contract properties.
+          type: object
+          properties:
+            ownerId:
+              type: string
+              description: The user resource identifier of the subscription owner.
+                The value is a valid relative URL in the format of /users/{userId}
+                where {userId} is a user identifier.
+            scope:
+              type: string
+              description: Scope like /products/{productId} or /apis or /apis/{apiId}.
+            displayName:
+              type: string
+              description: The name of the subscription, or null if the subscription
+                has no name.
+              minLength: 0
+              maxLength: 100
+            state:
+              type: string
+              description: "Subscription state. Possible states are * active \u2013\
+                \ the subscription is active, * suspended \u2013 the subscription\
+                \ is blocked, and the subscriber cannot call any APIs of the product,\
+                \ * submitted \u2013 the subscription request has been made by the\
+                \ developer, but has not yet been approved or rejected, * rejected\
+                \ \u2013 the subscription request has been denied by an administrator,\
+                \ * cancelled \u2013 the subscription has been cancelled by the developer\
+                \ or administrator, * expired \u2013 the subscription reached its\
+                \ expiration date and was deactivated."
+              enum:
+              - suspended
+              - active
+              - expired
+              - submitted
+              - rejected
+              - cancelled
+              x-ms-enum:
+                name: SubscriptionState
+                modelAsString: false
+            createdDate:
+              type: string
+              format: date-time
+              description: 'Subscription creation date. The date conforms to the following
+                format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601 standard.
+
+                '
+              readOnly: true
+            startDate:
+              type: string
+              format: date-time
+              description: 'Subscription activation date. The setting is for audit
+                purposes only and the subscription is not automatically activated.
+                The subscription lifecycle can be managed by using the `state` property.
+                The date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                as specified by the ISO 8601 standard.
+
+                '
+            expirationDate:
+              type: string
+              format: date-time
+              description: 'Subscription expiration date. The setting is for audit
+                purposes only and the subscription is not automatically expired. The
+                subscription lifecycle can be managed by using the `state` property.
+                The date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                as specified by the ISO 8601 standard.
+
+                '
+            endDate:
+              type: string
+              format: date-time
+              description: 'Date when subscription was cancelled or expired. The setting
+                is for audit purposes only and the subscription is not automatically
+                cancelled. The subscription lifecycle can be managed by using the
+                `state` property. The date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                as specified by the ISO 8601 standard.
+
+                '
+            notificationDate:
+              type: string
+              format: date-time
+              description: 'Upcoming subscription expiration notification date. The
+                date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                by the ISO 8601 standard.
+
+                '
+            primaryKey:
+              x-ms-secret: true
+              type: string
+              description: Subscription primary key. This property will not be filled
+                on 'GET' operations! Use '/listSecrets' POST request to get the value.
+              minLength: 1
+              maxLength: 256
+            secondaryKey:
+              x-ms-secret: true
+              type: string
+              description: Subscription secondary key. This property will not be filled
+                on 'GET' operations! Use '/listSecrets' POST request to get the value.
+              minLength: 1
+              maxLength: 256
+            stateComment:
+              type: string
+              description: Optional subscription comment added by an administrator
+                when the state is changed to the 'rejected'.
+            allowTracing:
+              type: boolean
+              description: Determines whether tracing is enabled
+              x-apim-code-nillable: true
+          required:
+          - scope
+          - state
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    SubscriptionCollection:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+              name:
+                readOnly: true
+                type: string
+                description: The name of the resource
+              type:
+                readOnly: true
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+              properties:
+                x-ms-client-flatten: true
+                description: Subscription contract properties.
+                type: object
+                properties:
+                  ownerId:
+                    type: string
+                    description: The user resource identifier of the subscription
+                      owner. The value is a valid relative URL in the format of /users/{userId}
+                      where {userId} is a user identifier.
+                  scope:
+                    type: string
+                    description: Scope like /products/{productId} or /apis or /apis/{apiId}.
+                  displayName:
+                    type: string
+                    description: The name of the subscription, or null if the subscription
+                      has no name.
+                    minLength: 0
+                    maxLength: 100
+                  state:
+                    type: string
+                    description: "Subscription state. Possible states are * active\
+                      \ \u2013 the subscription is active, * suspended \u2013 the\
+                      \ subscription is blocked, and the subscriber cannot call any\
+                      \ APIs of the product, * submitted \u2013 the subscription request\
+                      \ has been made by the developer, but has not yet been approved\
+                      \ or rejected, * rejected \u2013 the subscription request has\
+                      \ been denied by an administrator, * cancelled \u2013 the subscription\
+                      \ has been cancelled by the developer or administrator, * expired\
+                      \ \u2013 the subscription reached its expiration date and was\
+                      \ deactivated."
+                    enum:
+                    - suspended
+                    - active
+                    - expired
+                    - submitted
+                    - rejected
+                    - cancelled
+                    x-ms-enum:
+                      name: SubscriptionState
+                      modelAsString: false
+                  createdDate:
+                    type: string
+                    format: date-time
+                    description: 'Subscription creation date. The date conforms to
+                      the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified by
+                      the ISO 8601 standard.
+
+                      '
+                    readOnly: true
+                  startDate:
+                    type: string
+                    format: date-time
+                    description: 'Subscription activation date. The setting is for
+                      audit purposes only and the subscription is not automatically
+                      activated. The subscription lifecycle can be managed by using
+                      the `state` property. The date conforms to the following format:
+                      `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601 standard.
+
+                      '
+                  expirationDate:
+                    type: string
+                    format: date-time
+                    description: 'Subscription expiration date. The setting is for
+                      audit purposes only and the subscription is not automatically
+                      expired. The subscription lifecycle can be managed by using
+                      the `state` property. The date conforms to the following format:
+                      `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601 standard.
+
+                      '
+                  endDate:
+                    type: string
+                    format: date-time
+                    description: 'Date when subscription was cancelled or expired.
+                      The setting is for audit purposes only and the subscription
+                      is not automatically cancelled. The subscription lifecycle can
+                      be managed by using the `state` property. The date conforms
+                      to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                      by the ISO 8601 standard.
+
+                      '
+                  notificationDate:
+                    type: string
+                    format: date-time
+                    description: 'Upcoming subscription expiration notification date.
+                      The date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                      as specified by the ISO 8601 standard.
+
+                      '
+                  primaryKey:
+                    x-ms-secret: true
+                    type: string
+                    description: Subscription primary key. This property will not
+                      be filled on 'GET' operations! Use '/listSecrets' POST request
+                      to get the value.
+                    minLength: 1
+                    maxLength: 256
+                  secondaryKey:
+                    x-ms-secret: true
+                    type: string
+                    description: Subscription secondary key. This property will not
+                      be filled on 'GET' operations! Use '/listSecrets' POST request
+                      to get the value.
+                    minLength: 1
+                    maxLength: 256
+                  stateComment:
+                    type: string
+                    description: Optional subscription comment added by an administrator
+                      when the state is changed to the 'rejected'.
+                  allowTracing:
+                    type: boolean
+                    description: Determines whether tracing is enabled
+                    x-apim-code-nillable: true
+                required:
+                - scope
+                - state
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+          description: Page values.
+        count:
+          type: integer
+          format: int64
+          description: Total record count number across all pages.
+        nextLink:
+          type: string
+          description: Next page link if any.
+      description: Paged Subscriptions list representation.
+    SubscriptionCreateParameterProperties:
+      type: object
+      properties:
+        ownerId:
+          type: string
+          description: User (user id path) for whom subscription is being created
+            in form /users/{userId}
+        scope:
+          type: string
+          description: Scope like /products/{productId} or /apis or /apis/{apiId}.
+        displayName:
+          type: string
+          description: Subscription name.
+          minLength: 1
+          maxLength: 100
+        primaryKey:
+          type: string
+          description: Primary subscription key. If not specified during request key
+            will be generated automatically.
+          minLength: 1
+          maxLength: 256
+        secondaryKey:
+          type: string
+          description: Secondary subscription key. If not specified during request
+            key will be generated automatically.
+          minLength: 1
+          maxLength: 256
+        state:
+          type: string
+          description: "Initial subscription state. If no value is specified, subscription\
+            \ is created with Submitted state. Possible states are * active \u2013\
+            \ the subscription is active, * suspended \u2013 the subscription is blocked,\
+            \ and the subscriber cannot call any APIs of the product, * submitted\
+            \ \u2013 the subscription request has been made by the developer, but\
+            \ has not yet been approved or rejected, * rejected \u2013 the subscription\
+            \ request has been denied by an administrator, * cancelled \u2013 the\
+            \ subscription has been cancelled by the developer or administrator, *\
+            \ expired \u2013 the subscription reached its expiration date and was\
+            \ deactivated."
+          enum:
+          - suspended
+          - active
+          - expired
+          - submitted
+          - rejected
+          - cancelled
+          x-ms-enum:
+            name: SubscriptionState
+            modelAsString: false
+        allowTracing:
+          type: boolean
+          description: Determines whether tracing can be enabled
+      required:
+      - scope
+      - displayName
+      description: Parameters supplied to the Create subscription operation.
+    SubscriptionCreateParameters:
+      type: object
+      properties:
+        properties:
+          x-ms-client-flatten: true
+          description: Subscription contract properties.
+          type: object
+          properties:
+            ownerId:
+              type: string
+              description: User (user id path) for whom subscription is being created
+                in form /users/{userId}
+            scope:
+              type: string
+              description: Scope like /products/{productId} or /apis or /apis/{apiId}.
+            displayName:
+              type: string
+              description: Subscription name.
+              minLength: 1
+              maxLength: 100
+            primaryKey:
+              type: string
+              description: Primary subscription key. If not specified during request
+                key will be generated automatically.
+              minLength: 1
+              maxLength: 256
+            secondaryKey:
+              type: string
+              description: Secondary subscription key. If not specified during request
+                key will be generated automatically.
+              minLength: 1
+              maxLength: 256
+            state:
+              type: string
+              description: "Initial subscription state. If no value is specified,\
+                \ subscription is created with Submitted state. Possible states are\
+                \ * active \u2013 the subscription is active, * suspended \u2013 the\
+                \ subscription is blocked, and the subscriber cannot call any APIs\
+                \ of the product, * submitted \u2013 the subscription request has\
+                \ been made by the developer, but has not yet been approved or rejected,\
+                \ * rejected \u2013 the subscription request has been denied by an\
+                \ administrator, * cancelled \u2013 the subscription has been cancelled\
+                \ by the developer or administrator, * expired \u2013 the subscription\
+                \ reached its expiration date and was deactivated."
+              enum:
+              - suspended
+              - active
+              - expired
+              - submitted
+              - rejected
+              - cancelled
+              x-ms-enum:
+                name: SubscriptionState
+                modelAsString: false
+            allowTracing:
+              type: boolean
+              description: Determines whether tracing can be enabled
+          required:
+          - scope
+          - displayName
+      description: Subscription create details.
+    SubscriptionUpdateParameterProperties:
+      type: object
+      properties:
+        ownerId:
+          type: string
+          description: 'User identifier path: /users/{userId}'
+        scope:
+          type: string
+          description: Scope like /products/{productId} or /apis or /apis/{apiId}
+        expirationDate:
+          type: string
+          format: date-time
+          description: 'Subscription expiration date. The setting is for audit purposes
+            only and the subscription is not automatically expired. The subscription
+            lifecycle can be managed by using the `state` property. The date conforms
+            to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO
+            8601 standard.'
+        displayName:
+          type: string
+          description: Subscription name.
+        primaryKey:
+          type: string
+          description: Primary subscription key.
+          minLength: 1
+          maxLength: 256
+        secondaryKey:
+          type: string
+          description: Secondary subscription key.
+          minLength: 1
+          maxLength: 256
+        state:
+          type: string
+          description: "Subscription state. Possible states are * active \u2013 the\
+            \ subscription is active, * suspended \u2013 the subscription is blocked,\
+            \ and the subscriber cannot call any APIs of the product, * submitted\
+            \ \u2013 the subscription request has been made by the developer, but\
+            \ has not yet been approved or rejected, * rejected \u2013 the subscription\
+            \ request has been denied by an administrator, * cancelled \u2013 the\
+            \ subscription has been cancelled by the developer or administrator, *\
+            \ expired \u2013 the subscription reached its expiration date and was\
+            \ deactivated."
+          enum:
+          - suspended
+          - active
+          - expired
+          - submitted
+          - rejected
+          - cancelled
+          x-ms-enum:
+            name: SubscriptionState
+            modelAsString: false
+        stateComment:
+          type: string
+          description: Comments describing subscription state change by the administrator
+            when the state is changed to the 'rejected'.
+        allowTracing:
+          type: boolean
+          description: Determines whether tracing can be enabled
+      description: Parameters supplied to the Update subscription operation.
+    SubscriptionUpdateParameters:
+      type: object
+      properties:
+        properties:
+          x-ms-client-flatten: true
+          description: Subscription Update contract properties.
+          type: object
+          properties:
+            ownerId:
+              type: string
+              description: 'User identifier path: /users/{userId}'
+            scope:
+              type: string
+              description: Scope like /products/{productId} or /apis or /apis/{apiId}
+            expirationDate:
+              type: string
+              format: date-time
+              description: 'Subscription expiration date. The setting is for audit
+                purposes only and the subscription is not automatically expired. The
+                subscription lifecycle can be managed by using the `state` property.
+                The date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                as specified by the ISO 8601 standard.'
+            displayName:
+              type: string
+              description: Subscription name.
+            primaryKey:
+              type: string
+              description: Primary subscription key.
+              minLength: 1
+              maxLength: 256
+            secondaryKey:
+              type: string
+              description: Secondary subscription key.
+              minLength: 1
+              maxLength: 256
+            state:
+              type: string
+              description: "Subscription state. Possible states are * active \u2013\
+                \ the subscription is active, * suspended \u2013 the subscription\
+                \ is blocked, and the subscriber cannot call any APIs of the product,\
+                \ * submitted \u2013 the subscription request has been made by the\
+                \ developer, but has not yet been approved or rejected, * rejected\
+                \ \u2013 the subscription request has been denied by an administrator,\
+                \ * cancelled \u2013 the subscription has been cancelled by the developer\
+                \ or administrator, * expired \u2013 the subscription reached its\
+                \ expiration date and was deactivated."
+              enum:
+              - suspended
+              - active
+              - expired
+              - submitted
+              - rejected
+              - cancelled
+              x-ms-enum:
+                name: SubscriptionState
+                modelAsString: false
+            stateComment:
+              type: string
+              description: Comments describing subscription state change by the administrator
+                when the state is changed to the 'rejected'.
+            allowTracing:
+              type: boolean
+              description: Determines whether tracing can be enabled
+      description: Subscription update details.
+    SubscriptionKeysContract:
+      type: object
+      properties:
+        primaryKey:
+          type: string
+          description: Subscription primary key.
+          minLength: 1
+          maxLength: 256
+        secondaryKey:
+          type: string
+          description: Subscription secondary key.
+          minLength: 1
+          maxLength: 256
+      description: Subscription keys.

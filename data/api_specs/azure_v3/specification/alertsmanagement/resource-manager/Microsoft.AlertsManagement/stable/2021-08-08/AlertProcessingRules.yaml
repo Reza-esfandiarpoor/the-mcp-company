@@ -1,0 +1,3163 @@
+openapi: 3.0.0
+info:
+  version: 2021-08-08
+  title: Azure Alerts Management Service Resource Provider
+  description: APIs for Azure alert processing rules CRUD operations.
+servers:
+- url: https://management.azure.com
+paths:
+  /subscriptions/{subscriptionId}/providers/Microsoft.AlertsManagement/actionRules:
+    get:
+      description: List all alert processing rules in a subscription.
+      operationId: AlertProcessingRules_ListBySubscription
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: api-version
+        description: Client API version.
+        in: query
+        required: true
+        x-ms-enum:
+          name: api-version
+          modelAsString: true
+        schema:
+          type: string
+          enum:
+          - 2021-08-08
+      responses:
+        '200':
+          description: OK. Return the list of alert processing rules.
+          headers:
+            x-ms-request-id:
+              description: Service generated Request ID.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of alert processing rules.
+                properties:
+                  nextLink:
+                    type: string
+                    description: URL to fetch the next set of alert processing rules.
+                  value:
+                    type: array
+                    description: List of alert processing rules.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          readOnly: true
+                          description: Azure resource Id
+                        type:
+                          type: string
+                          readOnly: true
+                          description: Azure resource type
+                        name:
+                          type: string
+                          readOnly: true
+                          description: Azure resource name
+                        location:
+                          type: string
+                          description: Resource location
+                          x-ms-mutability:
+                          - create
+                          - read
+                        tags:
+                          type: object
+                          additionalProperties:
+                            type: string
+                          description: Resource tags
+                        properties:
+                          description: Alert processing rule properties.
+                          type: object
+                          required:
+                          - scopes
+                          - actions
+                          properties:
+                            scopes:
+                              description: Scopes on which alert processing rule will
+                                apply.
+                              type: array
+                              items:
+                                type: string
+                            conditions:
+                              description: Conditions on which alerts will be filtered.
+                              type: array
+                              items:
+                                type: object
+                                description: Condition to trigger an alert processing
+                                  rule.
+                                properties:
+                                  field:
+                                    type: string
+                                    description: Field for a given condition.
+                                    enum:
+                                    - Severity
+                                    - MonitorService
+                                    - MonitorCondition
+                                    - SignalType
+                                    - TargetResourceType
+                                    - TargetResource
+                                    - TargetResourceGroup
+                                    - AlertRuleId
+                                    - AlertRuleName
+                                    - Description
+                                    - AlertContext
+                                    x-ms-enum:
+                                      name: Field
+                                      modelAsString: true
+                                  operator:
+                                    type: string
+                                    description: Operator for a given condition.
+                                    enum:
+                                    - Equals
+                                    - NotEquals
+                                    - Contains
+                                    - DoesNotContain
+                                    x-ms-enum:
+                                      name: Operator
+                                      modelAsString: true
+                                  values:
+                                    type: array
+                                    description: List of values to match for a given
+                                      condition.
+                                    items:
+                                      type: string
+                            schedule:
+                              description: Scheduling for alert processing rule.
+                              type: object
+                              properties:
+                                effectiveFrom:
+                                  type: string
+                                  pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                                  description: Scheduling effective from time. Date-Time
+                                    in ISO-8601 format without timezone suffix.
+                                effectiveUntil:
+                                  type: string
+                                  pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                                  description: Scheduling effective until time. Date-Time
+                                    in ISO-8601 format without timezone suffix.
+                                timeZone:
+                                  type: string
+                                  description: Scheduling time zone.
+                                recurrences:
+                                  type: array
+                                  description: List of recurrences.
+                                  items:
+                                    type: object
+                                    description: Recurrence object.
+                                    discriminator:
+                                      propertyName: recurrenceType
+                                    required:
+                                    - recurrenceType
+                                    properties:
+                                      recurrenceType:
+                                        type: string
+                                        description: Specifies when the recurrence
+                                          should be applied.
+                                        enum:
+                                        - Daily
+                                        - Weekly
+                                        - Monthly
+                                        x-ms-enum:
+                                          name: RecurrenceType
+                                          modelAsString: true
+                                      startTime:
+                                        type: string
+                                        description: Start time for recurrence.
+                                      endTime:
+                                        type: string
+                                        description: End time for recurrence.
+                            actions:
+                              type: array
+                              description: Actions to be applied.
+                              items:
+                                type: object
+                                description: Action to be applied.
+                                discriminator:
+                                  propertyName: actionType
+                                required:
+                                - actionType
+                                properties:
+                                  actionType:
+                                    type: string
+                                    description: Action that should be applied.
+                                    enum:
+                                    - AddActionGroups
+                                    - RemoveAllActionGroups
+                                    x-ms-enum:
+                                      name: actionType
+                                      modelAsString: true
+                            description:
+                              type: string
+                              description: Description of alert processing rule.
+                            enabled:
+                              type: boolean
+                              default: true
+                              description: Indicates if the given alert processing
+                                rule is enabled or disabled.
+                        systemData:
+                          description: Alert processing rule system data.
+                          type: object
+                          readOnly: true
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource last modification
+                                (UTC)
+                      required:
+                      - location
+                      description: An azure resource object
+                      x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: An error response from the service.
+                properties:
+                  error:
+                    description: Details of error response.
+                    properties:
+                      code:
+                        type: string
+                        description: Error code, intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: Description of the error, intended for display
+                          in user interface.
+                      target:
+                        type: string
+                        description: Target of the particular error, for example name
+                          of the property.
+                      details:
+                        type: array
+                        description: A list of additional details about the error.
+                        items:
+                          description: Details of error response.
+                          properties:
+                            code:
+                              type: string
+                              description: Error code, intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: Description of the error, intended for
+                                display in user interface.
+                            target:
+                              type: string
+                              description: Target of the particular error, for example
+                                name of the property.
+                            details:
+                              type: array
+                              description: A list of additional details about the
+                                error.
+                              items:
+                                description: Details of error response.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: Error code, intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: Description of the error, intended
+                                      for display in user interface.
+                                  target:
+                                    type: string
+                                    description: Target of the particular error, for
+                                      example name of the property.
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AlertsManagement/actionRules:
+    get:
+      operationId: AlertProcessingRules_ListByResourceGroup
+      description: List all alert processing rules in a resource group.
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        description: Resource group name where the resource is created.
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        description: Client API version.
+        in: query
+        required: true
+        x-ms-enum:
+          name: api-version
+          modelAsString: true
+        schema:
+          type: string
+          enum:
+          - 2021-08-08
+      responses:
+        '200':
+          description: OK. Return the list of alert processing rules.
+          headers:
+            x-ms-request-id:
+              description: Service generated Request ID.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of alert processing rules.
+                properties:
+                  nextLink:
+                    type: string
+                    description: URL to fetch the next set of alert processing rules.
+                  value:
+                    type: array
+                    description: List of alert processing rules.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          readOnly: true
+                          description: Azure resource Id
+                        type:
+                          type: string
+                          readOnly: true
+                          description: Azure resource type
+                        name:
+                          type: string
+                          readOnly: true
+                          description: Azure resource name
+                        location:
+                          type: string
+                          description: Resource location
+                          x-ms-mutability:
+                          - create
+                          - read
+                        tags:
+                          type: object
+                          additionalProperties:
+                            type: string
+                          description: Resource tags
+                        properties:
+                          description: Alert processing rule properties.
+                          type: object
+                          required:
+                          - scopes
+                          - actions
+                          properties:
+                            scopes:
+                              description: Scopes on which alert processing rule will
+                                apply.
+                              type: array
+                              items:
+                                type: string
+                            conditions:
+                              description: Conditions on which alerts will be filtered.
+                              type: array
+                              items:
+                                type: object
+                                description: Condition to trigger an alert processing
+                                  rule.
+                                properties:
+                                  field:
+                                    type: string
+                                    description: Field for a given condition.
+                                    enum:
+                                    - Severity
+                                    - MonitorService
+                                    - MonitorCondition
+                                    - SignalType
+                                    - TargetResourceType
+                                    - TargetResource
+                                    - TargetResourceGroup
+                                    - AlertRuleId
+                                    - AlertRuleName
+                                    - Description
+                                    - AlertContext
+                                    x-ms-enum:
+                                      name: Field
+                                      modelAsString: true
+                                  operator:
+                                    type: string
+                                    description: Operator for a given condition.
+                                    enum:
+                                    - Equals
+                                    - NotEquals
+                                    - Contains
+                                    - DoesNotContain
+                                    x-ms-enum:
+                                      name: Operator
+                                      modelAsString: true
+                                  values:
+                                    type: array
+                                    description: List of values to match for a given
+                                      condition.
+                                    items:
+                                      type: string
+                            schedule:
+                              description: Scheduling for alert processing rule.
+                              type: object
+                              properties:
+                                effectiveFrom:
+                                  type: string
+                                  pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                                  description: Scheduling effective from time. Date-Time
+                                    in ISO-8601 format without timezone suffix.
+                                effectiveUntil:
+                                  type: string
+                                  pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                                  description: Scheduling effective until time. Date-Time
+                                    in ISO-8601 format without timezone suffix.
+                                timeZone:
+                                  type: string
+                                  description: Scheduling time zone.
+                                recurrences:
+                                  type: array
+                                  description: List of recurrences.
+                                  items:
+                                    type: object
+                                    description: Recurrence object.
+                                    discriminator:
+                                      propertyName: recurrenceType
+                                    required:
+                                    - recurrenceType
+                                    properties:
+                                      recurrenceType:
+                                        type: string
+                                        description: Specifies when the recurrence
+                                          should be applied.
+                                        enum:
+                                        - Daily
+                                        - Weekly
+                                        - Monthly
+                                        x-ms-enum:
+                                          name: RecurrenceType
+                                          modelAsString: true
+                                      startTime:
+                                        type: string
+                                        description: Start time for recurrence.
+                                      endTime:
+                                        type: string
+                                        description: End time for recurrence.
+                            actions:
+                              type: array
+                              description: Actions to be applied.
+                              items:
+                                type: object
+                                description: Action to be applied.
+                                discriminator:
+                                  propertyName: actionType
+                                required:
+                                - actionType
+                                properties:
+                                  actionType:
+                                    type: string
+                                    description: Action that should be applied.
+                                    enum:
+                                    - AddActionGroups
+                                    - RemoveAllActionGroups
+                                    x-ms-enum:
+                                      name: actionType
+                                      modelAsString: true
+                            description:
+                              type: string
+                              description: Description of alert processing rule.
+                            enabled:
+                              type: boolean
+                              default: true
+                              description: Indicates if the given alert processing
+                                rule is enabled or disabled.
+                        systemData:
+                          description: Alert processing rule system data.
+                          type: object
+                          readOnly: true
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource last modification
+                                (UTC)
+                      required:
+                      - location
+                      description: An azure resource object
+                      x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: An error response from the service.
+                properties:
+                  error:
+                    description: Details of error response.
+                    properties:
+                      code:
+                        type: string
+                        description: Error code, intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: Description of the error, intended for display
+                          in user interface.
+                      target:
+                        type: string
+                        description: Target of the particular error, for example name
+                          of the property.
+                      details:
+                        type: array
+                        description: A list of additional details about the error.
+                        items:
+                          description: Details of error response.
+                          properties:
+                            code:
+                              type: string
+                              description: Error code, intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: Description of the error, intended for
+                                display in user interface.
+                            target:
+                              type: string
+                              description: Target of the particular error, for example
+                                name of the property.
+                            details:
+                              type: array
+                              description: A list of additional details about the
+                                error.
+                              items:
+                                description: Details of error response.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: Error code, intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: Description of the error, intended
+                                      for display in user interface.
+                                  target:
+                                    type: string
+                                    description: Target of the particular error, for
+                                      example name of the property.
+      x-ms-pageable:
+        nextLinkName: nextLink
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.AlertsManagement/actionRules/{alertProcessingRuleName}
+  : get:
+      description: Get an alert processing rule by name.
+      operationId: AlertProcessingRules_GetByName
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        description: Resource group name where the resource is created.
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: alertProcessingRuleName
+        in: path
+        description: The name of the alert processing rule that needs to be fetched.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        description: Client API version.
+        in: query
+        required: true
+        x-ms-enum:
+          name: api-version
+          modelAsString: true
+        schema:
+          type: string
+          enum:
+          - 2021-08-08
+      responses:
+        '200':
+          description: OK. Returns the specific alert processing rule.
+          headers:
+            x-ms-request-id:
+              description: Service generated Request ID.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                    description: Azure resource Id
+                  type:
+                    type: string
+                    readOnly: true
+                    description: Azure resource type
+                  name:
+                    type: string
+                    readOnly: true
+                    description: Azure resource name
+                  location:
+                    type: string
+                    description: Resource location
+                    x-ms-mutability:
+                    - create
+                    - read
+                  tags:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: Resource tags
+                  properties:
+                    description: Alert processing rule properties.
+                    type: object
+                    required:
+                    - scopes
+                    - actions
+                    properties:
+                      scopes:
+                        description: Scopes on which alert processing rule will apply.
+                        type: array
+                        items:
+                          type: string
+                      conditions:
+                        description: Conditions on which alerts will be filtered.
+                        type: array
+                        items:
+                          type: object
+                          description: Condition to trigger an alert processing rule.
+                          properties:
+                            field:
+                              type: string
+                              description: Field for a given condition.
+                              enum:
+                              - Severity
+                              - MonitorService
+                              - MonitorCondition
+                              - SignalType
+                              - TargetResourceType
+                              - TargetResource
+                              - TargetResourceGroup
+                              - AlertRuleId
+                              - AlertRuleName
+                              - Description
+                              - AlertContext
+                              x-ms-enum:
+                                name: Field
+                                modelAsString: true
+                            operator:
+                              type: string
+                              description: Operator for a given condition.
+                              enum:
+                              - Equals
+                              - NotEquals
+                              - Contains
+                              - DoesNotContain
+                              x-ms-enum:
+                                name: Operator
+                                modelAsString: true
+                            values:
+                              type: array
+                              description: List of values to match for a given condition.
+                              items:
+                                type: string
+                      schedule:
+                        description: Scheduling for alert processing rule.
+                        type: object
+                        properties:
+                          effectiveFrom:
+                            type: string
+                            pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                            description: Scheduling effective from time. Date-Time
+                              in ISO-8601 format without timezone suffix.
+                          effectiveUntil:
+                            type: string
+                            pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                            description: Scheduling effective until time. Date-Time
+                              in ISO-8601 format without timezone suffix.
+                          timeZone:
+                            type: string
+                            description: Scheduling time zone.
+                          recurrences:
+                            type: array
+                            description: List of recurrences.
+                            items:
+                              type: object
+                              description: Recurrence object.
+                              discriminator:
+                                propertyName: recurrenceType
+                              required:
+                              - recurrenceType
+                              properties:
+                                recurrenceType:
+                                  type: string
+                                  description: Specifies when the recurrence should
+                                    be applied.
+                                  enum:
+                                  - Daily
+                                  - Weekly
+                                  - Monthly
+                                  x-ms-enum:
+                                    name: RecurrenceType
+                                    modelAsString: true
+                                startTime:
+                                  type: string
+                                  description: Start time for recurrence.
+                                endTime:
+                                  type: string
+                                  description: End time for recurrence.
+                      actions:
+                        type: array
+                        description: Actions to be applied.
+                        items:
+                          type: object
+                          description: Action to be applied.
+                          discriminator:
+                            propertyName: actionType
+                          required:
+                          - actionType
+                          properties:
+                            actionType:
+                              type: string
+                              description: Action that should be applied.
+                              enum:
+                              - AddActionGroups
+                              - RemoveAllActionGroups
+                              x-ms-enum:
+                                name: actionType
+                                modelAsString: true
+                      description:
+                        type: string
+                        description: Description of alert processing rule.
+                      enabled:
+                        type: boolean
+                        default: true
+                        description: Indicates if the given alert processing rule
+                          is enabled or disabled.
+                  systemData:
+                    description: Alert processing rule system data.
+                    type: object
+                    readOnly: true
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                required:
+                - location
+                description: An azure resource object
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: An error response from the service.
+                properties:
+                  error:
+                    description: Details of error response.
+                    properties:
+                      code:
+                        type: string
+                        description: Error code, intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: Description of the error, intended for display
+                          in user interface.
+                      target:
+                        type: string
+                        description: Target of the particular error, for example name
+                          of the property.
+                      details:
+                        type: array
+                        description: A list of additional details about the error.
+                        items:
+                          description: Details of error response.
+                          properties:
+                            code:
+                              type: string
+                              description: Error code, intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: Description of the error, intended for
+                                display in user interface.
+                            target:
+                              type: string
+                              description: Target of the particular error, for example
+                                name of the property.
+                            details:
+                              type: array
+                              description: A list of additional details about the
+                                error.
+                              items:
+                                description: Details of error response.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: Error code, intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: Description of the error, intended
+                                      for display in user interface.
+                                  target:
+                                    type: string
+                                    description: Target of the particular error, for
+                                      example name of the property.
+    put:
+      operationId: AlertProcessingRules_CreateOrUpdate
+      description: Create or update an alert processing rule.
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        description: Resource group name where the resource is created.
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: alertProcessingRuleName
+        in: path
+        description: The name of the alert processing rule that needs to be created/updated.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        description: Client API version.
+        in: query
+        required: true
+        x-ms-enum:
+          name: api-version
+          modelAsString: true
+        schema:
+          type: string
+          enum:
+          - 2021-08-08
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  readOnly: true
+                  description: Azure resource Id
+                type:
+                  type: string
+                  readOnly: true
+                  description: Azure resource type
+                name:
+                  type: string
+                  readOnly: true
+                  description: Azure resource name
+                location:
+                  type: string
+                  description: Resource location
+                  x-ms-mutability:
+                  - create
+                  - read
+                tags:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: Resource tags
+                properties:
+                  description: Alert processing rule properties.
+                  type: object
+                  required:
+                  - scopes
+                  - actions
+                  properties:
+                    scopes:
+                      description: Scopes on which alert processing rule will apply.
+                      type: array
+                      items:
+                        type: string
+                    conditions:
+                      description: Conditions on which alerts will be filtered.
+                      type: array
+                      items:
+                        type: object
+                        description: Condition to trigger an alert processing rule.
+                        properties:
+                          field:
+                            type: string
+                            description: Field for a given condition.
+                            enum:
+                            - Severity
+                            - MonitorService
+                            - MonitorCondition
+                            - SignalType
+                            - TargetResourceType
+                            - TargetResource
+                            - TargetResourceGroup
+                            - AlertRuleId
+                            - AlertRuleName
+                            - Description
+                            - AlertContext
+                            x-ms-enum:
+                              name: Field
+                              modelAsString: true
+                          operator:
+                            type: string
+                            description: Operator for a given condition.
+                            enum:
+                            - Equals
+                            - NotEquals
+                            - Contains
+                            - DoesNotContain
+                            x-ms-enum:
+                              name: Operator
+                              modelAsString: true
+                          values:
+                            type: array
+                            description: List of values to match for a given condition.
+                            items:
+                              type: string
+                    schedule:
+                      description: Scheduling for alert processing rule.
+                      type: object
+                      properties:
+                        effectiveFrom:
+                          type: string
+                          pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                          description: Scheduling effective from time. Date-Time in
+                            ISO-8601 format without timezone suffix.
+                        effectiveUntil:
+                          type: string
+                          pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                          description: Scheduling effective until time. Date-Time
+                            in ISO-8601 format without timezone suffix.
+                        timeZone:
+                          type: string
+                          description: Scheduling time zone.
+                        recurrences:
+                          type: array
+                          description: List of recurrences.
+                          items:
+                            type: object
+                            description: Recurrence object.
+                            discriminator:
+                              propertyName: recurrenceType
+                            required:
+                            - recurrenceType
+                            properties:
+                              recurrenceType:
+                                type: string
+                                description: Specifies when the recurrence should
+                                  be applied.
+                                enum:
+                                - Daily
+                                - Weekly
+                                - Monthly
+                                x-ms-enum:
+                                  name: RecurrenceType
+                                  modelAsString: true
+                              startTime:
+                                type: string
+                                description: Start time for recurrence.
+                              endTime:
+                                type: string
+                                description: End time for recurrence.
+                    actions:
+                      type: array
+                      description: Actions to be applied.
+                      items:
+                        type: object
+                        description: Action to be applied.
+                        discriminator:
+                          propertyName: actionType
+                        required:
+                        - actionType
+                        properties:
+                          actionType:
+                            type: string
+                            description: Action that should be applied.
+                            enum:
+                            - AddActionGroups
+                            - RemoveAllActionGroups
+                            x-ms-enum:
+                              name: actionType
+                              modelAsString: true
+                    description:
+                      type: string
+                      description: Description of alert processing rule.
+                    enabled:
+                      type: boolean
+                      default: true
+                      description: Indicates if the given alert processing rule is
+                        enabled or disabled.
+                systemData:
+                  description: Alert processing rule system data.
+                  type: object
+                  readOnly: true
+                  properties:
+                    createdBy:
+                      type: string
+                      description: The identity that created the resource.
+                    createdByType:
+                      type: string
+                      description: The type of identity that created the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource creation (UTC).
+                    lastModifiedBy:
+                      type: string
+                      description: The identity that last modified the resource.
+                    lastModifiedByType:
+                      type: string
+                      description: The type of identity that last modified the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    lastModifiedAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource last modification (UTC)
+              required:
+              - location
+              description: An azure resource object
+              x-ms-azure-resource: true
+        description: Alert processing rule to be created/updated.
+        required: true
+      responses:
+        '200':
+          description: OK. Returns the updated alert processing rule.
+          headers:
+            x-ms-request-id:
+              description: Service generated Request ID.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                    description: Azure resource Id
+                  type:
+                    type: string
+                    readOnly: true
+                    description: Azure resource type
+                  name:
+                    type: string
+                    readOnly: true
+                    description: Azure resource name
+                  location:
+                    type: string
+                    description: Resource location
+                    x-ms-mutability:
+                    - create
+                    - read
+                  tags:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: Resource tags
+                  properties:
+                    description: Alert processing rule properties.
+                    type: object
+                    required:
+                    - scopes
+                    - actions
+                    properties:
+                      scopes:
+                        description: Scopes on which alert processing rule will apply.
+                        type: array
+                        items:
+                          type: string
+                      conditions:
+                        description: Conditions on which alerts will be filtered.
+                        type: array
+                        items:
+                          type: object
+                          description: Condition to trigger an alert processing rule.
+                          properties:
+                            field:
+                              type: string
+                              description: Field for a given condition.
+                              enum:
+                              - Severity
+                              - MonitorService
+                              - MonitorCondition
+                              - SignalType
+                              - TargetResourceType
+                              - TargetResource
+                              - TargetResourceGroup
+                              - AlertRuleId
+                              - AlertRuleName
+                              - Description
+                              - AlertContext
+                              x-ms-enum:
+                                name: Field
+                                modelAsString: true
+                            operator:
+                              type: string
+                              description: Operator for a given condition.
+                              enum:
+                              - Equals
+                              - NotEquals
+                              - Contains
+                              - DoesNotContain
+                              x-ms-enum:
+                                name: Operator
+                                modelAsString: true
+                            values:
+                              type: array
+                              description: List of values to match for a given condition.
+                              items:
+                                type: string
+                      schedule:
+                        description: Scheduling for alert processing rule.
+                        type: object
+                        properties:
+                          effectiveFrom:
+                            type: string
+                            pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                            description: Scheduling effective from time. Date-Time
+                              in ISO-8601 format without timezone suffix.
+                          effectiveUntil:
+                            type: string
+                            pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                            description: Scheduling effective until time. Date-Time
+                              in ISO-8601 format without timezone suffix.
+                          timeZone:
+                            type: string
+                            description: Scheduling time zone.
+                          recurrences:
+                            type: array
+                            description: List of recurrences.
+                            items:
+                              type: object
+                              description: Recurrence object.
+                              discriminator:
+                                propertyName: recurrenceType
+                              required:
+                              - recurrenceType
+                              properties:
+                                recurrenceType:
+                                  type: string
+                                  description: Specifies when the recurrence should
+                                    be applied.
+                                  enum:
+                                  - Daily
+                                  - Weekly
+                                  - Monthly
+                                  x-ms-enum:
+                                    name: RecurrenceType
+                                    modelAsString: true
+                                startTime:
+                                  type: string
+                                  description: Start time for recurrence.
+                                endTime:
+                                  type: string
+                                  description: End time for recurrence.
+                      actions:
+                        type: array
+                        description: Actions to be applied.
+                        items:
+                          type: object
+                          description: Action to be applied.
+                          discriminator:
+                            propertyName: actionType
+                          required:
+                          - actionType
+                          properties:
+                            actionType:
+                              type: string
+                              description: Action that should be applied.
+                              enum:
+                              - AddActionGroups
+                              - RemoveAllActionGroups
+                              x-ms-enum:
+                                name: actionType
+                                modelAsString: true
+                      description:
+                        type: string
+                        description: Description of alert processing rule.
+                      enabled:
+                        type: boolean
+                        default: true
+                        description: Indicates if the given alert processing rule
+                          is enabled or disabled.
+                  systemData:
+                    description: Alert processing rule system data.
+                    type: object
+                    readOnly: true
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                required:
+                - location
+                description: An azure resource object
+                x-ms-azure-resource: true
+        '201':
+          description: Created. Returns the created alert processing rule.
+          headers:
+            x-ms-request-id:
+              description: Service generated Request ID.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                    description: Azure resource Id
+                  type:
+                    type: string
+                    readOnly: true
+                    description: Azure resource type
+                  name:
+                    type: string
+                    readOnly: true
+                    description: Azure resource name
+                  location:
+                    type: string
+                    description: Resource location
+                    x-ms-mutability:
+                    - create
+                    - read
+                  tags:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: Resource tags
+                  properties:
+                    description: Alert processing rule properties.
+                    type: object
+                    required:
+                    - scopes
+                    - actions
+                    properties:
+                      scopes:
+                        description: Scopes on which alert processing rule will apply.
+                        type: array
+                        items:
+                          type: string
+                      conditions:
+                        description: Conditions on which alerts will be filtered.
+                        type: array
+                        items:
+                          type: object
+                          description: Condition to trigger an alert processing rule.
+                          properties:
+                            field:
+                              type: string
+                              description: Field for a given condition.
+                              enum:
+                              - Severity
+                              - MonitorService
+                              - MonitorCondition
+                              - SignalType
+                              - TargetResourceType
+                              - TargetResource
+                              - TargetResourceGroup
+                              - AlertRuleId
+                              - AlertRuleName
+                              - Description
+                              - AlertContext
+                              x-ms-enum:
+                                name: Field
+                                modelAsString: true
+                            operator:
+                              type: string
+                              description: Operator for a given condition.
+                              enum:
+                              - Equals
+                              - NotEquals
+                              - Contains
+                              - DoesNotContain
+                              x-ms-enum:
+                                name: Operator
+                                modelAsString: true
+                            values:
+                              type: array
+                              description: List of values to match for a given condition.
+                              items:
+                                type: string
+                      schedule:
+                        description: Scheduling for alert processing rule.
+                        type: object
+                        properties:
+                          effectiveFrom:
+                            type: string
+                            pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                            description: Scheduling effective from time. Date-Time
+                              in ISO-8601 format without timezone suffix.
+                          effectiveUntil:
+                            type: string
+                            pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                            description: Scheduling effective until time. Date-Time
+                              in ISO-8601 format without timezone suffix.
+                          timeZone:
+                            type: string
+                            description: Scheduling time zone.
+                          recurrences:
+                            type: array
+                            description: List of recurrences.
+                            items:
+                              type: object
+                              description: Recurrence object.
+                              discriminator:
+                                propertyName: recurrenceType
+                              required:
+                              - recurrenceType
+                              properties:
+                                recurrenceType:
+                                  type: string
+                                  description: Specifies when the recurrence should
+                                    be applied.
+                                  enum:
+                                  - Daily
+                                  - Weekly
+                                  - Monthly
+                                  x-ms-enum:
+                                    name: RecurrenceType
+                                    modelAsString: true
+                                startTime:
+                                  type: string
+                                  description: Start time for recurrence.
+                                endTime:
+                                  type: string
+                                  description: End time for recurrence.
+                      actions:
+                        type: array
+                        description: Actions to be applied.
+                        items:
+                          type: object
+                          description: Action to be applied.
+                          discriminator:
+                            propertyName: actionType
+                          required:
+                          - actionType
+                          properties:
+                            actionType:
+                              type: string
+                              description: Action that should be applied.
+                              enum:
+                              - AddActionGroups
+                              - RemoveAllActionGroups
+                              x-ms-enum:
+                                name: actionType
+                                modelAsString: true
+                      description:
+                        type: string
+                        description: Description of alert processing rule.
+                      enabled:
+                        type: boolean
+                        default: true
+                        description: Indicates if the given alert processing rule
+                          is enabled or disabled.
+                  systemData:
+                    description: Alert processing rule system data.
+                    type: object
+                    readOnly: true
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                required:
+                - location
+                description: An azure resource object
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: An error response from the service.
+                properties:
+                  error:
+                    description: Details of error response.
+                    properties:
+                      code:
+                        type: string
+                        description: Error code, intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: Description of the error, intended for display
+                          in user interface.
+                      target:
+                        type: string
+                        description: Target of the particular error, for example name
+                          of the property.
+                      details:
+                        type: array
+                        description: A list of additional details about the error.
+                        items:
+                          description: Details of error response.
+                          properties:
+                            code:
+                              type: string
+                              description: Error code, intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: Description of the error, intended for
+                                display in user interface.
+                            target:
+                              type: string
+                              description: Target of the particular error, for example
+                                name of the property.
+                            details:
+                              type: array
+                              description: A list of additional details about the
+                                error.
+                              items:
+                                description: Details of error response.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: Error code, intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: Description of the error, intended
+                                      for display in user interface.
+                                  target:
+                                    type: string
+                                    description: Target of the particular error, for
+                                      example name of the property.
+    delete:
+      description: Delete an alert processing rule.
+      operationId: AlertProcessingRules_Delete
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        description: Resource group name where the resource is created.
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: alertProcessingRuleName
+        in: path
+        description: The name of the alert processing rule that needs to be deleted.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        description: Client API version.
+        in: query
+        required: true
+        x-ms-enum:
+          name: api-version
+          modelAsString: true
+        schema:
+          type: string
+          enum:
+          - 2021-08-08
+      responses:
+        '200':
+          description: Successful request to delete an alert processing rule.
+          headers:
+            x-ms-request-id:
+              description: Service generated Request ID.
+              schema:
+                type: string
+        '204':
+          description: 'No content: the request was successful, but the response is
+            empty.'
+          headers:
+            x-ms-request-id:
+              description: Service generated Request ID.
+              schema:
+                type: string
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: An error response from the service.
+                properties:
+                  error:
+                    description: Details of error response.
+                    properties:
+                      code:
+                        type: string
+                        description: Error code, intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: Description of the error, intended for display
+                          in user interface.
+                      target:
+                        type: string
+                        description: Target of the particular error, for example name
+                          of the property.
+                      details:
+                        type: array
+                        description: A list of additional details about the error.
+                        items:
+                          description: Details of error response.
+                          properties:
+                            code:
+                              type: string
+                              description: Error code, intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: Description of the error, intended for
+                                display in user interface.
+                            target:
+                              type: string
+                              description: Target of the particular error, for example
+                                name of the property.
+                            details:
+                              type: array
+                              description: A list of additional details about the
+                                error.
+                              items:
+                                description: Details of error response.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: Error code, intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: Description of the error, intended
+                                      for display in user interface.
+                                  target:
+                                    type: string
+                                    description: Target of the particular error, for
+                                      example name of the property.
+    patch:
+      description: Enable, disable, or update tags for an alert processing rule.
+      operationId: AlertProcessingRules_Update
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: resourceGroupName
+        description: Resource group name where the resource is created.
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: alertProcessingRuleName
+        in: path
+        description: The name that needs to be updated.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        description: Client API version.
+        in: query
+        required: true
+        x-ms-enum:
+          name: api-version
+          modelAsString: true
+        schema:
+          type: string
+          enum:
+          - 2021-08-08
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Data contract for patch.
+              properties:
+                properties:
+                  x-ms-client-flatten: true
+                  description: Properties supported by patch operation.
+                  properties:
+                    enabled:
+                      type: boolean
+                      description: Indicates if the given alert processing rule is
+                        enabled or disabled.
+                tags:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: Tags to be updated.
+        description: Parameters supplied to the operation.
+        required: true
+      responses:
+        '200':
+          description: OK. Returns the created/updated alert processing rule.
+          headers:
+            x-ms-request-id:
+              description: Service generated Request ID.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                    description: Azure resource Id
+                  type:
+                    type: string
+                    readOnly: true
+                    description: Azure resource type
+                  name:
+                    type: string
+                    readOnly: true
+                    description: Azure resource name
+                  location:
+                    type: string
+                    description: Resource location
+                    x-ms-mutability:
+                    - create
+                    - read
+                  tags:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: Resource tags
+                  properties:
+                    description: Alert processing rule properties.
+                    type: object
+                    required:
+                    - scopes
+                    - actions
+                    properties:
+                      scopes:
+                        description: Scopes on which alert processing rule will apply.
+                        type: array
+                        items:
+                          type: string
+                      conditions:
+                        description: Conditions on which alerts will be filtered.
+                        type: array
+                        items:
+                          type: object
+                          description: Condition to trigger an alert processing rule.
+                          properties:
+                            field:
+                              type: string
+                              description: Field for a given condition.
+                              enum:
+                              - Severity
+                              - MonitorService
+                              - MonitorCondition
+                              - SignalType
+                              - TargetResourceType
+                              - TargetResource
+                              - TargetResourceGroup
+                              - AlertRuleId
+                              - AlertRuleName
+                              - Description
+                              - AlertContext
+                              x-ms-enum:
+                                name: Field
+                                modelAsString: true
+                            operator:
+                              type: string
+                              description: Operator for a given condition.
+                              enum:
+                              - Equals
+                              - NotEquals
+                              - Contains
+                              - DoesNotContain
+                              x-ms-enum:
+                                name: Operator
+                                modelAsString: true
+                            values:
+                              type: array
+                              description: List of values to match for a given condition.
+                              items:
+                                type: string
+                      schedule:
+                        description: Scheduling for alert processing rule.
+                        type: object
+                        properties:
+                          effectiveFrom:
+                            type: string
+                            pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                            description: Scheduling effective from time. Date-Time
+                              in ISO-8601 format without timezone suffix.
+                          effectiveUntil:
+                            type: string
+                            pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                            description: Scheduling effective until time. Date-Time
+                              in ISO-8601 format without timezone suffix.
+                          timeZone:
+                            type: string
+                            description: Scheduling time zone.
+                          recurrences:
+                            type: array
+                            description: List of recurrences.
+                            items:
+                              type: object
+                              description: Recurrence object.
+                              discriminator:
+                                propertyName: recurrenceType
+                              required:
+                              - recurrenceType
+                              properties:
+                                recurrenceType:
+                                  type: string
+                                  description: Specifies when the recurrence should
+                                    be applied.
+                                  enum:
+                                  - Daily
+                                  - Weekly
+                                  - Monthly
+                                  x-ms-enum:
+                                    name: RecurrenceType
+                                    modelAsString: true
+                                startTime:
+                                  type: string
+                                  description: Start time for recurrence.
+                                endTime:
+                                  type: string
+                                  description: End time for recurrence.
+                      actions:
+                        type: array
+                        description: Actions to be applied.
+                        items:
+                          type: object
+                          description: Action to be applied.
+                          discriminator:
+                            propertyName: actionType
+                          required:
+                          - actionType
+                          properties:
+                            actionType:
+                              type: string
+                              description: Action that should be applied.
+                              enum:
+                              - AddActionGroups
+                              - RemoveAllActionGroups
+                              x-ms-enum:
+                                name: actionType
+                                modelAsString: true
+                      description:
+                        type: string
+                        description: Description of alert processing rule.
+                      enabled:
+                        type: boolean
+                        default: true
+                        description: Indicates if the given alert processing rule
+                          is enabled or disabled.
+                  systemData:
+                    description: Alert processing rule system data.
+                    type: object
+                    readOnly: true
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                required:
+                - location
+                description: An azure resource object
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: An error response from the service.
+                properties:
+                  error:
+                    description: Details of error response.
+                    properties:
+                      code:
+                        type: string
+                        description: Error code, intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: Description of the error, intended for display
+                          in user interface.
+                      target:
+                        type: string
+                        description: Target of the particular error, for example name
+                          of the property.
+                      details:
+                        type: array
+                        description: A list of additional details about the error.
+                        items:
+                          description: Details of error response.
+                          properties:
+                            code:
+                              type: string
+                              description: Error code, intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: Description of the error, intended for
+                                display in user interface.
+                            target:
+                              type: string
+                              description: Target of the particular error, for example
+                                name of the property.
+                            details:
+                              type: array
+                              description: A list of additional details about the
+                                error.
+                              items:
+                                description: Details of error response.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: Error code, intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: Description of the error, intended
+                                      for display in user interface.
+                                  target:
+                                    type: string
+                                    description: Target of the particular error, for
+                                      example name of the property.
+components:
+  parameters:
+    subscriptionId:
+      name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    resourceGroupName:
+      name: resourceGroupName
+      description: Resource group name where the resource is created.
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    api-version:
+      name: api-version
+      description: Client API version.
+      in: query
+      required: true
+      x-ms-enum:
+        name: api-version
+        modelAsString: true
+      schema:
+        type: string
+        enum:
+        - 2021-08-08
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    errorResponse:
+      description: An error response from the service.
+      properties:
+        error:
+          description: Details of error response.
+          properties:
+            code:
+              type: string
+              description: Error code, intended to be consumed programmatically.
+            message:
+              type: string
+              description: Description of the error, intended for display in user
+                interface.
+            target:
+              type: string
+              description: Target of the particular error, for example name of the
+                property.
+            details:
+              type: array
+              description: A list of additional details about the error.
+              items:
+                description: Details of error response.
+                properties:
+                  code:
+                    type: string
+                    description: Error code, intended to be consumed programmatically.
+                  message:
+                    type: string
+                    description: Description of the error, intended for display in
+                      user interface.
+                  target:
+                    type: string
+                    description: Target of the particular error, for example name
+                      of the property.
+                  details:
+                    type: array
+                    description: A list of additional details about the error.
+                    items:
+                      description: Details of error response.
+                      properties:
+                        code:
+                          type: string
+                          description: Error code, intended to be consumed programmatically.
+                        message:
+                          type: string
+                          description: Description of the error, intended for display
+                            in user interface.
+                        target:
+                          type: string
+                          description: Target of the particular error, for example
+                            name of the property.
+    errorResponseBody:
+      description: Details of error response.
+      properties:
+        code:
+          type: string
+          description: Error code, intended to be consumed programmatically.
+        message:
+          type: string
+          description: Description of the error, intended for display in user interface.
+        target:
+          type: string
+          description: Target of the particular error, for example name of the property.
+        details:
+          type: array
+          description: A list of additional details about the error.
+          items:
+            description: Details of error response.
+            properties:
+              code:
+                type: string
+                description: Error code, intended to be consumed programmatically.
+              message:
+                type: string
+                description: Description of the error, intended for display in user
+                  interface.
+              target:
+                type: string
+                description: Target of the particular error, for example name of the
+                  property.
+              details:
+                type: array
+                description: A list of additional details about the error.
+                items:
+                  description: Details of error response.
+                  properties:
+                    code:
+                      type: string
+                      description: Error code, intended to be consumed programmatically.
+                    message:
+                      type: string
+                      description: Description of the error, intended for display
+                        in user interface.
+                    target:
+                      type: string
+                      description: Target of the particular error, for example name
+                        of the property.
+    Resource:
+      x-ms-azure-resource: true
+      description: An azure resource object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: Azure resource Id
+        type:
+          type: string
+          readOnly: true
+          description: Azure resource type
+        name:
+          type: string
+          readOnly: true
+          description: Azure resource name
+    ManagedResource:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: Azure resource Id
+        type:
+          type: string
+          readOnly: true
+          description: Azure resource type
+        name:
+          type: string
+          readOnly: true
+          description: Azure resource name
+        location:
+          type: string
+          description: Resource location
+          x-ms-mutability:
+          - create
+          - read
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Resource tags
+      description: An azure resource object
+      x-ms-azure-resource: true
+      required:
+      - location
+    Scopes:
+      type: array
+      description: List of ARM IDs which will be the target of the given alert processing
+        rule.
+      items:
+        type: string
+    Condition:
+      type: object
+      description: Condition to trigger an alert processing rule.
+      properties:
+        field:
+          type: string
+          description: Field for a given condition.
+          enum:
+          - Severity
+          - MonitorService
+          - MonitorCondition
+          - SignalType
+          - TargetResourceType
+          - TargetResource
+          - TargetResourceGroup
+          - AlertRuleId
+          - AlertRuleName
+          - Description
+          - AlertContext
+          x-ms-enum:
+            name: Field
+            modelAsString: true
+        operator:
+          type: string
+          description: Operator for a given condition.
+          enum:
+          - Equals
+          - NotEquals
+          - Contains
+          - DoesNotContain
+          x-ms-enum:
+            name: Operator
+            modelAsString: true
+        values:
+          type: array
+          description: List of values to match for a given condition.
+          items:
+            type: string
+    Conditions:
+      type: array
+      description: Conditions in alert instance to be matched for a given alert processing
+        rule. Default value is all. Multiple values could be provided with comma separation.
+      items:
+        type: object
+        description: Condition to trigger an alert processing rule.
+        properties:
+          field:
+            type: string
+            description: Field for a given condition.
+            enum:
+            - Severity
+            - MonitorService
+            - MonitorCondition
+            - SignalType
+            - TargetResourceType
+            - TargetResource
+            - TargetResourceGroup
+            - AlertRuleId
+            - AlertRuleName
+            - Description
+            - AlertContext
+            x-ms-enum:
+              name: Field
+              modelAsString: true
+          operator:
+            type: string
+            description: Operator for a given condition.
+            enum:
+            - Equals
+            - NotEquals
+            - Contains
+            - DoesNotContain
+            x-ms-enum:
+              name: Operator
+              modelAsString: true
+          values:
+            type: array
+            description: List of values to match for a given condition.
+            items:
+              type: string
+    Schedule:
+      type: object
+      description: Scheduling configuration for a given alert processing rule.
+      properties:
+        effectiveFrom:
+          type: string
+          pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+          description: Scheduling effective from time. Date-Time in ISO-8601 format
+            without timezone suffix.
+        effectiveUntil:
+          type: string
+          pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+          description: Scheduling effective until time. Date-Time in ISO-8601 format
+            without timezone suffix.
+        timeZone:
+          type: string
+          description: Scheduling time zone.
+        recurrences:
+          type: array
+          description: List of recurrences.
+          items:
+            type: object
+            description: Recurrence object.
+            discriminator:
+              propertyName: recurrenceType
+            required:
+            - recurrenceType
+            properties:
+              recurrenceType:
+                type: string
+                description: Specifies when the recurrence should be applied.
+                enum:
+                - Daily
+                - Weekly
+                - Monthly
+                x-ms-enum:
+                  name: RecurrenceType
+                  modelAsString: true
+              startTime:
+                type: string
+                description: Start time for recurrence.
+              endTime:
+                type: string
+                description: End time for recurrence.
+    Recurrence:
+      type: object
+      description: Recurrence object.
+      discriminator:
+        propertyName: recurrenceType
+      required:
+      - recurrenceType
+      properties:
+        recurrenceType:
+          type: string
+          description: Specifies when the recurrence should be applied.
+          enum:
+          - Daily
+          - Weekly
+          - Monthly
+          x-ms-enum:
+            name: RecurrenceType
+            modelAsString: true
+        startTime:
+          type: string
+          description: Start time for recurrence.
+        endTime:
+          type: string
+          description: End time for recurrence.
+    DailyRecurrence:
+      type: object
+      properties:
+        recurrenceType:
+          type: string
+          description: Specifies when the recurrence should be applied.
+          enum:
+          - Daily
+          - Weekly
+          - Monthly
+          x-ms-enum:
+            name: RecurrenceType
+            modelAsString: true
+        startTime:
+          type: string
+          description: Start time for recurrence.
+        endTime:
+          type: string
+          description: End time for recurrence.
+      required:
+      - recurrenceType
+      - startTime
+      - endTime
+      description: Recurrence object.
+      discriminator:
+        propertyName: recurrenceType
+      x-ms-discriminator-value: Daily
+    WeeklyRecurrence:
+      type: object
+      properties:
+        recurrenceType:
+          type: string
+          description: Specifies when the recurrence should be applied.
+          enum:
+          - Daily
+          - Weekly
+          - Monthly
+          x-ms-enum:
+            name: RecurrenceType
+            modelAsString: true
+        startTime:
+          type: string
+          description: Start time for recurrence.
+        endTime:
+          type: string
+          description: End time for recurrence.
+        daysOfWeek:
+          type: array
+          description: Specifies the values for weekly recurrence pattern.
+          items:
+            type: string
+            description: Days of week.
+            enum:
+            - Sunday
+            - Monday
+            - Tuesday
+            - Wednesday
+            - Thursday
+            - Friday
+            - Saturday
+            x-ms-enum:
+              name: DaysOfWeek
+              modelAsString: true
+      required:
+      - recurrenceType
+      - daysOfWeek
+      description: Recurrence object.
+      discriminator:
+        propertyName: recurrenceType
+      x-ms-discriminator-value: Weekly
+    MonthlyRecurrence:
+      type: object
+      properties:
+        recurrenceType:
+          type: string
+          description: Specifies when the recurrence should be applied.
+          enum:
+          - Daily
+          - Weekly
+          - Monthly
+          x-ms-enum:
+            name: RecurrenceType
+            modelAsString: true
+        startTime:
+          type: string
+          description: Start time for recurrence.
+        endTime:
+          type: string
+          description: End time for recurrence.
+        daysOfMonth:
+          type: array
+          description: Specifies the values for monthly recurrence pattern.
+          items:
+            type: integer
+            format: int32
+      required:
+      - recurrenceType
+      - daysOfMonth
+      description: Recurrence object.
+      discriminator:
+        propertyName: recurrenceType
+      x-ms-discriminator-value: Monthly
+    DaysOfWeek:
+      type: string
+      description: Days of week.
+      enum:
+      - Sunday
+      - Monday
+      - Tuesday
+      - Wednesday
+      - Thursday
+      - Friday
+      - Saturday
+      x-ms-enum:
+        name: DaysOfWeek
+        modelAsString: true
+    AlertProcessingRule:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: Azure resource Id
+        type:
+          type: string
+          readOnly: true
+          description: Azure resource type
+        name:
+          type: string
+          readOnly: true
+          description: Azure resource name
+        location:
+          type: string
+          description: Resource location
+          x-ms-mutability:
+          - create
+          - read
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Resource tags
+        properties:
+          description: Alert processing rule properties.
+          type: object
+          required:
+          - scopes
+          - actions
+          properties:
+            scopes:
+              description: Scopes on which alert processing rule will apply.
+              type: array
+              items:
+                type: string
+            conditions:
+              description: Conditions on which alerts will be filtered.
+              type: array
+              items:
+                type: object
+                description: Condition to trigger an alert processing rule.
+                properties:
+                  field:
+                    type: string
+                    description: Field for a given condition.
+                    enum:
+                    - Severity
+                    - MonitorService
+                    - MonitorCondition
+                    - SignalType
+                    - TargetResourceType
+                    - TargetResource
+                    - TargetResourceGroup
+                    - AlertRuleId
+                    - AlertRuleName
+                    - Description
+                    - AlertContext
+                    x-ms-enum:
+                      name: Field
+                      modelAsString: true
+                  operator:
+                    type: string
+                    description: Operator for a given condition.
+                    enum:
+                    - Equals
+                    - NotEquals
+                    - Contains
+                    - DoesNotContain
+                    x-ms-enum:
+                      name: Operator
+                      modelAsString: true
+                  values:
+                    type: array
+                    description: List of values to match for a given condition.
+                    items:
+                      type: string
+            schedule:
+              description: Scheduling for alert processing rule.
+              type: object
+              properties:
+                effectiveFrom:
+                  type: string
+                  pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                  description: Scheduling effective from time. Date-Time in ISO-8601
+                    format without timezone suffix.
+                effectiveUntil:
+                  type: string
+                  pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                  description: Scheduling effective until time. Date-Time in ISO-8601
+                    format without timezone suffix.
+                timeZone:
+                  type: string
+                  description: Scheduling time zone.
+                recurrences:
+                  type: array
+                  description: List of recurrences.
+                  items:
+                    type: object
+                    description: Recurrence object.
+                    discriminator:
+                      propertyName: recurrenceType
+                    required:
+                    - recurrenceType
+                    properties:
+                      recurrenceType:
+                        type: string
+                        description: Specifies when the recurrence should be applied.
+                        enum:
+                        - Daily
+                        - Weekly
+                        - Monthly
+                        x-ms-enum:
+                          name: RecurrenceType
+                          modelAsString: true
+                      startTime:
+                        type: string
+                        description: Start time for recurrence.
+                      endTime:
+                        type: string
+                        description: End time for recurrence.
+            actions:
+              type: array
+              description: Actions to be applied.
+              items:
+                type: object
+                description: Action to be applied.
+                discriminator:
+                  propertyName: actionType
+                required:
+                - actionType
+                properties:
+                  actionType:
+                    type: string
+                    description: Action that should be applied.
+                    enum:
+                    - AddActionGroups
+                    - RemoveAllActionGroups
+                    x-ms-enum:
+                      name: actionType
+                      modelAsString: true
+            description:
+              type: string
+              description: Description of alert processing rule.
+            enabled:
+              type: boolean
+              default: true
+              description: Indicates if the given alert processing rule is enabled
+                or disabled.
+        systemData:
+          description: Alert processing rule system data.
+          type: object
+          readOnly: true
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+      required:
+      - location
+      description: An azure resource object
+      x-ms-azure-resource: true
+    AlertProcessingRuleProperties:
+      type: object
+      description: Alert processing rule properties defining scopes, conditions and
+        scheduling logic for alert processing rule.
+      required:
+      - scopes
+      - actions
+      properties:
+        scopes:
+          description: Scopes on which alert processing rule will apply.
+          type: array
+          items:
+            type: string
+        conditions:
+          description: Conditions on which alerts will be filtered.
+          type: array
+          items:
+            type: object
+            description: Condition to trigger an alert processing rule.
+            properties:
+              field:
+                type: string
+                description: Field for a given condition.
+                enum:
+                - Severity
+                - MonitorService
+                - MonitorCondition
+                - SignalType
+                - TargetResourceType
+                - TargetResource
+                - TargetResourceGroup
+                - AlertRuleId
+                - AlertRuleName
+                - Description
+                - AlertContext
+                x-ms-enum:
+                  name: Field
+                  modelAsString: true
+              operator:
+                type: string
+                description: Operator for a given condition.
+                enum:
+                - Equals
+                - NotEquals
+                - Contains
+                - DoesNotContain
+                x-ms-enum:
+                  name: Operator
+                  modelAsString: true
+              values:
+                type: array
+                description: List of values to match for a given condition.
+                items:
+                  type: string
+        schedule:
+          description: Scheduling for alert processing rule.
+          type: object
+          properties:
+            effectiveFrom:
+              type: string
+              pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+              description: Scheduling effective from time. Date-Time in ISO-8601 format
+                without timezone suffix.
+            effectiveUntil:
+              type: string
+              pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+              description: Scheduling effective until time. Date-Time in ISO-8601
+                format without timezone suffix.
+            timeZone:
+              type: string
+              description: Scheduling time zone.
+            recurrences:
+              type: array
+              description: List of recurrences.
+              items:
+                type: object
+                description: Recurrence object.
+                discriminator:
+                  propertyName: recurrenceType
+                required:
+                - recurrenceType
+                properties:
+                  recurrenceType:
+                    type: string
+                    description: Specifies when the recurrence should be applied.
+                    enum:
+                    - Daily
+                    - Weekly
+                    - Monthly
+                    x-ms-enum:
+                      name: RecurrenceType
+                      modelAsString: true
+                  startTime:
+                    type: string
+                    description: Start time for recurrence.
+                  endTime:
+                    type: string
+                    description: End time for recurrence.
+        actions:
+          type: array
+          description: Actions to be applied.
+          items:
+            type: object
+            description: Action to be applied.
+            discriminator:
+              propertyName: actionType
+            required:
+            - actionType
+            properties:
+              actionType:
+                type: string
+                description: Action that should be applied.
+                enum:
+                - AddActionGroups
+                - RemoveAllActionGroups
+                x-ms-enum:
+                  name: actionType
+                  modelAsString: true
+        description:
+          type: string
+          description: Description of alert processing rule.
+        enabled:
+          type: boolean
+          default: true
+          description: Indicates if the given alert processing rule is enabled or
+            disabled.
+    Action:
+      type: object
+      description: Action to be applied.
+      discriminator:
+        propertyName: actionType
+      required:
+      - actionType
+      properties:
+        actionType:
+          type: string
+          description: Action that should be applied.
+          enum:
+          - AddActionGroups
+          - RemoveAllActionGroups
+          x-ms-enum:
+            name: actionType
+            modelAsString: true
+    AddActionGroups:
+      type: object
+      properties:
+        actionType:
+          type: string
+          description: Action that should be applied.
+          enum:
+          - AddActionGroups
+          - RemoveAllActionGroups
+          x-ms-enum:
+            name: actionType
+            modelAsString: true
+        actionGroupIds:
+          description: List of action group Ids to add to alert processing rule.
+          type: array
+          items:
+            type: string
+      required:
+      - actionType
+      - actionGroupIds
+      description: Action to be applied.
+      discriminator:
+        propertyName: actionType
+      x-ms-discriminator-value: AddActionGroups
+    RemoveAllActionGroups:
+      type: object
+      properties:
+        actionType:
+          type: string
+          description: Action that should be applied.
+          enum:
+          - AddActionGroups
+          - RemoveAllActionGroups
+          x-ms-enum:
+            name: actionType
+            modelAsString: true
+      required:
+      - actionType
+      description: Action to be applied.
+      discriminator:
+        propertyName: actionType
+      x-ms-discriminator-value: RemoveAllActionGroups
+    AlertProcessingRulesList:
+      type: object
+      description: List of alert processing rules.
+      properties:
+        nextLink:
+          type: string
+          description: URL to fetch the next set of alert processing rules.
+        value:
+          type: array
+          description: List of alert processing rules.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                readOnly: true
+                description: Azure resource Id
+              type:
+                type: string
+                readOnly: true
+                description: Azure resource type
+              name:
+                type: string
+                readOnly: true
+                description: Azure resource name
+              location:
+                type: string
+                description: Resource location
+                x-ms-mutability:
+                - create
+                - read
+              tags:
+                type: object
+                additionalProperties:
+                  type: string
+                description: Resource tags
+              properties:
+                description: Alert processing rule properties.
+                type: object
+                required:
+                - scopes
+                - actions
+                properties:
+                  scopes:
+                    description: Scopes on which alert processing rule will apply.
+                    type: array
+                    items:
+                      type: string
+                  conditions:
+                    description: Conditions on which alerts will be filtered.
+                    type: array
+                    items:
+                      type: object
+                      description: Condition to trigger an alert processing rule.
+                      properties:
+                        field:
+                          type: string
+                          description: Field for a given condition.
+                          enum:
+                          - Severity
+                          - MonitorService
+                          - MonitorCondition
+                          - SignalType
+                          - TargetResourceType
+                          - TargetResource
+                          - TargetResourceGroup
+                          - AlertRuleId
+                          - AlertRuleName
+                          - Description
+                          - AlertContext
+                          x-ms-enum:
+                            name: Field
+                            modelAsString: true
+                        operator:
+                          type: string
+                          description: Operator for a given condition.
+                          enum:
+                          - Equals
+                          - NotEquals
+                          - Contains
+                          - DoesNotContain
+                          x-ms-enum:
+                            name: Operator
+                            modelAsString: true
+                        values:
+                          type: array
+                          description: List of values to match for a given condition.
+                          items:
+                            type: string
+                  schedule:
+                    description: Scheduling for alert processing rule.
+                    type: object
+                    properties:
+                      effectiveFrom:
+                        type: string
+                        pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                        description: Scheduling effective from time. Date-Time in
+                          ISO-8601 format without timezone suffix.
+                      effectiveUntil:
+                        type: string
+                        pattern: ^(?:(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2}(?:\.\d+)?))$
+                        description: Scheduling effective until time. Date-Time in
+                          ISO-8601 format without timezone suffix.
+                      timeZone:
+                        type: string
+                        description: Scheduling time zone.
+                      recurrences:
+                        type: array
+                        description: List of recurrences.
+                        items:
+                          type: object
+                          description: Recurrence object.
+                          discriminator:
+                            propertyName: recurrenceType
+                          required:
+                          - recurrenceType
+                          properties:
+                            recurrenceType:
+                              type: string
+                              description: Specifies when the recurrence should be
+                                applied.
+                              enum:
+                              - Daily
+                              - Weekly
+                              - Monthly
+                              x-ms-enum:
+                                name: RecurrenceType
+                                modelAsString: true
+                            startTime:
+                              type: string
+                              description: Start time for recurrence.
+                            endTime:
+                              type: string
+                              description: End time for recurrence.
+                  actions:
+                    type: array
+                    description: Actions to be applied.
+                    items:
+                      type: object
+                      description: Action to be applied.
+                      discriminator:
+                        propertyName: actionType
+                      required:
+                      - actionType
+                      properties:
+                        actionType:
+                          type: string
+                          description: Action that should be applied.
+                          enum:
+                          - AddActionGroups
+                          - RemoveAllActionGroups
+                          x-ms-enum:
+                            name: actionType
+                            modelAsString: true
+                  description:
+                    type: string
+                    description: Description of alert processing rule.
+                  enabled:
+                    type: boolean
+                    default: true
+                    description: Indicates if the given alert processing rule is enabled
+                      or disabled.
+              systemData:
+                description: Alert processing rule system data.
+                type: object
+                readOnly: true
+                properties:
+                  createdBy:
+                    type: string
+                    description: The identity that created the resource.
+                  createdByType:
+                    type: string
+                    description: The type of identity that created the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource creation (UTC).
+                  lastModifiedBy:
+                    type: string
+                    description: The identity that last modified the resource.
+                  lastModifiedByType:
+                    type: string
+                    description: The type of identity that last modified the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  lastModifiedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource last modification (UTC)
+            required:
+            - location
+            description: An azure resource object
+            x-ms-azure-resource: true
+    PatchProperties:
+      description: Alert processing rule properties supported by patch.
+      properties:
+        enabled:
+          type: boolean
+          description: Indicates if the given alert processing rule is enabled or
+            disabled.
+    PatchObject:
+      description: Data contract for patch.
+      properties:
+        properties:
+          x-ms-client-flatten: true
+          description: Properties supported by patch operation.
+          properties:
+            enabled:
+              type: boolean
+              description: Indicates if the given alert processing rule is enabled
+                or disabled.
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Tags to be updated.
+    systemData:
+      description: Metadata pertaining to creation and last modification of the resource.
+      type: object
+      readOnly: true
+      properties:
+        createdBy:
+          type: string
+          description: The identity that created the resource.
+        createdByType:
+          type: string
+          description: The type of identity that created the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource creation (UTC).
+        lastModifiedBy:
+          type: string
+          description: The identity that last modified the resource.
+        lastModifiedByType:
+          type: string
+          description: The type of identity that last modified the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource last modification (UTC)

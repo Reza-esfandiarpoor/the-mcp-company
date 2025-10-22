@@ -1,0 +1,944 @@
+openapi: 3.0.0
+info:
+  title: Azure Database Migration Service (classic) Resource Provider
+  version: 2025-06-30
+paths: {}
+components:
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    MigrateSqlServerSqlDbSyncTaskInput:
+      type: object
+      properties:
+        sourceConnectionInfo:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of connection info
+            userName:
+              type: string
+              description: User name
+            password:
+              type: string
+              description: Password credential.
+            dataSource:
+              type: string
+              description: Data source in the format Protocol:MachineName\SQLServerInstanceName,PortNumber
+            serverName:
+              type: string
+              description: name of the server
+            port:
+              type: integer
+              description: Port for Server
+            serverVersion:
+              type: string
+              description: server version
+            serverBrandVersion:
+              type: string
+              description: server brand version
+            resourceId:
+              type: string
+              description: Represents the ID of an HTTP resource represented by an
+                Azure resource provider.
+            authentication:
+              description: Authentication type to use for connection
+              type: string
+              enum:
+              - None
+              - WindowsAuthentication
+              - SqlAuthentication
+              - ActiveDirectoryIntegrated
+              - ActiveDirectoryPassword
+              x-ms-enum:
+                name: AuthenticationType
+                modelAsString: true
+            encryptConnection:
+              type: boolean
+              description: Whether to encrypt the connection
+              default: true
+            additionalSettings:
+              type: string
+              description: Additional connection settings
+            trustServerCertificate:
+              type: boolean
+              description: Whether to trust the server certificate
+              default: false
+            platform:
+              description: Server platform type for connection
+              type: string
+              enum:
+              - SqlOnPrem
+              x-ms-enum:
+                name: SqlSourcePlatform
+                modelAsString: true
+          required:
+          - type
+          - dataSource
+          description: Defines the connection properties of a server
+          discriminator:
+            propertyName: type
+          x-ms-discriminator-value: SqlConnectionInfo
+        targetConnectionInfo:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of connection info
+            userName:
+              type: string
+              description: User name
+            password:
+              type: string
+              description: Password credential.
+            dataSource:
+              type: string
+              description: Data source in the format Protocol:MachineName\SQLServerInstanceName,PortNumber
+            serverName:
+              type: string
+              description: name of the server
+            port:
+              type: integer
+              description: Port for Server
+            serverVersion:
+              type: string
+              description: server version
+            serverBrandVersion:
+              type: string
+              description: server brand version
+            resourceId:
+              type: string
+              description: Represents the ID of an HTTP resource represented by an
+                Azure resource provider.
+            authentication:
+              description: Authentication type to use for connection
+              type: string
+              enum:
+              - None
+              - WindowsAuthentication
+              - SqlAuthentication
+              - ActiveDirectoryIntegrated
+              - ActiveDirectoryPassword
+              x-ms-enum:
+                name: AuthenticationType
+                modelAsString: true
+            encryptConnection:
+              type: boolean
+              description: Whether to encrypt the connection
+              default: true
+            additionalSettings:
+              type: string
+              description: Additional connection settings
+            trustServerCertificate:
+              type: boolean
+              description: Whether to trust the server certificate
+              default: false
+            platform:
+              description: Server platform type for connection
+              type: string
+              enum:
+              - SqlOnPrem
+              x-ms-enum:
+                name: SqlSourcePlatform
+                modelAsString: true
+          required:
+          - type
+          - dataSource
+          description: Defines the connection properties of a server
+          discriminator:
+            propertyName: type
+          x-ms-discriminator-value: SqlConnectionInfo
+        selectedDatabases:
+          type: array
+          description: Databases to migrate
+          items:
+            type: object
+            description: Database specific information for SQL to Azure SQL DB sync
+              migration task inputs
+            properties:
+              id:
+                type: string
+                description: Unique identifier for database
+              name:
+                type: string
+                description: Name of database
+              targetDatabaseName:
+                type: string
+                description: Target database name
+              schemaName:
+                type: string
+                description: Schema name to be migrated
+              tableMap:
+                type: object
+                description: Mapping of source to target tables
+                additionalProperties:
+                  type: string
+              migrationSetting:
+                type: object
+                description: Migration settings which tune the migration behavior
+                additionalProperties:
+                  type: string
+              sourceSetting:
+                type: object
+                description: Source settings to tune source endpoint migration behavior
+                additionalProperties:
+                  type: string
+              targetSetting:
+                type: object
+                description: Target settings to tune target endpoint migration behavior
+                additionalProperties:
+                  type: string
+        validationOptions:
+          description: Validation options
+          type: object
+          properties:
+            enableSchemaValidation:
+              type: boolean
+              description: Allows to compare the schema information between source
+                and target.
+            enableDataIntegrityValidation:
+              type: boolean
+              description: Allows to perform a checksum based data integrity validation
+                between source and target for the selected database / tables .
+            enableQueryAnalysisValidation:
+              type: boolean
+              description: Allows to perform a quick and intelligent query analysis
+                by retrieving queries from the source database and executes them in
+                the target. The result will have execution statistics for executions
+                in source and target databases for the extracted queries.
+      required:
+      - sourceConnectionInfo
+      - targetConnectionInfo
+      - selectedDatabases
+      description: Base class for migration task input
+    MigrateSqlServerSqlDbSyncTaskOutput:
+      type: object
+      description: Output for the task that migrates on-prem SQL Server databases
+        to Azure SQL Database for online migrations
+      properties:
+        id:
+          type: string
+          description: Result identifier
+          readOnly: true
+        resultType:
+          description: Result type
+          type: string
+      required:
+      - resultType
+      discriminator:
+        propertyName: resultType
+    MigrateSqlServerSqlDbSyncTaskOutputMigrationLevel:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Result identifier
+          readOnly: true
+        resultType:
+          description: Result type
+          type: string
+        startedOn:
+          type: string
+          format: date-time
+          description: Migration start time
+          readOnly: true
+        endedOn:
+          type: string
+          format: date-time
+          description: Migration end time
+          readOnly: true
+        sourceServerVersion:
+          type: string
+          description: Source server version
+          readOnly: true
+        sourceServer:
+          type: string
+          description: Source server name
+          readOnly: true
+        targetServerVersion:
+          type: string
+          description: Target server version
+          readOnly: true
+        targetServer:
+          type: string
+          description: Target server name
+          readOnly: true
+        databaseCount:
+          type: integer
+          description: Count of databases
+          readOnly: true
+      required:
+      - resultType
+      description: Output for the task that migrates on-prem SQL Server databases
+        to Azure SQL Database for online migrations
+      discriminator:
+        propertyName: resultType
+      x-ms-discriminator-value: MigrationLevelOutput
+    MigrateSqlServerSqlDbSyncTaskOutputDatabaseLevel:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Result identifier
+          readOnly: true
+        resultType:
+          description: Result type
+          type: string
+        databaseName:
+          type: string
+          description: Name of the database
+          readOnly: true
+        startedOn:
+          type: string
+          format: date-time
+          description: Migration start time
+          readOnly: true
+        endedOn:
+          type: string
+          format: date-time
+          description: Migration end time
+          readOnly: true
+        migrationState:
+          description: Migration state that this database is in
+          readOnly: true
+          type: string
+          enum:
+          - UNDEFINED
+          - CONFIGURING
+          - INITIALIAZING
+          - STARTING
+          - RUNNING
+          - READY_TO_COMPLETE
+          - COMPLETING
+          - COMPLETE
+          - CANCELLING
+          - CANCELLED
+          - FAILED
+          - VALIDATING
+          - VALIDATION_COMPLETE
+          - VALIDATION_FAILED
+          - RESTORE_IN_PROGRESS
+          - RESTORE_COMPLETED
+          - BACKUP_IN_PROGRESS
+          - BACKUP_COMPLETED
+          x-ms-enum:
+            name: SyncDatabaseMigrationReportingState
+            modelAsString: true
+        incomingChanges:
+          type: integer
+          format: int64
+          description: Number of incoming changes
+          readOnly: true
+        appliedChanges:
+          type: integer
+          format: int64
+          description: Number of applied changes
+          readOnly: true
+        cdcInsertCounter:
+          type: integer
+          format: int64
+          description: Number of cdc inserts
+          readOnly: true
+        cdcDeleteCounter:
+          type: integer
+          format: int64
+          description: Number of cdc deletes
+          readOnly: true
+        cdcUpdateCounter:
+          type: integer
+          format: int64
+          description: Number of cdc updates
+          readOnly: true
+        fullLoadCompletedTables:
+          type: integer
+          format: int64
+          description: Number of tables completed in full load
+          readOnly: true
+        fullLoadLoadingTables:
+          type: integer
+          format: int64
+          description: Number of tables loading in full load
+          readOnly: true
+        fullLoadQueuedTables:
+          type: integer
+          format: int64
+          description: Number of tables queued in full load
+          readOnly: true
+        fullLoadErroredTables:
+          type: integer
+          format: int64
+          description: Number of tables errored in full load
+          readOnly: true
+        initializationCompleted:
+          type: boolean
+          description: Indicates if initial load (full load) has been completed
+          readOnly: true
+        latency:
+          type: integer
+          format: int64
+          description: CDC apply latency
+          readOnly: true
+      required:
+      - resultType
+      description: Output for the task that migrates on-prem SQL Server databases
+        to Azure SQL Database for online migrations
+      discriminator:
+        propertyName: resultType
+      x-ms-discriminator-value: DatabaseLevelOutput
+    MigrateSqlServerSqlDbSyncTaskOutputTableLevel:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Result identifier
+          readOnly: true
+        resultType:
+          description: Result type
+          type: string
+        tableName:
+          type: string
+          description: Name of the table
+          readOnly: true
+        databaseName:
+          type: string
+          description: Name of the database
+          readOnly: true
+        cdcInsertCounter:
+          type: integer
+          format: int64
+          description: Number of applied inserts
+          readOnly: true
+        cdcUpdateCounter:
+          type: integer
+          format: int64
+          description: Number of applied updates
+          readOnly: true
+        cdcDeleteCounter:
+          type: integer
+          format: int64
+          description: Number of applied deletes
+          readOnly: true
+        fullLoadEstFinishTime:
+          type: string
+          format: date-time
+          description: Estimate to finish full load
+          readOnly: true
+        fullLoadStartedOn:
+          type: string
+          format: date-time
+          description: Full load start time
+          readOnly: true
+        fullLoadEndedOn:
+          type: string
+          format: date-time
+          description: Full load end time
+          readOnly: true
+        fullLoadTotalRows:
+          type: integer
+          format: int64
+          description: Number of rows applied in full load
+          readOnly: true
+        state:
+          description: Current state of the table migration
+          readOnly: true
+          type: string
+          enum:
+          - BEFORE_LOAD
+          - FULL_LOAD
+          - COMPLETED
+          - CANCELED
+          - ERROR
+          - FAILED
+          x-ms-enum:
+            name: SyncTableMigrationState
+            modelAsString: true
+        totalChangesApplied:
+          type: integer
+          format: int64
+          description: Total number of applied changes
+          readOnly: true
+        dataErrorsCounter:
+          type: integer
+          format: int64
+          description: Number of data errors occurred
+          readOnly: true
+        lastModifiedTime:
+          type: string
+          format: date-time
+          description: Last modified time on target
+          readOnly: true
+      required:
+      - resultType
+      description: Output for the task that migrates on-prem SQL Server databases
+        to Azure SQL Database for online migrations
+      discriminator:
+        propertyName: resultType
+      x-ms-discriminator-value: TableLevelOutput
+    MigrateSqlServerSqlDbSyncTaskOutputError:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Result identifier
+          readOnly: true
+        resultType:
+          description: Result type
+          type: string
+        error:
+          description: Migration error
+          readOnly: true
+          type: object
+          properties:
+            message:
+              type: string
+              description: Error message
+            actionableMessage:
+              type: string
+              description: Actionable steps for this exception
+            filePath:
+              type: string
+              description: The path to the file where exception occurred
+            lineNumber:
+              type: string
+              description: The line number where exception occurred
+            hResult:
+              type: integer
+              description: Coded numerical value that is assigned to a specific exception
+            stackTrace:
+              type: string
+              description: Stack trace
+      required:
+      - resultType
+      description: Output for the task that migrates on-prem SQL Server databases
+        to Azure SQL Database for online migrations
+      discriminator:
+        propertyName: resultType
+      x-ms-discriminator-value: ErrorOutput
+    MigrateSqlServerSqlDbSyncTaskOutputDatabaseError:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Result identifier
+          readOnly: true
+        resultType:
+          description: Result type
+          type: string
+        errorMessage:
+          type: string
+          description: Error message
+        events:
+          type: array
+          items:
+            type: object
+            description: Database migration errors for online migration
+            properties:
+              timestampString:
+                type: string
+                description: String value of timestamp.
+                readOnly: true
+              eventTypeString:
+                description: Event type.
+                type: string
+                readOnly: true
+              eventText:
+                description: Event text.
+                type: string
+                readOnly: true
+          description: List of error events.
+      required:
+      - resultType
+      description: Output for the task that migrates on-prem SQL Server databases
+        to Azure SQL Database for online migrations
+      discriminator:
+        propertyName: resultType
+      x-ms-discriminator-value: DatabaseLevelErrorOutput
+    ConnectionInfo:
+      type: object
+      description: Defines the connection properties of a server
+      properties:
+        type:
+          type: string
+          description: Type of connection info
+        userName:
+          type: string
+          description: User name
+        password:
+          type: string
+          description: Password credential.
+      required:
+      - type
+      discriminator:
+        propertyName: type
+    AuthenticationType:
+      type: string
+      description: An enumeration of possible authentication types when connecting
+      enum:
+      - None
+      - WindowsAuthentication
+      - SqlAuthentication
+      - ActiveDirectoryIntegrated
+      - ActiveDirectoryPassword
+      x-ms-enum:
+        name: AuthenticationType
+        modelAsString: true
+    SqlServerSourcePlatform:
+      type: string
+      description: An enumeration of source platform types
+      enum:
+      - SqlOnPrem
+      x-ms-enum:
+        name: SqlSourcePlatform
+        modelAsString: true
+    SqlConnectionInfo:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of connection info
+        userName:
+          type: string
+          description: User name
+        password:
+          type: string
+          description: Password credential.
+        dataSource:
+          type: string
+          description: Data source in the format Protocol:MachineName\SQLServerInstanceName,PortNumber
+        serverName:
+          type: string
+          description: name of the server
+        port:
+          type: integer
+          description: Port for Server
+        serverVersion:
+          type: string
+          description: server version
+        serverBrandVersion:
+          type: string
+          description: server brand version
+        resourceId:
+          type: string
+          description: Represents the ID of an HTTP resource represented by an Azure
+            resource provider.
+        authentication:
+          description: Authentication type to use for connection
+          type: string
+          enum:
+          - None
+          - WindowsAuthentication
+          - SqlAuthentication
+          - ActiveDirectoryIntegrated
+          - ActiveDirectoryPassword
+          x-ms-enum:
+            name: AuthenticationType
+            modelAsString: true
+        encryptConnection:
+          type: boolean
+          description: Whether to encrypt the connection
+          default: true
+        additionalSettings:
+          type: string
+          description: Additional connection settings
+        trustServerCertificate:
+          type: boolean
+          description: Whether to trust the server certificate
+          default: false
+        platform:
+          description: Server platform type for connection
+          type: string
+          enum:
+          - SqlOnPrem
+          x-ms-enum:
+            name: SqlSourcePlatform
+            modelAsString: true
+      required:
+      - type
+      - dataSource
+      description: Defines the connection properties of a server
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: SqlConnectionInfo
+    SqlMigrationTaskInput:
+      type: object
+      description: Base class for migration task input
+      properties:
+        sourceConnectionInfo:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of connection info
+            userName:
+              type: string
+              description: User name
+            password:
+              type: string
+              description: Password credential.
+            dataSource:
+              type: string
+              description: Data source in the format Protocol:MachineName\SQLServerInstanceName,PortNumber
+            serverName:
+              type: string
+              description: name of the server
+            port:
+              type: integer
+              description: Port for Server
+            serverVersion:
+              type: string
+              description: server version
+            serverBrandVersion:
+              type: string
+              description: server brand version
+            resourceId:
+              type: string
+              description: Represents the ID of an HTTP resource represented by an
+                Azure resource provider.
+            authentication:
+              description: Authentication type to use for connection
+              type: string
+              enum:
+              - None
+              - WindowsAuthentication
+              - SqlAuthentication
+              - ActiveDirectoryIntegrated
+              - ActiveDirectoryPassword
+              x-ms-enum:
+                name: AuthenticationType
+                modelAsString: true
+            encryptConnection:
+              type: boolean
+              description: Whether to encrypt the connection
+              default: true
+            additionalSettings:
+              type: string
+              description: Additional connection settings
+            trustServerCertificate:
+              type: boolean
+              description: Whether to trust the server certificate
+              default: false
+            platform:
+              description: Server platform type for connection
+              type: string
+              enum:
+              - SqlOnPrem
+              x-ms-enum:
+                name: SqlSourcePlatform
+                modelAsString: true
+          required:
+          - type
+          - dataSource
+          description: Defines the connection properties of a server
+          discriminator:
+            propertyName: type
+          x-ms-discriminator-value: SqlConnectionInfo
+        targetConnectionInfo:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of connection info
+            userName:
+              type: string
+              description: User name
+            password:
+              type: string
+              description: Password credential.
+            dataSource:
+              type: string
+              description: Data source in the format Protocol:MachineName\SQLServerInstanceName,PortNumber
+            serverName:
+              type: string
+              description: name of the server
+            port:
+              type: integer
+              description: Port for Server
+            serverVersion:
+              type: string
+              description: server version
+            serverBrandVersion:
+              type: string
+              description: server brand version
+            resourceId:
+              type: string
+              description: Represents the ID of an HTTP resource represented by an
+                Azure resource provider.
+            authentication:
+              description: Authentication type to use for connection
+              type: string
+              enum:
+              - None
+              - WindowsAuthentication
+              - SqlAuthentication
+              - ActiveDirectoryIntegrated
+              - ActiveDirectoryPassword
+              x-ms-enum:
+                name: AuthenticationType
+                modelAsString: true
+            encryptConnection:
+              type: boolean
+              description: Whether to encrypt the connection
+              default: true
+            additionalSettings:
+              type: string
+              description: Additional connection settings
+            trustServerCertificate:
+              type: boolean
+              description: Whether to trust the server certificate
+              default: false
+            platform:
+              description: Server platform type for connection
+              type: string
+              enum:
+              - SqlOnPrem
+              x-ms-enum:
+                name: SqlSourcePlatform
+                modelAsString: true
+          required:
+          - type
+          - dataSource
+          description: Defines the connection properties of a server
+          discriminator:
+            propertyName: type
+          x-ms-discriminator-value: SqlConnectionInfo
+      required:
+      - sourceConnectionInfo
+      - targetConnectionInfo
+    MigrateSqlServerSqlDbSyncDatabaseInput:
+      type: object
+      description: Database specific information for SQL to Azure SQL DB sync migration
+        task inputs
+      properties:
+        id:
+          type: string
+          description: Unique identifier for database
+        name:
+          type: string
+          description: Name of database
+        targetDatabaseName:
+          type: string
+          description: Target database name
+        schemaName:
+          type: string
+          description: Schema name to be migrated
+        tableMap:
+          type: object
+          description: Mapping of source to target tables
+          additionalProperties:
+            type: string
+        migrationSetting:
+          type: object
+          description: Migration settings which tune the migration behavior
+          additionalProperties:
+            type: string
+        sourceSetting:
+          type: object
+          description: Source settings to tune source endpoint migration behavior
+          additionalProperties:
+            type: string
+        targetSetting:
+          type: object
+          description: Target settings to tune target endpoint migration behavior
+          additionalProperties:
+            type: string
+    MigrationValidationOptions:
+      type: object
+      description: Types of validations to run after the migration
+      properties:
+        enableSchemaValidation:
+          type: boolean
+          description: Allows to compare the schema information between source and
+            target.
+        enableDataIntegrityValidation:
+          type: boolean
+          description: Allows to perform a checksum based data integrity validation
+            between source and target for the selected database / tables .
+        enableQueryAnalysisValidation:
+          type: boolean
+          description: Allows to perform a quick and intelligent query analysis by
+            retrieving queries from the source database and executes them in the target.
+            The result will have execution statistics for executions in source and
+            target databases for the extracted queries.
+    SyncDatabaseMigrationReportingState:
+      type: string
+      description: Enum of the different state of database level online migration.
+      enum:
+      - UNDEFINED
+      - CONFIGURING
+      - INITIALIAZING
+      - STARTING
+      - RUNNING
+      - READY_TO_COMPLETE
+      - COMPLETING
+      - COMPLETE
+      - CANCELLING
+      - CANCELLED
+      - FAILED
+      - VALIDATING
+      - VALIDATION_COMPLETE
+      - VALIDATION_FAILED
+      - RESTORE_IN_PROGRESS
+      - RESTORE_COMPLETED
+      - BACKUP_IN_PROGRESS
+      - BACKUP_COMPLETED
+      x-ms-enum:
+        name: SyncDatabaseMigrationReportingState
+        modelAsString: true
+    SyncTableMigrationState:
+      type: string
+      description: Enum of the different state of table level online migration.
+      enum:
+      - BEFORE_LOAD
+      - FULL_LOAD
+      - COMPLETED
+      - CANCELED
+      - ERROR
+      - FAILED
+      x-ms-enum:
+        name: SyncTableMigrationState
+        modelAsString: true
+    ReportableException:
+      type: object
+      description: Exception object for all custom exceptions
+      properties:
+        message:
+          type: string
+          description: Error message
+        actionableMessage:
+          type: string
+          description: Actionable steps for this exception
+        filePath:
+          type: string
+          description: The path to the file where exception occurred
+        lineNumber:
+          type: string
+          description: The line number where exception occurred
+        hResult:
+          type: integer
+          description: Coded numerical value that is assigned to a specific exception
+        stackTrace:
+          type: string
+          description: Stack trace
+    SyncMigrationDatabaseErrorEvent:
+      type: object
+      description: Database migration errors for online migration
+      properties:
+        timestampString:
+          type: string
+          description: String value of timestamp.
+          readOnly: true
+        eventTypeString:
+          description: Event type.
+          type: string
+          readOnly: true
+        eventText:
+          description: Event text.
+          type: string
+          readOnly: true

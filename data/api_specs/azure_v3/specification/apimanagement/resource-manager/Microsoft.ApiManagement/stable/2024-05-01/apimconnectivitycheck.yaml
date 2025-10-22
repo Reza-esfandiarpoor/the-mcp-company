@@ -1,0 +1,1061 @@
+openapi: 3.0.0
+info:
+  title: ApiManagementClient
+  description: Use this REST APIs to perform connectivity troubleshoot operations
+    in API Management deployments.
+  version: 2024-05-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/connectivityCheck
+  : post:
+      tags:
+      - PerformConnectivityCheck
+      operationId: PerformConnectivityCheckAsync
+      description: Performs a connectivity check between the API Management service
+        and a given destination, and returns metrics for the connection, as well as
+        errors encountered while trying to establish it.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: A request to perform the connectivity check operation on
+                a API Management service.
+              type: object
+              required:
+              - source
+              - destination
+              properties:
+                source:
+                  description: Definitions about the connectivity check origin.
+                  type: object
+                  required:
+                  - region
+                  properties:
+                    region:
+                      description: The API Management service region from where to
+                        start the connectivity check operation.
+                      type: string
+                    instance:
+                      description: The particular VMSS instance from which to fire
+                        the request.
+                      type: integer
+                      format: int64
+                destination:
+                  description: The connectivity check operation destination.
+                  type: object
+                  required:
+                  - address
+                  - port
+                  properties:
+                    address:
+                      description: Destination address. Can either be an IP address
+                        or a FQDN.
+                      type: string
+                    port:
+                      description: Destination port.
+                      type: integer
+                      format: int64
+                preferredIPVersion:
+                  description: The IP version to be used. Only IPv4 is supported for
+                    now.
+                  type: string
+                  enum:
+                  - IPv4
+                  x-ms-enum:
+                    name: PreferredIPVersion
+                    modelAsString: true
+                protocol:
+                  description: The request's protocol. Specific protocol configuration
+                    can be available based on this selection. The specified destination
+                    address must be coherent with this value.
+                  type: string
+                  enum:
+                  - TCP
+                  - HTTP
+                  - HTTPS
+                  x-ms-enum:
+                    name: ConnectivityCheckProtocol
+                    modelAsString: true
+                protocolConfiguration:
+                  description: Protocol-specific configuration.
+                  type: object
+                  properties:
+                    HTTPConfiguration:
+                      description: Configuration for HTTP or HTTPS requests.
+                      type: object
+                      properties:
+                        method:
+                          description: The HTTP method to be used.
+                          type: string
+                          enum:
+                          - GET
+                          - POST
+                          x-ms-enum:
+                            name: Method
+                            modelAsString: true
+                        validStatusCodes:
+                          type: array
+                          description: List of HTTP status codes considered valid
+                            for the request response.
+                          items:
+                            type: integer
+                            format: int64
+                        headers:
+                          type: array
+                          description: List of headers to be included in the request.
+                          items:
+                            description: HTTP header and it's value.
+                            type: object
+                            required:
+                            - name
+                            - value
+                            properties:
+                              name:
+                                type: string
+                                description: Header name.
+                              value:
+                                type: string
+                                description: Header value.
+                          x-ms-identifiers:
+                          - name
+        description: Connectivity Check request parameters.
+        required: true
+      responses:
+        '200':
+          description: Connectivity Check Request was completed.
+          content:
+            application/json:
+              schema:
+                description: Information on the connectivity status.
+                type: object
+                properties:
+                  hops:
+                    readOnly: true
+                    type: array
+                    description: List of hops between the source and the destination.
+                    items:
+                      description: Information about a hop between the source and
+                        the destination.
+                      type: object
+                      properties:
+                        type:
+                          description: The type of the hop.
+                          readOnly: true
+                          type: string
+                        id:
+                          description: The ID of the hop.
+                          readOnly: true
+                          type: string
+                        address:
+                          description: The IP address of the hop.
+                          readOnly: true
+                          type: string
+                        resourceId:
+                          description: The ID of the resource corresponding to this
+                            hop.
+                          readOnly: true
+                          type: string
+                        nextHopIds:
+                          readOnly: true
+                          type: array
+                          description: List of next hop identifiers.
+                          items:
+                            type: string
+                        issues:
+                          readOnly: true
+                          type: array
+                          description: List of issues.
+                          items:
+                            description: Information about an issue encountered in
+                              the process of checking for connectivity.
+                            type: object
+                            properties:
+                              origin:
+                                readOnly: true
+                                type: string
+                                enum:
+                                - Local
+                                - Inbound
+                                - Outbound
+                                x-ms-enum:
+                                  name: Origin
+                                  modelAsString: true
+                                description: The origin of the issue.
+                              severity:
+                                readOnly: true
+                                type: string
+                                enum:
+                                - Error
+                                - Warning
+                                x-ms-enum:
+                                  name: Severity
+                                  modelAsString: true
+                                description: The severity of the issue.
+                              type:
+                                readOnly: true
+                                type: string
+                                enum:
+                                - Unknown
+                                - AgentStopped
+                                - GuestFirewall
+                                - DnsResolution
+                                - SocketBind
+                                - NetworkSecurityRule
+                                - UserDefinedRoute
+                                - PortThrottled
+                                - Platform
+                                x-ms-enum:
+                                  name: IssueType
+                                  modelAsString: true
+                                description: The type of issue.
+                              context:
+                                readOnly: true
+                                type: array
+                                description: Provides additional context on the issue.
+                                items:
+                                  description: A key-value pair that provides additional
+                                    context on the issue.
+                                  type: object
+                                  additionalProperties:
+                                    type: string
+                                x-ms-identifiers: []
+                          x-ms-identifiers: []
+                  connectionStatus:
+                    readOnly: true
+                    type: string
+                    enum:
+                    - Unknown
+                    - Connected
+                    - Disconnected
+                    - Degraded
+                    x-ms-enum:
+                      name: ConnectionStatus
+                      modelAsString: true
+                    description: The connection status.
+                  avgLatencyInMs:
+                    description: Average latency in milliseconds.
+                    readOnly: true
+                    type: integer
+                    format: int64
+                  minLatencyInMs:
+                    description: Minimum latency in milliseconds.
+                    readOnly: true
+                    type: integer
+                    format: int64
+                  maxLatencyInMs:
+                    description: Maximum latency in milliseconds.
+                    readOnly: true
+                    type: integer
+                    format: int64
+                  probesSent:
+                    description: Total number of probes sent.
+                    readOnly: true
+                    type: integer
+                    format: int64
+                  probesFailed:
+                    description: Number of failed probes.
+                    readOnly: true
+                    type: integer
+                    format: int64
+        '202':
+          description: Request was accepted and is currently running. Location header
+            contains the URL where the status of the long running operation can be
+            checked and the result eventually retrieved.
+          headers:
+            location:
+              schema:
+                type: string
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: location
+components:
+  parameters:
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      description: The name of the resource group. The name is case insensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    ServiceNameParameter:
+      name: serviceName
+      in: path
+      required: true
+      description: The name of the API Management service.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 50
+        pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription. The value must be an UUID.
+      required: true
+      schema:
+        type: string
+        format: uuid
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    HTTPHeader:
+      description: HTTP header and it's value.
+      type: object
+      required:
+      - name
+      - value
+      properties:
+        name:
+          type: string
+          description: Header name.
+        value:
+          type: string
+          description: Header value.
+    ConnectivityCheckRequest:
+      description: A request to perform the connectivity check operation on a API
+        Management service.
+      type: object
+      required:
+      - source
+      - destination
+      properties:
+        source:
+          description: Definitions about the connectivity check origin.
+          type: object
+          required:
+          - region
+          properties:
+            region:
+              description: The API Management service region from where to start the
+                connectivity check operation.
+              type: string
+            instance:
+              description: The particular VMSS instance from which to fire the request.
+              type: integer
+              format: int64
+        destination:
+          description: The connectivity check operation destination.
+          type: object
+          required:
+          - address
+          - port
+          properties:
+            address:
+              description: Destination address. Can either be an IP address or a FQDN.
+              type: string
+            port:
+              description: Destination port.
+              type: integer
+              format: int64
+        preferredIPVersion:
+          description: The IP version to be used. Only IPv4 is supported for now.
+          type: string
+          enum:
+          - IPv4
+          x-ms-enum:
+            name: PreferredIPVersion
+            modelAsString: true
+        protocol:
+          description: The request's protocol. Specific protocol configuration can
+            be available based on this selection. The specified destination address
+            must be coherent with this value.
+          type: string
+          enum:
+          - TCP
+          - HTTP
+          - HTTPS
+          x-ms-enum:
+            name: ConnectivityCheckProtocol
+            modelAsString: true
+        protocolConfiguration:
+          description: Protocol-specific configuration.
+          type: object
+          properties:
+            HTTPConfiguration:
+              description: Configuration for HTTP or HTTPS requests.
+              type: object
+              properties:
+                method:
+                  description: The HTTP method to be used.
+                  type: string
+                  enum:
+                  - GET
+                  - POST
+                  x-ms-enum:
+                    name: Method
+                    modelAsString: true
+                validStatusCodes:
+                  type: array
+                  description: List of HTTP status codes considered valid for the
+                    request response.
+                  items:
+                    type: integer
+                    format: int64
+                headers:
+                  type: array
+                  description: List of headers to be included in the request.
+                  items:
+                    description: HTTP header and it's value.
+                    type: object
+                    required:
+                    - name
+                    - value
+                    properties:
+                      name:
+                        type: string
+                        description: Header name.
+                      value:
+                        type: string
+                        description: Header value.
+                  x-ms-identifiers:
+                  - name
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+    IssueContext:
+      description: A key-value pair that provides additional context on the issue.
+      type: object
+      additionalProperties:
+        type: string
+    ConnectivityIssue:
+      description: Information about an issue encountered in the process of checking
+        for connectivity.
+      type: object
+      properties:
+        origin:
+          readOnly: true
+          type: string
+          enum:
+          - Local
+          - Inbound
+          - Outbound
+          x-ms-enum:
+            name: Origin
+            modelAsString: true
+          description: The origin of the issue.
+        severity:
+          readOnly: true
+          type: string
+          enum:
+          - Error
+          - Warning
+          x-ms-enum:
+            name: Severity
+            modelAsString: true
+          description: The severity of the issue.
+        type:
+          readOnly: true
+          type: string
+          enum:
+          - Unknown
+          - AgentStopped
+          - GuestFirewall
+          - DnsResolution
+          - SocketBind
+          - NetworkSecurityRule
+          - UserDefinedRoute
+          - PortThrottled
+          - Platform
+          x-ms-enum:
+            name: IssueType
+            modelAsString: true
+          description: The type of issue.
+        context:
+          readOnly: true
+          type: array
+          description: Provides additional context on the issue.
+          items:
+            description: A key-value pair that provides additional context on the
+              issue.
+            type: object
+            additionalProperties:
+              type: string
+          x-ms-identifiers: []
+    ConnectivityHop:
+      description: Information about a hop between the source and the destination.
+      type: object
+      properties:
+        type:
+          description: The type of the hop.
+          readOnly: true
+          type: string
+        id:
+          description: The ID of the hop.
+          readOnly: true
+          type: string
+        address:
+          description: The IP address of the hop.
+          readOnly: true
+          type: string
+        resourceId:
+          description: The ID of the resource corresponding to this hop.
+          readOnly: true
+          type: string
+        nextHopIds:
+          readOnly: true
+          type: array
+          description: List of next hop identifiers.
+          items:
+            type: string
+        issues:
+          readOnly: true
+          type: array
+          description: List of issues.
+          items:
+            description: Information about an issue encountered in the process of
+              checking for connectivity.
+            type: object
+            properties:
+              origin:
+                readOnly: true
+                type: string
+                enum:
+                - Local
+                - Inbound
+                - Outbound
+                x-ms-enum:
+                  name: Origin
+                  modelAsString: true
+                description: The origin of the issue.
+              severity:
+                readOnly: true
+                type: string
+                enum:
+                - Error
+                - Warning
+                x-ms-enum:
+                  name: Severity
+                  modelAsString: true
+                description: The severity of the issue.
+              type:
+                readOnly: true
+                type: string
+                enum:
+                - Unknown
+                - AgentStopped
+                - GuestFirewall
+                - DnsResolution
+                - SocketBind
+                - NetworkSecurityRule
+                - UserDefinedRoute
+                - PortThrottled
+                - Platform
+                x-ms-enum:
+                  name: IssueType
+                  modelAsString: true
+                description: The type of issue.
+              context:
+                readOnly: true
+                type: array
+                description: Provides additional context on the issue.
+                items:
+                  description: A key-value pair that provides additional context on
+                    the issue.
+                  type: object
+                  additionalProperties:
+                    type: string
+                x-ms-identifiers: []
+          x-ms-identifiers: []
+    ConnectivityCheckResponse:
+      description: Information on the connectivity status.
+      type: object
+      properties:
+        hops:
+          readOnly: true
+          type: array
+          description: List of hops between the source and the destination.
+          items:
+            description: Information about a hop between the source and the destination.
+            type: object
+            properties:
+              type:
+                description: The type of the hop.
+                readOnly: true
+                type: string
+              id:
+                description: The ID of the hop.
+                readOnly: true
+                type: string
+              address:
+                description: The IP address of the hop.
+                readOnly: true
+                type: string
+              resourceId:
+                description: The ID of the resource corresponding to this hop.
+                readOnly: true
+                type: string
+              nextHopIds:
+                readOnly: true
+                type: array
+                description: List of next hop identifiers.
+                items:
+                  type: string
+              issues:
+                readOnly: true
+                type: array
+                description: List of issues.
+                items:
+                  description: Information about an issue encountered in the process
+                    of checking for connectivity.
+                  type: object
+                  properties:
+                    origin:
+                      readOnly: true
+                      type: string
+                      enum:
+                      - Local
+                      - Inbound
+                      - Outbound
+                      x-ms-enum:
+                        name: Origin
+                        modelAsString: true
+                      description: The origin of the issue.
+                    severity:
+                      readOnly: true
+                      type: string
+                      enum:
+                      - Error
+                      - Warning
+                      x-ms-enum:
+                        name: Severity
+                        modelAsString: true
+                      description: The severity of the issue.
+                    type:
+                      readOnly: true
+                      type: string
+                      enum:
+                      - Unknown
+                      - AgentStopped
+                      - GuestFirewall
+                      - DnsResolution
+                      - SocketBind
+                      - NetworkSecurityRule
+                      - UserDefinedRoute
+                      - PortThrottled
+                      - Platform
+                      x-ms-enum:
+                        name: IssueType
+                        modelAsString: true
+                      description: The type of issue.
+                    context:
+                      readOnly: true
+                      type: array
+                      description: Provides additional context on the issue.
+                      items:
+                        description: A key-value pair that provides additional context
+                          on the issue.
+                        type: object
+                        additionalProperties:
+                          type: string
+                      x-ms-identifiers: []
+                x-ms-identifiers: []
+        connectionStatus:
+          readOnly: true
+          type: string
+          enum:
+          - Unknown
+          - Connected
+          - Disconnected
+          - Degraded
+          x-ms-enum:
+            name: ConnectionStatus
+            modelAsString: true
+          description: The connection status.
+        avgLatencyInMs:
+          description: Average latency in milliseconds.
+          readOnly: true
+          type: integer
+          format: int64
+        minLatencyInMs:
+          description: Minimum latency in milliseconds.
+          readOnly: true
+          type: integer
+          format: int64
+        maxLatencyInMs:
+          description: Maximum latency in milliseconds.
+          readOnly: true
+          type: integer
+          format: int64
+        probesSent:
+          description: Total number of probes sent.
+          readOnly: true
+          type: integer
+          format: int64
+        probesFailed:
+          description: Number of failed probes.
+          readOnly: true
+          type: integer
+          format: int64

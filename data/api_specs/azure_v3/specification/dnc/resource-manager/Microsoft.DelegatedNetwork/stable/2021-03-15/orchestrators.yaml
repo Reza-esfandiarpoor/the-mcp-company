@@ -1,0 +1,2349 @@
+openapi: 3.0.0
+info:
+  version: 2021-03-15
+  title: DNC
+  description: DNC web api provides way to create, get and delete dnc controller
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DelegatedNetwork/orchestrators/{resourceName}
+  : get:
+      description: Gets details about the orchestrator instance.
+      tags:
+      - OrchestratorInstance
+      operationId: OrchestratorInstanceService_GetDetails
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group. The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: resourceName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: The name of the resource. It must be a minimum of 3 characters,
+          and a maximum of 63.
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 63
+          pattern: ^[a-z][a-z0-9]*$
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: OK. The operation was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                    description: An identifier that represents the resource.
+                  name:
+                    type: string
+                    readOnly: true
+                    description: The name of the resource.
+                  type:
+                    type: string
+                    readOnly: true
+                    description: The type of resource.
+                  location:
+                    type: string
+                    description: Location of the resource.
+                  kind:
+                    type: string
+                    description: The kind of workbook. Choices are user and shared.
+                    enum:
+                    - Kubernetes
+                    x-ms-enum:
+                      name: OrchestratorKind
+                      modelAsString: true
+                  identity:
+                    description: The identity of the orchestrator
+                    properties:
+                      principalId:
+                        readOnly: true
+                        type: string
+                        description: The principal id of the system assigned identity
+                          which is used by orchestrator.
+                      tenantId:
+                        readOnly: true
+                        type: string
+                        description: The tenant id of the system assigned identity
+                          which is used by orchestrator.
+                      type:
+                        type: string
+                        description: The type of identity used for orchestrator cluster.
+                          Type 'SystemAssigned' will use an implicitly created identity
+                          orchestrator clusters
+                        enum:
+                        - SystemAssigned
+                        - None
+                        x-ms-enum:
+                          name: ResourceIdentityType
+                          modelAsString: false
+                  tags:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: The resource tags.
+                  properties:
+                    description: Properties of the provision operation request.
+                    type: object
+                    properties:
+                      resourceGuid:
+                        type: string
+                        readOnly: true
+                        description: Resource guid.
+                      provisioningState:
+                        type: string
+                        enum:
+                        - Deleting
+                        - Succeeded
+                        - Failed
+                        - Provisioning
+                        x-ms-enum:
+                          name: OrchestratorInstanceState
+                          modelAsString: true
+                        readOnly: true
+                        description: The current state of orchestratorInstance resource.
+                      orchestratorAppId:
+                        description: AAD ID used with apiserver
+                        type: string
+                      orchestratorTenantId:
+                        description: TenantID of server App ID
+                        type: string
+                      clusterRootCA:
+                        description: RootCA certificate of kubernetes cluster base64
+                          encoded
+                        type: string
+                      apiServerEndpoint:
+                        description: K8s APIServer url. Either one of apiServerEndpoint
+                          or privateLinkResourceId can be specified
+                        type: string
+                      privateLinkResourceId:
+                        description: private link arm resource id. Either one of apiServerEndpoint
+                          or privateLinkResourceId can be specified
+                        type: string
+                      controllerDetails:
+                        description: Properties of the controller.
+                        type: object
+                        properties:
+                          id:
+                            description: controller arm resource id
+                            type: string
+                    required:
+                    - controllerDetails
+                required:
+                - kind
+                description: Represents an instance of a resource.
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+    put:
+      description: Create a orchestrator instance
+      tags:
+      - OrchestratorInstance
+      operationId: OrchestratorInstanceService_Create
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group. The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: resourceName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: The name of the resource. It must be a minimum of 3 characters,
+          and a maximum of 63.
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 63
+          pattern: ^[a-z][a-z0-9]*$
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  readOnly: true
+                  description: An identifier that represents the resource.
+                name:
+                  type: string
+                  readOnly: true
+                  description: The name of the resource.
+                type:
+                  type: string
+                  readOnly: true
+                  description: The type of resource.
+                location:
+                  type: string
+                  description: Location of the resource.
+                kind:
+                  type: string
+                  description: The kind of workbook. Choices are user and shared.
+                  enum:
+                  - Kubernetes
+                  x-ms-enum:
+                    name: OrchestratorKind
+                    modelAsString: true
+                identity:
+                  description: The identity of the orchestrator
+                  properties:
+                    principalId:
+                      readOnly: true
+                      type: string
+                      description: The principal id of the system assigned identity
+                        which is used by orchestrator.
+                    tenantId:
+                      readOnly: true
+                      type: string
+                      description: The tenant id of the system assigned identity which
+                        is used by orchestrator.
+                    type:
+                      type: string
+                      description: The type of identity used for orchestrator cluster.
+                        Type 'SystemAssigned' will use an implicitly created identity
+                        orchestrator clusters
+                      enum:
+                      - SystemAssigned
+                      - None
+                      x-ms-enum:
+                        name: ResourceIdentityType
+                        modelAsString: false
+                tags:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: The resource tags.
+                properties:
+                  description: Properties of the provision operation request.
+                  type: object
+                  properties:
+                    resourceGuid:
+                      type: string
+                      readOnly: true
+                      description: Resource guid.
+                    provisioningState:
+                      type: string
+                      enum:
+                      - Deleting
+                      - Succeeded
+                      - Failed
+                      - Provisioning
+                      x-ms-enum:
+                        name: OrchestratorInstanceState
+                        modelAsString: true
+                      readOnly: true
+                      description: The current state of orchestratorInstance resource.
+                    orchestratorAppId:
+                      description: AAD ID used with apiserver
+                      type: string
+                    orchestratorTenantId:
+                      description: TenantID of server App ID
+                      type: string
+                    clusterRootCA:
+                      description: RootCA certificate of kubernetes cluster base64
+                        encoded
+                      type: string
+                    apiServerEndpoint:
+                      description: K8s APIServer url. Either one of apiServerEndpoint
+                        or privateLinkResourceId can be specified
+                      type: string
+                    privateLinkResourceId:
+                      description: private link arm resource id. Either one of apiServerEndpoint
+                        or privateLinkResourceId can be specified
+                      type: string
+                    controllerDetails:
+                      description: Properties of the controller.
+                      type: object
+                      properties:
+                        id:
+                          description: controller arm resource id
+                          type: string
+                  required:
+                  - controllerDetails
+              required:
+              - kind
+              description: Represents an instance of a resource.
+              x-ms-azure-resource: true
+        description: OrchestratorInstance type parameters
+        required: true
+      responses:
+        '200':
+          description: OK. The operation completed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                    description: An identifier that represents the resource.
+                  name:
+                    type: string
+                    readOnly: true
+                    description: The name of the resource.
+                  type:
+                    type: string
+                    readOnly: true
+                    description: The type of resource.
+                  location:
+                    type: string
+                    description: Location of the resource.
+                  kind:
+                    type: string
+                    description: The kind of workbook. Choices are user and shared.
+                    enum:
+                    - Kubernetes
+                    x-ms-enum:
+                      name: OrchestratorKind
+                      modelAsString: true
+                  identity:
+                    description: The identity of the orchestrator
+                    properties:
+                      principalId:
+                        readOnly: true
+                        type: string
+                        description: The principal id of the system assigned identity
+                          which is used by orchestrator.
+                      tenantId:
+                        readOnly: true
+                        type: string
+                        description: The tenant id of the system assigned identity
+                          which is used by orchestrator.
+                      type:
+                        type: string
+                        description: The type of identity used for orchestrator cluster.
+                          Type 'SystemAssigned' will use an implicitly created identity
+                          orchestrator clusters
+                        enum:
+                        - SystemAssigned
+                        - None
+                        x-ms-enum:
+                          name: ResourceIdentityType
+                          modelAsString: false
+                  tags:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: The resource tags.
+                  properties:
+                    description: Properties of the provision operation request.
+                    type: object
+                    properties:
+                      resourceGuid:
+                        type: string
+                        readOnly: true
+                        description: Resource guid.
+                      provisioningState:
+                        type: string
+                        enum:
+                        - Deleting
+                        - Succeeded
+                        - Failed
+                        - Provisioning
+                        x-ms-enum:
+                          name: OrchestratorInstanceState
+                          modelAsString: true
+                        readOnly: true
+                        description: The current state of orchestratorInstance resource.
+                      orchestratorAppId:
+                        description: AAD ID used with apiserver
+                        type: string
+                      orchestratorTenantId:
+                        description: TenantID of server App ID
+                        type: string
+                      clusterRootCA:
+                        description: RootCA certificate of kubernetes cluster base64
+                          encoded
+                        type: string
+                      apiServerEndpoint:
+                        description: K8s APIServer url. Either one of apiServerEndpoint
+                          or privateLinkResourceId can be specified
+                        type: string
+                      privateLinkResourceId:
+                        description: private link arm resource id. Either one of apiServerEndpoint
+                          or privateLinkResourceId can be specified
+                        type: string
+                      controllerDetails:
+                        description: Properties of the controller.
+                        type: object
+                        properties:
+                          id:
+                            description: controller arm resource id
+                            type: string
+                    required:
+                    - controllerDetails
+                required:
+                - kind
+                description: Represents an instance of a resource.
+                x-ms-azure-resource: true
+        '201':
+          description: InProgress. The operation is still in progress.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                    description: An identifier that represents the resource.
+                  name:
+                    type: string
+                    readOnly: true
+                    description: The name of the resource.
+                  type:
+                    type: string
+                    readOnly: true
+                    description: The type of resource.
+                  location:
+                    type: string
+                    description: Location of the resource.
+                  kind:
+                    type: string
+                    description: The kind of workbook. Choices are user and shared.
+                    enum:
+                    - Kubernetes
+                    x-ms-enum:
+                      name: OrchestratorKind
+                      modelAsString: true
+                  identity:
+                    description: The identity of the orchestrator
+                    properties:
+                      principalId:
+                        readOnly: true
+                        type: string
+                        description: The principal id of the system assigned identity
+                          which is used by orchestrator.
+                      tenantId:
+                        readOnly: true
+                        type: string
+                        description: The tenant id of the system assigned identity
+                          which is used by orchestrator.
+                      type:
+                        type: string
+                        description: The type of identity used for orchestrator cluster.
+                          Type 'SystemAssigned' will use an implicitly created identity
+                          orchestrator clusters
+                        enum:
+                        - SystemAssigned
+                        - None
+                        x-ms-enum:
+                          name: ResourceIdentityType
+                          modelAsString: false
+                  tags:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: The resource tags.
+                  properties:
+                    description: Properties of the provision operation request.
+                    type: object
+                    properties:
+                      resourceGuid:
+                        type: string
+                        readOnly: true
+                        description: Resource guid.
+                      provisioningState:
+                        type: string
+                        enum:
+                        - Deleting
+                        - Succeeded
+                        - Failed
+                        - Provisioning
+                        x-ms-enum:
+                          name: OrchestratorInstanceState
+                          modelAsString: true
+                        readOnly: true
+                        description: The current state of orchestratorInstance resource.
+                      orchestratorAppId:
+                        description: AAD ID used with apiserver
+                        type: string
+                      orchestratorTenantId:
+                        description: TenantID of server App ID
+                        type: string
+                      clusterRootCA:
+                        description: RootCA certificate of kubernetes cluster base64
+                          encoded
+                        type: string
+                      apiServerEndpoint:
+                        description: K8s APIServer url. Either one of apiServerEndpoint
+                          or privateLinkResourceId can be specified
+                        type: string
+                      privateLinkResourceId:
+                        description: private link arm resource id. Either one of apiServerEndpoint
+                          or privateLinkResourceId can be specified
+                        type: string
+                      controllerDetails:
+                        description: Properties of the controller.
+                        type: object
+                        properties:
+                          id:
+                            description: controller arm resource id
+                            type: string
+                    required:
+                    - controllerDetails
+                required:
+                - kind
+                description: Represents an instance of a resource.
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-long-running-operation: true
+    delete:
+      description: Deletes the Orchestrator Instance
+      tags:
+      - OrchestratorInstance
+      operationId: OrchestratorInstanceService_Delete
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group. The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: resourceName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: The name of the resource. It must be a minimum of 3 characters,
+          and a maximum of 63.
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 63
+          pattern: ^[a-z][a-z0-9]*$
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: forceDelete
+        in: query
+        required: false
+        description: Force delete resource
+        x-ms-parameter-location: method
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: OK.
+        '202':
+          description: Accepted.
+        '204':
+          description: No Content.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-long-running-operation: true
+    patch:
+      description: Update Orchestrator Instance
+      tags:
+      - OrchestratorInstance
+      operationId: OrchestratorInstanceService_Patch
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group. The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: resourceName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: The name of the resource. It must be a minimum of 3 characters,
+          and a maximum of 63.
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 63
+          pattern: ^[a-z][a-z0-9]*$
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Parameters for updating a resource.
+              properties:
+                tags:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: The resource tags.
+        description: OrchestratorInstance update parameters
+        required: true
+      responses:
+        '200':
+          description: OK. The operation completed successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    readOnly: true
+                    description: An identifier that represents the resource.
+                  name:
+                    type: string
+                    readOnly: true
+                    description: The name of the resource.
+                  type:
+                    type: string
+                    readOnly: true
+                    description: The type of resource.
+                  location:
+                    type: string
+                    description: Location of the resource.
+                  kind:
+                    type: string
+                    description: The kind of workbook. Choices are user and shared.
+                    enum:
+                    - Kubernetes
+                    x-ms-enum:
+                      name: OrchestratorKind
+                      modelAsString: true
+                  identity:
+                    description: The identity of the orchestrator
+                    properties:
+                      principalId:
+                        readOnly: true
+                        type: string
+                        description: The principal id of the system assigned identity
+                          which is used by orchestrator.
+                      tenantId:
+                        readOnly: true
+                        type: string
+                        description: The tenant id of the system assigned identity
+                          which is used by orchestrator.
+                      type:
+                        type: string
+                        description: The type of identity used for orchestrator cluster.
+                          Type 'SystemAssigned' will use an implicitly created identity
+                          orchestrator clusters
+                        enum:
+                        - SystemAssigned
+                        - None
+                        x-ms-enum:
+                          name: ResourceIdentityType
+                          modelAsString: false
+                  tags:
+                    type: object
+                    additionalProperties:
+                      type: string
+                    description: The resource tags.
+                  properties:
+                    description: Properties of the provision operation request.
+                    type: object
+                    properties:
+                      resourceGuid:
+                        type: string
+                        readOnly: true
+                        description: Resource guid.
+                      provisioningState:
+                        type: string
+                        enum:
+                        - Deleting
+                        - Succeeded
+                        - Failed
+                        - Provisioning
+                        x-ms-enum:
+                          name: OrchestratorInstanceState
+                          modelAsString: true
+                        readOnly: true
+                        description: The current state of orchestratorInstance resource.
+                      orchestratorAppId:
+                        description: AAD ID used with apiserver
+                        type: string
+                      orchestratorTenantId:
+                        description: TenantID of server App ID
+                        type: string
+                      clusterRootCA:
+                        description: RootCA certificate of kubernetes cluster base64
+                          encoded
+                        type: string
+                      apiServerEndpoint:
+                        description: K8s APIServer url. Either one of apiServerEndpoint
+                          or privateLinkResourceId can be specified
+                        type: string
+                      privateLinkResourceId:
+                        description: private link arm resource id. Either one of apiServerEndpoint
+                          or privateLinkResourceId can be specified
+                        type: string
+                      controllerDetails:
+                        description: Properties of the controller.
+                        type: object
+                        properties:
+                          id:
+                            description: controller arm resource id
+                            type: string
+                    required:
+                    - controllerDetails
+                required:
+                - kind
+                description: Represents an instance of a resource.
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+  /subscriptions/{subscriptionId}/providers/Microsoft.DelegatedNetwork/orchestrators:
+    get:
+      tags:
+      - OrchestratorInstanceList
+      description: Get all the orchestratorInstance resources in a subscription.
+      operationId: OrchestratorInstanceService_ListBySubscription
+      x-ms-pageable:
+        nextLinkName: nextLink
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: This is a synchronous operation. The body contains a JSON-serialized
+            array of the metadata from all the orchestratorInstance in the subscription.
+          content:
+            application/json:
+              schema:
+                description: An array of OrchestratorInstance resources.
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          readOnly: true
+                          description: An identifier that represents the resource.
+                        name:
+                          type: string
+                          readOnly: true
+                          description: The name of the resource.
+                        type:
+                          type: string
+                          readOnly: true
+                          description: The type of resource.
+                        location:
+                          type: string
+                          description: Location of the resource.
+                        kind:
+                          type: string
+                          description: The kind of workbook. Choices are user and
+                            shared.
+                          enum:
+                          - Kubernetes
+                          x-ms-enum:
+                            name: OrchestratorKind
+                            modelAsString: true
+                        identity:
+                          description: The identity of the orchestrator
+                          properties:
+                            principalId:
+                              readOnly: true
+                              type: string
+                              description: The principal id of the system assigned
+                                identity which is used by orchestrator.
+                            tenantId:
+                              readOnly: true
+                              type: string
+                              description: The tenant id of the system assigned identity
+                                which is used by orchestrator.
+                            type:
+                              type: string
+                              description: The type of identity used for orchestrator
+                                cluster. Type 'SystemAssigned' will use an implicitly
+                                created identity orchestrator clusters
+                              enum:
+                              - SystemAssigned
+                              - None
+                              x-ms-enum:
+                                name: ResourceIdentityType
+                                modelAsString: false
+                        tags:
+                          type: object
+                          additionalProperties:
+                            type: string
+                          description: The resource tags.
+                        properties:
+                          description: Properties of the provision operation request.
+                          type: object
+                          properties:
+                            resourceGuid:
+                              type: string
+                              readOnly: true
+                              description: Resource guid.
+                            provisioningState:
+                              type: string
+                              enum:
+                              - Deleting
+                              - Succeeded
+                              - Failed
+                              - Provisioning
+                              x-ms-enum:
+                                name: OrchestratorInstanceState
+                                modelAsString: true
+                              readOnly: true
+                              description: The current state of orchestratorInstance
+                                resource.
+                            orchestratorAppId:
+                              description: AAD ID used with apiserver
+                              type: string
+                            orchestratorTenantId:
+                              description: TenantID of server App ID
+                              type: string
+                            clusterRootCA:
+                              description: RootCA certificate of kubernetes cluster
+                                base64 encoded
+                              type: string
+                            apiServerEndpoint:
+                              description: K8s APIServer url. Either one of apiServerEndpoint
+                                or privateLinkResourceId can be specified
+                              type: string
+                            privateLinkResourceId:
+                              description: private link arm resource id. Either one
+                                of apiServerEndpoint or privateLinkResourceId can
+                                be specified
+                              type: string
+                            controllerDetails:
+                              description: Properties of the controller.
+                              type: object
+                              properties:
+                                id:
+                                  description: controller arm resource id
+                                  type: string
+                          required:
+                          - controllerDetails
+                      required:
+                      - kind
+                      description: Represents an instance of a resource.
+                      x-ms-azure-resource: true
+                    description: An array of OrchestratorInstance resources.
+                  nextLink:
+                    type: string
+                    description: The URL to get the next set of orchestrators.
+                    readOnly: true
+                required:
+                - value
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.DelegatedNetwork/orchestrators:
+    get:
+      tags:
+      - OrchestratorInstanceList
+      description: Get all the OrchestratorInstances resources in a resource group.
+      operationId: OrchestratorInstanceService_ListByResourceGroup
+      x-ms-pageable:
+        nextLinkName: nextLink
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group. The name is case insensitive.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: This is a synchronous operation. The body contains a JSON-serialized
+            array of the metadata from all the orchestratorInstances in the resource
+            group.
+          content:
+            application/json:
+              schema:
+                description: An array of OrchestratorInstance resources.
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          readOnly: true
+                          description: An identifier that represents the resource.
+                        name:
+                          type: string
+                          readOnly: true
+                          description: The name of the resource.
+                        type:
+                          type: string
+                          readOnly: true
+                          description: The type of resource.
+                        location:
+                          type: string
+                          description: Location of the resource.
+                        kind:
+                          type: string
+                          description: The kind of workbook. Choices are user and
+                            shared.
+                          enum:
+                          - Kubernetes
+                          x-ms-enum:
+                            name: OrchestratorKind
+                            modelAsString: true
+                        identity:
+                          description: The identity of the orchestrator
+                          properties:
+                            principalId:
+                              readOnly: true
+                              type: string
+                              description: The principal id of the system assigned
+                                identity which is used by orchestrator.
+                            tenantId:
+                              readOnly: true
+                              type: string
+                              description: The tenant id of the system assigned identity
+                                which is used by orchestrator.
+                            type:
+                              type: string
+                              description: The type of identity used for orchestrator
+                                cluster. Type 'SystemAssigned' will use an implicitly
+                                created identity orchestrator clusters
+                              enum:
+                              - SystemAssigned
+                              - None
+                              x-ms-enum:
+                                name: ResourceIdentityType
+                                modelAsString: false
+                        tags:
+                          type: object
+                          additionalProperties:
+                            type: string
+                          description: The resource tags.
+                        properties:
+                          description: Properties of the provision operation request.
+                          type: object
+                          properties:
+                            resourceGuid:
+                              type: string
+                              readOnly: true
+                              description: Resource guid.
+                            provisioningState:
+                              type: string
+                              enum:
+                              - Deleting
+                              - Succeeded
+                              - Failed
+                              - Provisioning
+                              x-ms-enum:
+                                name: OrchestratorInstanceState
+                                modelAsString: true
+                              readOnly: true
+                              description: The current state of orchestratorInstance
+                                resource.
+                            orchestratorAppId:
+                              description: AAD ID used with apiserver
+                              type: string
+                            orchestratorTenantId:
+                              description: TenantID of server App ID
+                              type: string
+                            clusterRootCA:
+                              description: RootCA certificate of kubernetes cluster
+                                base64 encoded
+                              type: string
+                            apiServerEndpoint:
+                              description: K8s APIServer url. Either one of apiServerEndpoint
+                                or privateLinkResourceId can be specified
+                              type: string
+                            privateLinkResourceId:
+                              description: private link arm resource id. Either one
+                                of apiServerEndpoint or privateLinkResourceId can
+                                be specified
+                              type: string
+                            controllerDetails:
+                              description: Properties of the controller.
+                              type: object
+                              properties:
+                                id:
+                                  description: controller arm resource id
+                                  type: string
+                          required:
+                          - controllerDetails
+                      required:
+                      - kind
+                      description: Represents an instance of a resource.
+                      x-ms-azure-resource: true
+                    description: An array of OrchestratorInstance resources.
+                  nextLink:
+                    type: string
+                    description: The URL to get the next set of orchestrators.
+                    readOnly: true
+                required:
+                - value
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+components:
+  parameters:
+    resourceNameParameter:
+      name: resourceName
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      description: The name of the resource. It must be a minimum of 3 characters,
+        and a maximum of 63.
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 63
+        pattern: ^[a-z][a-z0-9]*$
+    ForceDeleteParameter:
+      name: forceDelete
+      in: query
+      required: false
+      description: Force delete resource
+      x-ms-parameter-location: method
+      schema:
+        type: boolean
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    OrchestratorResource:
+      description: Represents an instance of a resource.
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: An identifier that represents the resource.
+        name:
+          type: string
+          readOnly: true
+          description: The name of the resource.
+        type:
+          type: string
+          readOnly: true
+          description: The type of resource.
+        location:
+          type: string
+          description: Location of the resource.
+        kind:
+          type: string
+          description: The kind of workbook. Choices are user and shared.
+          enum:
+          - Kubernetes
+          x-ms-enum:
+            name: OrchestratorKind
+            modelAsString: true
+        identity:
+          description: The identity of the orchestrator
+          properties:
+            principalId:
+              readOnly: true
+              type: string
+              description: The principal id of the system assigned identity which
+                is used by orchestrator.
+            tenantId:
+              readOnly: true
+              type: string
+              description: The tenant id of the system assigned identity which is
+                used by orchestrator.
+            type:
+              type: string
+              description: The type of identity used for orchestrator cluster. Type
+                'SystemAssigned' will use an implicitly created identity orchestrator
+                clusters
+              enum:
+              - SystemAssigned
+              - None
+              x-ms-enum:
+                name: ResourceIdentityType
+                modelAsString: false
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: The resource tags.
+      required:
+      - kind
+      x-ms-azure-resource: true
+    OrchestratorResourceUpdateParameters:
+      description: Parameters for updating a resource.
+      properties:
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: The resource tags.
+    Orchestrators:
+      description: An array of OrchestratorInstance resources.
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                readOnly: true
+                description: An identifier that represents the resource.
+              name:
+                type: string
+                readOnly: true
+                description: The name of the resource.
+              type:
+                type: string
+                readOnly: true
+                description: The type of resource.
+              location:
+                type: string
+                description: Location of the resource.
+              kind:
+                type: string
+                description: The kind of workbook. Choices are user and shared.
+                enum:
+                - Kubernetes
+                x-ms-enum:
+                  name: OrchestratorKind
+                  modelAsString: true
+              identity:
+                description: The identity of the orchestrator
+                properties:
+                  principalId:
+                    readOnly: true
+                    type: string
+                    description: The principal id of the system assigned identity
+                      which is used by orchestrator.
+                  tenantId:
+                    readOnly: true
+                    type: string
+                    description: The tenant id of the system assigned identity which
+                      is used by orchestrator.
+                  type:
+                    type: string
+                    description: The type of identity used for orchestrator cluster.
+                      Type 'SystemAssigned' will use an implicitly created identity
+                      orchestrator clusters
+                    enum:
+                    - SystemAssigned
+                    - None
+                    x-ms-enum:
+                      name: ResourceIdentityType
+                      modelAsString: false
+              tags:
+                type: object
+                additionalProperties:
+                  type: string
+                description: The resource tags.
+              properties:
+                description: Properties of the provision operation request.
+                type: object
+                properties:
+                  resourceGuid:
+                    type: string
+                    readOnly: true
+                    description: Resource guid.
+                  provisioningState:
+                    type: string
+                    enum:
+                    - Deleting
+                    - Succeeded
+                    - Failed
+                    - Provisioning
+                    x-ms-enum:
+                      name: OrchestratorInstanceState
+                      modelAsString: true
+                    readOnly: true
+                    description: The current state of orchestratorInstance resource.
+                  orchestratorAppId:
+                    description: AAD ID used with apiserver
+                    type: string
+                  orchestratorTenantId:
+                    description: TenantID of server App ID
+                    type: string
+                  clusterRootCA:
+                    description: RootCA certificate of kubernetes cluster base64 encoded
+                    type: string
+                  apiServerEndpoint:
+                    description: K8s APIServer url. Either one of apiServerEndpoint
+                      or privateLinkResourceId can be specified
+                    type: string
+                  privateLinkResourceId:
+                    description: private link arm resource id. Either one of apiServerEndpoint
+                      or privateLinkResourceId can be specified
+                    type: string
+                  controllerDetails:
+                    description: Properties of the controller.
+                    type: object
+                    properties:
+                      id:
+                        description: controller arm resource id
+                        type: string
+                required:
+                - controllerDetails
+            required:
+            - kind
+            description: Represents an instance of a resource.
+            x-ms-azure-resource: true
+          description: An array of OrchestratorInstance resources.
+        nextLink:
+          type: string
+          description: The URL to get the next set of orchestrators.
+          readOnly: true
+      required:
+      - value
+    Orchestrator:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: An identifier that represents the resource.
+        name:
+          type: string
+          readOnly: true
+          description: The name of the resource.
+        type:
+          type: string
+          readOnly: true
+          description: The type of resource.
+        location:
+          type: string
+          description: Location of the resource.
+        kind:
+          type: string
+          description: The kind of workbook. Choices are user and shared.
+          enum:
+          - Kubernetes
+          x-ms-enum:
+            name: OrchestratorKind
+            modelAsString: true
+        identity:
+          description: The identity of the orchestrator
+          properties:
+            principalId:
+              readOnly: true
+              type: string
+              description: The principal id of the system assigned identity which
+                is used by orchestrator.
+            tenantId:
+              readOnly: true
+              type: string
+              description: The tenant id of the system assigned identity which is
+                used by orchestrator.
+            type:
+              type: string
+              description: The type of identity used for orchestrator cluster. Type
+                'SystemAssigned' will use an implicitly created identity orchestrator
+                clusters
+              enum:
+              - SystemAssigned
+              - None
+              x-ms-enum:
+                name: ResourceIdentityType
+                modelAsString: false
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: The resource tags.
+        properties:
+          description: Properties of the provision operation request.
+          type: object
+          properties:
+            resourceGuid:
+              type: string
+              readOnly: true
+              description: Resource guid.
+            provisioningState:
+              type: string
+              enum:
+              - Deleting
+              - Succeeded
+              - Failed
+              - Provisioning
+              x-ms-enum:
+                name: OrchestratorInstanceState
+                modelAsString: true
+              readOnly: true
+              description: The current state of orchestratorInstance resource.
+            orchestratorAppId:
+              description: AAD ID used with apiserver
+              type: string
+            orchestratorTenantId:
+              description: TenantID of server App ID
+              type: string
+            clusterRootCA:
+              description: RootCA certificate of kubernetes cluster base64 encoded
+              type: string
+            apiServerEndpoint:
+              description: K8s APIServer url. Either one of apiServerEndpoint or privateLinkResourceId
+                can be specified
+              type: string
+            privateLinkResourceId:
+              description: private link arm resource id. Either one of apiServerEndpoint
+                or privateLinkResourceId can be specified
+              type: string
+            controllerDetails:
+              description: Properties of the controller.
+              type: object
+              properties:
+                id:
+                  description: controller arm resource id
+                  type: string
+          required:
+          - controllerDetails
+      required:
+      - kind
+      description: Represents an instance of a resource.
+      x-ms-azure-resource: true
+    OrchestratorResourceProperties:
+      description: Properties of orchestrator
+      type: object
+      properties:
+        resourceGuid:
+          type: string
+          readOnly: true
+          description: Resource guid.
+        provisioningState:
+          type: string
+          enum:
+          - Deleting
+          - Succeeded
+          - Failed
+          - Provisioning
+          x-ms-enum:
+            name: OrchestratorInstanceState
+            modelAsString: true
+          readOnly: true
+          description: The current state of orchestratorInstance resource.
+        orchestratorAppId:
+          description: AAD ID used with apiserver
+          type: string
+        orchestratorTenantId:
+          description: TenantID of server App ID
+          type: string
+        clusterRootCA:
+          description: RootCA certificate of kubernetes cluster base64 encoded
+          type: string
+        apiServerEndpoint:
+          description: K8s APIServer url. Either one of apiServerEndpoint or privateLinkResourceId
+            can be specified
+          type: string
+        privateLinkResourceId:
+          description: private link arm resource id. Either one of apiServerEndpoint
+            or privateLinkResourceId can be specified
+          type: string
+        controllerDetails:
+          description: Properties of the controller.
+          type: object
+          properties:
+            id:
+              description: controller arm resource id
+              type: string
+      required:
+      - controllerDetails
+    OrchestratorIdentity:
+      properties:
+        principalId:
+          readOnly: true
+          type: string
+          description: The principal id of the system assigned identity which is used
+            by orchestrator.
+        tenantId:
+          readOnly: true
+          type: string
+          description: The tenant id of the system assigned identity which is used
+            by orchestrator.
+        type:
+          type: string
+          description: The type of identity used for orchestrator cluster. Type 'SystemAssigned'
+            will use an implicitly created identity orchestrator clusters
+          enum:
+          - SystemAssigned
+          - None
+          x-ms-enum:
+            name: ResourceIdentityType
+            modelAsString: false
+    ErrorDetail:
+      description: The error detail.
+      type: object
+      properties:
+        code:
+          readOnly: true
+          type: string
+          description: The error code.
+        message:
+          readOnly: true
+          type: string
+          description: The error message.
+        target:
+          readOnly: true
+          type: string
+          description: The error target.
+        details:
+          readOnly: true
+          type: array
+          items:
+            description: The error detail.
+            type: object
+            properties:
+              code:
+                readOnly: true
+                type: string
+                description: The error code.
+              message:
+                readOnly: true
+                type: string
+                description: The error message.
+              target:
+                readOnly: true
+                type: string
+                description: The error target.
+              details:
+                readOnly: true
+                type: array
+                items:
+                  description: The error detail.
+                  type: object
+                  properties:
+                    code:
+                      readOnly: true
+                      type: string
+                      description: The error code.
+                    message:
+                      readOnly: true
+                      type: string
+                      description: The error message.
+                    target:
+                      readOnly: true
+                      type: string
+                      description: The error target.
+                x-ms-identifiers:
+                - message
+                - target
+                description: The error details.
+              additionalInfo:
+                readOnly: true
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      readOnly: true
+                      type: string
+                      description: The additional info type.
+                    info:
+                      readOnly: true
+                      type: object
+                      description: The additional info.
+                  description: The resource management error additional info.
+                x-ms-identifiers: []
+                description: The error additional info.
+          x-ms-identifiers:
+          - message
+          - target
+          description: The error details.
+        additionalInfo:
+          readOnly: true
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                readOnly: true
+                type: string
+                description: The additional info type.
+              info:
+                readOnly: true
+                type: object
+                description: The additional info.
+            description: The resource management error additional info.
+          x-ms-identifiers: []
+          description: The error additional info.
+    ErrorAdditionalInfo:
+      type: object
+      properties:
+        type:
+          readOnly: true
+          type: string
+          description: The additional info type.
+        info:
+          readOnly: true
+          type: object
+          description: The additional info.
+      description: The resource management error additional info.
+    ErrorResponse:
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      type: object
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              readOnly: true
+              type: string
+              description: The error code.
+            message:
+              readOnly: true
+              type: string
+              description: The error message.
+            target:
+              readOnly: true
+              type: string
+              description: The error target.
+            details:
+              readOnly: true
+              type: array
+              items:
+                description: The error detail.
+                type: object
+                properties:
+                  code:
+                    readOnly: true
+                    type: string
+                    description: The error code.
+                  message:
+                    readOnly: true
+                    type: string
+                    description: The error message.
+                  target:
+                    readOnly: true
+                    type: string
+                    description: The error target.
+                  details:
+                    readOnly: true
+                    type: array
+                    items:
+                      description: The error detail.
+                      type: object
+                      properties:
+                        code:
+                          readOnly: true
+                          type: string
+                          description: The error code.
+                        message:
+                          readOnly: true
+                          type: string
+                          description: The error message.
+                        target:
+                          readOnly: true
+                          type: string
+                          description: The error target.
+                    x-ms-identifiers:
+                    - message
+                    - target
+                    description: The error details.
+                  additionalInfo:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The additional info type.
+                        info:
+                          readOnly: true
+                          type: object
+                          description: The additional info.
+                      description: The resource management error additional info.
+                    x-ms-identifiers: []
+                    description: The error additional info.
+              x-ms-identifiers:
+              - message
+              - target
+              description: The error details.
+            additionalInfo:
+              readOnly: true
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The additional info type.
+                  info:
+                    readOnly: true
+                    type: object
+                    description: The additional info.
+                description: The resource management error additional info.
+              x-ms-identifiers: []
+              description: The error additional info.
+    controllerDetails:
+      description: controller details
+      type: object
+      properties:
+        id:
+          description: controller arm resource id
+          type: string

@@ -1,0 +1,3002 @@
+openapi: 3.0.0
+info:
+  title: BlueprintClient
+  description: Azure Blueprints Client provides access to blueprint definitions, assignments,
+    and artifacts, and related blueprint operations.
+  version: 2018-11-01-preview
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  /{resourceScope}/providers/Microsoft.Blueprint/blueprintAssignments/{assignmentName}:
+    put:
+      tags:
+      - Assignment
+      operationId: Assignments_CreateOrUpdate
+      description: Create or update a blueprint assignment.
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        description: Client API Version.
+        schema:
+          type: string
+      - name: resourceScope
+        in: path
+        required: true
+        description: 'The scope of the resource. Valid scopes are: management group
+          (format: ''/providers/Microsoft.Management/managementGroups/{managementGroup}''),
+          subscription (format: ''/subscriptions/{subscriptionId}'').'
+        x-ms-parameter-location: method
+        x-ms-skip-url-encoding: true
+        schema:
+          type: string
+      - name: assignmentName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Name of the blueprint assignment.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  readOnly: true
+                  type: string
+                  description: String Id used to locate any resource on Azure.
+                type:
+                  readOnly: true
+                  type: string
+                  description: Type of this resource.
+                name:
+                  readOnly: true
+                  type: string
+                  description: Name of this resource.
+                location:
+                  type: string
+                  description: The location of this blueprint assignment.
+                  x-ms-mutability:
+                  - read
+                  - create
+                identity:
+                  description: Managed identity for this blueprint assignment.
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      description: Type of the managed identity.
+                      enum:
+                      - None
+                      - SystemAssigned
+                      - UserAssigned
+                      x-ms-enum:
+                        name: ManagedServiceIdentityType
+                        modelAsString: true
+                    principalId:
+                      type: string
+                      description: Azure Active Directory principal ID associated
+                        with this Identity.
+                    tenantId:
+                      type: string
+                      description: ID of the Azure Active Directory.
+                    userAssignedIdentities:
+                      type: object
+                      description: The list of user-assigned managed identities associated
+                        with the resource. Key is the Azure resource Id of the managed
+                        identity.
+                      additionalProperties:
+                        description: User-assigned managed identity.
+                        type: object
+                        properties:
+                          principalId:
+                            type: string
+                            description: Azure Active Directory principal ID associated
+                              with this Identity.
+                          clientId:
+                            type: string
+                            description: Client App Id associated with this identity.
+                  required:
+                  - type
+                properties:
+                  type: object
+                  properties:
+                    displayName:
+                      type: string
+                      description: One-liner string explain this resource.
+                      maxLength: 256
+                    description:
+                      type: string
+                      description: Multi-line explain this resource.
+                      maxLength: 500
+                    blueprintId:
+                      type: string
+                      description: ID of the published version of a blueprint definition.
+                    scope:
+                      type: string
+                      description: 'The target subscription scope of the blueprint
+                        assignment (format: ''/subscriptions/{subscriptionId}'').
+                        For management group level assignments, the property is required.'
+                    parameters:
+                      type: object
+                      description: Blueprint assignment parameter values.
+                      additionalProperties:
+                        description: Key/Value pair of parameter fulfillment.
+                        type: object
+                        properties:
+                          value:
+                            type: object
+                            description: Parameter value. Any valid JSON value is
+                              allowed including objects, arrays, strings, numbers
+                              and booleans.
+                          reference:
+                            type: object
+                            description: Parameter value as reference type.
+                            properties:
+                              keyVault:
+                                description: Specifies the reference to a given Azure
+                                  Key Vault.
+                                type: object
+                                properties:
+                                  id:
+                                    description: Azure resource ID of the Key Vault.
+                                    type: string
+                                required:
+                                - id
+                              secretName:
+                                description: Name of the secret.
+                                type: string
+                              secretVersion:
+                                description: The version of the secret to use. If
+                                  left blank, the latest version of the secret is
+                                  used.
+                                type: string
+                            required:
+                            - keyVault
+                            - secretName
+                    resourceGroups:
+                      description: Names and locations of resource group placeholders.
+                      type: object
+                      additionalProperties:
+                        description: Represents an Azure resource group.
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            description: Name of the resource group.
+                            minLength: 1
+                            maxLength: 90
+                          location:
+                            type: string
+                            description: Location of the resource group.
+                    status:
+                      type: object
+                      properties:
+                        timeCreated:
+                          type: string
+                          format: date-time
+                          readOnly: true
+                          description: Creation time of this blueprint definition.
+                        lastModified:
+                          type: string
+                          format: date-time
+                          readOnly: true
+                          description: Last modified time of this blueprint definition.
+                        managedResources:
+                          type: array
+                          description: List of resources that were created by the
+                            blueprint assignment.
+                          readOnly: true
+                          items:
+                            type: string
+                      description: Shared status properties between all blueprint
+                        resources.
+                      readOnly: true
+                    locks:
+                      description: Defines how resources deployed by a blueprint assignment
+                        are locked.
+                      type: object
+                      properties:
+                        mode:
+                          type: string
+                          description: Lock mode.
+                          enum:
+                          - None
+                          - AllResourcesReadOnly
+                          - AllResourcesDoNotDelete
+                          x-ms-enum:
+                            name: AssignmentLockMode
+                            modelAsString: true
+                        excludedPrincipals:
+                          type: array
+                          description: List of AAD principals excluded from blueprint
+                            locks. Up to 5 principals are permitted.
+                          items:
+                            type: string
+                        excludedActions:
+                          type: array
+                          description: "List\_of\_management\_operations\_that\_are\_\
+                            excluded\_from\_blueprint\_locks.\_Up\_to\_200\_actions\_\
+                            are\_permitted. If the lock mode is set to 'AllResourcesReadOnly',\
+                            \ then the following actions are automatically appended\
+                            \ to 'excludedActions': '*/read', 'Microsoft.Network/virtualNetworks/subnets/join/action'\
+                            \ and 'Microsoft.Authorization/locks/delete'. If the lock\
+                            \ mode is set to 'AllResourcesDoNotDelete', then the following\
+                            \ actions are automatically appended to 'excludedActions':\
+                            \ 'Microsoft.Authorization/locks/delete'. Duplicate actions\
+                            \ will get removed."
+                          items:
+                            type: string
+                    provisioningState:
+                      type: string
+                      readOnly: true
+                      description: State of the blueprint assignment.
+                      enum:
+                      - creating
+                      - validating
+                      - waiting
+                      - deploying
+                      - cancelling
+                      - locking
+                      - succeeded
+                      - failed
+                      - canceled
+                      - deleting
+                      x-ms-enum:
+                        name: AssignmentProvisioningState
+                        modelAsString: true
+                  description: Shared properties between all blueprint resources.
+                  x-ms-external: true
+                  required:
+                  - parameters
+                  - resourceGroups
+                  x-ms-client-flatten: true
+              required:
+              - location
+              - identity
+              - properties
+              description: Common properties for all Azure resources.
+              x-ms-azure-resource: true
+        description: Blueprint assignment object to save.
+        required: true
+      responses:
+        '201':
+          description: Created -- blueprint assignment saved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: String Id used to locate any resource on Azure.
+                  type:
+                    readOnly: true
+                    type: string
+                    description: Type of this resource.
+                  name:
+                    readOnly: true
+                    type: string
+                    description: Name of this resource.
+                  location:
+                    type: string
+                    description: The location of this blueprint assignment.
+                    x-ms-mutability:
+                    - read
+                    - create
+                  identity:
+                    description: Managed identity for this blueprint assignment.
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        description: Type of the managed identity.
+                        enum:
+                        - None
+                        - SystemAssigned
+                        - UserAssigned
+                        x-ms-enum:
+                          name: ManagedServiceIdentityType
+                          modelAsString: true
+                      principalId:
+                        type: string
+                        description: Azure Active Directory principal ID associated
+                          with this Identity.
+                      tenantId:
+                        type: string
+                        description: ID of the Azure Active Directory.
+                      userAssignedIdentities:
+                        type: object
+                        description: The list of user-assigned managed identities
+                          associated with the resource. Key is the Azure resource
+                          Id of the managed identity.
+                        additionalProperties:
+                          description: User-assigned managed identity.
+                          type: object
+                          properties:
+                            principalId:
+                              type: string
+                              description: Azure Active Directory principal ID associated
+                                with this Identity.
+                            clientId:
+                              type: string
+                              description: Client App Id associated with this identity.
+                    required:
+                    - type
+                  properties:
+                    type: object
+                    properties:
+                      displayName:
+                        type: string
+                        description: One-liner string explain this resource.
+                        maxLength: 256
+                      description:
+                        type: string
+                        description: Multi-line explain this resource.
+                        maxLength: 500
+                      blueprintId:
+                        type: string
+                        description: ID of the published version of a blueprint definition.
+                      scope:
+                        type: string
+                        description: 'The target subscription scope of the blueprint
+                          assignment (format: ''/subscriptions/{subscriptionId}'').
+                          For management group level assignments, the property is
+                          required.'
+                      parameters:
+                        type: object
+                        description: Blueprint assignment parameter values.
+                        additionalProperties:
+                          description: Key/Value pair of parameter fulfillment.
+                          type: object
+                          properties:
+                            value:
+                              type: object
+                              description: Parameter value. Any valid JSON value is
+                                allowed including objects, arrays, strings, numbers
+                                and booleans.
+                            reference:
+                              type: object
+                              description: Parameter value as reference type.
+                              properties:
+                                keyVault:
+                                  description: Specifies the reference to a given
+                                    Azure Key Vault.
+                                  type: object
+                                  properties:
+                                    id:
+                                      description: Azure resource ID of the Key Vault.
+                                      type: string
+                                  required:
+                                  - id
+                                secretName:
+                                  description: Name of the secret.
+                                  type: string
+                                secretVersion:
+                                  description: The version of the secret to use. If
+                                    left blank, the latest version of the secret is
+                                    used.
+                                  type: string
+                              required:
+                              - keyVault
+                              - secretName
+                      resourceGroups:
+                        description: Names and locations of resource group placeholders.
+                        type: object
+                        additionalProperties:
+                          description: Represents an Azure resource group.
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: Name of the resource group.
+                              minLength: 1
+                              maxLength: 90
+                            location:
+                              type: string
+                              description: Location of the resource group.
+                      status:
+                        type: object
+                        properties:
+                          timeCreated:
+                            type: string
+                            format: date-time
+                            readOnly: true
+                            description: Creation time of this blueprint definition.
+                          lastModified:
+                            type: string
+                            format: date-time
+                            readOnly: true
+                            description: Last modified time of this blueprint definition.
+                          managedResources:
+                            type: array
+                            description: List of resources that were created by the
+                              blueprint assignment.
+                            readOnly: true
+                            items:
+                              type: string
+                        description: Shared status properties between all blueprint
+                          resources.
+                        readOnly: true
+                      locks:
+                        description: Defines how resources deployed by a blueprint
+                          assignment are locked.
+                        type: object
+                        properties:
+                          mode:
+                            type: string
+                            description: Lock mode.
+                            enum:
+                            - None
+                            - AllResourcesReadOnly
+                            - AllResourcesDoNotDelete
+                            x-ms-enum:
+                              name: AssignmentLockMode
+                              modelAsString: true
+                          excludedPrincipals:
+                            type: array
+                            description: List of AAD principals excluded from blueprint
+                              locks. Up to 5 principals are permitted.
+                            items:
+                              type: string
+                          excludedActions:
+                            type: array
+                            description: "List\_of\_management\_operations\_that\_\
+                              are\_excluded\_from\_blueprint\_locks.\_Up\_to\_200\_\
+                              actions\_are\_permitted. If the lock mode is set to\
+                              \ 'AllResourcesReadOnly', then the following actions\
+                              \ are automatically appended to 'excludedActions': '*/read',\
+                              \ 'Microsoft.Network/virtualNetworks/subnets/join/action'\
+                              \ and 'Microsoft.Authorization/locks/delete'. If the\
+                              \ lock mode is set to 'AllResourcesDoNotDelete', then\
+                              \ the following actions are automatically appended to\
+                              \ 'excludedActions': 'Microsoft.Authorization/locks/delete'.\
+                              \ Duplicate actions will get removed."
+                            items:
+                              type: string
+                      provisioningState:
+                        type: string
+                        readOnly: true
+                        description: State of the blueprint assignment.
+                        enum:
+                        - creating
+                        - validating
+                        - waiting
+                        - deploying
+                        - cancelling
+                        - locking
+                        - succeeded
+                        - failed
+                        - canceled
+                        - deleting
+                        x-ms-enum:
+                          name: AssignmentProvisioningState
+                          modelAsString: true
+                    description: Shared properties between all blueprint resources.
+                    x-ms-external: true
+                    required:
+                    - parameters
+                    - resourceGroups
+                    x-ms-client-flatten: true
+                required:
+                - location
+                - identity
+                - properties
+                description: Common properties for all Azure resources.
+                x-ms-azure-resource: true
+        default:
+          description: Blueprints error response.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    title: Error Response
+                    description: Common error response for all Azure Resource Manager
+                      APIs to return error details for failed operations. (This also
+                      follows the OData error response format.)
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          title: Error Response
+                          description: Common error response for all Azure Resource
+                            Manager APIs to return error details for failed operations.
+                            (This also follows the OData error response format.)
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                title: Error Response
+                                description: Common error response for all Azure Resource
+                                  Manager APIs to return error details for failed
+                                  operations. (This also follows the OData error response
+                                  format.)
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+    get:
+      tags:
+      - Assignment
+      operationId: Assignments_Get
+      description: Get a blueprint assignment.
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        description: Client API Version.
+        schema:
+          type: string
+      - name: resourceScope
+        in: path
+        required: true
+        description: 'The scope of the resource. Valid scopes are: management group
+          (format: ''/providers/Microsoft.Management/managementGroups/{managementGroup}''),
+          subscription (format: ''/subscriptions/{subscriptionId}'').'
+        x-ms-parameter-location: method
+        x-ms-skip-url-encoding: true
+        schema:
+          type: string
+      - name: assignmentName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Name of the blueprint assignment.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK -- blueprint assignment retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: String Id used to locate any resource on Azure.
+                  type:
+                    readOnly: true
+                    type: string
+                    description: Type of this resource.
+                  name:
+                    readOnly: true
+                    type: string
+                    description: Name of this resource.
+                  location:
+                    type: string
+                    description: The location of this blueprint assignment.
+                    x-ms-mutability:
+                    - read
+                    - create
+                  identity:
+                    description: Managed identity for this blueprint assignment.
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        description: Type of the managed identity.
+                        enum:
+                        - None
+                        - SystemAssigned
+                        - UserAssigned
+                        x-ms-enum:
+                          name: ManagedServiceIdentityType
+                          modelAsString: true
+                      principalId:
+                        type: string
+                        description: Azure Active Directory principal ID associated
+                          with this Identity.
+                      tenantId:
+                        type: string
+                        description: ID of the Azure Active Directory.
+                      userAssignedIdentities:
+                        type: object
+                        description: The list of user-assigned managed identities
+                          associated with the resource. Key is the Azure resource
+                          Id of the managed identity.
+                        additionalProperties:
+                          description: User-assigned managed identity.
+                          type: object
+                          properties:
+                            principalId:
+                              type: string
+                              description: Azure Active Directory principal ID associated
+                                with this Identity.
+                            clientId:
+                              type: string
+                              description: Client App Id associated with this identity.
+                    required:
+                    - type
+                  properties:
+                    type: object
+                    properties:
+                      displayName:
+                        type: string
+                        description: One-liner string explain this resource.
+                        maxLength: 256
+                      description:
+                        type: string
+                        description: Multi-line explain this resource.
+                        maxLength: 500
+                      blueprintId:
+                        type: string
+                        description: ID of the published version of a blueprint definition.
+                      scope:
+                        type: string
+                        description: 'The target subscription scope of the blueprint
+                          assignment (format: ''/subscriptions/{subscriptionId}'').
+                          For management group level assignments, the property is
+                          required.'
+                      parameters:
+                        type: object
+                        description: Blueprint assignment parameter values.
+                        additionalProperties:
+                          description: Key/Value pair of parameter fulfillment.
+                          type: object
+                          properties:
+                            value:
+                              type: object
+                              description: Parameter value. Any valid JSON value is
+                                allowed including objects, arrays, strings, numbers
+                                and booleans.
+                            reference:
+                              type: object
+                              description: Parameter value as reference type.
+                              properties:
+                                keyVault:
+                                  description: Specifies the reference to a given
+                                    Azure Key Vault.
+                                  type: object
+                                  properties:
+                                    id:
+                                      description: Azure resource ID of the Key Vault.
+                                      type: string
+                                  required:
+                                  - id
+                                secretName:
+                                  description: Name of the secret.
+                                  type: string
+                                secretVersion:
+                                  description: The version of the secret to use. If
+                                    left blank, the latest version of the secret is
+                                    used.
+                                  type: string
+                              required:
+                              - keyVault
+                              - secretName
+                      resourceGroups:
+                        description: Names and locations of resource group placeholders.
+                        type: object
+                        additionalProperties:
+                          description: Represents an Azure resource group.
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: Name of the resource group.
+                              minLength: 1
+                              maxLength: 90
+                            location:
+                              type: string
+                              description: Location of the resource group.
+                      status:
+                        type: object
+                        properties:
+                          timeCreated:
+                            type: string
+                            format: date-time
+                            readOnly: true
+                            description: Creation time of this blueprint definition.
+                          lastModified:
+                            type: string
+                            format: date-time
+                            readOnly: true
+                            description: Last modified time of this blueprint definition.
+                          managedResources:
+                            type: array
+                            description: List of resources that were created by the
+                              blueprint assignment.
+                            readOnly: true
+                            items:
+                              type: string
+                        description: Shared status properties between all blueprint
+                          resources.
+                        readOnly: true
+                      locks:
+                        description: Defines how resources deployed by a blueprint
+                          assignment are locked.
+                        type: object
+                        properties:
+                          mode:
+                            type: string
+                            description: Lock mode.
+                            enum:
+                            - None
+                            - AllResourcesReadOnly
+                            - AllResourcesDoNotDelete
+                            x-ms-enum:
+                              name: AssignmentLockMode
+                              modelAsString: true
+                          excludedPrincipals:
+                            type: array
+                            description: List of AAD principals excluded from blueprint
+                              locks. Up to 5 principals are permitted.
+                            items:
+                              type: string
+                          excludedActions:
+                            type: array
+                            description: "List\_of\_management\_operations\_that\_\
+                              are\_excluded\_from\_blueprint\_locks.\_Up\_to\_200\_\
+                              actions\_are\_permitted. If the lock mode is set to\
+                              \ 'AllResourcesReadOnly', then the following actions\
+                              \ are automatically appended to 'excludedActions': '*/read',\
+                              \ 'Microsoft.Network/virtualNetworks/subnets/join/action'\
+                              \ and 'Microsoft.Authorization/locks/delete'. If the\
+                              \ lock mode is set to 'AllResourcesDoNotDelete', then\
+                              \ the following actions are automatically appended to\
+                              \ 'excludedActions': 'Microsoft.Authorization/locks/delete'.\
+                              \ Duplicate actions will get removed."
+                            items:
+                              type: string
+                      provisioningState:
+                        type: string
+                        readOnly: true
+                        description: State of the blueprint assignment.
+                        enum:
+                        - creating
+                        - validating
+                        - waiting
+                        - deploying
+                        - cancelling
+                        - locking
+                        - succeeded
+                        - failed
+                        - canceled
+                        - deleting
+                        x-ms-enum:
+                          name: AssignmentProvisioningState
+                          modelAsString: true
+                    description: Shared properties between all blueprint resources.
+                    x-ms-external: true
+                    required:
+                    - parameters
+                    - resourceGroups
+                    x-ms-client-flatten: true
+                required:
+                - location
+                - identity
+                - properties
+                description: Common properties for all Azure resources.
+                x-ms-azure-resource: true
+        default:
+          description: Blueprints error response.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    title: Error Response
+                    description: Common error response for all Azure Resource Manager
+                      APIs to return error details for failed operations. (This also
+                      follows the OData error response format.)
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          title: Error Response
+                          description: Common error response for all Azure Resource
+                            Manager APIs to return error details for failed operations.
+                            (This also follows the OData error response format.)
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                title: Error Response
+                                description: Common error response for all Azure Resource
+                                  Manager APIs to return error details for failed
+                                  operations. (This also follows the OData error response
+                                  format.)
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+    delete:
+      tags:
+      - Assignment
+      operationId: Assignments_Delete
+      description: Delete a blueprint assignment.
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        description: Client API Version.
+        schema:
+          type: string
+      - name: resourceScope
+        in: path
+        required: true
+        description: 'The scope of the resource. Valid scopes are: management group
+          (format: ''/providers/Microsoft.Management/managementGroups/{managementGroup}''),
+          subscription (format: ''/subscriptions/{subscriptionId}'').'
+        x-ms-parameter-location: method
+        x-ms-skip-url-encoding: true
+        schema:
+          type: string
+      - name: assignmentName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Name of the blueprint assignment.
+        schema:
+          type: string
+      - name: deleteBehavior
+        in: query
+        required: false
+        x-ms-enum:
+          name: AssignmentDeleteBehavior
+          modelAsString: true
+        description: When deleteBehavior=all, the resources that were created by the
+          blueprint assignment will be deleted.
+        schema:
+          type: string
+          enum:
+          - none
+          - all
+      responses:
+        '202':
+          description: OK -- blueprint assignment deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: String Id used to locate any resource on Azure.
+                  type:
+                    readOnly: true
+                    type: string
+                    description: Type of this resource.
+                  name:
+                    readOnly: true
+                    type: string
+                    description: Name of this resource.
+                  location:
+                    type: string
+                    description: The location of this blueprint assignment.
+                    x-ms-mutability:
+                    - read
+                    - create
+                  identity:
+                    description: Managed identity for this blueprint assignment.
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        description: Type of the managed identity.
+                        enum:
+                        - None
+                        - SystemAssigned
+                        - UserAssigned
+                        x-ms-enum:
+                          name: ManagedServiceIdentityType
+                          modelAsString: true
+                      principalId:
+                        type: string
+                        description: Azure Active Directory principal ID associated
+                          with this Identity.
+                      tenantId:
+                        type: string
+                        description: ID of the Azure Active Directory.
+                      userAssignedIdentities:
+                        type: object
+                        description: The list of user-assigned managed identities
+                          associated with the resource. Key is the Azure resource
+                          Id of the managed identity.
+                        additionalProperties:
+                          description: User-assigned managed identity.
+                          type: object
+                          properties:
+                            principalId:
+                              type: string
+                              description: Azure Active Directory principal ID associated
+                                with this Identity.
+                            clientId:
+                              type: string
+                              description: Client App Id associated with this identity.
+                    required:
+                    - type
+                  properties:
+                    type: object
+                    properties:
+                      displayName:
+                        type: string
+                        description: One-liner string explain this resource.
+                        maxLength: 256
+                      description:
+                        type: string
+                        description: Multi-line explain this resource.
+                        maxLength: 500
+                      blueprintId:
+                        type: string
+                        description: ID of the published version of a blueprint definition.
+                      scope:
+                        type: string
+                        description: 'The target subscription scope of the blueprint
+                          assignment (format: ''/subscriptions/{subscriptionId}'').
+                          For management group level assignments, the property is
+                          required.'
+                      parameters:
+                        type: object
+                        description: Blueprint assignment parameter values.
+                        additionalProperties:
+                          description: Key/Value pair of parameter fulfillment.
+                          type: object
+                          properties:
+                            value:
+                              type: object
+                              description: Parameter value. Any valid JSON value is
+                                allowed including objects, arrays, strings, numbers
+                                and booleans.
+                            reference:
+                              type: object
+                              description: Parameter value as reference type.
+                              properties:
+                                keyVault:
+                                  description: Specifies the reference to a given
+                                    Azure Key Vault.
+                                  type: object
+                                  properties:
+                                    id:
+                                      description: Azure resource ID of the Key Vault.
+                                      type: string
+                                  required:
+                                  - id
+                                secretName:
+                                  description: Name of the secret.
+                                  type: string
+                                secretVersion:
+                                  description: The version of the secret to use. If
+                                    left blank, the latest version of the secret is
+                                    used.
+                                  type: string
+                              required:
+                              - keyVault
+                              - secretName
+                      resourceGroups:
+                        description: Names and locations of resource group placeholders.
+                        type: object
+                        additionalProperties:
+                          description: Represents an Azure resource group.
+                          type: object
+                          properties:
+                            name:
+                              type: string
+                              description: Name of the resource group.
+                              minLength: 1
+                              maxLength: 90
+                            location:
+                              type: string
+                              description: Location of the resource group.
+                      status:
+                        type: object
+                        properties:
+                          timeCreated:
+                            type: string
+                            format: date-time
+                            readOnly: true
+                            description: Creation time of this blueprint definition.
+                          lastModified:
+                            type: string
+                            format: date-time
+                            readOnly: true
+                            description: Last modified time of this blueprint definition.
+                          managedResources:
+                            type: array
+                            description: List of resources that were created by the
+                              blueprint assignment.
+                            readOnly: true
+                            items:
+                              type: string
+                        description: Shared status properties between all blueprint
+                          resources.
+                        readOnly: true
+                      locks:
+                        description: Defines how resources deployed by a blueprint
+                          assignment are locked.
+                        type: object
+                        properties:
+                          mode:
+                            type: string
+                            description: Lock mode.
+                            enum:
+                            - None
+                            - AllResourcesReadOnly
+                            - AllResourcesDoNotDelete
+                            x-ms-enum:
+                              name: AssignmentLockMode
+                              modelAsString: true
+                          excludedPrincipals:
+                            type: array
+                            description: List of AAD principals excluded from blueprint
+                              locks. Up to 5 principals are permitted.
+                            items:
+                              type: string
+                          excludedActions:
+                            type: array
+                            description: "List\_of\_management\_operations\_that\_\
+                              are\_excluded\_from\_blueprint\_locks.\_Up\_to\_200\_\
+                              actions\_are\_permitted. If the lock mode is set to\
+                              \ 'AllResourcesReadOnly', then the following actions\
+                              \ are automatically appended to 'excludedActions': '*/read',\
+                              \ 'Microsoft.Network/virtualNetworks/subnets/join/action'\
+                              \ and 'Microsoft.Authorization/locks/delete'. If the\
+                              \ lock mode is set to 'AllResourcesDoNotDelete', then\
+                              \ the following actions are automatically appended to\
+                              \ 'excludedActions': 'Microsoft.Authorization/locks/delete'.\
+                              \ Duplicate actions will get removed."
+                            items:
+                              type: string
+                      provisioningState:
+                        type: string
+                        readOnly: true
+                        description: State of the blueprint assignment.
+                        enum:
+                        - creating
+                        - validating
+                        - waiting
+                        - deploying
+                        - cancelling
+                        - locking
+                        - succeeded
+                        - failed
+                        - canceled
+                        - deleting
+                        x-ms-enum:
+                          name: AssignmentProvisioningState
+                          modelAsString: true
+                    description: Shared properties between all blueprint resources.
+                    x-ms-external: true
+                    required:
+                    - parameters
+                    - resourceGroups
+                    x-ms-client-flatten: true
+                required:
+                - location
+                - identity
+                - properties
+                description: Common properties for all Azure resources.
+                x-ms-azure-resource: true
+        '204':
+          description: No Content
+        default:
+          description: Blueprints error response.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    title: Error Response
+                    description: Common error response for all Azure Resource Manager
+                      APIs to return error details for failed operations. (This also
+                      follows the OData error response format.)
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          title: Error Response
+                          description: Common error response for all Azure Resource
+                            Manager APIs to return error details for failed operations.
+                            (This also follows the OData error response format.)
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                title: Error Response
+                                description: Common error response for all Azure Resource
+                                  Manager APIs to return error details for failed
+                                  operations. (This also follows the OData error response
+                                  format.)
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+  /{resourceScope}/providers/Microsoft.Blueprint/blueprintAssignments/{assignmentName}/whoIsBlueprint:
+    post:
+      operationId: Assignments_WhoIsBlueprint
+      description: Get Blueprints service SPN objectId
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        description: Client API Version.
+        schema:
+          type: string
+      - name: resourceScope
+        in: path
+        required: true
+        description: 'The scope of the resource. Valid scopes are: management group
+          (format: ''/providers/Microsoft.Management/managementGroups/{managementGroup}''),
+          subscription (format: ''/subscriptions/{subscriptionId}'').'
+        x-ms-parameter-location: method
+        x-ms-skip-url-encoding: true
+        schema:
+          type: string
+      - name: assignmentName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Name of the blueprint assignment.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Blueprints service SPN objectId
+          content:
+            application/json:
+              schema:
+                description: Response schema for querying the Azure Blueprints service
+                  principal in the tenant.
+                properties:
+                  objectId:
+                    type: string
+                    description: AAD object Id of the Azure Blueprints service principal
+                      in the tenant.
+        default:
+          description: Blueprints error response.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    title: Error Response
+                    description: Common error response for all Azure Resource Manager
+                      APIs to return error details for failed operations. (This also
+                      follows the OData error response format.)
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          title: Error Response
+                          description: Common error response for all Azure Resource
+                            Manager APIs to return error details for failed operations.
+                            (This also follows the OData error response format.)
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                title: Error Response
+                                description: Common error response for all Azure Resource
+                                  Manager APIs to return error details for failed
+                                  operations. (This also follows the OData error response
+                                  format.)
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+  /{resourceScope}/providers/Microsoft.Blueprint/blueprintAssignments:
+    get:
+      tags:
+      - Assignment
+      operationId: Assignments_List
+      description: List blueprint assignments within a subscription or a management
+        group.
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        description: Client API Version.
+        schema:
+          type: string
+      - name: resourceScope
+        in: path
+        required: true
+        description: 'The scope of the resource. Valid scopes are: management group
+          (format: ''/providers/Microsoft.Management/managementGroups/{managementGroup}''),
+          subscription (format: ''/subscriptions/{subscriptionId}'').'
+        x-ms-parameter-location: method
+        x-ms-skip-url-encoding: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK -- all blueprint assignments retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of blueprint assignments
+                properties:
+                  value:
+                    type: array
+                    description: List of blueprint assignments.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: String Id used to locate any resource on Azure.
+                        type:
+                          readOnly: true
+                          type: string
+                          description: Type of this resource.
+                        name:
+                          readOnly: true
+                          type: string
+                          description: Name of this resource.
+                        location:
+                          type: string
+                          description: The location of this blueprint assignment.
+                          x-ms-mutability:
+                          - read
+                          - create
+                        identity:
+                          description: Managed identity for this blueprint assignment.
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              description: Type of the managed identity.
+                              enum:
+                              - None
+                              - SystemAssigned
+                              - UserAssigned
+                              x-ms-enum:
+                                name: ManagedServiceIdentityType
+                                modelAsString: true
+                            principalId:
+                              type: string
+                              description: Azure Active Directory principal ID associated
+                                with this Identity.
+                            tenantId:
+                              type: string
+                              description: ID of the Azure Active Directory.
+                            userAssignedIdentities:
+                              type: object
+                              description: The list of user-assigned managed identities
+                                associated with the resource. Key is the Azure resource
+                                Id of the managed identity.
+                              additionalProperties:
+                                description: User-assigned managed identity.
+                                type: object
+                                properties:
+                                  principalId:
+                                    type: string
+                                    description: Azure Active Directory principal
+                                      ID associated with this Identity.
+                                  clientId:
+                                    type: string
+                                    description: Client App Id associated with this
+                                      identity.
+                          required:
+                          - type
+                        properties:
+                          type: object
+                          properties:
+                            displayName:
+                              type: string
+                              description: One-liner string explain this resource.
+                              maxLength: 256
+                            description:
+                              type: string
+                              description: Multi-line explain this resource.
+                              maxLength: 500
+                            blueprintId:
+                              type: string
+                              description: ID of the published version of a blueprint
+                                definition.
+                            scope:
+                              type: string
+                              description: 'The target subscription scope of the blueprint
+                                assignment (format: ''/subscriptions/{subscriptionId}'').
+                                For management group level assignments, the property
+                                is required.'
+                            parameters:
+                              type: object
+                              description: Blueprint assignment parameter values.
+                              additionalProperties:
+                                description: Key/Value pair of parameter fulfillment.
+                                type: object
+                                properties:
+                                  value:
+                                    type: object
+                                    description: Parameter value. Any valid JSON value
+                                      is allowed including objects, arrays, strings,
+                                      numbers and booleans.
+                                  reference:
+                                    type: object
+                                    description: Parameter value as reference type.
+                                    properties:
+                                      keyVault:
+                                        description: Specifies the reference to a
+                                          given Azure Key Vault.
+                                        type: object
+                                        properties:
+                                          id:
+                                            description: Azure resource ID of the
+                                              Key Vault.
+                                            type: string
+                                        required:
+                                        - id
+                                      secretName:
+                                        description: Name of the secret.
+                                        type: string
+                                      secretVersion:
+                                        description: The version of the secret to
+                                          use. If left blank, the latest version of
+                                          the secret is used.
+                                        type: string
+                                    required:
+                                    - keyVault
+                                    - secretName
+                            resourceGroups:
+                              description: Names and locations of resource group placeholders.
+                              type: object
+                              additionalProperties:
+                                description: Represents an Azure resource group.
+                                type: object
+                                properties:
+                                  name:
+                                    type: string
+                                    description: Name of the resource group.
+                                    minLength: 1
+                                    maxLength: 90
+                                  location:
+                                    type: string
+                                    description: Location of the resource group.
+                            status:
+                              type: object
+                              properties:
+                                timeCreated:
+                                  type: string
+                                  format: date-time
+                                  readOnly: true
+                                  description: Creation time of this blueprint definition.
+                                lastModified:
+                                  type: string
+                                  format: date-time
+                                  readOnly: true
+                                  description: Last modified time of this blueprint
+                                    definition.
+                                managedResources:
+                                  type: array
+                                  description: List of resources that were created
+                                    by the blueprint assignment.
+                                  readOnly: true
+                                  items:
+                                    type: string
+                              description: Shared status properties between all blueprint
+                                resources.
+                              readOnly: true
+                            locks:
+                              description: Defines how resources deployed by a blueprint
+                                assignment are locked.
+                              type: object
+                              properties:
+                                mode:
+                                  type: string
+                                  description: Lock mode.
+                                  enum:
+                                  - None
+                                  - AllResourcesReadOnly
+                                  - AllResourcesDoNotDelete
+                                  x-ms-enum:
+                                    name: AssignmentLockMode
+                                    modelAsString: true
+                                excludedPrincipals:
+                                  type: array
+                                  description: List of AAD principals excluded from
+                                    blueprint locks. Up to 5 principals are permitted.
+                                  items:
+                                    type: string
+                                excludedActions:
+                                  type: array
+                                  description: "List\_of\_management\_operations\_\
+                                    that\_are\_excluded\_from\_blueprint\_locks.\_\
+                                    Up\_to\_200\_actions\_are\_permitted. If the lock\
+                                    \ mode is set to 'AllResourcesReadOnly', then\
+                                    \ the following actions are automatically appended\
+                                    \ to 'excludedActions': '*/read', 'Microsoft.Network/virtualNetworks/subnets/join/action'\
+                                    \ and 'Microsoft.Authorization/locks/delete'.\
+                                    \ If the lock mode is set to 'AllResourcesDoNotDelete',\
+                                    \ then the following actions are automatically\
+                                    \ appended to 'excludedActions': 'Microsoft.Authorization/locks/delete'.\
+                                    \ Duplicate actions will get removed."
+                                  items:
+                                    type: string
+                            provisioningState:
+                              type: string
+                              readOnly: true
+                              description: State of the blueprint assignment.
+                              enum:
+                              - creating
+                              - validating
+                              - waiting
+                              - deploying
+                              - cancelling
+                              - locking
+                              - succeeded
+                              - failed
+                              - canceled
+                              - deleting
+                              x-ms-enum:
+                                name: AssignmentProvisioningState
+                                modelAsString: true
+                          description: Shared properties between all blueprint resources.
+                          x-ms-external: true
+                          required:
+                          - parameters
+                          - resourceGroups
+                          x-ms-client-flatten: true
+                      required:
+                      - location
+                      - identity
+                      - properties
+                      description: Common properties for all Azure resources.
+                      x-ms-azure-resource: true
+                  nextLink:
+                    type: string
+                    readOnly: true
+                    description: Link to the next page of results.
+        default:
+          description: Blueprints error response.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    title: Error Response
+                    description: Common error response for all Azure Resource Manager
+                      APIs to return error details for failed operations. (This also
+                      follows the OData error response format.)
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          title: Error Response
+                          description: Common error response for all Azure Resource
+                            Manager APIs to return error details for failed operations.
+                            (This also follows the OData error response format.)
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                title: Error Response
+                                description: Common error response for all Azure Resource
+                                  Manager APIs to return error details for failed
+                                  operations. (This also follows the OData error response
+                                  format.)
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-pageable:
+        nextLinkName: nextLink
+components:
+  parameters:
+    ScopeParameter:
+      name: resourceScope
+      in: path
+      required: true
+      description: 'The scope of the resource. Valid scopes are: management group
+        (format: ''/providers/Microsoft.Management/managementGroups/{managementGroup}''),
+        subscription (format: ''/subscriptions/{subscriptionId}'').'
+      x-ms-parameter-location: method
+      x-ms-skip-url-encoding: true
+      schema:
+        type: string
+    AssignmentNameParameter:
+      name: assignmentName
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      description: Name of the blueprint assignment.
+      schema:
+        type: string
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      x-ms-parameter-location: client
+      description: Client API Version.
+      schema:
+        type: string
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    Assignment:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: String Id used to locate any resource on Azure.
+        type:
+          readOnly: true
+          type: string
+          description: Type of this resource.
+        name:
+          readOnly: true
+          type: string
+          description: Name of this resource.
+        location:
+          type: string
+          description: The location of this blueprint assignment.
+          x-ms-mutability:
+          - read
+          - create
+        identity:
+          description: Managed identity for this blueprint assignment.
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of the managed identity.
+              enum:
+              - None
+              - SystemAssigned
+              - UserAssigned
+              x-ms-enum:
+                name: ManagedServiceIdentityType
+                modelAsString: true
+            principalId:
+              type: string
+              description: Azure Active Directory principal ID associated with this
+                Identity.
+            tenantId:
+              type: string
+              description: ID of the Azure Active Directory.
+            userAssignedIdentities:
+              type: object
+              description: The list of user-assigned managed identities associated
+                with the resource. Key is the Azure resource Id of the managed identity.
+              additionalProperties:
+                description: User-assigned managed identity.
+                type: object
+                properties:
+                  principalId:
+                    type: string
+                    description: Azure Active Directory principal ID associated with
+                      this Identity.
+                  clientId:
+                    type: string
+                    description: Client App Id associated with this identity.
+          required:
+          - type
+        properties:
+          type: object
+          properties:
+            displayName:
+              type: string
+              description: One-liner string explain this resource.
+              maxLength: 256
+            description:
+              type: string
+              description: Multi-line explain this resource.
+              maxLength: 500
+            blueprintId:
+              type: string
+              description: ID of the published version of a blueprint definition.
+            scope:
+              type: string
+              description: 'The target subscription scope of the blueprint assignment
+                (format: ''/subscriptions/{subscriptionId}''). For management group
+                level assignments, the property is required.'
+            parameters:
+              type: object
+              description: Blueprint assignment parameter values.
+              additionalProperties:
+                description: Key/Value pair of parameter fulfillment.
+                type: object
+                properties:
+                  value:
+                    type: object
+                    description: Parameter value. Any valid JSON value is allowed
+                      including objects, arrays, strings, numbers and booleans.
+                  reference:
+                    type: object
+                    description: Parameter value as reference type.
+                    properties:
+                      keyVault:
+                        description: Specifies the reference to a given Azure Key
+                          Vault.
+                        type: object
+                        properties:
+                          id:
+                            description: Azure resource ID of the Key Vault.
+                            type: string
+                        required:
+                        - id
+                      secretName:
+                        description: Name of the secret.
+                        type: string
+                      secretVersion:
+                        description: The version of the secret to use. If left blank,
+                          the latest version of the secret is used.
+                        type: string
+                    required:
+                    - keyVault
+                    - secretName
+            resourceGroups:
+              description: Names and locations of resource group placeholders.
+              type: object
+              additionalProperties:
+                description: Represents an Azure resource group.
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: Name of the resource group.
+                    minLength: 1
+                    maxLength: 90
+                  location:
+                    type: string
+                    description: Location of the resource group.
+            status:
+              type: object
+              properties:
+                timeCreated:
+                  type: string
+                  format: date-time
+                  readOnly: true
+                  description: Creation time of this blueprint definition.
+                lastModified:
+                  type: string
+                  format: date-time
+                  readOnly: true
+                  description: Last modified time of this blueprint definition.
+                managedResources:
+                  type: array
+                  description: List of resources that were created by the blueprint
+                    assignment.
+                  readOnly: true
+                  items:
+                    type: string
+              description: Shared status properties between all blueprint resources.
+              readOnly: true
+            locks:
+              description: Defines how resources deployed by a blueprint assignment
+                are locked.
+              type: object
+              properties:
+                mode:
+                  type: string
+                  description: Lock mode.
+                  enum:
+                  - None
+                  - AllResourcesReadOnly
+                  - AllResourcesDoNotDelete
+                  x-ms-enum:
+                    name: AssignmentLockMode
+                    modelAsString: true
+                excludedPrincipals:
+                  type: array
+                  description: List of AAD principals excluded from blueprint locks.
+                    Up to 5 principals are permitted.
+                  items:
+                    type: string
+                excludedActions:
+                  type: array
+                  description: "List\_of\_management\_operations\_that\_are\_excluded\_\
+                    from\_blueprint\_locks.\_Up\_to\_200\_actions\_are\_permitted.\
+                    \ If the lock mode is set to 'AllResourcesReadOnly', then the\
+                    \ following actions are automatically appended to 'excludedActions':\
+                    \ '*/read', 'Microsoft.Network/virtualNetworks/subnets/join/action'\
+                    \ and 'Microsoft.Authorization/locks/delete'. If the lock mode\
+                    \ is set to 'AllResourcesDoNotDelete', then the following actions\
+                    \ are automatically appended to 'excludedActions': 'Microsoft.Authorization/locks/delete'.\
+                    \ Duplicate actions will get removed."
+                  items:
+                    type: string
+            provisioningState:
+              type: string
+              readOnly: true
+              description: State of the blueprint assignment.
+              enum:
+              - creating
+              - validating
+              - waiting
+              - deploying
+              - cancelling
+              - locking
+              - succeeded
+              - failed
+              - canceled
+              - deleting
+              x-ms-enum:
+                name: AssignmentProvisioningState
+                modelAsString: true
+          description: Shared properties between all blueprint resources.
+          x-ms-external: true
+          required:
+          - parameters
+          - resourceGroups
+          x-ms-client-flatten: true
+      required:
+      - location
+      - identity
+      - properties
+      description: Common properties for all Azure resources.
+      x-ms-azure-resource: true
+    AssignmentList:
+      type: object
+      description: List of blueprint assignments
+      properties:
+        value:
+          type: array
+          description: List of blueprint assignments.
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: String Id used to locate any resource on Azure.
+              type:
+                readOnly: true
+                type: string
+                description: Type of this resource.
+              name:
+                readOnly: true
+                type: string
+                description: Name of this resource.
+              location:
+                type: string
+                description: The location of this blueprint assignment.
+                x-ms-mutability:
+                - read
+                - create
+              identity:
+                description: Managed identity for this blueprint assignment.
+                type: object
+                properties:
+                  type:
+                    type: string
+                    description: Type of the managed identity.
+                    enum:
+                    - None
+                    - SystemAssigned
+                    - UserAssigned
+                    x-ms-enum:
+                      name: ManagedServiceIdentityType
+                      modelAsString: true
+                  principalId:
+                    type: string
+                    description: Azure Active Directory principal ID associated with
+                      this Identity.
+                  tenantId:
+                    type: string
+                    description: ID of the Azure Active Directory.
+                  userAssignedIdentities:
+                    type: object
+                    description: The list of user-assigned managed identities associated
+                      with the resource. Key is the Azure resource Id of the managed
+                      identity.
+                    additionalProperties:
+                      description: User-assigned managed identity.
+                      type: object
+                      properties:
+                        principalId:
+                          type: string
+                          description: Azure Active Directory principal ID associated
+                            with this Identity.
+                        clientId:
+                          type: string
+                          description: Client App Id associated with this identity.
+                required:
+                - type
+              properties:
+                type: object
+                properties:
+                  displayName:
+                    type: string
+                    description: One-liner string explain this resource.
+                    maxLength: 256
+                  description:
+                    type: string
+                    description: Multi-line explain this resource.
+                    maxLength: 500
+                  blueprintId:
+                    type: string
+                    description: ID of the published version of a blueprint definition.
+                  scope:
+                    type: string
+                    description: 'The target subscription scope of the blueprint assignment
+                      (format: ''/subscriptions/{subscriptionId}''). For management
+                      group level assignments, the property is required.'
+                  parameters:
+                    type: object
+                    description: Blueprint assignment parameter values.
+                    additionalProperties:
+                      description: Key/Value pair of parameter fulfillment.
+                      type: object
+                      properties:
+                        value:
+                          type: object
+                          description: Parameter value. Any valid JSON value is allowed
+                            including objects, arrays, strings, numbers and booleans.
+                        reference:
+                          type: object
+                          description: Parameter value as reference type.
+                          properties:
+                            keyVault:
+                              description: Specifies the reference to a given Azure
+                                Key Vault.
+                              type: object
+                              properties:
+                                id:
+                                  description: Azure resource ID of the Key Vault.
+                                  type: string
+                              required:
+                              - id
+                            secretName:
+                              description: Name of the secret.
+                              type: string
+                            secretVersion:
+                              description: The version of the secret to use. If left
+                                blank, the latest version of the secret is used.
+                              type: string
+                          required:
+                          - keyVault
+                          - secretName
+                  resourceGroups:
+                    description: Names and locations of resource group placeholders.
+                    type: object
+                    additionalProperties:
+                      description: Represents an Azure resource group.
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Name of the resource group.
+                          minLength: 1
+                          maxLength: 90
+                        location:
+                          type: string
+                          description: Location of the resource group.
+                  status:
+                    type: object
+                    properties:
+                      timeCreated:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Creation time of this blueprint definition.
+                      lastModified:
+                        type: string
+                        format: date-time
+                        readOnly: true
+                        description: Last modified time of this blueprint definition.
+                      managedResources:
+                        type: array
+                        description: List of resources that were created by the blueprint
+                          assignment.
+                        readOnly: true
+                        items:
+                          type: string
+                    description: Shared status properties between all blueprint resources.
+                    readOnly: true
+                  locks:
+                    description: Defines how resources deployed by a blueprint assignment
+                      are locked.
+                    type: object
+                    properties:
+                      mode:
+                        type: string
+                        description: Lock mode.
+                        enum:
+                        - None
+                        - AllResourcesReadOnly
+                        - AllResourcesDoNotDelete
+                        x-ms-enum:
+                          name: AssignmentLockMode
+                          modelAsString: true
+                      excludedPrincipals:
+                        type: array
+                        description: List of AAD principals excluded from blueprint
+                          locks. Up to 5 principals are permitted.
+                        items:
+                          type: string
+                      excludedActions:
+                        type: array
+                        description: "List\_of\_management\_operations\_that\_are\_\
+                          excluded\_from\_blueprint\_locks.\_Up\_to\_200\_actions\_\
+                          are\_permitted. If the lock mode is set to 'AllResourcesReadOnly',\
+                          \ then the following actions are automatically appended\
+                          \ to 'excludedActions': '*/read', 'Microsoft.Network/virtualNetworks/subnets/join/action'\
+                          \ and 'Microsoft.Authorization/locks/delete'. If the lock\
+                          \ mode is set to 'AllResourcesDoNotDelete', then the following\
+                          \ actions are automatically appended to 'excludedActions':\
+                          \ 'Microsoft.Authorization/locks/delete'. Duplicate actions\
+                          \ will get removed."
+                        items:
+                          type: string
+                  provisioningState:
+                    type: string
+                    readOnly: true
+                    description: State of the blueprint assignment.
+                    enum:
+                    - creating
+                    - validating
+                    - waiting
+                    - deploying
+                    - cancelling
+                    - locking
+                    - succeeded
+                    - failed
+                    - canceled
+                    - deleting
+                    x-ms-enum:
+                      name: AssignmentProvisioningState
+                      modelAsString: true
+                description: Shared properties between all blueprint resources.
+                x-ms-external: true
+                required:
+                - parameters
+                - resourceGroups
+                x-ms-client-flatten: true
+            required:
+            - location
+            - identity
+            - properties
+            description: Common properties for all Azure resources.
+            x-ms-azure-resource: true
+        nextLink:
+          type: string
+          readOnly: true
+          description: Link to the next page of results.
+    UserAssignedIdentity:
+      type: object
+      description: User-assigned managed identity.
+      properties:
+        principalId:
+          type: string
+          description: Azure Active Directory principal ID associated with this Identity.
+        clientId:
+          type: string
+          description: Client App Id associated with this identity.
+    ManagedServiceIdentity:
+      type: object
+      description: Managed identity generic object.
+      properties:
+        type:
+          type: string
+          description: Type of the managed identity.
+          enum:
+          - None
+          - SystemAssigned
+          - UserAssigned
+          x-ms-enum:
+            name: ManagedServiceIdentityType
+            modelAsString: true
+        principalId:
+          type: string
+          description: Azure Active Directory principal ID associated with this Identity.
+        tenantId:
+          type: string
+          description: ID of the Azure Active Directory.
+        userAssignedIdentities:
+          type: object
+          description: The list of user-assigned managed identities associated with
+            the resource. Key is the Azure resource Id of the managed identity.
+          additionalProperties:
+            description: User-assigned managed identity.
+            type: object
+            properties:
+              principalId:
+                type: string
+                description: Azure Active Directory principal ID associated with this
+                  Identity.
+              clientId:
+                type: string
+                description: Client App Id associated with this identity.
+      required:
+      - type
+    AssignmentStatus:
+      type: object
+      properties:
+        timeCreated:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation time of this blueprint definition.
+        lastModified:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Last modified time of this blueprint definition.
+        managedResources:
+          type: array
+          description: List of resources that were created by the blueprint assignment.
+          readOnly: true
+          items:
+            type: string
+      description: Shared status properties between all blueprint resources.
+    AssignmentLockSettings:
+      description: Defines how resources deployed by a blueprint assignment are locked.
+      type: object
+      properties:
+        mode:
+          type: string
+          description: Lock mode.
+          enum:
+          - None
+          - AllResourcesReadOnly
+          - AllResourcesDoNotDelete
+          x-ms-enum:
+            name: AssignmentLockMode
+            modelAsString: true
+        excludedPrincipals:
+          type: array
+          description: List of AAD principals excluded from blueprint locks. Up to
+            5 principals are permitted.
+          items:
+            type: string
+        excludedActions:
+          type: array
+          description: "List\_of\_management\_operations\_that\_are\_excluded\_from\_\
+            blueprint\_locks.\_Up\_to\_200\_actions\_are\_permitted. If the lock mode\
+            \ is set to 'AllResourcesReadOnly', then the following actions are automatically\
+            \ appended to 'excludedActions': '*/read', 'Microsoft.Network/virtualNetworks/subnets/join/action'\
+            \ and 'Microsoft.Authorization/locks/delete'. If the lock mode is set\
+            \ to 'AllResourcesDoNotDelete', then the following actions are automatically\
+            \ appended to 'excludedActions': 'Microsoft.Authorization/locks/delete'.\
+            \ Duplicate actions will get removed."
+          items:
+            type: string
+    AssignmentProperties:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: One-liner string explain this resource.
+          maxLength: 256
+        description:
+          type: string
+          description: Multi-line explain this resource.
+          maxLength: 500
+        blueprintId:
+          type: string
+          description: ID of the published version of a blueprint definition.
+        scope:
+          type: string
+          description: 'The target subscription scope of the blueprint assignment
+            (format: ''/subscriptions/{subscriptionId}''). For management group level
+            assignments, the property is required.'
+        parameters:
+          type: object
+          description: Blueprint assignment parameter values.
+          additionalProperties:
+            description: Key/Value pair of parameter fulfillment.
+            type: object
+            properties:
+              value:
+                type: object
+                description: Parameter value. Any valid JSON value is allowed including
+                  objects, arrays, strings, numbers and booleans.
+              reference:
+                type: object
+                description: Parameter value as reference type.
+                properties:
+                  keyVault:
+                    description: Specifies the reference to a given Azure Key Vault.
+                    type: object
+                    properties:
+                      id:
+                        description: Azure resource ID of the Key Vault.
+                        type: string
+                    required:
+                    - id
+                  secretName:
+                    description: Name of the secret.
+                    type: string
+                  secretVersion:
+                    description: The version of the secret to use. If left blank,
+                      the latest version of the secret is used.
+                    type: string
+                required:
+                - keyVault
+                - secretName
+        resourceGroups:
+          description: Names and locations of resource group placeholders.
+          type: object
+          additionalProperties:
+            description: Represents an Azure resource group.
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name of the resource group.
+                minLength: 1
+                maxLength: 90
+              location:
+                type: string
+                description: Location of the resource group.
+        status:
+          type: object
+          properties:
+            timeCreated:
+              type: string
+              format: date-time
+              readOnly: true
+              description: Creation time of this blueprint definition.
+            lastModified:
+              type: string
+              format: date-time
+              readOnly: true
+              description: Last modified time of this blueprint definition.
+            managedResources:
+              type: array
+              description: List of resources that were created by the blueprint assignment.
+              readOnly: true
+              items:
+                type: string
+          description: Shared status properties between all blueprint resources.
+          readOnly: true
+        locks:
+          description: Defines how resources deployed by a blueprint assignment are
+            locked.
+          type: object
+          properties:
+            mode:
+              type: string
+              description: Lock mode.
+              enum:
+              - None
+              - AllResourcesReadOnly
+              - AllResourcesDoNotDelete
+              x-ms-enum:
+                name: AssignmentLockMode
+                modelAsString: true
+            excludedPrincipals:
+              type: array
+              description: List of AAD principals excluded from blueprint locks. Up
+                to 5 principals are permitted.
+              items:
+                type: string
+            excludedActions:
+              type: array
+              description: "List\_of\_management\_operations\_that\_are\_excluded\_\
+                from\_blueprint\_locks.\_Up\_to\_200\_actions\_are\_permitted. If\
+                \ the lock mode is set to 'AllResourcesReadOnly', then the following\
+                \ actions are automatically appended to 'excludedActions': '*/read',\
+                \ 'Microsoft.Network/virtualNetworks/subnets/join/action' and 'Microsoft.Authorization/locks/delete'.\
+                \ If the lock mode is set to 'AllResourcesDoNotDelete', then the following\
+                \ actions are automatically appended to 'excludedActions': 'Microsoft.Authorization/locks/delete'.\
+                \ Duplicate actions will get removed."
+              items:
+                type: string
+        provisioningState:
+          type: string
+          readOnly: true
+          description: State of the blueprint assignment.
+          enum:
+          - creating
+          - validating
+          - waiting
+          - deploying
+          - cancelling
+          - locking
+          - succeeded
+          - failed
+          - canceled
+          - deleting
+          x-ms-enum:
+            name: AssignmentProvisioningState
+            modelAsString: true
+      description: Shared properties between all blueprint resources.
+      x-ms-external: true
+      required:
+      - parameters
+      - resourceGroups
+    ParameterValue:
+      description: Value for the specified parameter. Can be either 'value' or 'reference'
+        but not both.
+      type: object
+      properties:
+        value:
+          type: object
+          description: Parameter value. Any valid JSON value is allowed including
+            objects, arrays, strings, numbers and booleans.
+        reference:
+          type: object
+          description: Parameter value as reference type.
+          properties:
+            keyVault:
+              description: Specifies the reference to a given Azure Key Vault.
+              type: object
+              properties:
+                id:
+                  description: Azure resource ID of the Key Vault.
+                  type: string
+              required:
+              - id
+            secretName:
+              description: Name of the secret.
+              type: string
+            secretVersion:
+              description: The version of the secret to use. If left blank, the latest
+                version of the secret is used.
+              type: string
+          required:
+          - keyVault
+          - secretName
+    SecretValueReference:
+      description: Reference to a Key Vault secret.
+      type: object
+      properties:
+        keyVault:
+          description: Specifies the reference to a given Azure Key Vault.
+          type: object
+          properties:
+            id:
+              description: Azure resource ID of the Key Vault.
+              type: string
+          required:
+          - id
+        secretName:
+          description: Name of the secret.
+          type: string
+        secretVersion:
+          description: The version of the secret to use. If left blank, the latest
+            version of the secret is used.
+          type: string
+      required:
+      - keyVault
+      - secretName
+    keyVaultReference:
+      description: Specifies the link to a Key Vault.
+      type: object
+      properties:
+        id:
+          description: Azure resource ID of the Key Vault.
+          type: string
+      required:
+      - id
+    ResourceGroupValue:
+      description: Represents an Azure resource group.
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the resource group.
+          minLength: 1
+          maxLength: 90
+        location:
+          type: string
+          description: Location of the resource group.
+    TrackedResource:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: String Id used to locate any resource on Azure.
+        type:
+          readOnly: true
+          type: string
+          description: Type of this resource.
+        name:
+          readOnly: true
+          type: string
+          description: Name of this resource.
+        location:
+          type: string
+          description: The location of this blueprint assignment.
+          x-ms-mutability:
+          - read
+          - create
+      description: Common properties for all Azure resources.
+      x-ms-azure-resource: true
+      required:
+      - location
+    AzureResourceBase:
+      description: Common properties for all Azure resources.
+      type: object
+      x-ms-azure-resource: true
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: String Id used to locate any resource on Azure.
+        type:
+          readOnly: true
+          type: string
+          description: Type of this resource.
+        name:
+          readOnly: true
+          type: string
+          description: Name of this resource.
+    BlueprintResourcePropertiesBase:
+      description: Shared properties between all blueprint resources.
+      type: object
+      x-ms-external: true
+      properties:
+        displayName:
+          type: string
+          description: One-liner string explain this resource.
+          maxLength: 256
+        description:
+          type: string
+          description: Multi-line explain this resource.
+          maxLength: 500
+    BlueprintResourceStatusBase:
+      description: Shared status properties between all blueprint resources.
+      type: object
+      properties:
+        timeCreated:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Creation time of this blueprint definition.
+        lastModified:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Last modified time of this blueprint definition.
+    WhoIsBlueprintContract:
+      description: Response schema for querying the Azure Blueprints service principal
+        in the tenant.
+      properties:
+        objectId:
+          type: string
+          description: AAD object Id of the Azure Blueprints service principal in
+            the tenant.
+    ErrorResponse:
+      title: Error Response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.)
+      type: object
+      properties:
+        code:
+          readOnly: true
+          type: string
+          description: The error code.
+        message:
+          readOnly: true
+          type: string
+          description: The error message.
+        target:
+          readOnly: true
+          type: string
+          description: The error target.
+        details:
+          readOnly: true
+          type: array
+          items:
+            title: Error Response
+            description: Common error response for all Azure Resource Manager APIs
+              to return error details for failed operations. (This also follows the
+              OData error response format.)
+            type: object
+            properties:
+              code:
+                readOnly: true
+                type: string
+                description: The error code.
+              message:
+                readOnly: true
+                type: string
+                description: The error message.
+              target:
+                readOnly: true
+                type: string
+                description: The error target.
+              details:
+                readOnly: true
+                type: array
+                items:
+                  title: Error Response
+                  description: Common error response for all Azure Resource Manager
+                    APIs to return error details for failed operations. (This also
+                    follows the OData error response format.)
+                  type: object
+                  properties:
+                    code:
+                      readOnly: true
+                      type: string
+                      description: The error code.
+                    message:
+                      readOnly: true
+                      type: string
+                      description: The error message.
+                    target:
+                      readOnly: true
+                      type: string
+                      description: The error target.
+                x-ms-identifiers:
+                - message
+                - target
+                description: The error details.
+              additionalInfo:
+                readOnly: true
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      readOnly: true
+                      type: string
+                      description: The additional info type.
+                    info:
+                      readOnly: true
+                      type: object
+                      description: The additional info.
+                  description: The resource management error additional info.
+                x-ms-identifiers: []
+                description: The error additional info.
+          x-ms-identifiers:
+          - message
+          - target
+          description: The error details.
+        additionalInfo:
+          readOnly: true
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                readOnly: true
+                type: string
+                description: The additional info type.
+              info:
+                readOnly: true
+                type: object
+                description: The additional info.
+            description: The resource management error additional info.
+          x-ms-identifiers: []
+          description: The error additional info.
+    ErrorAdditionalInfo:
+      type: object
+      properties:
+        type:
+          readOnly: true
+          type: string
+          description: The additional info type.
+        info:
+          readOnly: true
+          type: object
+          description: The additional info.
+      description: The resource management error additional info.
+    CloudError:
+      x-ms-external: true
+      properties:
+        error:
+          title: Error Response
+          description: Common error response for all Azure Resource Manager APIs to
+            return error details for failed operations. (This also follows the OData
+            error response format.)
+          type: object
+          properties:
+            code:
+              readOnly: true
+              type: string
+              description: The error code.
+            message:
+              readOnly: true
+              type: string
+              description: The error message.
+            target:
+              readOnly: true
+              type: string
+              description: The error target.
+            details:
+              readOnly: true
+              type: array
+              items:
+                title: Error Response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.)
+                type: object
+                properties:
+                  code:
+                    readOnly: true
+                    type: string
+                    description: The error code.
+                  message:
+                    readOnly: true
+                    type: string
+                    description: The error message.
+                  target:
+                    readOnly: true
+                    type: string
+                    description: The error target.
+                  details:
+                    readOnly: true
+                    type: array
+                    items:
+                      title: Error Response
+                      description: Common error response for all Azure Resource Manager
+                        APIs to return error details for failed operations. (This
+                        also follows the OData error response format.)
+                      type: object
+                      properties:
+                        code:
+                          readOnly: true
+                          type: string
+                          description: The error code.
+                        message:
+                          readOnly: true
+                          type: string
+                          description: The error message.
+                        target:
+                          readOnly: true
+                          type: string
+                          description: The error target.
+                    x-ms-identifiers:
+                    - message
+                    - target
+                    description: The error details.
+                  additionalInfo:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The additional info type.
+                        info:
+                          readOnly: true
+                          type: object
+                          description: The additional info.
+                      description: The resource management error additional info.
+                    x-ms-identifiers: []
+                    description: The error additional info.
+              x-ms-identifiers:
+              - message
+              - target
+              description: The error details.
+            additionalInfo:
+              readOnly: true
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The additional info type.
+                  info:
+                    readOnly: true
+                    type: object
+                    description: The additional info.
+                description: The resource management error additional info.
+              x-ms-identifiers: []
+              description: The error additional info.

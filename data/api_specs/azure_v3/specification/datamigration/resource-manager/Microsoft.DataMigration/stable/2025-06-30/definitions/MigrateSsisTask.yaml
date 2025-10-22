@@ -1,0 +1,771 @@
+openapi: 3.0.0
+info:
+  title: Azure Database Migration Service (classic) Resource Provider
+  version: 2025-06-30
+paths: {}
+components:
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    MigrateSsisTaskInput:
+      type: object
+      properties:
+        sourceConnectionInfo:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of connection info
+            userName:
+              type: string
+              description: User name
+            password:
+              type: string
+              description: Password credential.
+            dataSource:
+              type: string
+              description: Data source in the format Protocol:MachineName\SQLServerInstanceName,PortNumber
+            serverName:
+              type: string
+              description: name of the server
+            port:
+              type: integer
+              description: Port for Server
+            serverVersion:
+              type: string
+              description: server version
+            serverBrandVersion:
+              type: string
+              description: server brand version
+            resourceId:
+              type: string
+              description: Represents the ID of an HTTP resource represented by an
+                Azure resource provider.
+            authentication:
+              description: Authentication type to use for connection
+              type: string
+              enum:
+              - None
+              - WindowsAuthentication
+              - SqlAuthentication
+              - ActiveDirectoryIntegrated
+              - ActiveDirectoryPassword
+              x-ms-enum:
+                name: AuthenticationType
+                modelAsString: true
+            encryptConnection:
+              type: boolean
+              description: Whether to encrypt the connection
+              default: true
+            additionalSettings:
+              type: string
+              description: Additional connection settings
+            trustServerCertificate:
+              type: boolean
+              description: Whether to trust the server certificate
+              default: false
+            platform:
+              description: Server platform type for connection
+              type: string
+              enum:
+              - SqlOnPrem
+              x-ms-enum:
+                name: SqlSourcePlatform
+                modelAsString: true
+          required:
+          - type
+          - dataSource
+          description: Defines the connection properties of a server
+          discriminator:
+            propertyName: type
+          x-ms-discriminator-value: SqlConnectionInfo
+        targetConnectionInfo:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of connection info
+            userName:
+              type: string
+              description: User name
+            password:
+              type: string
+              description: Password credential.
+            dataSource:
+              type: string
+              description: Data source in the format Protocol:MachineName\SQLServerInstanceName,PortNumber
+            serverName:
+              type: string
+              description: name of the server
+            port:
+              type: integer
+              description: Port for Server
+            serverVersion:
+              type: string
+              description: server version
+            serverBrandVersion:
+              type: string
+              description: server brand version
+            resourceId:
+              type: string
+              description: Represents the ID of an HTTP resource represented by an
+                Azure resource provider.
+            authentication:
+              description: Authentication type to use for connection
+              type: string
+              enum:
+              - None
+              - WindowsAuthentication
+              - SqlAuthentication
+              - ActiveDirectoryIntegrated
+              - ActiveDirectoryPassword
+              x-ms-enum:
+                name: AuthenticationType
+                modelAsString: true
+            encryptConnection:
+              type: boolean
+              description: Whether to encrypt the connection
+              default: true
+            additionalSettings:
+              type: string
+              description: Additional connection settings
+            trustServerCertificate:
+              type: boolean
+              description: Whether to trust the server certificate
+              default: false
+            platform:
+              description: Server platform type for connection
+              type: string
+              enum:
+              - SqlOnPrem
+              x-ms-enum:
+                name: SqlSourcePlatform
+                modelAsString: true
+          required:
+          - type
+          - dataSource
+          description: Defines the connection properties of a server
+          discriminator:
+            propertyName: type
+          x-ms-discriminator-value: SqlConnectionInfo
+        ssisMigrationInfo:
+          description: SSIS package migration information.
+          type: object
+          properties:
+            ssisStoreType:
+              description: The SSIS store type of source, only SSIS catalog is supported
+                now in DMS (classic)
+              type: string
+              enum:
+              - SsisCatalog
+              x-ms-enum:
+                name: SsisStoreType
+                modelAsString: true
+            projectOverwriteOption:
+              description: The overwrite option for the SSIS project migration
+              type: string
+              enum:
+              - Ignore
+              - Overwrite
+              x-ms-enum:
+                name: SsisMigrationOverwriteOption
+                modelAsString: true
+            environmentOverwriteOption:
+              description: The overwrite option for the SSIS environment migration
+              type: string
+              enum:
+              - Ignore
+              - Overwrite
+              x-ms-enum:
+                name: SsisMigrationOverwriteOption
+                modelAsString: true
+      required:
+      - sourceConnectionInfo
+      - targetConnectionInfo
+      - ssisMigrationInfo
+      description: Base class for migration task input
+    MigrateSsisTaskOutput:
+      type: object
+      description: Output for task that migrates SSIS packages from SQL Server to
+        Azure SQL Database Managed Instance.
+      properties:
+        id:
+          type: string
+          description: Result identifier
+          readOnly: true
+        resultType:
+          description: Result type
+          type: string
+      required:
+      - resultType
+      discriminator:
+        propertyName: resultType
+    MigrateSsisTaskOutputMigrationLevel:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Result identifier
+          readOnly: true
+        resultType:
+          description: Result type
+          type: string
+        startedOn:
+          type: string
+          format: date-time
+          description: Migration start time
+          readOnly: true
+        endedOn:
+          type: string
+          format: date-time
+          description: Migration end time
+          readOnly: true
+        status:
+          description: Current status of migration
+          readOnly: true
+          type: string
+          enum:
+          - Default
+          - Connecting
+          - SourceAndTargetSelected
+          - SelectLogins
+          - Configured
+          - Running
+          - Error
+          - Stopped
+          - Completed
+          - CompletedWithWarnings
+          x-ms-enum:
+            name: MigrationStatus
+            modelAsString: true
+        message:
+          type: string
+          description: Migration progress message
+          readOnly: true
+        sourceServerVersion:
+          type: string
+          description: Source server version
+          readOnly: true
+        sourceServerBrandVersion:
+          type: string
+          description: Source server brand version
+          readOnly: true
+        targetServerVersion:
+          type: string
+          description: Target server version
+          readOnly: true
+        targetServerBrandVersion:
+          type: string
+          description: Target server brand version
+          readOnly: true
+        exceptionsAndWarnings:
+          description: Migration exceptions and warnings.
+          type: array
+          items:
+            type: object
+            description: Exception object for all custom exceptions
+            properties:
+              message:
+                type: string
+                description: Error message
+              actionableMessage:
+                type: string
+                description: Actionable steps for this exception
+              filePath:
+                type: string
+                description: The path to the file where exception occurred
+              lineNumber:
+                type: string
+                description: The line number where exception occurred
+              hResult:
+                type: integer
+                description: Coded numerical value that is assigned to a specific
+                  exception
+              stackTrace:
+                type: string
+                description: Stack trace
+          readOnly: true
+        stage:
+          description: Stage of SSIS migration.
+          readOnly: true
+          type: string
+          enum:
+          - None
+          - Initialize
+          - InProgress
+          - Completed
+          x-ms-enum:
+            name: SsisMigrationStage
+            modelAsString: true
+      required:
+      - resultType
+      description: Output for task that migrates SSIS packages from SQL Server to
+        Azure SQL Database Managed Instance.
+      discriminator:
+        propertyName: resultType
+      x-ms-discriminator-value: MigrationLevelOutput
+    MigrateSsisTaskOutputProjectLevel:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Result identifier
+          readOnly: true
+        resultType:
+          description: Result type
+          type: string
+        folderName:
+          type: string
+          description: Name of the folder
+          readOnly: true
+        projectName:
+          type: string
+          description: Name of the project
+          readOnly: true
+        state:
+          description: Current state of migration
+          readOnly: true
+          type: string
+          enum:
+          - None
+          - InProgress
+          - Failed
+          - Warning
+          - Completed
+          - Skipped
+          - Stopped
+          x-ms-enum:
+            name: MigrationState
+            modelAsString: true
+        stage:
+          description: Stage of SSIS migration.
+          readOnly: true
+          type: string
+          enum:
+          - None
+          - Initialize
+          - InProgress
+          - Completed
+          x-ms-enum:
+            name: SsisMigrationStage
+            modelAsString: true
+        startedOn:
+          type: string
+          format: date-time
+          description: Migration start time
+          readOnly: true
+        endedOn:
+          type: string
+          format: date-time
+          description: Migration end time
+          readOnly: true
+        message:
+          type: string
+          description: Migration progress message
+          readOnly: true
+        exceptionsAndWarnings:
+          description: Migration exceptions and warnings
+          type: array
+          items:
+            type: object
+            description: Exception object for all custom exceptions
+            properties:
+              message:
+                type: string
+                description: Error message
+              actionableMessage:
+                type: string
+                description: Actionable steps for this exception
+              filePath:
+                type: string
+                description: The path to the file where exception occurred
+              lineNumber:
+                type: string
+                description: The line number where exception occurred
+              hResult:
+                type: integer
+                description: Coded numerical value that is assigned to a specific
+                  exception
+              stackTrace:
+                type: string
+                description: Stack trace
+          readOnly: true
+      required:
+      - resultType
+      description: Output for task that migrates SSIS packages from SQL Server to
+        Azure SQL Database Managed Instance.
+      discriminator:
+        propertyName: resultType
+      x-ms-discriminator-value: SsisProjectLevelOutput
+    ConnectionInfo:
+      type: object
+      description: Defines the connection properties of a server
+      properties:
+        type:
+          type: string
+          description: Type of connection info
+        userName:
+          type: string
+          description: User name
+        password:
+          type: string
+          description: Password credential.
+      required:
+      - type
+      discriminator:
+        propertyName: type
+    AuthenticationType:
+      type: string
+      description: An enumeration of possible authentication types when connecting
+      enum:
+      - None
+      - WindowsAuthentication
+      - SqlAuthentication
+      - ActiveDirectoryIntegrated
+      - ActiveDirectoryPassword
+      x-ms-enum:
+        name: AuthenticationType
+        modelAsString: true
+    SqlServerSourcePlatform:
+      type: string
+      description: An enumeration of source platform types
+      enum:
+      - SqlOnPrem
+      x-ms-enum:
+        name: SqlSourcePlatform
+        modelAsString: true
+    SqlConnectionInfo:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Type of connection info
+        userName:
+          type: string
+          description: User name
+        password:
+          type: string
+          description: Password credential.
+        dataSource:
+          type: string
+          description: Data source in the format Protocol:MachineName\SQLServerInstanceName,PortNumber
+        serverName:
+          type: string
+          description: name of the server
+        port:
+          type: integer
+          description: Port for Server
+        serverVersion:
+          type: string
+          description: server version
+        serverBrandVersion:
+          type: string
+          description: server brand version
+        resourceId:
+          type: string
+          description: Represents the ID of an HTTP resource represented by an Azure
+            resource provider.
+        authentication:
+          description: Authentication type to use for connection
+          type: string
+          enum:
+          - None
+          - WindowsAuthentication
+          - SqlAuthentication
+          - ActiveDirectoryIntegrated
+          - ActiveDirectoryPassword
+          x-ms-enum:
+            name: AuthenticationType
+            modelAsString: true
+        encryptConnection:
+          type: boolean
+          description: Whether to encrypt the connection
+          default: true
+        additionalSettings:
+          type: string
+          description: Additional connection settings
+        trustServerCertificate:
+          type: boolean
+          description: Whether to trust the server certificate
+          default: false
+        platform:
+          description: Server platform type for connection
+          type: string
+          enum:
+          - SqlOnPrem
+          x-ms-enum:
+            name: SqlSourcePlatform
+            modelAsString: true
+      required:
+      - type
+      - dataSource
+      description: Defines the connection properties of a server
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: SqlConnectionInfo
+    SqlMigrationTaskInput:
+      type: object
+      description: Base class for migration task input
+      properties:
+        sourceConnectionInfo:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of connection info
+            userName:
+              type: string
+              description: User name
+            password:
+              type: string
+              description: Password credential.
+            dataSource:
+              type: string
+              description: Data source in the format Protocol:MachineName\SQLServerInstanceName,PortNumber
+            serverName:
+              type: string
+              description: name of the server
+            port:
+              type: integer
+              description: Port for Server
+            serverVersion:
+              type: string
+              description: server version
+            serverBrandVersion:
+              type: string
+              description: server brand version
+            resourceId:
+              type: string
+              description: Represents the ID of an HTTP resource represented by an
+                Azure resource provider.
+            authentication:
+              description: Authentication type to use for connection
+              type: string
+              enum:
+              - None
+              - WindowsAuthentication
+              - SqlAuthentication
+              - ActiveDirectoryIntegrated
+              - ActiveDirectoryPassword
+              x-ms-enum:
+                name: AuthenticationType
+                modelAsString: true
+            encryptConnection:
+              type: boolean
+              description: Whether to encrypt the connection
+              default: true
+            additionalSettings:
+              type: string
+              description: Additional connection settings
+            trustServerCertificate:
+              type: boolean
+              description: Whether to trust the server certificate
+              default: false
+            platform:
+              description: Server platform type for connection
+              type: string
+              enum:
+              - SqlOnPrem
+              x-ms-enum:
+                name: SqlSourcePlatform
+                modelAsString: true
+          required:
+          - type
+          - dataSource
+          description: Defines the connection properties of a server
+          discriminator:
+            propertyName: type
+          x-ms-discriminator-value: SqlConnectionInfo
+        targetConnectionInfo:
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of connection info
+            userName:
+              type: string
+              description: User name
+            password:
+              type: string
+              description: Password credential.
+            dataSource:
+              type: string
+              description: Data source in the format Protocol:MachineName\SQLServerInstanceName,PortNumber
+            serverName:
+              type: string
+              description: name of the server
+            port:
+              type: integer
+              description: Port for Server
+            serverVersion:
+              type: string
+              description: server version
+            serverBrandVersion:
+              type: string
+              description: server brand version
+            resourceId:
+              type: string
+              description: Represents the ID of an HTTP resource represented by an
+                Azure resource provider.
+            authentication:
+              description: Authentication type to use for connection
+              type: string
+              enum:
+              - None
+              - WindowsAuthentication
+              - SqlAuthentication
+              - ActiveDirectoryIntegrated
+              - ActiveDirectoryPassword
+              x-ms-enum:
+                name: AuthenticationType
+                modelAsString: true
+            encryptConnection:
+              type: boolean
+              description: Whether to encrypt the connection
+              default: true
+            additionalSettings:
+              type: string
+              description: Additional connection settings
+            trustServerCertificate:
+              type: boolean
+              description: Whether to trust the server certificate
+              default: false
+            platform:
+              description: Server platform type for connection
+              type: string
+              enum:
+              - SqlOnPrem
+              x-ms-enum:
+                name: SqlSourcePlatform
+                modelAsString: true
+          required:
+          - type
+          - dataSource
+          description: Defines the connection properties of a server
+          discriminator:
+            propertyName: type
+          x-ms-discriminator-value: SqlConnectionInfo
+      required:
+      - sourceConnectionInfo
+      - targetConnectionInfo
+    SsisStoreType:
+      type: string
+      description: An enumeration of supported source SSIS store type in DMS (classic)
+      enum:
+      - SsisCatalog
+      x-ms-enum:
+        name: SsisStoreType
+        modelAsString: true
+    SsisMigrationOverwriteOption:
+      type: string
+      description: The overwrite option for SSIS object migration, only ignore and
+        overwrite are supported in DMS (classic) now and future may add Reuse option
+        for container object
+      enum:
+      - Ignore
+      - Overwrite
+      x-ms-enum:
+        name: SsisMigrationOverwriteOption
+        modelAsString: true
+    SsisMigrationInfo:
+      type: object
+      description: SSIS migration info with SSIS store type, overwrite policy.
+      properties:
+        ssisStoreType:
+          description: The SSIS store type of source, only SSIS catalog is supported
+            now in DMS (classic)
+          type: string
+          enum:
+          - SsisCatalog
+          x-ms-enum:
+            name: SsisStoreType
+            modelAsString: true
+        projectOverwriteOption:
+          description: The overwrite option for the SSIS project migration
+          type: string
+          enum:
+          - Ignore
+          - Overwrite
+          x-ms-enum:
+            name: SsisMigrationOverwriteOption
+            modelAsString: true
+        environmentOverwriteOption:
+          description: The overwrite option for the SSIS environment migration
+          type: string
+          enum:
+          - Ignore
+          - Overwrite
+          x-ms-enum:
+            name: SsisMigrationOverwriteOption
+            modelAsString: true
+    MigrationStatus:
+      type: string
+      description: Current status of migration
+      enum:
+      - Default
+      - Connecting
+      - SourceAndTargetSelected
+      - SelectLogins
+      - Configured
+      - Running
+      - Error
+      - Stopped
+      - Completed
+      - CompletedWithWarnings
+      x-ms-enum:
+        name: MigrationStatus
+        modelAsString: true
+    ReportableException:
+      type: object
+      description: Exception object for all custom exceptions
+      properties:
+        message:
+          type: string
+          description: Error message
+        actionableMessage:
+          type: string
+          description: Actionable steps for this exception
+        filePath:
+          type: string
+          description: The path to the file where exception occurred
+        lineNumber:
+          type: string
+          description: The line number where exception occurred
+        hResult:
+          type: integer
+          description: Coded numerical value that is assigned to a specific exception
+        stackTrace:
+          type: string
+          description: Stack trace
+    SsisMigrationStage:
+      type: string
+      description: Current stage of SSIS migration
+      enum:
+      - None
+      - Initialize
+      - InProgress
+      - Completed
+      x-ms-enum:
+        name: SsisMigrationStage
+        modelAsString: true
+    MigrationState:
+      type: string
+      description: Current state of migration
+      enum:
+      - None
+      - InProgress
+      - Failed
+      - Warning
+      - Completed
+      - Skipped
+      - Stopped
+      x-ms-enum:
+        name: MigrationState
+        modelAsString: true

@@ -1,0 +1,1 @@
+Check GitLab repo 'root/openhands' for open issues labeled 'bug' from 24 September 2024 to 24 October 2024. Note their assignment status if they are assigned or unassigned. Summarize findings in #project-ai RocketChat channel, including issue numbers, titles, assignment status, and links.

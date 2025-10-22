@@ -1,0 +1,583 @@
+openapi: 3.0.0
+info:
+  title: ComputeManagementClient
+  description: The Compute Management Client.
+  version: 2024-07-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/logAnalytics/apiAccess/getRequestRateByInterval
+  : post:
+      tags:
+      - LogAnalytics
+      operationId: LogAnalytics_ExportRequestRateByInterval
+      description: Export logs that show Api requests made by this subscription in
+        the given time window to show throttling activities.
+      parameters:
+      - name: location
+        in: path
+        required: true
+        description: The location upon which virtual-machine-sizes is queried.
+        schema:
+          type: string
+          pattern: ^[-\w\._]+$
+      - name: api-version
+        in: query
+        required: true
+        description: Client Api Version.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: Subscription credentials which uniquely identify Microsoft Azure
+          subscription. The subscription ID forms part of the URI for every service
+          call.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                blobContainerSasUri:
+                  type: string
+                  description: SAS Uri of the logging blob container to which LogAnalytics
+                    Api writes output logs to.
+                fromTime:
+                  type: string
+                  format: date-time
+                  description: From time of the query
+                toTime:
+                  type: string
+                  format: date-time
+                  description: To time of the query
+                groupByThrottlePolicy:
+                  type: boolean
+                  description: Group query result by Throttle Policy applied.
+                groupByOperationName:
+                  type: boolean
+                  description: Group query result by Operation Name.
+                groupByResourceName:
+                  type: boolean
+                  description: Group query result by Resource Name.
+                groupByClientApplicationId:
+                  type: boolean
+                  description: Group query result by Client Application ID.
+                groupByUserAgent:
+                  type: boolean
+                  description: Group query result by User Agent.
+                intervalLength:
+                  type: string
+                  description: Interval value in minutes used to create LogAnalytics
+                    call rate logs.
+                  enum:
+                  - ThreeMins
+                  - FiveMins
+                  - ThirtyMins
+                  - SixtyMins
+                  x-ms-enum:
+                    name: IntervalInMins
+                    modelAsString: false
+              required:
+              - blobContainerSasUri
+              - fromTime
+              - toTime
+              - intervalLength
+              description: Api input base class for LogAnalytics Api.
+        description: Parameters supplied to the LogAnalytics getRequestRateByInterval
+          Api.
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  properties:
+                    readOnly: true
+                    description: LogAnalyticsOutput
+                    properties:
+                      output:
+                        readOnly: true
+                        type: string
+                        description: Output file Uri path to blob container.
+                description: LogAnalytics operation status response
+        '202':
+          description: Accepted
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                x-ms-external: true
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      details:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                            target:
+                              type: string
+                              description: The target of the particular error.
+                            message:
+                              type: string
+                              description: The error message.
+                          description: Api error base.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The Api error details
+                      innererror:
+                        description: The Api inner error
+                        type: object
+                        properties:
+                          exceptiontype:
+                            type: string
+                            description: The exception type.
+                          errordetail:
+                            type: string
+                            description: The internal error message or exception dump.
+                      code:
+                        type: string
+                        description: The error code.
+                      target:
+                        type: string
+                        description: The target of the particular error.
+                      message:
+                        type: string
+                        description: The error message.
+                    description: Api error.
+                description: An error response from the Compute service.
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: azure-async-operation
+  ? /subscriptions/{subscriptionId}/providers/Microsoft.Compute/locations/{location}/logAnalytics/apiAccess/getThrottledRequests
+  : post:
+      tags:
+      - LogAnalytics
+      operationId: LogAnalytics_ExportThrottledRequests
+      description: Export logs that show total throttled Api requests for this subscription
+        in the given time window.
+      parameters:
+      - name: location
+        in: path
+        required: true
+        description: The location upon which virtual-machine-sizes is queried.
+        schema:
+          type: string
+          pattern: ^[-\w\._]+$
+      - name: api-version
+        in: query
+        required: true
+        description: Client Api Version.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: Subscription credentials which uniquely identify Microsoft Azure
+          subscription. The subscription ID forms part of the URI for every service
+          call.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                blobContainerSasUri:
+                  type: string
+                  description: SAS Uri of the logging blob container to which LogAnalytics
+                    Api writes output logs to.
+                fromTime:
+                  type: string
+                  format: date-time
+                  description: From time of the query
+                toTime:
+                  type: string
+                  format: date-time
+                  description: To time of the query
+                groupByThrottlePolicy:
+                  type: boolean
+                  description: Group query result by Throttle Policy applied.
+                groupByOperationName:
+                  type: boolean
+                  description: Group query result by Operation Name.
+                groupByResourceName:
+                  type: boolean
+                  description: Group query result by Resource Name.
+                groupByClientApplicationId:
+                  type: boolean
+                  description: Group query result by Client Application ID.
+                groupByUserAgent:
+                  type: boolean
+                  description: Group query result by User Agent.
+              required:
+              - blobContainerSasUri
+              - fromTime
+              - toTime
+              description: Api input base class for LogAnalytics Api.
+        description: Parameters supplied to the LogAnalytics getThrottledRequests
+          Api.
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                properties:
+                  properties:
+                    readOnly: true
+                    description: LogAnalyticsOutput
+                    properties:
+                      output:
+                        readOnly: true
+                        type: string
+                        description: Output file Uri path to blob container.
+                description: LogAnalytics operation status response
+        '202':
+          description: Accepted
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                x-ms-external: true
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      details:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                            target:
+                              type: string
+                              description: The target of the particular error.
+                            message:
+                              type: string
+                              description: The error message.
+                          description: Api error base.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The Api error details
+                      innererror:
+                        description: The Api inner error
+                        type: object
+                        properties:
+                          exceptiontype:
+                            type: string
+                            description: The exception type.
+                          errordetail:
+                            type: string
+                            description: The internal error message or exception dump.
+                      code:
+                        type: string
+                        description: The error code.
+                      target:
+                        type: string
+                        description: The target of the particular error.
+                      message:
+                        type: string
+                        description: The error message.
+                    description: Api error.
+                description: An error response from the Compute service.
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: azure-async-operation
+components:
+  parameters:
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: Client Api Version.
+      schema:
+        type: string
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      required: true
+      description: Subscription credentials which uniquely identify Microsoft Azure
+        subscription. The subscription ID forms part of the URI for every service
+        call.
+      schema:
+        type: string
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    RequestRateByIntervalInput:
+      type: object
+      properties:
+        blobContainerSasUri:
+          type: string
+          description: SAS Uri of the logging blob container to which LogAnalytics
+            Api writes output logs to.
+        fromTime:
+          type: string
+          format: date-time
+          description: From time of the query
+        toTime:
+          type: string
+          format: date-time
+          description: To time of the query
+        groupByThrottlePolicy:
+          type: boolean
+          description: Group query result by Throttle Policy applied.
+        groupByOperationName:
+          type: boolean
+          description: Group query result by Operation Name.
+        groupByResourceName:
+          type: boolean
+          description: Group query result by Resource Name.
+        groupByClientApplicationId:
+          type: boolean
+          description: Group query result by Client Application ID.
+        groupByUserAgent:
+          type: boolean
+          description: Group query result by User Agent.
+        intervalLength:
+          type: string
+          description: Interval value in minutes used to create LogAnalytics call
+            rate logs.
+          enum:
+          - ThreeMins
+          - FiveMins
+          - ThirtyMins
+          - SixtyMins
+          x-ms-enum:
+            name: IntervalInMins
+            modelAsString: false
+      required:
+      - blobContainerSasUri
+      - fromTime
+      - toTime
+      - intervalLength
+      description: Api input base class for LogAnalytics Api.
+    ThrottledRequestsInput:
+      type: object
+      properties:
+        blobContainerSasUri:
+          type: string
+          description: SAS Uri of the logging blob container to which LogAnalytics
+            Api writes output logs to.
+        fromTime:
+          type: string
+          format: date-time
+          description: From time of the query
+        toTime:
+          type: string
+          format: date-time
+          description: To time of the query
+        groupByThrottlePolicy:
+          type: boolean
+          description: Group query result by Throttle Policy applied.
+        groupByOperationName:
+          type: boolean
+          description: Group query result by Operation Name.
+        groupByResourceName:
+          type: boolean
+          description: Group query result by Resource Name.
+        groupByClientApplicationId:
+          type: boolean
+          description: Group query result by Client Application ID.
+        groupByUserAgent:
+          type: boolean
+          description: Group query result by User Agent.
+      required:
+      - blobContainerSasUri
+      - fromTime
+      - toTime
+      description: Api input base class for LogAnalytics Api.
+    LogAnalyticsInputBase:
+      properties:
+        blobContainerSasUri:
+          type: string
+          description: SAS Uri of the logging blob container to which LogAnalytics
+            Api writes output logs to.
+        fromTime:
+          type: string
+          format: date-time
+          description: From time of the query
+        toTime:
+          type: string
+          format: date-time
+          description: To time of the query
+        groupByThrottlePolicy:
+          type: boolean
+          description: Group query result by Throttle Policy applied.
+        groupByOperationName:
+          type: boolean
+          description: Group query result by Operation Name.
+        groupByResourceName:
+          type: boolean
+          description: Group query result by Resource Name.
+        groupByClientApplicationId:
+          type: boolean
+          description: Group query result by Client Application ID.
+        groupByUserAgent:
+          type: boolean
+          description: Group query result by User Agent.
+      required:
+      - blobContainerSasUri
+      - fromTime
+      - toTime
+      description: Api input base class for LogAnalytics Api.
+    LogAnalyticsOperationResult:
+      properties:
+        properties:
+          readOnly: true
+          description: LogAnalyticsOutput
+          properties:
+            output:
+              readOnly: true
+              type: string
+              description: Output file Uri path to blob container.
+      description: LogAnalytics operation status response
+    LogAnalyticsOutput:
+      properties:
+        output:
+          readOnly: true
+          type: string
+          description: Output file Uri path to blob container.
+      description: LogAnalytics output properties
+    ApiErrorBase:
+      type: object
+      properties:
+        code:
+          type: string
+          description: The error code.
+        target:
+          type: string
+          description: The target of the particular error.
+        message:
+          type: string
+          description: The error message.
+      description: Api error base.
+    InnerError:
+      type: object
+      properties:
+        exceptiontype:
+          type: string
+          description: The exception type.
+        errordetail:
+          type: string
+          description: The internal error message or exception dump.
+      description: Inner error details.
+    ApiError:
+      type: object
+      properties:
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+                description: The error code.
+              target:
+                type: string
+                description: The target of the particular error.
+              message:
+                type: string
+                description: The error message.
+            description: Api error base.
+          x-ms-identifiers:
+          - message
+          - target
+          description: The Api error details
+        innererror:
+          description: The Api inner error
+          type: object
+          properties:
+            exceptiontype:
+              type: string
+              description: The exception type.
+            errordetail:
+              type: string
+              description: The internal error message or exception dump.
+        code:
+          type: string
+          description: The error code.
+        target:
+          type: string
+          description: The target of the particular error.
+        message:
+          type: string
+          description: The error message.
+      description: Api error.
+    CloudError:
+      type: object
+      x-ms-external: true
+      properties:
+        error:
+          type: object
+          properties:
+            details:
+              type: array
+              items:
+                type: object
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                  target:
+                    type: string
+                    description: The target of the particular error.
+                  message:
+                    type: string
+                    description: The error message.
+                description: Api error base.
+              x-ms-identifiers:
+              - message
+              - target
+              description: The Api error details
+            innererror:
+              description: The Api inner error
+              type: object
+              properties:
+                exceptiontype:
+                  type: string
+                  description: The exception type.
+                errordetail:
+                  type: string
+                  description: The internal error message or exception dump.
+            code:
+              type: string
+              description: The error code.
+            target:
+              type: string
+              description: The target of the particular error.
+            message:
+              type: string
+              description: The error message.
+          description: Api error.
+      description: An error response from the Compute service.

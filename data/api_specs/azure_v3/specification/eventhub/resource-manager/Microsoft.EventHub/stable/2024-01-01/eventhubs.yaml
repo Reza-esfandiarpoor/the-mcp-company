@@ -1,0 +1,2648 @@
+openapi: 3.0.0
+info:
+  title: EventHubManagementClient
+  description: Azure Event Hubs client
+  version: 2024-01-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs
+  : get:
+      tags:
+      - EventHubs
+      operationId: EventHubs_ListByNamespace
+      description: Gets all the Event Hubs in a Namespace.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Name of the resource group within the azure subscription.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: namespaceName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: The Namespace name
+        schema:
+          type: string
+          minLength: 6
+          maxLength: 50
+          pattern: ^[a-zA-Z][a-zA-Z0-9-]{6,50}[a-zA-Z0-9]$
+      - name: api-version
+        in: query
+        required: true
+        description: Client API Version.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: Subscription credentials that uniquely identify a Microsoft Azure
+          subscription. The subscription ID forms part of the URI for every service
+          call.
+        schema:
+          type: string
+      - name: $skip
+        description: Skip is only used if a previous operation returned a partial
+          result. If a previous response contains a nextLink element, the value of
+          the nextLink element will include a skip parameter that specifies a starting
+          point to use for subsequent calls.
+        in: query
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          minimum: 0
+          maximum: 1000
+      - name: $top
+        description: May be used to limit the number of results to the most recent
+          N usageDetails.
+        in: query
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 1000
+      responses:
+        '200':
+          description: Successfully retrieved the list of Event Hubs.
+          content:
+            application/json:
+              schema:
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                        name:
+                          readOnly: true
+                          type: string
+                          description: The name of the resource
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.EventHub/Namespaces"
+                            or "Microsoft.EventHub/Namespaces/EventHubs"
+                        location:
+                          type: string
+                          readOnly: true
+                          description: The geo-location where the resource lives
+                        properties:
+                          x-ms-client-flatten: true
+                          properties:
+                            partitionIds:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: string
+                              description: Current number of shards on the Event Hub.
+                            createdAt:
+                              readOnly: true
+                              format: date-time
+                              type: string
+                              description: Exact time the Event Hub was created.
+                            updatedAt:
+                              readOnly: true
+                              format: date-time
+                              type: string
+                              description: The exact time the message was updated.
+                            messageRetentionInDays:
+                              format: int64
+                              type: integer
+                              minimum: 1
+                              description: Number of days to retain the events for
+                                this Event Hub, value should be 1 to 7 days
+                            partitionCount:
+                              format: int64
+                              type: integer
+                              minimum: 1
+                              description: Number of partitions created for the Event
+                                Hub, allowed values are from 1 to 32 partitions.
+                            status:
+                              type: string
+                              description: Enumerates the possible values for the
+                                status of the Event Hub.
+                              enum:
+                              - Active
+                              - Disabled
+                              - Restoring
+                              - SendDisabled
+                              - ReceiveDisabled
+                              - Creating
+                              - Deleting
+                              - Renaming
+                              - Unknown
+                              x-ms-enum:
+                                name: EntityStatus
+                                modelAsString: false
+                            userMetadata:
+                              type: string
+                              description: Gets and Sets Metadata of User.
+                            captureDescription:
+                              description: Properties of capture description
+                              properties:
+                                enabled:
+                                  type: boolean
+                                  description: 'A value that indicates whether capture
+                                    description is enabled. '
+                                encoding:
+                                  type: string
+                                  description: 'Enumerates the possible values for
+                                    the encoding format of capture description. Note:
+                                    ''AvroDeflate'' will be deprecated in New API
+                                    Version'
+                                  enum:
+                                  - Avro
+                                  - AvroDeflate
+                                  x-ms-enum:
+                                    name: EncodingCaptureDescription
+                                    modelAsString: false
+                                intervalInSeconds:
+                                  format: int32
+                                  type: integer
+                                  description: The time window allows you to set the
+                                    frequency with which the capture to Azure Blobs
+                                    will happen, value should between 60 to 900 seconds
+                                sizeLimitInBytes:
+                                  format: int32
+                                  type: integer
+                                  description: The size window defines the amount
+                                    of data built up in your Event Hub before an capture
+                                    operation, value should be between 10485760 to
+                                    524288000 bytes
+                                destination:
+                                  description: Properties of Destination where capture
+                                    will be stored. (Storage Account, Blob Names)
+                                  properties:
+                                    name:
+                                      type: string
+                                      description: Name for capture destination
+                                    identity:
+                                      type: object
+                                      description: A value that indicates whether
+                                        capture description is enabled.
+                                      properties:
+                                        type:
+                                          type: string
+                                          description: Type of Azure Active Directory
+                                            Managed Identity.
+                                          enum:
+                                          - SystemAssigned
+                                          - UserAssigned
+                                          x-ms-enum:
+                                            name: CaptureIdentityType
+                                            modelAsString: false
+                                        userAssignedIdentity:
+                                          type: string
+                                          description: ARM ID of Managed User Identity.
+                                            This property is required is the type
+                                            is UserAssignedIdentity. If type is SystemAssigned,
+                                            then the System Assigned Identity Associated
+                                            with the namespace will be used.
+                                    properties:
+                                      x-ms-client-flatten: true
+                                      properties:
+                                        storageAccountResourceId:
+                                          type: string
+                                          description: Resource id of the storage
+                                            account to be used to create the blobs
+                                        blobContainer:
+                                          type: string
+                                          description: Blob container Name
+                                        archiveNameFormat:
+                                          type: string
+                                          description: Blob naming convention for
+                                            archive, e.g. {Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}.
+                                            Here all the parameters (Namespace,EventHub
+                                            .. etc) are mandatory irrespective of
+                                            order
+                                        dataLakeSubscriptionId:
+                                          type: string
+                                          format: uuid
+                                          description: Subscription Id of Azure Data
+                                            Lake Store
+                                        dataLakeAccountName:
+                                          type: string
+                                          description: The Azure Data Lake Store name
+                                            for the captured events
+                                        dataLakeFolderPath:
+                                          type: string
+                                          description: The destination folder path
+                                            for the captured events
+                                      description: Properties describing the storage
+                                        account, blob container and archive name format
+                                        for capture destination
+                                skipEmptyArchives:
+                                  type: boolean
+                                  description: A value that indicates whether to Skip
+                                    Empty Archives
+                            retentionDescription:
+                              description: Event Hub retention settings
+                              type: object
+                              properties:
+                                cleanupPolicy:
+                                  type: string
+                                  description: Enumerates the possible values for
+                                    cleanup policy
+                                  enum:
+                                  - Delete
+                                  - Compact
+                                  x-ms-enum:
+                                    name: CleanupPolicyRetentionDescription
+                                    modelAsString: true
+                                retentionTimeInHours:
+                                  format: int64
+                                  type: integer
+                                  description: 'Number of hours to retain the events
+                                    for this Event Hub. This value is only used when
+                                    cleanupPolicy is Delete. If cleanupPolicy is Compact
+                                    the returned value of this property is Long.MaxValue '
+                                tombstoneRetentionTimeInHours:
+                                  format: int32
+                                  type: integer
+                                  description: Number of hours to retain the tombstone
+                                    markers of a compacted Event Hub. This value is
+                                    only used when cleanupPolicy is Compact. Consumer
+                                    must complete reading the tombstone marker within
+                                    this specified amount of time if consumer begins
+                                    from starting offset to ensure they get a valid
+                                    snapshot for the specific key described by the
+                                    tombstone marker within the compacted Event Hub
+                          description: Properties supplied to the Create Or Update
+                            Event Hub operation.
+                        systemData:
+                          readOnly: true
+                          description: The system meta data relating to this resource.
+                          type: object
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The type of identity that last modified
+                                the resource.
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                    description: Result of the List EventHubs operation.
+                  nextLink:
+                    type: string
+                    description: Link to the next set of results. Not empty if Value
+                      contains incomplete list of EventHubs.
+                description: The result of the List EventHubs operation.
+        default:
+          description: Eventhub error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response indicates Event Hub service is not able
+                  to process the incoming request. The reason is provided in the error
+                  message.
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              description: The error additional info.
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        description: The error additional info.
+      x-ms-pageable:
+        nextLinkName: nextLink
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.EventHub/namespaces/{namespaceName}/eventhubs/{eventHubName}
+  : put:
+      tags:
+      - EventHubs
+      operationId: EventHubs_CreateOrUpdate
+      description: Creates or updates a new Event Hub as a nested resource within
+        a Namespace.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Name of the resource group within the azure subscription.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: namespaceName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: The Namespace name
+        schema:
+          type: string
+          minLength: 6
+          maxLength: 50
+          pattern: ^[a-zA-Z][a-zA-Z0-9-]{6,50}[a-zA-Z0-9]$
+      - name: eventHubName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: The Event Hub name
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+      - name: api-version
+        in: query
+        required: true
+        description: Client API Version.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: Subscription credentials that uniquely identify a Microsoft Azure
+          subscription. The subscription ID forms part of the URI for every service
+          call.
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  readOnly: true
+                  type: string
+                  description: Fully qualified resource ID for the resource. Ex -
+                    /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                name:
+                  readOnly: true
+                  type: string
+                  description: The name of the resource
+                type:
+                  readOnly: true
+                  type: string
+                  description: The type of the resource. E.g. "Microsoft.EventHub/Namespaces"
+                    or "Microsoft.EventHub/Namespaces/EventHubs"
+                location:
+                  type: string
+                  readOnly: true
+                  description: The geo-location where the resource lives
+                properties:
+                  x-ms-client-flatten: true
+                  properties:
+                    partitionIds:
+                      readOnly: true
+                      type: array
+                      items:
+                        type: string
+                      description: Current number of shards on the Event Hub.
+                    createdAt:
+                      readOnly: true
+                      format: date-time
+                      type: string
+                      description: Exact time the Event Hub was created.
+                    updatedAt:
+                      readOnly: true
+                      format: date-time
+                      type: string
+                      description: The exact time the message was updated.
+                    messageRetentionInDays:
+                      format: int64
+                      type: integer
+                      minimum: 1
+                      description: Number of days to retain the events for this Event
+                        Hub, value should be 1 to 7 days
+                    partitionCount:
+                      format: int64
+                      type: integer
+                      minimum: 1
+                      description: Number of partitions created for the Event Hub,
+                        allowed values are from 1 to 32 partitions.
+                    status:
+                      type: string
+                      description: Enumerates the possible values for the status of
+                        the Event Hub.
+                      enum:
+                      - Active
+                      - Disabled
+                      - Restoring
+                      - SendDisabled
+                      - ReceiveDisabled
+                      - Creating
+                      - Deleting
+                      - Renaming
+                      - Unknown
+                      x-ms-enum:
+                        name: EntityStatus
+                        modelAsString: false
+                    userMetadata:
+                      type: string
+                      description: Gets and Sets Metadata of User.
+                    captureDescription:
+                      description: Properties of capture description
+                      properties:
+                        enabled:
+                          type: boolean
+                          description: 'A value that indicates whether capture description
+                            is enabled. '
+                        encoding:
+                          type: string
+                          description: 'Enumerates the possible values for the encoding
+                            format of capture description. Note: ''AvroDeflate'' will
+                            be deprecated in New API Version'
+                          enum:
+                          - Avro
+                          - AvroDeflate
+                          x-ms-enum:
+                            name: EncodingCaptureDescription
+                            modelAsString: false
+                        intervalInSeconds:
+                          format: int32
+                          type: integer
+                          description: The time window allows you to set the frequency
+                            with which the capture to Azure Blobs will happen, value
+                            should between 60 to 900 seconds
+                        sizeLimitInBytes:
+                          format: int32
+                          type: integer
+                          description: The size window defines the amount of data
+                            built up in your Event Hub before an capture operation,
+                            value should be between 10485760 to 524288000 bytes
+                        destination:
+                          description: Properties of Destination where capture will
+                            be stored. (Storage Account, Blob Names)
+                          properties:
+                            name:
+                              type: string
+                              description: Name for capture destination
+                            identity:
+                              type: object
+                              description: A value that indicates whether capture
+                                description is enabled.
+                              properties:
+                                type:
+                                  type: string
+                                  description: Type of Azure Active Directory Managed
+                                    Identity.
+                                  enum:
+                                  - SystemAssigned
+                                  - UserAssigned
+                                  x-ms-enum:
+                                    name: CaptureIdentityType
+                                    modelAsString: false
+                                userAssignedIdentity:
+                                  type: string
+                                  description: ARM ID of Managed User Identity. This
+                                    property is required is the type is UserAssignedIdentity.
+                                    If type is SystemAssigned, then the System Assigned
+                                    Identity Associated with the namespace will be
+                                    used.
+                            properties:
+                              x-ms-client-flatten: true
+                              properties:
+                                storageAccountResourceId:
+                                  type: string
+                                  description: Resource id of the storage account
+                                    to be used to create the blobs
+                                blobContainer:
+                                  type: string
+                                  description: Blob container Name
+                                archiveNameFormat:
+                                  type: string
+                                  description: Blob naming convention for archive,
+                                    e.g. {Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}.
+                                    Here all the parameters (Namespace,EventHub ..
+                                    etc) are mandatory irrespective of order
+                                dataLakeSubscriptionId:
+                                  type: string
+                                  format: uuid
+                                  description: Subscription Id of Azure Data Lake
+                                    Store
+                                dataLakeAccountName:
+                                  type: string
+                                  description: The Azure Data Lake Store name for
+                                    the captured events
+                                dataLakeFolderPath:
+                                  type: string
+                                  description: The destination folder path for the
+                                    captured events
+                              description: Properties describing the storage account,
+                                blob container and archive name format for capture
+                                destination
+                        skipEmptyArchives:
+                          type: boolean
+                          description: A value that indicates whether to Skip Empty
+                            Archives
+                    retentionDescription:
+                      description: Event Hub retention settings
+                      type: object
+                      properties:
+                        cleanupPolicy:
+                          type: string
+                          description: Enumerates the possible values for cleanup
+                            policy
+                          enum:
+                          - Delete
+                          - Compact
+                          x-ms-enum:
+                            name: CleanupPolicyRetentionDescription
+                            modelAsString: true
+                        retentionTimeInHours:
+                          format: int64
+                          type: integer
+                          description: 'Number of hours to retain the events for this
+                            Event Hub. This value is only used when cleanupPolicy
+                            is Delete. If cleanupPolicy is Compact the returned value
+                            of this property is Long.MaxValue '
+                        tombstoneRetentionTimeInHours:
+                          format: int32
+                          type: integer
+                          description: Number of hours to retain the tombstone markers
+                            of a compacted Event Hub. This value is only used when
+                            cleanupPolicy is Compact. Consumer must complete reading
+                            the tombstone marker within this specified amount of time
+                            if consumer begins from starting offset to ensure they
+                            get a valid snapshot for the specific key described by
+                            the tombstone marker within the compacted Event Hub
+                  description: Properties supplied to the Create Or Update Event Hub
+                    operation.
+                systemData:
+                  readOnly: true
+                  description: The system meta data relating to this resource.
+                  type: object
+                  properties:
+                    createdBy:
+                      type: string
+                      description: The identity that created the resource.
+                    createdByType:
+                      type: string
+                      description: The type of identity that created the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource creation (UTC).
+                    lastModifiedBy:
+                      type: string
+                      description: The identity that last modified the resource.
+                    lastModifiedByType:
+                      type: string
+                      description: The type of identity that last modified the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    lastModifiedAt:
+                      type: string
+                      format: date-time
+                      description: The type of identity that last modified the resource.
+              title: Resource
+              description: Common fields that are returned in the response for all
+                Azure Resource Manager resources
+              x-ms-azure-resource: true
+        description: Parameters supplied to create an Event Hub resource.
+        required: true
+      responses:
+        '200':
+          description: Event Hub successfully created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.EventHub/Namespaces"
+                      or "Microsoft.EventHub/Namespaces/EventHubs"
+                  location:
+                    type: string
+                    readOnly: true
+                    description: The geo-location where the resource lives
+                  properties:
+                    x-ms-client-flatten: true
+                    properties:
+                      partitionIds:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: string
+                        description: Current number of shards on the Event Hub.
+                      createdAt:
+                        readOnly: true
+                        format: date-time
+                        type: string
+                        description: Exact time the Event Hub was created.
+                      updatedAt:
+                        readOnly: true
+                        format: date-time
+                        type: string
+                        description: The exact time the message was updated.
+                      messageRetentionInDays:
+                        format: int64
+                        type: integer
+                        minimum: 1
+                        description: Number of days to retain the events for this
+                          Event Hub, value should be 1 to 7 days
+                      partitionCount:
+                        format: int64
+                        type: integer
+                        minimum: 1
+                        description: Number of partitions created for the Event Hub,
+                          allowed values are from 1 to 32 partitions.
+                      status:
+                        type: string
+                        description: Enumerates the possible values for the status
+                          of the Event Hub.
+                        enum:
+                        - Active
+                        - Disabled
+                        - Restoring
+                        - SendDisabled
+                        - ReceiveDisabled
+                        - Creating
+                        - Deleting
+                        - Renaming
+                        - Unknown
+                        x-ms-enum:
+                          name: EntityStatus
+                          modelAsString: false
+                      userMetadata:
+                        type: string
+                        description: Gets and Sets Metadata of User.
+                      captureDescription:
+                        description: Properties of capture description
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: 'A value that indicates whether capture description
+                              is enabled. '
+                          encoding:
+                            type: string
+                            description: 'Enumerates the possible values for the encoding
+                              format of capture description. Note: ''AvroDeflate''
+                              will be deprecated in New API Version'
+                            enum:
+                            - Avro
+                            - AvroDeflate
+                            x-ms-enum:
+                              name: EncodingCaptureDescription
+                              modelAsString: false
+                          intervalInSeconds:
+                            format: int32
+                            type: integer
+                            description: The time window allows you to set the frequency
+                              with which the capture to Azure Blobs will happen, value
+                              should between 60 to 900 seconds
+                          sizeLimitInBytes:
+                            format: int32
+                            type: integer
+                            description: The size window defines the amount of data
+                              built up in your Event Hub before an capture operation,
+                              value should be between 10485760 to 524288000 bytes
+                          destination:
+                            description: Properties of Destination where capture will
+                              be stored. (Storage Account, Blob Names)
+                            properties:
+                              name:
+                                type: string
+                                description: Name for capture destination
+                              identity:
+                                type: object
+                                description: A value that indicates whether capture
+                                  description is enabled.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: Type of Azure Active Directory Managed
+                                      Identity.
+                                    enum:
+                                    - SystemAssigned
+                                    - UserAssigned
+                                    x-ms-enum:
+                                      name: CaptureIdentityType
+                                      modelAsString: false
+                                  userAssignedIdentity:
+                                    type: string
+                                    description: ARM ID of Managed User Identity.
+                                      This property is required is the type is UserAssignedIdentity.
+                                      If type is SystemAssigned, then the System Assigned
+                                      Identity Associated with the namespace will
+                                      be used.
+                              properties:
+                                x-ms-client-flatten: true
+                                properties:
+                                  storageAccountResourceId:
+                                    type: string
+                                    description: Resource id of the storage account
+                                      to be used to create the blobs
+                                  blobContainer:
+                                    type: string
+                                    description: Blob container Name
+                                  archiveNameFormat:
+                                    type: string
+                                    description: Blob naming convention for archive,
+                                      e.g. {Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}.
+                                      Here all the parameters (Namespace,EventHub
+                                      .. etc) are mandatory irrespective of order
+                                  dataLakeSubscriptionId:
+                                    type: string
+                                    format: uuid
+                                    description: Subscription Id of Azure Data Lake
+                                      Store
+                                  dataLakeAccountName:
+                                    type: string
+                                    description: The Azure Data Lake Store name for
+                                      the captured events
+                                  dataLakeFolderPath:
+                                    type: string
+                                    description: The destination folder path for the
+                                      captured events
+                                description: Properties describing the storage account,
+                                  blob container and archive name format for capture
+                                  destination
+                          skipEmptyArchives:
+                            type: boolean
+                            description: A value that indicates whether to Skip Empty
+                              Archives
+                      retentionDescription:
+                        description: Event Hub retention settings
+                        type: object
+                        properties:
+                          cleanupPolicy:
+                            type: string
+                            description: Enumerates the possible values for cleanup
+                              policy
+                            enum:
+                            - Delete
+                            - Compact
+                            x-ms-enum:
+                              name: CleanupPolicyRetentionDescription
+                              modelAsString: true
+                          retentionTimeInHours:
+                            format: int64
+                            type: integer
+                            description: 'Number of hours to retain the events for
+                              this Event Hub. This value is only used when cleanupPolicy
+                              is Delete. If cleanupPolicy is Compact the returned
+                              value of this property is Long.MaxValue '
+                          tombstoneRetentionTimeInHours:
+                            format: int32
+                            type: integer
+                            description: Number of hours to retain the tombstone markers
+                              of a compacted Event Hub. This value is only used when
+                              cleanupPolicy is Compact. Consumer must complete reading
+                              the tombstone marker within this specified amount of
+                              time if consumer begins from starting offset to ensure
+                              they get a valid snapshot for the specific key described
+                              by the tombstone marker within the compacted Event Hub
+                    description: Properties supplied to the Create Or Update Event
+                      Hub operation.
+                  systemData:
+                    readOnly: true
+                    description: The system meta data relating to this resource.
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The type of identity that last modified the resource.
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Eventhub error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response indicates Event Hub service is not able
+                  to process the incoming request. The reason is provided in the error
+                  message.
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              description: The error additional info.
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        description: The error additional info.
+    delete:
+      tags:
+      - EventHubs
+      operationId: EventHubs_Delete
+      description: Deletes an Event Hub from the specified Namespace and resource
+        group.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Name of the resource group within the azure subscription.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: namespaceName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: The Namespace name
+        schema:
+          type: string
+          minLength: 6
+          maxLength: 50
+          pattern: ^[a-zA-Z][a-zA-Z0-9-]{6,50}[a-zA-Z0-9]$
+      - name: eventHubName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: The Event Hub name
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+      - name: api-version
+        in: query
+        required: true
+        description: Client API Version.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: Subscription credentials that uniquely identify a Microsoft Azure
+          subscription. The subscription ID forms part of the URI for every service
+          call.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Event Hub successfully deleted.
+        '204':
+          description: No content.
+        default:
+          description: Eventhub error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response indicates Event Hub service is not able
+                  to process the incoming request. The reason is provided in the error
+                  message.
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              description: The error additional info.
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        description: The error additional info.
+    get:
+      tags:
+      - EventHubs
+      operationId: EventHubs_Get
+      description: Gets an Event Hubs description for the specified Event Hub.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: Name of the resource group within the azure subscription.
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: namespaceName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: The Namespace name
+        schema:
+          type: string
+          minLength: 6
+          maxLength: 50
+          pattern: ^[a-zA-Z][a-zA-Z0-9-]{6,50}[a-zA-Z0-9]$
+      - name: eventHubName
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        description: The Event Hub name
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+      - name: api-version
+        in: query
+        required: true
+        description: Client API Version.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: Subscription credentials that uniquely identify a Microsoft Azure
+          subscription. The subscription ID forms part of the URI for every service
+          call.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successfully retrieved the Event Hub description.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.EventHub/Namespaces"
+                      or "Microsoft.EventHub/Namespaces/EventHubs"
+                  location:
+                    type: string
+                    readOnly: true
+                    description: The geo-location where the resource lives
+                  properties:
+                    x-ms-client-flatten: true
+                    properties:
+                      partitionIds:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: string
+                        description: Current number of shards on the Event Hub.
+                      createdAt:
+                        readOnly: true
+                        format: date-time
+                        type: string
+                        description: Exact time the Event Hub was created.
+                      updatedAt:
+                        readOnly: true
+                        format: date-time
+                        type: string
+                        description: The exact time the message was updated.
+                      messageRetentionInDays:
+                        format: int64
+                        type: integer
+                        minimum: 1
+                        description: Number of days to retain the events for this
+                          Event Hub, value should be 1 to 7 days
+                      partitionCount:
+                        format: int64
+                        type: integer
+                        minimum: 1
+                        description: Number of partitions created for the Event Hub,
+                          allowed values are from 1 to 32 partitions.
+                      status:
+                        type: string
+                        description: Enumerates the possible values for the status
+                          of the Event Hub.
+                        enum:
+                        - Active
+                        - Disabled
+                        - Restoring
+                        - SendDisabled
+                        - ReceiveDisabled
+                        - Creating
+                        - Deleting
+                        - Renaming
+                        - Unknown
+                        x-ms-enum:
+                          name: EntityStatus
+                          modelAsString: false
+                      userMetadata:
+                        type: string
+                        description: Gets and Sets Metadata of User.
+                      captureDescription:
+                        description: Properties of capture description
+                        properties:
+                          enabled:
+                            type: boolean
+                            description: 'A value that indicates whether capture description
+                              is enabled. '
+                          encoding:
+                            type: string
+                            description: 'Enumerates the possible values for the encoding
+                              format of capture description. Note: ''AvroDeflate''
+                              will be deprecated in New API Version'
+                            enum:
+                            - Avro
+                            - AvroDeflate
+                            x-ms-enum:
+                              name: EncodingCaptureDescription
+                              modelAsString: false
+                          intervalInSeconds:
+                            format: int32
+                            type: integer
+                            description: The time window allows you to set the frequency
+                              with which the capture to Azure Blobs will happen, value
+                              should between 60 to 900 seconds
+                          sizeLimitInBytes:
+                            format: int32
+                            type: integer
+                            description: The size window defines the amount of data
+                              built up in your Event Hub before an capture operation,
+                              value should be between 10485760 to 524288000 bytes
+                          destination:
+                            description: Properties of Destination where capture will
+                              be stored. (Storage Account, Blob Names)
+                            properties:
+                              name:
+                                type: string
+                                description: Name for capture destination
+                              identity:
+                                type: object
+                                description: A value that indicates whether capture
+                                  description is enabled.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: Type of Azure Active Directory Managed
+                                      Identity.
+                                    enum:
+                                    - SystemAssigned
+                                    - UserAssigned
+                                    x-ms-enum:
+                                      name: CaptureIdentityType
+                                      modelAsString: false
+                                  userAssignedIdentity:
+                                    type: string
+                                    description: ARM ID of Managed User Identity.
+                                      This property is required is the type is UserAssignedIdentity.
+                                      If type is SystemAssigned, then the System Assigned
+                                      Identity Associated with the namespace will
+                                      be used.
+                              properties:
+                                x-ms-client-flatten: true
+                                properties:
+                                  storageAccountResourceId:
+                                    type: string
+                                    description: Resource id of the storage account
+                                      to be used to create the blobs
+                                  blobContainer:
+                                    type: string
+                                    description: Blob container Name
+                                  archiveNameFormat:
+                                    type: string
+                                    description: Blob naming convention for archive,
+                                      e.g. {Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}.
+                                      Here all the parameters (Namespace,EventHub
+                                      .. etc) are mandatory irrespective of order
+                                  dataLakeSubscriptionId:
+                                    type: string
+                                    format: uuid
+                                    description: Subscription Id of Azure Data Lake
+                                      Store
+                                  dataLakeAccountName:
+                                    type: string
+                                    description: The Azure Data Lake Store name for
+                                      the captured events
+                                  dataLakeFolderPath:
+                                    type: string
+                                    description: The destination folder path for the
+                                      captured events
+                                description: Properties describing the storage account,
+                                  blob container and archive name format for capture
+                                  destination
+                          skipEmptyArchives:
+                            type: boolean
+                            description: A value that indicates whether to Skip Empty
+                              Archives
+                      retentionDescription:
+                        description: Event Hub retention settings
+                        type: object
+                        properties:
+                          cleanupPolicy:
+                            type: string
+                            description: Enumerates the possible values for cleanup
+                              policy
+                            enum:
+                            - Delete
+                            - Compact
+                            x-ms-enum:
+                              name: CleanupPolicyRetentionDescription
+                              modelAsString: true
+                          retentionTimeInHours:
+                            format: int64
+                            type: integer
+                            description: 'Number of hours to retain the events for
+                              this Event Hub. This value is only used when cleanupPolicy
+                              is Delete. If cleanupPolicy is Compact the returned
+                              value of this property is Long.MaxValue '
+                          tombstoneRetentionTimeInHours:
+                            format: int32
+                            type: integer
+                            description: Number of hours to retain the tombstone markers
+                              of a compacted Event Hub. This value is only used when
+                              cleanupPolicy is Compact. Consumer must complete reading
+                              the tombstone marker within this specified amount of
+                              time if consumer begins from starting offset to ensure
+                              they get a valid snapshot for the specific key described
+                              by the tombstone marker within the compacted Event Hub
+                    description: Properties supplied to the Create Or Update Event
+                      Hub operation.
+                  systemData:
+                    readOnly: true
+                    description: The system meta data relating to this resource.
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The type of identity that last modified the resource.
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Eventhub error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response indicates Event Hub service is not able
+                  to process the incoming request. The reason is provided in the error
+                  message.
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              description: The error additional info.
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        description: The error additional info.
+components:
+  parameters:
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      description: Name of the resource group within the azure subscription.
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    NamespaceNameParameter:
+      name: namespaceName
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      description: The Namespace name
+      schema:
+        type: string
+        minLength: 6
+        maxLength: 50
+        pattern: ^[a-zA-Z][a-zA-Z0-9-]{6,50}[a-zA-Z0-9]$
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: Client API Version.
+      schema:
+        type: string
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      required: true
+      description: Subscription credentials that uniquely identify a Microsoft Azure
+        subscription. The subscription ID forms part of the URI for every service
+        call.
+      schema:
+        type: string
+    SkipParameter:
+      name: $skip
+      description: Skip is only used if a previous operation returned a partial result.
+        If a previous response contains a nextLink element, the value of the nextLink
+        element will include a skip parameter that specifies a starting point to use
+        for subsequent calls.
+      in: query
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 1000
+    TopParameter:
+      name: $top
+      description: May be used to limit the number of results to the most recent N
+        usageDetails.
+      in: query
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 1000
+    EventHubNameParameter:
+      name: eventHubName
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      description: The Event Hub name
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 256
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    CaptureDescription:
+      properties:
+        enabled:
+          type: boolean
+          description: 'A value that indicates whether capture description is enabled. '
+        encoding:
+          type: string
+          description: 'Enumerates the possible values for the encoding format of
+            capture description. Note: ''AvroDeflate'' will be deprecated in New API
+            Version'
+          enum:
+          - Avro
+          - AvroDeflate
+          x-ms-enum:
+            name: EncodingCaptureDescription
+            modelAsString: false
+        intervalInSeconds:
+          format: int32
+          type: integer
+          description: The time window allows you to set the frequency with which
+            the capture to Azure Blobs will happen, value should between 60 to 900
+            seconds
+        sizeLimitInBytes:
+          format: int32
+          type: integer
+          description: The size window defines the amount of data built up in your
+            Event Hub before an capture operation, value should be between 10485760
+            to 524288000 bytes
+        destination:
+          description: Properties of Destination where capture will be stored. (Storage
+            Account, Blob Names)
+          properties:
+            name:
+              type: string
+              description: Name for capture destination
+            identity:
+              type: object
+              description: A value that indicates whether capture description is enabled.
+              properties:
+                type:
+                  type: string
+                  description: Type of Azure Active Directory Managed Identity.
+                  enum:
+                  - SystemAssigned
+                  - UserAssigned
+                  x-ms-enum:
+                    name: CaptureIdentityType
+                    modelAsString: false
+                userAssignedIdentity:
+                  type: string
+                  description: ARM ID of Managed User Identity. This property is required
+                    is the type is UserAssignedIdentity. If type is SystemAssigned,
+                    then the System Assigned Identity Associated with the namespace
+                    will be used.
+            properties:
+              x-ms-client-flatten: true
+              properties:
+                storageAccountResourceId:
+                  type: string
+                  description: Resource id of the storage account to be used to create
+                    the blobs
+                blobContainer:
+                  type: string
+                  description: Blob container Name
+                archiveNameFormat:
+                  type: string
+                  description: Blob naming convention for archive, e.g. {Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}.
+                    Here all the parameters (Namespace,EventHub .. etc) are mandatory
+                    irrespective of order
+                dataLakeSubscriptionId:
+                  type: string
+                  format: uuid
+                  description: Subscription Id of Azure Data Lake Store
+                dataLakeAccountName:
+                  type: string
+                  description: The Azure Data Lake Store name for the captured events
+                dataLakeFolderPath:
+                  type: string
+                  description: The destination folder path for the captured events
+              description: Properties describing the storage account, blob container
+                and archive name format for capture destination
+        skipEmptyArchives:
+          type: boolean
+          description: A value that indicates whether to Skip Empty Archives
+      description: Properties to configure capture description for eventhub
+    RetentionDescription:
+      type: object
+      properties:
+        cleanupPolicy:
+          type: string
+          description: Enumerates the possible values for cleanup policy
+          enum:
+          - Delete
+          - Compact
+          x-ms-enum:
+            name: CleanupPolicyRetentionDescription
+            modelAsString: true
+        retentionTimeInHours:
+          format: int64
+          type: integer
+          description: 'Number of hours to retain the events for this Event Hub. This
+            value is only used when cleanupPolicy is Delete. If cleanupPolicy is Compact
+            the returned value of this property is Long.MaxValue '
+        tombstoneRetentionTimeInHours:
+          format: int32
+          type: integer
+          description: Number of hours to retain the tombstone markers of a compacted
+            Event Hub. This value is only used when cleanupPolicy is Compact. Consumer
+            must complete reading the tombstone marker within this specified amount
+            of time if consumer begins from starting offset to ensure they get a valid
+            snapshot for the specific key described by the tombstone marker within
+            the compacted Event Hub
+      description: Properties to configure retention settings for the  eventhub
+    Eventhub:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.EventHub/Namespaces"
+            or "Microsoft.EventHub/Namespaces/EventHubs"
+        location:
+          type: string
+          readOnly: true
+          description: The geo-location where the resource lives
+        properties:
+          x-ms-client-flatten: true
+          properties:
+            partitionIds:
+              readOnly: true
+              type: array
+              items:
+                type: string
+              description: Current number of shards on the Event Hub.
+            createdAt:
+              readOnly: true
+              format: date-time
+              type: string
+              description: Exact time the Event Hub was created.
+            updatedAt:
+              readOnly: true
+              format: date-time
+              type: string
+              description: The exact time the message was updated.
+            messageRetentionInDays:
+              format: int64
+              type: integer
+              minimum: 1
+              description: Number of days to retain the events for this Event Hub,
+                value should be 1 to 7 days
+            partitionCount:
+              format: int64
+              type: integer
+              minimum: 1
+              description: Number of partitions created for the Event Hub, allowed
+                values are from 1 to 32 partitions.
+            status:
+              type: string
+              description: Enumerates the possible values for the status of the Event
+                Hub.
+              enum:
+              - Active
+              - Disabled
+              - Restoring
+              - SendDisabled
+              - ReceiveDisabled
+              - Creating
+              - Deleting
+              - Renaming
+              - Unknown
+              x-ms-enum:
+                name: EntityStatus
+                modelAsString: false
+            userMetadata:
+              type: string
+              description: Gets and Sets Metadata of User.
+            captureDescription:
+              description: Properties of capture description
+              properties:
+                enabled:
+                  type: boolean
+                  description: 'A value that indicates whether capture description
+                    is enabled. '
+                encoding:
+                  type: string
+                  description: 'Enumerates the possible values for the encoding format
+                    of capture description. Note: ''AvroDeflate'' will be deprecated
+                    in New API Version'
+                  enum:
+                  - Avro
+                  - AvroDeflate
+                  x-ms-enum:
+                    name: EncodingCaptureDescription
+                    modelAsString: false
+                intervalInSeconds:
+                  format: int32
+                  type: integer
+                  description: The time window allows you to set the frequency with
+                    which the capture to Azure Blobs will happen, value should between
+                    60 to 900 seconds
+                sizeLimitInBytes:
+                  format: int32
+                  type: integer
+                  description: The size window defines the amount of data built up
+                    in your Event Hub before an capture operation, value should be
+                    between 10485760 to 524288000 bytes
+                destination:
+                  description: Properties of Destination where capture will be stored.
+                    (Storage Account, Blob Names)
+                  properties:
+                    name:
+                      type: string
+                      description: Name for capture destination
+                    identity:
+                      type: object
+                      description: A value that indicates whether capture description
+                        is enabled.
+                      properties:
+                        type:
+                          type: string
+                          description: Type of Azure Active Directory Managed Identity.
+                          enum:
+                          - SystemAssigned
+                          - UserAssigned
+                          x-ms-enum:
+                            name: CaptureIdentityType
+                            modelAsString: false
+                        userAssignedIdentity:
+                          type: string
+                          description: ARM ID of Managed User Identity. This property
+                            is required is the type is UserAssignedIdentity. If type
+                            is SystemAssigned, then the System Assigned Identity Associated
+                            with the namespace will be used.
+                    properties:
+                      x-ms-client-flatten: true
+                      properties:
+                        storageAccountResourceId:
+                          type: string
+                          description: Resource id of the storage account to be used
+                            to create the blobs
+                        blobContainer:
+                          type: string
+                          description: Blob container Name
+                        archiveNameFormat:
+                          type: string
+                          description: Blob naming convention for archive, e.g. {Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}.
+                            Here all the parameters (Namespace,EventHub .. etc) are
+                            mandatory irrespective of order
+                        dataLakeSubscriptionId:
+                          type: string
+                          format: uuid
+                          description: Subscription Id of Azure Data Lake Store
+                        dataLakeAccountName:
+                          type: string
+                          description: The Azure Data Lake Store name for the captured
+                            events
+                        dataLakeFolderPath:
+                          type: string
+                          description: The destination folder path for the captured
+                            events
+                      description: Properties describing the storage account, blob
+                        container and archive name format for capture destination
+                skipEmptyArchives:
+                  type: boolean
+                  description: A value that indicates whether to Skip Empty Archives
+            retentionDescription:
+              description: Event Hub retention settings
+              type: object
+              properties:
+                cleanupPolicy:
+                  type: string
+                  description: Enumerates the possible values for cleanup policy
+                  enum:
+                  - Delete
+                  - Compact
+                  x-ms-enum:
+                    name: CleanupPolicyRetentionDescription
+                    modelAsString: true
+                retentionTimeInHours:
+                  format: int64
+                  type: integer
+                  description: 'Number of hours to retain the events for this Event
+                    Hub. This value is only used when cleanupPolicy is Delete. If
+                    cleanupPolicy is Compact the returned value of this property is
+                    Long.MaxValue '
+                tombstoneRetentionTimeInHours:
+                  format: int32
+                  type: integer
+                  description: Number of hours to retain the tombstone markers of
+                    a compacted Event Hub. This value is only used when cleanupPolicy
+                    is Compact. Consumer must complete reading the tombstone marker
+                    within this specified amount of time if consumer begins from starting
+                    offset to ensure they get a valid snapshot for the specific key
+                    described by the tombstone marker within the compacted Event Hub
+          description: Properties supplied to the Create Or Update Event Hub operation.
+        systemData:
+          readOnly: true
+          description: The system meta data relating to this resource.
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The type of identity that last modified the resource.
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    EventHubListResult:
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+              name:
+                readOnly: true
+                type: string
+                description: The name of the resource
+              type:
+                readOnly: true
+                type: string
+                description: The type of the resource. E.g. "Microsoft.EventHub/Namespaces"
+                  or "Microsoft.EventHub/Namespaces/EventHubs"
+              location:
+                type: string
+                readOnly: true
+                description: The geo-location where the resource lives
+              properties:
+                x-ms-client-flatten: true
+                properties:
+                  partitionIds:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: string
+                    description: Current number of shards on the Event Hub.
+                  createdAt:
+                    readOnly: true
+                    format: date-time
+                    type: string
+                    description: Exact time the Event Hub was created.
+                  updatedAt:
+                    readOnly: true
+                    format: date-time
+                    type: string
+                    description: The exact time the message was updated.
+                  messageRetentionInDays:
+                    format: int64
+                    type: integer
+                    minimum: 1
+                    description: Number of days to retain the events for this Event
+                      Hub, value should be 1 to 7 days
+                  partitionCount:
+                    format: int64
+                    type: integer
+                    minimum: 1
+                    description: Number of partitions created for the Event Hub, allowed
+                      values are from 1 to 32 partitions.
+                  status:
+                    type: string
+                    description: Enumerates the possible values for the status of
+                      the Event Hub.
+                    enum:
+                    - Active
+                    - Disabled
+                    - Restoring
+                    - SendDisabled
+                    - ReceiveDisabled
+                    - Creating
+                    - Deleting
+                    - Renaming
+                    - Unknown
+                    x-ms-enum:
+                      name: EntityStatus
+                      modelAsString: false
+                  userMetadata:
+                    type: string
+                    description: Gets and Sets Metadata of User.
+                  captureDescription:
+                    description: Properties of capture description
+                    properties:
+                      enabled:
+                        type: boolean
+                        description: 'A value that indicates whether capture description
+                          is enabled. '
+                      encoding:
+                        type: string
+                        description: 'Enumerates the possible values for the encoding
+                          format of capture description. Note: ''AvroDeflate'' will
+                          be deprecated in New API Version'
+                        enum:
+                        - Avro
+                        - AvroDeflate
+                        x-ms-enum:
+                          name: EncodingCaptureDescription
+                          modelAsString: false
+                      intervalInSeconds:
+                        format: int32
+                        type: integer
+                        description: The time window allows you to set the frequency
+                          with which the capture to Azure Blobs will happen, value
+                          should between 60 to 900 seconds
+                      sizeLimitInBytes:
+                        format: int32
+                        type: integer
+                        description: The size window defines the amount of data built
+                          up in your Event Hub before an capture operation, value
+                          should be between 10485760 to 524288000 bytes
+                      destination:
+                        description: Properties of Destination where capture will
+                          be stored. (Storage Account, Blob Names)
+                        properties:
+                          name:
+                            type: string
+                            description: Name for capture destination
+                          identity:
+                            type: object
+                            description: A value that indicates whether capture description
+                              is enabled.
+                            properties:
+                              type:
+                                type: string
+                                description: Type of Azure Active Directory Managed
+                                  Identity.
+                                enum:
+                                - SystemAssigned
+                                - UserAssigned
+                                x-ms-enum:
+                                  name: CaptureIdentityType
+                                  modelAsString: false
+                              userAssignedIdentity:
+                                type: string
+                                description: ARM ID of Managed User Identity. This
+                                  property is required is the type is UserAssignedIdentity.
+                                  If type is SystemAssigned, then the System Assigned
+                                  Identity Associated with the namespace will be used.
+                          properties:
+                            x-ms-client-flatten: true
+                            properties:
+                              storageAccountResourceId:
+                                type: string
+                                description: Resource id of the storage account to
+                                  be used to create the blobs
+                              blobContainer:
+                                type: string
+                                description: Blob container Name
+                              archiveNameFormat:
+                                type: string
+                                description: Blob naming convention for archive, e.g.
+                                  {Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}.
+                                  Here all the parameters (Namespace,EventHub .. etc)
+                                  are mandatory irrespective of order
+                              dataLakeSubscriptionId:
+                                type: string
+                                format: uuid
+                                description: Subscription Id of Azure Data Lake Store
+                              dataLakeAccountName:
+                                type: string
+                                description: The Azure Data Lake Store name for the
+                                  captured events
+                              dataLakeFolderPath:
+                                type: string
+                                description: The destination folder path for the captured
+                                  events
+                            description: Properties describing the storage account,
+                              blob container and archive name format for capture destination
+                      skipEmptyArchives:
+                        type: boolean
+                        description: A value that indicates whether to Skip Empty
+                          Archives
+                  retentionDescription:
+                    description: Event Hub retention settings
+                    type: object
+                    properties:
+                      cleanupPolicy:
+                        type: string
+                        description: Enumerates the possible values for cleanup policy
+                        enum:
+                        - Delete
+                        - Compact
+                        x-ms-enum:
+                          name: CleanupPolicyRetentionDescription
+                          modelAsString: true
+                      retentionTimeInHours:
+                        format: int64
+                        type: integer
+                        description: 'Number of hours to retain the events for this
+                          Event Hub. This value is only used when cleanupPolicy is
+                          Delete. If cleanupPolicy is Compact the returned value of
+                          this property is Long.MaxValue '
+                      tombstoneRetentionTimeInHours:
+                        format: int32
+                        type: integer
+                        description: Number of hours to retain the tombstone markers
+                          of a compacted Event Hub. This value is only used when cleanupPolicy
+                          is Compact. Consumer must complete reading the tombstone
+                          marker within this specified amount of time if consumer
+                          begins from starting offset to ensure they get a valid snapshot
+                          for the specific key described by the tombstone marker within
+                          the compacted Event Hub
+                description: Properties supplied to the Create Or Update Event Hub
+                  operation.
+              systemData:
+                readOnly: true
+                description: The system meta data relating to this resource.
+                type: object
+                properties:
+                  createdBy:
+                    type: string
+                    description: The identity that created the resource.
+                  createdByType:
+                    type: string
+                    description: The type of identity that created the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource creation (UTC).
+                  lastModifiedBy:
+                    type: string
+                    description: The identity that last modified the resource.
+                  lastModifiedByType:
+                    type: string
+                    description: The type of identity that last modified the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  lastModifiedAt:
+                    type: string
+                    format: date-time
+                    description: The type of identity that last modified the resource.
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+          description: Result of the List EventHubs operation.
+        nextLink:
+          type: string
+          description: Link to the next set of results. Not empty if Value contains
+            incomplete list of EventHubs.
+      description: The result of the List EventHubs operation.
+    CaptureIdentity:
+      type: object
+      description: A value that indicates whether capture description is enabled.
+      properties:
+        type:
+          type: string
+          description: Type of Azure Active Directory Managed Identity.
+          enum:
+          - SystemAssigned
+          - UserAssigned
+          x-ms-enum:
+            name: CaptureIdentityType
+            modelAsString: false
+        userAssignedIdentity:
+          type: string
+          description: ARM ID of Managed User Identity. This property is required
+            is the type is UserAssignedIdentity. If type is SystemAssigned, then the
+            System Assigned Identity Associated with the namespace will be used.
+    Destination:
+      properties:
+        name:
+          type: string
+          description: Name for capture destination
+        identity:
+          type: object
+          description: A value that indicates whether capture description is enabled.
+          properties:
+            type:
+              type: string
+              description: Type of Azure Active Directory Managed Identity.
+              enum:
+              - SystemAssigned
+              - UserAssigned
+              x-ms-enum:
+                name: CaptureIdentityType
+                modelAsString: false
+            userAssignedIdentity:
+              type: string
+              description: ARM ID of Managed User Identity. This property is required
+                is the type is UserAssignedIdentity. If type is SystemAssigned, then
+                the System Assigned Identity Associated with the namespace will be
+                used.
+        properties:
+          x-ms-client-flatten: true
+          properties:
+            storageAccountResourceId:
+              type: string
+              description: Resource id of the storage account to be used to create
+                the blobs
+            blobContainer:
+              type: string
+              description: Blob container Name
+            archiveNameFormat:
+              type: string
+              description: Blob naming convention for archive, e.g. {Namespace}/{EventHub}/{PartitionId}/{Year}/{Month}/{Day}/{Hour}/{Minute}/{Second}.
+                Here all the parameters (Namespace,EventHub .. etc) are mandatory
+                irrespective of order
+            dataLakeSubscriptionId:
+              type: string
+              format: uuid
+              description: Subscription Id of Azure Data Lake Store
+            dataLakeAccountName:
+              type: string
+              description: The Azure Data Lake Store name for the captured events
+            dataLakeFolderPath:
+              type: string
+              description: The destination folder path for the captured events
+          description: Properties describing the storage account, blob container and
+            archive name format for capture destination
+      description: Capture storage details for capture description
+    ErrorDetail:
+      description: The error detail.
+      type: object
+      properties:
+        code:
+          readOnly: true
+          type: string
+          description: The error code.
+        message:
+          readOnly: true
+          type: string
+          description: The error message.
+        target:
+          readOnly: true
+          type: string
+          description: The error target.
+        details:
+          readOnly: true
+          type: array
+          items:
+            description: The error detail.
+            type: object
+            properties:
+              code:
+                readOnly: true
+                type: string
+                description: The error code.
+              message:
+                readOnly: true
+                type: string
+                description: The error message.
+              target:
+                readOnly: true
+                type: string
+                description: The error target.
+              details:
+                readOnly: true
+                type: array
+                items:
+                  description: The error detail.
+                  type: object
+                  properties:
+                    code:
+                      readOnly: true
+                      type: string
+                      description: The error code.
+                    message:
+                      readOnly: true
+                      type: string
+                      description: The error message.
+                    target:
+                      readOnly: true
+                      type: string
+                      description: The error target.
+                description: The error details.
+              additionalInfo:
+                readOnly: true
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      readOnly: true
+                      type: string
+                      description: The additional info type.
+                    info:
+                      readOnly: true
+                      type: object
+                      description: The additional info.
+                  description: The resource management error additional info.
+                description: The error additional info.
+          description: The error details.
+        additionalInfo:
+          readOnly: true
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                readOnly: true
+                type: string
+                description: The additional info type.
+              info:
+                readOnly: true
+                type: object
+                description: The additional info.
+            description: The resource management error additional info.
+          description: The error additional info.
+    ErrorAdditionalInfo:
+      type: object
+      properties:
+        type:
+          readOnly: true
+          type: string
+          description: The additional info type.
+        info:
+          readOnly: true
+          type: object
+          description: The additional info.
+      description: The resource management error additional info.
+    ErrorResponse:
+      description: Error response indicates Event Hub service is not able to process
+        the incoming request. The reason is provided in the error message.
+      type: object
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              readOnly: true
+              type: string
+              description: The error code.
+            message:
+              readOnly: true
+              type: string
+              description: The error message.
+            target:
+              readOnly: true
+              type: string
+              description: The error target.
+            details:
+              readOnly: true
+              type: array
+              items:
+                description: The error detail.
+                type: object
+                properties:
+                  code:
+                    readOnly: true
+                    type: string
+                    description: The error code.
+                  message:
+                    readOnly: true
+                    type: string
+                    description: The error message.
+                  target:
+                    readOnly: true
+                    type: string
+                    description: The error target.
+                  details:
+                    readOnly: true
+                    type: array
+                    items:
+                      description: The error detail.
+                      type: object
+                      properties:
+                        code:
+                          readOnly: true
+                          type: string
+                          description: The error code.
+                        message:
+                          readOnly: true
+                          type: string
+                          description: The error message.
+                        target:
+                          readOnly: true
+                          type: string
+                          description: The error target.
+                    description: The error details.
+                  additionalInfo:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The additional info type.
+                        info:
+                          readOnly: true
+                          type: object
+                          description: The additional info.
+                      description: The resource management error additional info.
+                    description: The error additional info.
+              description: The error details.
+            additionalInfo:
+              readOnly: true
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The additional info type.
+                  info:
+                    readOnly: true
+                    type: object
+                    description: The additional info.
+                description: The resource management error additional info.
+              description: The error additional info.
+    ProxyResource:
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.EventHub/Namespaces"
+            or "Microsoft.EventHub/Namespaces/EventHubs"
+        location:
+          type: string
+          readOnly: true
+          description: The geo-location where the resource lives
+      x-ms-azure-resource: true
+    systemData:
+      description: Metadata pertaining to creation and last modification of the resource.
+      type: object
+      readOnly: true
+      properties:
+        createdBy:
+          type: string
+          description: The identity that created the resource.
+        createdByType:
+          type: string
+          description: The type of identity that created the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource creation (UTC).
+        lastModifiedBy:
+          type: string
+          description: The identity that last modified the resource.
+        lastModifiedByType:
+          type: string
+          description: The type of identity that last modified the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The type of identity that last modified the resource.

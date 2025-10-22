@@ -1,0 +1,1 @@
+On openhands gitlab repo (repo name: 'root/openhands'), find the issue titled "Please add the model used and its configuration in the demo video", reply with “Closing due to inactivity”, and close the issue.

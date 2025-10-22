@@ -1,0 +1,1019 @@
+openapi: 3.0.0
+info:
+  version: 2021-04-01
+  title: ComputeDiskAdminManagementClient
+  description: The Admin Compute Disk Management Client.
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  /subscriptions/{subscriptionId}/providers/Microsoft.Compute.Admin/locations/{location}/disks:
+    get:
+      tags:
+      - Disks
+      operationId: Disks_List
+      description: Returns a list of disks.
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: Subscription credentials that uniquely identify Microsoft Azure
+          subscription. The subscription ID forms part of the URI for every service
+          call.
+        required: true
+        schema:
+          type: string
+      - description: Location of the resource.
+        name: location
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - description: User Subscription Id which the resource belongs to.
+        name: userSubscriptionId
+        in: query
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - description: The parameters of disk state.
+        name: status
+        in: query
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - description: The share which the resource belongs to.
+        name: sharePath
+        in: query
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - description: The scale unit which the resource belongs to.
+        name: scaleUnit
+        in: query
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - description: The volume label of the volume which the resource belongs to.
+        name: volumeLabel
+        in: query
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - description: The maximum number of disks to return.
+        name: count
+        in: query
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+      - description: The start index of disks in query.
+        name: start
+        in: query
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: OK -- The list of disks has been returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of disks.
+                properties:
+                  value:
+                    description: List of disks.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          description: ID of the resource.
+                          type: string
+                        name:
+                          readOnly: true
+                          description: Name of the resource.
+                          type: string
+                        type:
+                          readOnly: true
+                          description: Type of Resource.
+                          type: string
+                        location:
+                          description: Location of the resource.
+                          type: string
+                        properties:
+                          x-ms-client-flatten: true
+                          description: Disk properties.
+                          type: object
+                          properties:
+                            diskId:
+                              description: The disk id.
+                              type: string
+                            status:
+                              description: The disk status.
+                              type: string
+                              enum:
+                              - Undefined
+                              - Unattached
+                              - Attached
+                              - Reserved
+                              - ActiveSAS
+                              - Unknown
+                              - All
+                              - Recommended
+                              - OfflineMigration
+                              - OnlineMigration
+                              x-ms-enum:
+                                name: DiskState
+                                modelAsString: true
+                            sharePath:
+                              description: The disk share path.
+                              type: string
+                            actualSizeGB:
+                              description: The actual size of disk in GB.
+                              type: integer
+                              format: int64
+                              readOnly: true
+                            provisionSizeGB:
+                              description: The provision size of disk in GB.
+                              type: integer
+                              format: int64
+                              readOnly: true
+                            managedBy:
+                              description: Compute resource Uri which owns this disk.
+                              type: string
+                              readOnly: true
+                            userResourceId:
+                              description: The disk resource Uri from user view.
+                              type: string
+                              readOnly: true
+                            diskType:
+                              description: The type of the disk resource.
+                              readOnly: true
+                              type: string
+                              enum:
+                              - Undefined
+                              - Disk
+                              - Snapshot
+                              - RestorePoint
+                              - ManagedBlob
+                              x-ms-enum:
+                                name: DiskResourceType
+                                modelAsString: true
+                            diskSku:
+                              description: the disk sku.
+                              readOnly: true
+                              type: string
+                              enum:
+                              - Standard_LRS
+                              - Standard_ZRS
+                              - Standard_GRS
+                              - Standard_RAGRS
+                              - Premium_LRS
+                              - StandardSSD_LRS
+                              - UltraSSD_LRS
+                              x-ms-enum:
+                                name: AccountType
+                                modelAsString: true
+                            creationSourceUri:
+                              description: The disk creation source uri.
+                              type: string
+                              readOnly: true
+                            creationOption:
+                              description: The disk creation option.
+                              readOnly: true
+                              type: string
+                              enum:
+                              - Empty
+                              - FromImage
+                              - Import
+                              - Copy
+                              - Restore
+                              - FromPreprovisioned
+                              - Undelete
+                              - Upload
+                              - RecoverFromBlob
+                              x-ms-enum:
+                                name: DiskCreationOption
+                                modelAsString: true
+                            exclusiveAllocatedSize:
+                              description: The exclusive allocated size for the disk.
+                              type: integer
+                              format: int64
+                              readOnly: true
+                      description: Base resource object.
+                      x-ms-azure-resource: true
+                  nextLink:
+                    description: URI to the next page.
+                    type: string
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: Error definition.
+                    readOnly: true
+                    required:
+                    - message
+                    - code
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        minimum: 100
+                        maximum: 600
+                      message:
+                        description: Description of the error.
+                        type: string
+      x-ms-pageable: {}
+  /subscriptions/{subscriptionId}/providers/Microsoft.Compute.Admin/locations/{location}/disks/{diskId}:
+    get:
+      tags:
+      - Disks
+      operationId: Disks_Get
+      description: Returns the disk.
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: Subscription credentials that uniquely identify Microsoft Azure
+          subscription. The subscription ID forms part of the URI for every service
+          call.
+        required: true
+        schema:
+          type: string
+      - description: Location of the resource.
+        name: location
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - description: The disk guid as identity.
+        name: diskId
+        in: path
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - description: Switch for whether summary or detailed disk size information
+          is returned.
+        name: showSizeDetail
+        in: query
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: boolean
+          default: false
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: OK -- The disk has been returned.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    description: ID of the resource.
+                    type: string
+                  name:
+                    readOnly: true
+                    description: Name of the resource.
+                    type: string
+                  type:
+                    readOnly: true
+                    description: Type of Resource.
+                    type: string
+                  location:
+                    description: Location of the resource.
+                    type: string
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Disk properties.
+                    type: object
+                    properties:
+                      diskId:
+                        description: The disk id.
+                        type: string
+                      status:
+                        description: The disk status.
+                        type: string
+                        enum:
+                        - Undefined
+                        - Unattached
+                        - Attached
+                        - Reserved
+                        - ActiveSAS
+                        - Unknown
+                        - All
+                        - Recommended
+                        - OfflineMigration
+                        - OnlineMigration
+                        x-ms-enum:
+                          name: DiskState
+                          modelAsString: true
+                      sharePath:
+                        description: The disk share path.
+                        type: string
+                      actualSizeGB:
+                        description: The actual size of disk in GB.
+                        type: integer
+                        format: int64
+                        readOnly: true
+                      provisionSizeGB:
+                        description: The provision size of disk in GB.
+                        type: integer
+                        format: int64
+                        readOnly: true
+                      managedBy:
+                        description: Compute resource Uri which owns this disk.
+                        type: string
+                        readOnly: true
+                      userResourceId:
+                        description: The disk resource Uri from user view.
+                        type: string
+                        readOnly: true
+                      diskType:
+                        description: The type of the disk resource.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Undefined
+                        - Disk
+                        - Snapshot
+                        - RestorePoint
+                        - ManagedBlob
+                        x-ms-enum:
+                          name: DiskResourceType
+                          modelAsString: true
+                      diskSku:
+                        description: the disk sku.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Standard_LRS
+                        - Standard_ZRS
+                        - Standard_GRS
+                        - Standard_RAGRS
+                        - Premium_LRS
+                        - StandardSSD_LRS
+                        - UltraSSD_LRS
+                        x-ms-enum:
+                          name: AccountType
+                          modelAsString: true
+                      creationSourceUri:
+                        description: The disk creation source uri.
+                        type: string
+                        readOnly: true
+                      creationOption:
+                        description: The disk creation option.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Empty
+                        - FromImage
+                        - Import
+                        - Copy
+                        - Restore
+                        - FromPreprovisioned
+                        - Undelete
+                        - Upload
+                        - RecoverFromBlob
+                        x-ms-enum:
+                          name: DiskCreationOption
+                          modelAsString: true
+                      exclusiveAllocatedSize:
+                        description: The exclusive allocated size for the disk.
+                        type: integer
+                        format: int64
+                        readOnly: true
+                description: Base resource object.
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response.
+                properties:
+                  error:
+                    description: Error definition.
+                    readOnly: true
+                    required:
+                    - message
+                    - code
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        minimum: 100
+                        maximum: 600
+                      message:
+                        description: Description of the error.
+                        type: string
+components:
+  parameters:
+    UserSubscriptionIdParameter:
+      description: User Subscription Id which the resource belongs to.
+      name: userSubscriptionId
+      in: query
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    DiskStateParameter:
+      description: The parameters of disk state.
+      name: status
+      in: query
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    SourceSharePathParameter:
+      description: The share which the resource belongs to.
+      name: sharePath
+      in: query
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    SourceScaleUnitParameter:
+      description: The scale unit which the resource belongs to.
+      name: scaleUnit
+      in: query
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    SourceVolumeLabelParameter:
+      description: The volume label of the volume which the resource belongs to.
+      name: volumeLabel
+      in: query
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    DiskCountParameter:
+      description: The maximum number of disks to return.
+      name: count
+      in: query
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+    DiskStartParameter:
+      description: The start index of disks in query.
+      name: start
+      in: query
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+    DiskIdParameter:
+      description: The disk guid as identity.
+      name: diskId
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    DiskSizeDetailParameter:
+      description: Switch for whether summary or detailed disk size information is
+        returned.
+      name: showSizeDetail
+      in: query
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: boolean
+        default: false
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: Subscription credentials that uniquely identify Microsoft Azure
+        subscription. The subscription ID forms part of the URI for every service
+        call.
+      required: true
+      schema:
+        type: string
+    LocationParameter:
+      description: Location of the resource.
+      name: location
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Authorization uses an Azure Active Directory OAuth2 flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    ErrorResponse:
+      description: Error response.
+      properties:
+        error:
+          description: Error definition.
+          readOnly: true
+          required:
+          - message
+          - code
+          properties:
+            code:
+              description: Service specific error code which serves as the substatus
+                for the HTTP error code.
+              type: string
+              minimum: 100
+              maximum: 600
+            message:
+              description: Description of the error.
+              type: string
+    ErrorDefinition:
+      description: Error definition.
+      readOnly: true
+      required:
+      - message
+      - code
+      properties:
+        code:
+          description: Service specific error code which serves as the substatus for
+            the HTTP error code.
+          type: string
+          minimum: 100
+          maximum: 600
+        message:
+          description: Description of the error.
+          type: string
+    DiskProperties:
+      description: Managed disk properties.
+      type: object
+      properties:
+        diskId:
+          description: The disk id.
+          type: string
+        status:
+          description: The disk status.
+          type: string
+          enum:
+          - Undefined
+          - Unattached
+          - Attached
+          - Reserved
+          - ActiveSAS
+          - Unknown
+          - All
+          - Recommended
+          - OfflineMigration
+          - OnlineMigration
+          x-ms-enum:
+            name: DiskState
+            modelAsString: true
+        sharePath:
+          description: The disk share path.
+          type: string
+        actualSizeGB:
+          description: The actual size of disk in GB.
+          type: integer
+          format: int64
+          readOnly: true
+        provisionSizeGB:
+          description: The provision size of disk in GB.
+          type: integer
+          format: int64
+          readOnly: true
+        managedBy:
+          description: Compute resource Uri which owns this disk.
+          type: string
+          readOnly: true
+        userResourceId:
+          description: The disk resource Uri from user view.
+          type: string
+          readOnly: true
+        diskType:
+          description: The type of the disk resource.
+          readOnly: true
+          type: string
+          enum:
+          - Undefined
+          - Disk
+          - Snapshot
+          - RestorePoint
+          - ManagedBlob
+          x-ms-enum:
+            name: DiskResourceType
+            modelAsString: true
+        diskSku:
+          description: the disk sku.
+          readOnly: true
+          type: string
+          enum:
+          - Standard_LRS
+          - Standard_ZRS
+          - Standard_GRS
+          - Standard_RAGRS
+          - Premium_LRS
+          - StandardSSD_LRS
+          - UltraSSD_LRS
+          x-ms-enum:
+            name: AccountType
+            modelAsString: true
+        creationSourceUri:
+          description: The disk creation source uri.
+          type: string
+          readOnly: true
+        creationOption:
+          description: The disk creation option.
+          readOnly: true
+          type: string
+          enum:
+          - Empty
+          - FromImage
+          - Import
+          - Copy
+          - Restore
+          - FromPreprovisioned
+          - Undelete
+          - Upload
+          - RecoverFromBlob
+          x-ms-enum:
+            name: DiskCreationOption
+            modelAsString: true
+        exclusiveAllocatedSize:
+          description: The exclusive allocated size for the disk.
+          type: integer
+          format: int64
+          readOnly: true
+    Disk:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          description: ID of the resource.
+          type: string
+        name:
+          readOnly: true
+          description: Name of the resource.
+          type: string
+        type:
+          readOnly: true
+          description: Type of Resource.
+          type: string
+        location:
+          description: Location of the resource.
+          type: string
+        properties:
+          x-ms-client-flatten: true
+          description: Disk properties.
+          type: object
+          properties:
+            diskId:
+              description: The disk id.
+              type: string
+            status:
+              description: The disk status.
+              type: string
+              enum:
+              - Undefined
+              - Unattached
+              - Attached
+              - Reserved
+              - ActiveSAS
+              - Unknown
+              - All
+              - Recommended
+              - OfflineMigration
+              - OnlineMigration
+              x-ms-enum:
+                name: DiskState
+                modelAsString: true
+            sharePath:
+              description: The disk share path.
+              type: string
+            actualSizeGB:
+              description: The actual size of disk in GB.
+              type: integer
+              format: int64
+              readOnly: true
+            provisionSizeGB:
+              description: The provision size of disk in GB.
+              type: integer
+              format: int64
+              readOnly: true
+            managedBy:
+              description: Compute resource Uri which owns this disk.
+              type: string
+              readOnly: true
+            userResourceId:
+              description: The disk resource Uri from user view.
+              type: string
+              readOnly: true
+            diskType:
+              description: The type of the disk resource.
+              readOnly: true
+              type: string
+              enum:
+              - Undefined
+              - Disk
+              - Snapshot
+              - RestorePoint
+              - ManagedBlob
+              x-ms-enum:
+                name: DiskResourceType
+                modelAsString: true
+            diskSku:
+              description: the disk sku.
+              readOnly: true
+              type: string
+              enum:
+              - Standard_LRS
+              - Standard_ZRS
+              - Standard_GRS
+              - Standard_RAGRS
+              - Premium_LRS
+              - StandardSSD_LRS
+              - UltraSSD_LRS
+              x-ms-enum:
+                name: AccountType
+                modelAsString: true
+            creationSourceUri:
+              description: The disk creation source uri.
+              type: string
+              readOnly: true
+            creationOption:
+              description: The disk creation option.
+              readOnly: true
+              type: string
+              enum:
+              - Empty
+              - FromImage
+              - Import
+              - Copy
+              - Restore
+              - FromPreprovisioned
+              - Undelete
+              - Upload
+              - RecoverFromBlob
+              x-ms-enum:
+                name: DiskCreationOption
+                modelAsString: true
+            exclusiveAllocatedSize:
+              description: The exclusive allocated size for the disk.
+              type: integer
+              format: int64
+              readOnly: true
+      description: Base resource object.
+      x-ms-azure-resource: true
+    DiskList:
+      type: object
+      description: List of disks.
+      properties:
+        value:
+          description: List of disks.
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                description: ID of the resource.
+                type: string
+              name:
+                readOnly: true
+                description: Name of the resource.
+                type: string
+              type:
+                readOnly: true
+                description: Type of Resource.
+                type: string
+              location:
+                description: Location of the resource.
+                type: string
+              properties:
+                x-ms-client-flatten: true
+                description: Disk properties.
+                type: object
+                properties:
+                  diskId:
+                    description: The disk id.
+                    type: string
+                  status:
+                    description: The disk status.
+                    type: string
+                    enum:
+                    - Undefined
+                    - Unattached
+                    - Attached
+                    - Reserved
+                    - ActiveSAS
+                    - Unknown
+                    - All
+                    - Recommended
+                    - OfflineMigration
+                    - OnlineMigration
+                    x-ms-enum:
+                      name: DiskState
+                      modelAsString: true
+                  sharePath:
+                    description: The disk share path.
+                    type: string
+                  actualSizeGB:
+                    description: The actual size of disk in GB.
+                    type: integer
+                    format: int64
+                    readOnly: true
+                  provisionSizeGB:
+                    description: The provision size of disk in GB.
+                    type: integer
+                    format: int64
+                    readOnly: true
+                  managedBy:
+                    description: Compute resource Uri which owns this disk.
+                    type: string
+                    readOnly: true
+                  userResourceId:
+                    description: The disk resource Uri from user view.
+                    type: string
+                    readOnly: true
+                  diskType:
+                    description: The type of the disk resource.
+                    readOnly: true
+                    type: string
+                    enum:
+                    - Undefined
+                    - Disk
+                    - Snapshot
+                    - RestorePoint
+                    - ManagedBlob
+                    x-ms-enum:
+                      name: DiskResourceType
+                      modelAsString: true
+                  diskSku:
+                    description: the disk sku.
+                    readOnly: true
+                    type: string
+                    enum:
+                    - Standard_LRS
+                    - Standard_ZRS
+                    - Standard_GRS
+                    - Standard_RAGRS
+                    - Premium_LRS
+                    - StandardSSD_LRS
+                    - UltraSSD_LRS
+                    x-ms-enum:
+                      name: AccountType
+                      modelAsString: true
+                  creationSourceUri:
+                    description: The disk creation source uri.
+                    type: string
+                    readOnly: true
+                  creationOption:
+                    description: The disk creation option.
+                    readOnly: true
+                    type: string
+                    enum:
+                    - Empty
+                    - FromImage
+                    - Import
+                    - Copy
+                    - Restore
+                    - FromPreprovisioned
+                    - Undelete
+                    - Upload
+                    - RecoverFromBlob
+                    x-ms-enum:
+                      name: DiskCreationOption
+                      modelAsString: true
+                  exclusiveAllocatedSize:
+                    description: The exclusive allocated size for the disk.
+                    type: integer
+                    format: int64
+                    readOnly: true
+            description: Base resource object.
+            x-ms-azure-resource: true
+        nextLink:
+          description: URI to the next page.
+          type: string
+    DiskState:
+      description: Disk State.
+      type: string
+      enum:
+      - Undefined
+      - Unattached
+      - Attached
+      - Reserved
+      - ActiveSAS
+      - Unknown
+      - All
+      - Recommended
+      - OfflineMigration
+      - OnlineMigration
+      x-ms-enum:
+        name: DiskState
+        modelAsString: true
+    DiskResourceType:
+      description: Disk resource type.
+      type: string
+      enum:
+      - Undefined
+      - Disk
+      - Snapshot
+      - RestorePoint
+      - ManagedBlob
+      x-ms-enum:
+        name: DiskResourceType
+        modelAsString: true
+    AccountType:
+      description: Disk Sku.
+      type: string
+      enum:
+      - Standard_LRS
+      - Standard_ZRS
+      - Standard_GRS
+      - Standard_RAGRS
+      - Premium_LRS
+      - StandardSSD_LRS
+      - UltraSSD_LRS
+      x-ms-enum:
+        name: AccountType
+        modelAsString: true
+    DiskCreationOption:
+      description: Disk creation option.
+      type: string
+      enum:
+      - Empty
+      - FromImage
+      - Import
+      - Copy
+      - Restore
+      - FromPreprovisioned
+      - Undelete
+      - Upload
+      - RecoverFromBlob
+      x-ms-enum:
+        name: DiskCreationOption
+        modelAsString: true
+    Resource:
+      description: Base resource object.
+      type: object
+      properties:
+        id:
+          readOnly: true
+          description: ID of the resource.
+          type: string
+        name:
+          readOnly: true
+          description: Name of the resource.
+          type: string
+        type:
+          readOnly: true
+          description: Type of Resource.
+          type: string
+        location:
+          description: Location of the resource.
+          type: string
+      x-ms-azure-resource: true

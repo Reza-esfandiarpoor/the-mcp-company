@@ -1,0 +1,502 @@
+openapi: 3.0.0
+info:
+  title: PostgreSQLManagementClient
+  description: The Azure Database for PostgreSQL management API provides create, read,
+    update, and delete functionality for Azure PostgreSQL resources including servers,
+    databases, firewall rules, network configuration, security alert policies, log
+    files and configurations with new business model.
+  version: 2024-08-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/providers/Microsoft.DBforPostgreSQL/locations/{locationName}/checkVirtualNetworkSubnetUsage
+  : post:
+      tags:
+      - VirtualNetworkSubnetUsage
+      operationId: VirtualNetworkSubnetUsage_Execute
+      description: Get virtual network subnet usage for a given vNet resource id.
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: locationName
+        in: path
+        required: true
+        description: The name of the location.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          pattern: ^[-\w\._]+$
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                virtualNetworkArmResourceId:
+                  type: string
+                  description: Virtual network resource id.
+              description: Virtual network subnet usage parameter
+        description: The required parameters for creating or updating a server.
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  delegatedSubnetsUsage:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        subnetName:
+                          type: string
+                          readOnly: true
+                          description: Name of the delegated subnet for which IP addresses
+                            are in use
+                        usage:
+                          type: integer
+                          format: int64
+                          readOnly: true
+                          description: Number of IP addresses used by the delegated
+                            subnet
+                      description: Delegated subnet usage data.
+                    readOnly: true
+                    x-ms-identifiers:
+                    - subnetName
+                  location:
+                    type: string
+                    readOnly: true
+                    description: location of the delegated subnet usage
+                  subscriptionId:
+                    type: string
+                    readOnly: true
+                    description: subscriptionId of the delegated subnet usage
+                description: Virtual network subnet usage data.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+components:
+  parameters:
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription. The value must be an UUID.
+      required: true
+      schema:
+        type: string
+        format: uuid
+    LocationNameParameter:
+      name: locationName
+      in: path
+      required: true
+      description: The name of the location.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        pattern: ^[-\w\._]+$
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Microsoft Entra OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    VirtualNetworkSubnetUsageParameter:
+      type: object
+      properties:
+        virtualNetworkArmResourceId:
+          type: string
+          description: Virtual network resource id.
+      description: Virtual network subnet usage parameter
+    VirtualNetworkSubnetUsageResult:
+      type: object
+      properties:
+        delegatedSubnetsUsage:
+          type: array
+          items:
+            type: object
+            properties:
+              subnetName:
+                type: string
+                readOnly: true
+                description: Name of the delegated subnet for which IP addresses are
+                  in use
+              usage:
+                type: integer
+                format: int64
+                readOnly: true
+                description: Number of IP addresses used by the delegated subnet
+            description: Delegated subnet usage data.
+          readOnly: true
+          x-ms-identifiers:
+          - subnetName
+        location:
+          type: string
+          readOnly: true
+          description: location of the delegated subnet usage
+        subscriptionId:
+          type: string
+          readOnly: true
+          description: subscriptionId of the delegated subnet usage
+      description: Virtual network subnet usage data.
+    DelegatedSubnetUsage:
+      type: object
+      properties:
+        subnetName:
+          type: string
+          readOnly: true
+          description: Name of the delegated subnet for which IP addresses are in
+            use
+        usage:
+          type: integer
+          format: int64
+          readOnly: true
+          description: Number of IP addresses used by the delegated subnet
+      description: Delegated subnet usage data.
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []

@@ -1,0 +1,644 @@
+openapi: 3.0.0
+info:
+  title: Azure Database Migration Service (classic) Resource Provider
+  version: 2025-06-30
+paths: {}
+components:
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    Project:
+      type: object
+      properties:
+        location:
+          type: string
+          x-ms-mutability:
+          - read
+          - create
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        systemData:
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+            createdByType:
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              type: string
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              format: date-time
+              type: string
+            lastModifiedBy:
+              type: string
+            lastModifiedByType:
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              type: string
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              format: date-time
+              type: string
+          description: Metadata pertaining to creation and last modification of the
+            resource.
+        properties:
+          description: Project properties
+          x-ms-client-flatten: true
+          type: object
+          properties:
+            sourcePlatform:
+              description: Source platform for the project
+              type: string
+              enum:
+              - SQL
+              - MySQL
+              - PostgreSql
+              - MongoDb
+              - Unknown
+              x-ms-enum:
+                name: ProjectSourcePlatform
+                modelAsString: true
+            azureAuthenticationInfo:
+              description: Field that defines the Azure active directory application
+                info, used to connect to the target Azure resource
+              type: object
+              properties:
+                applicationId:
+                  type: string
+                  description: Application ID of the Azure Active Directory Application
+                appKey:
+                  type: string
+                  description: Key used to authenticate to the Azure Active Directory
+                    Application
+                tenantId:
+                  type: string
+                  description: Tenant id of the customer
+                ignoreAzurePermissions:
+                  type: boolean
+                  description: Ignore checking azure permissions on the AAD app
+            targetPlatform:
+              description: Target platform for the project
+              type: string
+              enum:
+              - SQLDB
+              - SQLMI
+              - AzureDbForMySql
+              - AzureDbForPostgreSql
+              - MongoDb
+              - Unknown
+              x-ms-enum:
+                name: ProjectTargetPlatform
+                modelAsString: true
+            creationTime:
+              type: string
+              format: date-time
+              readOnly: true
+              description: UTC Date and time when project was created
+            sourceConnectionInfo:
+              description: Information for connecting to source
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Type of connection info
+                userName:
+                  type: string
+                  description: User name
+                password:
+                  type: string
+                  description: Password credential.
+              required:
+              - type
+              discriminator:
+                propertyName: type
+            targetConnectionInfo:
+              description: Information for connecting to target
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Type of connection info
+                userName:
+                  type: string
+                  description: User name
+                password:
+                  type: string
+                  description: Password credential.
+              required:
+              - type
+              discriminator:
+                propertyName: type
+            databasesInfo:
+              type: array
+              description: List of DatabaseInfo
+              items:
+                type: object
+                description: Project Database Details
+                properties:
+                  sourceDatabaseName:
+                    type: string
+                    description: Name of the database
+                required:
+                - sourceDatabaseName
+            provisioningState:
+              type: string
+              readOnly: true
+              description: The project's provisioning state
+              enum:
+              - Deleting
+              - Succeeded
+              x-ms-enum:
+                name: ProjectProvisioningState
+                modelAsString: true
+          required:
+          - sourcePlatform
+          - targetPlatform
+        etag:
+          type: string
+          description: HTTP strong entity tag value. This is ignored if submitted.
+      x-ms-azure-resource: true
+      description: A project resource
+    ProjectList:
+      type: object
+      description: OData page of project resources
+      properties:
+        value:
+          type: array
+          description: List of projects
+          items:
+            type: object
+            properties:
+              location:
+                type: string
+                x-ms-mutability:
+                - read
+                - create
+              tags:
+                type: object
+                additionalProperties:
+                  type: string
+              id:
+                type: string
+                readOnly: true
+              name:
+                type: string
+                readOnly: true
+              type:
+                type: string
+                readOnly: true
+              systemData:
+                readOnly: true
+                type: object
+                properties:
+                  createdBy:
+                    type: string
+                  createdByType:
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    type: string
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  createdAt:
+                    format: date-time
+                    type: string
+                  lastModifiedBy:
+                    type: string
+                  lastModifiedByType:
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    type: string
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  lastModifiedAt:
+                    format: date-time
+                    type: string
+                description: Metadata pertaining to creation and last modification
+                  of the resource.
+              properties:
+                description: Project properties
+                x-ms-client-flatten: true
+                type: object
+                properties:
+                  sourcePlatform:
+                    description: Source platform for the project
+                    type: string
+                    enum:
+                    - SQL
+                    - MySQL
+                    - PostgreSql
+                    - MongoDb
+                    - Unknown
+                    x-ms-enum:
+                      name: ProjectSourcePlatform
+                      modelAsString: true
+                  azureAuthenticationInfo:
+                    description: Field that defines the Azure active directory application
+                      info, used to connect to the target Azure resource
+                    type: object
+                    properties:
+                      applicationId:
+                        type: string
+                        description: Application ID of the Azure Active Directory
+                          Application
+                      appKey:
+                        type: string
+                        description: Key used to authenticate to the Azure Active
+                          Directory Application
+                      tenantId:
+                        type: string
+                        description: Tenant id of the customer
+                      ignoreAzurePermissions:
+                        type: boolean
+                        description: Ignore checking azure permissions on the AAD
+                          app
+                  targetPlatform:
+                    description: Target platform for the project
+                    type: string
+                    enum:
+                    - SQLDB
+                    - SQLMI
+                    - AzureDbForMySql
+                    - AzureDbForPostgreSql
+                    - MongoDb
+                    - Unknown
+                    x-ms-enum:
+                      name: ProjectTargetPlatform
+                      modelAsString: true
+                  creationTime:
+                    type: string
+                    format: date-time
+                    readOnly: true
+                    description: UTC Date and time when project was created
+                  sourceConnectionInfo:
+                    description: Information for connecting to source
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        description: Type of connection info
+                      userName:
+                        type: string
+                        description: User name
+                      password:
+                        type: string
+                        description: Password credential.
+                    required:
+                    - type
+                    discriminator:
+                      propertyName: type
+                  targetConnectionInfo:
+                    description: Information for connecting to target
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        description: Type of connection info
+                      userName:
+                        type: string
+                        description: User name
+                      password:
+                        type: string
+                        description: Password credential.
+                    required:
+                    - type
+                    discriminator:
+                      propertyName: type
+                  databasesInfo:
+                    type: array
+                    description: List of DatabaseInfo
+                    items:
+                      type: object
+                      description: Project Database Details
+                      properties:
+                        sourceDatabaseName:
+                          type: string
+                          description: Name of the database
+                      required:
+                      - sourceDatabaseName
+                  provisioningState:
+                    type: string
+                    readOnly: true
+                    description: The project's provisioning state
+                    enum:
+                    - Deleting
+                    - Succeeded
+                    x-ms-enum:
+                      name: ProjectProvisioningState
+                      modelAsString: true
+                required:
+                - sourcePlatform
+                - targetPlatform
+              etag:
+                type: string
+                description: HTTP strong entity tag value. This is ignored if submitted.
+            x-ms-azure-resource: true
+            description: A project resource
+        nextLink:
+          type: string
+          description: URL to load the next page of projects
+    ProjectProperties:
+      type: object
+      description: Project-specific properties
+      properties:
+        sourcePlatform:
+          description: Source platform for the project
+          type: string
+          enum:
+          - SQL
+          - MySQL
+          - PostgreSql
+          - MongoDb
+          - Unknown
+          x-ms-enum:
+            name: ProjectSourcePlatform
+            modelAsString: true
+        azureAuthenticationInfo:
+          description: Field that defines the Azure active directory application info,
+            used to connect to the target Azure resource
+          type: object
+          properties:
+            applicationId:
+              type: string
+              description: Application ID of the Azure Active Directory Application
+            appKey:
+              type: string
+              description: Key used to authenticate to the Azure Active Directory
+                Application
+            tenantId:
+              type: string
+              description: Tenant id of the customer
+            ignoreAzurePermissions:
+              type: boolean
+              description: Ignore checking azure permissions on the AAD app
+        targetPlatform:
+          description: Target platform for the project
+          type: string
+          enum:
+          - SQLDB
+          - SQLMI
+          - AzureDbForMySql
+          - AzureDbForPostgreSql
+          - MongoDb
+          - Unknown
+          x-ms-enum:
+            name: ProjectTargetPlatform
+            modelAsString: true
+        creationTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: UTC Date and time when project was created
+        sourceConnectionInfo:
+          description: Information for connecting to source
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of connection info
+            userName:
+              type: string
+              description: User name
+            password:
+              type: string
+              description: Password credential.
+          required:
+          - type
+          discriminator:
+            propertyName: type
+        targetConnectionInfo:
+          description: Information for connecting to target
+          type: object
+          properties:
+            type:
+              type: string
+              description: Type of connection info
+            userName:
+              type: string
+              description: User name
+            password:
+              type: string
+              description: Password credential.
+          required:
+          - type
+          discriminator:
+            propertyName: type
+        databasesInfo:
+          type: array
+          description: List of DatabaseInfo
+          items:
+            type: object
+            description: Project Database Details
+            properties:
+              sourceDatabaseName:
+                type: string
+                description: Name of the database
+            required:
+            - sourceDatabaseName
+        provisioningState:
+          type: string
+          readOnly: true
+          description: The project's provisioning state
+          enum:
+          - Deleting
+          - Succeeded
+          x-ms-enum:
+            name: ProjectProvisioningState
+            modelAsString: true
+      required:
+      - sourcePlatform
+      - targetPlatform
+    DatabaseInfo:
+      type: object
+      description: Project Database Details
+      properties:
+        sourceDatabaseName:
+          type: string
+          description: Name of the database
+      required:
+      - sourceDatabaseName
+    ProjectSourcePlatform:
+      type: string
+      description: Source platform of the project
+      enum:
+      - SQL
+      - MySQL
+      - PostgreSql
+      - MongoDb
+      - Unknown
+      x-ms-enum:
+        name: ProjectSourcePlatform
+        modelAsString: true
+    ProjectTargetPlatform:
+      type: string
+      description: Target platform of the project
+      enum:
+      - SQLDB
+      - SQLMI
+      - AzureDbForMySql
+      - AzureDbForPostgreSql
+      - MongoDb
+      - Unknown
+      x-ms-enum:
+        name: ProjectTargetPlatform
+        modelAsString: true
+    SystemData:
+      type: object
+      readOnly: true
+      properties:
+        createdBy:
+          type: string
+        createdByType:
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          type: string
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        createdAt:
+          format: date-time
+          type: string
+        lastModifiedBy:
+          type: string
+        lastModifiedByType:
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          type: string
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        lastModifiedAt:
+          format: date-time
+          type: string
+    TrackedResource:
+      type: object
+      properties:
+        location:
+          type: string
+          x-ms-mutability:
+          - read
+          - create
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+        id:
+          type: string
+          readOnly: true
+        name:
+          type: string
+          readOnly: true
+        type:
+          type: string
+          readOnly: true
+        systemData:
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+            createdByType:
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              type: string
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              format: date-time
+              type: string
+            lastModifiedBy:
+              type: string
+            lastModifiedByType:
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              type: string
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              format: date-time
+              type: string
+      x-ms-azure-resource: true
+    AzureActiveDirectoryApp:
+      type: object
+      description: Azure Active Directory Application
+      properties:
+        applicationId:
+          type: string
+          description: Application ID of the Azure Active Directory Application
+        appKey:
+          type: string
+          description: Key used to authenticate to the Azure Active Directory Application
+        tenantId:
+          type: string
+          description: Tenant id of the customer
+        ignoreAzurePermissions:
+          type: boolean
+          description: Ignore checking azure permissions on the AAD app
+    ConnectionInfo:
+      type: object
+      description: Defines the connection properties of a server
+      properties:
+        type:
+          type: string
+          description: Type of connection info
+        userName:
+          type: string
+          description: User name
+        password:
+          type: string
+          description: Password credential.
+      required:
+      - type
+      discriminator:
+        propertyName: type

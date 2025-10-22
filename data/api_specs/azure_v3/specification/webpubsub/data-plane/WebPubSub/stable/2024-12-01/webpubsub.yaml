@@ -1,0 +1,1641 @@
+openapi: 3.0.0
+info:
+  title: Azure Web PubSub Service REST API
+  version: 2024-12-01
+  description: WebPubSubServiceClient
+  x-typespec-generated:
+  - emitter: '@azure-tools/typespec-autorest'
+security:
+- OAuth2Auth:
+  - https://webpubsub.azure.com/.default
+tags: []
+paths:
+  /api/health:
+    head:
+      operationId: GetServiceStatus
+      summary: Get service health status.
+      description: Get service health status.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/:addToGroups:
+    post:
+      operationId: AddConnectionsToGroups
+      summary: Add filtered connections to multiple groups.
+      description: Add filtered connections to multiple groups.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddToGroupsRequest'
+        description: Target groups and connection filter.
+        required: true
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/:closeConnections:
+    post:
+      operationId: CloseAllConnections
+      summary: Close the connections in the hub.
+      description: Close the connections in the hub.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: excluded
+        in: query
+        description: Exclude these connectionIds when closing the connections in the
+          hub.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: reason
+        in: query
+        description: The reason closing the client connection.
+        required: false
+        schema:
+          type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/:generateToken:
+    post:
+      operationId: GenerateClientToken
+      summary: Generate token for the client to connect Azure Web PubSub service.
+      description: Generate token for the client to connect Azure Web PubSub service.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: userId
+        in: query
+        description: User Id.
+        required: false
+        schema:
+          type: string
+      - name: roles
+        in: query
+        description: Roles that the connection with the generated token will have.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: minutesToExpire
+        in: query
+        description: The expire time of the generated token.
+        required: false
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          default: 60
+      - name: groups
+        in: query
+        description: Groups that the connection will join when it connects.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: clientProtocol
+        in: query
+        description: 'The type of client. Case-insensitive. If not set, it''s "Default".
+          For Web
+
+          PubSub for Socket.IO, only the default value is supported. For Web PubSub,
+          the
+
+          valid values are ''Default'' and ''MQTT''.'
+        required: false
+        x-ms-enum:
+          name: WebPubSubClientType
+          modelAsString: true
+          values:
+          - name: Default
+            value: Default
+            description: Default value.
+          - name: MQTT
+            value: MQTT
+            description: MQTT client.
+        schema:
+          type: string
+          enum:
+          - Default
+          - MQTT
+          default: Default
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientTokenResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ClientTokenResponse'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/:removeFromGroups:
+    post:
+      operationId: RemoveConnectionsFromGroups
+      summary: Remove filtered connections from multiple groups.
+      description: Remove filtered connections from multiple groups.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemoveFromGroupsRequest'
+        description: Target groups and connection filter.
+        required: true
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/:send:
+    post:
+      operationId: SendToAll
+      summary: Broadcast content inside request body to all the connected client connections.
+      description: Broadcast content inside request body to all the connected client
+        connections.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: excluded
+        in: query
+        description: Excluded connection Ids.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: filter
+        in: query
+        description: 'Following OData filter syntax to filter out the subscribers
+          receiving the
+
+          messages.'
+        required: false
+        schema:
+          type: string
+      - name: messageTtlSeconds
+        in: query
+        description: 'The time-to-live (TTL) value in seconds for messages sent to
+          the service. 0 is
+
+          the default value, which means the message never expires. 300 is the maximum
+
+          value. If this parameter is non-zero, messages that are not consumed by
+          the
+
+          client within the specified TTL will be dropped by the service. This parameter
+
+          can help when the client''s bandwidth is limited.'
+        required: false
+        schema:
+          type: integer
+          format: int32
+          maximum: 300
+      requestBody:
+        $ref: '#/components/requestBodies/SendToAllMessage'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/connections/{connectionId}:
+    delete:
+      operationId: CloseConnection
+      summary: Close the client connection.
+      description: Close the client connection.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: connectionId
+        in: path
+        description: Target connection Id.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: reason
+        in: query
+        description: The reason closing the client connection.
+        required: false
+        schema:
+          type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    head:
+      operationId: ConnectionExists
+      summary: Check if the connection with the given connectionId exists.
+      description: Check if the connection with the given connectionId exists.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: connectionId
+        in: path
+        description: The connection Id.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: The request has succeeded.
+        '404':
+          description: The server cannot find the requested resource.
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/connections/{connectionId}/:send:
+    post:
+      operationId: SendToConnection
+      summary: Send content inside request body to the specific connection.
+      description: Send content inside request body to the specific connection.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: connectionId
+        in: path
+        description: The connection Id.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: messageTtlSeconds
+        in: query
+        description: 'The time-to-live (TTL) value in seconds for messages sent to
+          the service. 0 is
+
+          the default value, which means the message never expires. 300 is the maximum
+
+          value. If this parameter is non-zero, messages that are not consumed by
+          the
+
+          client within the specified TTL will be dropped by the service. This parameter
+
+          can help when the client''s bandwidth is limited.'
+        required: false
+        schema:
+          type: integer
+          format: int32
+          maximum: 300
+      requestBody:
+        $ref: '#/components/requestBodies/SendToAllMessage'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/connections/{connectionId}/groups:
+    delete:
+      operationId: RemoveConnectionFromAllGroups
+      summary: Remove a connection from all groups.
+      description: Remove a connection from all groups.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: connectionId
+        in: path
+        description: Target connection Id.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/groups/{group}:
+    head:
+      operationId: GroupExists
+      summary: Check if there are any client connections inside the given group
+      description: Check if there are any client connections inside the given group
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: group
+        in: path
+        description: Target group name, which length should be greater than 0 and
+          less than 1025.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 1024
+          pattern: ^(?!\s+$).+$
+      responses:
+        '200':
+          description: The request has succeeded.
+        '404':
+          description: The server cannot find the requested resource.
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/groups/{group}/:closeConnections:
+    post:
+      operationId: CloseGroupConnections
+      summary: Close connections in the specific group.
+      description: Close connections in the specific group.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: group
+        in: path
+        description: Target group name, which length should be greater than 0 and
+          less than 1025.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 1024
+          pattern: ^(?!\s+$).+$
+      - name: excluded
+        in: query
+        description: Exclude these connectionIds when closing the connections in the
+          group.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: reason
+        in: query
+        description: The reason closing the client connection.
+        required: false
+        schema:
+          type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/groups/{group}/:send:
+    post:
+      operationId: SendToGroup
+      summary: Send content inside request body to a group of connections.
+      description: Send content inside request body to a group of connections.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: group
+        in: path
+        description: Target group name, which length should be greater than 0 and
+          less than 1025.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 1024
+          pattern: ^(?!\s+$).+$
+      - name: excluded
+        in: query
+        description: Excluded connection Ids
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: filter
+        in: query
+        description: 'Following OData filter syntax to filter out the subscribers
+          receiving the
+
+          messages.'
+        required: false
+        schema:
+          type: string
+      - name: messageTtlSeconds
+        in: query
+        description: 'The time-to-live (TTL) value in seconds for messages sent to
+          the service. 0 is
+
+          the default value, which means the message never expires. 300 is the maximum
+
+          value. If this parameter is non-zero, messages that are not consumed by
+          the
+
+          client within the specified TTL will be dropped by the service. This parameter
+
+          can help when the client''s bandwidth is limited.'
+        required: false
+        schema:
+          type: integer
+          format: int32
+          maximum: 300
+      requestBody:
+        $ref: '#/components/requestBodies/SendToAllMessage'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/groups/{group}/connections:
+    get:
+      operationId: ListConnectionsInGroup
+      summary: List connections in a group.
+      description: List connections in a group.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: group
+        in: path
+        description: Target group name, whose length should be greater than 0 and
+          less than 1025.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 1024
+          pattern: ^(?!\s+$).+$
+      - name: maxpagesize
+        in: query
+        description: 'The maximum number of connections to include in a single response.
+          It should be
+
+          between 1 and 200.'
+        required: false
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 200
+      - name: top
+        in: query
+        description: 'The maximum number of connections to return. If the value is
+          not set, then all
+
+          the connections in a group are returned.'
+        required: false
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 2147483647
+      - name: continuationToken
+        in: query
+        description: 'A token that allows the client to retrieve the next page of
+          results. This
+
+          parameter is provided by the service in the response of a previous request
+          when
+
+          there are additional results to be fetched. Clients should include the
+
+          continuationToken in the next request to receive the subsequent page of
+          data.
+
+          If this parameter is omitted, the server will return the first page of results.'
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupMemberPagedValues'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /api/hubs/{hub}/groups/{group}/connections/{connectionId}:
+    put:
+      operationId: AddConnectionToGroup
+      summary: Add a connection to the target group.
+      description: Add a connection to the target group.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: group
+        in: path
+        description: Target group name, which length should be greater than 0 and
+          less than 1025.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 1024
+          pattern: ^(?!\s+$).+$
+      - name: connectionId
+        in: path
+        description: Target connection Id
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: The request has succeeded.
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    delete:
+      operationId: RemoveConnectionFromGroup
+      summary: Remove a connection from the target group.
+      description: Remove a connection from the target group.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: group
+        in: path
+        description: Target group name, which length should be greater than 0 and
+          less than 1025.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 1024
+          pattern: ^(?!\s+$).+$
+      - name: connectionId
+        in: path
+        description: Target connection Id.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/permissions/{permission}/connections/{connectionId}:
+    put:
+      operationId: GrantPermission
+      summary: Grant permission to the connection.
+      description: Grant permission to the connection.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: permission
+        in: path
+        description: 'The permission: current supported actions are joinLeaveGroup
+          and sendToGroup.'
+        required: true
+        x-ms-enum:
+          name: WebPubSubPermission
+          modelAsString: true
+          values:
+          - name: SendToGroup
+            value: sendToGroup
+            description: The permission to send messages to groups.
+          - name: JoinLeaveGroup
+            value: joinLeaveGroup
+            description: The permission to join/leave groups.
+        schema:
+          type: string
+          enum:
+          - sendToGroup
+          - joinLeaveGroup
+      - name: connectionId
+        in: path
+        description: Target connection Id.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: targetName
+        in: query
+        description: 'The meaning of the target depends on the specific permission.
+          For
+
+          joinLeaveGroup and sendToGroup, targetName is a required parameter standing
+          for
+
+          the group name.'
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    delete:
+      operationId: RevokePermission
+      summary: Revoke permission for the connection.
+      description: Revoke permission for the connection.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: permission
+        in: path
+        description: 'The permission: current supported actions are joinLeaveGroup
+          and sendToGroup.'
+        required: true
+        x-ms-enum:
+          name: WebPubSubPermission
+          modelAsString: true
+          values:
+          - name: SendToGroup
+            value: sendToGroup
+            description: The permission to send messages to groups.
+          - name: JoinLeaveGroup
+            value: joinLeaveGroup
+            description: The permission to join/leave groups.
+        schema:
+          type: string
+          enum:
+          - sendToGroup
+          - joinLeaveGroup
+      - name: connectionId
+        in: path
+        description: Target connection Id.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: targetName
+        in: query
+        description: 'The meaning of the target depends on the specific permission.
+          For
+
+          joinLeaveGroup and sendToGroup, targetName is a required parameter standing
+          for
+
+          the group name.'
+        required: false
+        schema:
+          type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    head:
+      operationId: CheckPermission
+      summary: Check if a connection has permission to the specified action.
+      description: Check if a connection has permission to the specified action.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: permission
+        in: path
+        description: 'The permission: current supported actions are joinLeaveGroup
+          and sendToGroup.'
+        required: true
+        x-ms-enum:
+          name: WebPubSubPermission
+          modelAsString: true
+          values:
+          - name: SendToGroup
+            value: sendToGroup
+            description: The permission to send messages to groups.
+          - name: JoinLeaveGroup
+            value: joinLeaveGroup
+            description: The permission to join/leave groups.
+        schema:
+          type: string
+          enum:
+          - sendToGroup
+          - joinLeaveGroup
+      - name: connectionId
+        in: path
+        description: Target connection Id.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: targetName
+        in: query
+        description: 'The meaning of the target depends on the specific permission.
+          For
+
+          joinLeaveGroup and sendToGroup, targetName is a required parameter standing
+          for
+
+          the group name.'
+        required: false
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+        '404':
+          description: The server cannot find the requested resource.
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/users/{userId}:
+    head:
+      operationId: UserExists
+      summary: Check if there are any client connections connected for the given user.
+      description: Check if there are any client connections connected for the given
+        user.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: userId
+        in: path
+        description: Target user Id.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: The request has succeeded.
+        '404':
+          description: The server cannot find the requested resource.
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/users/{userId}/:closeConnections:
+    post:
+      operationId: CloseUserConnections
+      summary: Close connections for the specific user.
+      description: Close connections for the specific user.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: userId
+        in: path
+        description: The user Id.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: excluded
+        in: query
+        description: Exclude these connectionIds when closing the connections for
+          the user.
+        required: false
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: reason
+        in: query
+        description: The reason closing the client connection.
+        required: false
+        schema:
+          type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/users/{userId}/:send:
+    post:
+      operationId: SendToUser
+      summary: Send content inside request body to the specific user.
+      description: Send content inside request body to the specific user.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: userId
+        in: path
+        description: The user Id.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: filter
+        in: query
+        description: 'Following OData filter syntax to filter out the subscribers
+          receiving the
+
+          messages.'
+        required: false
+        schema:
+          type: string
+      - name: messageTtlSeconds
+        in: query
+        description: 'The time-to-live (TTL) value in seconds for messages sent to
+          the service. 0 is
+
+          the default value, which means the message never expires. 300 is the maximum
+
+          value. If this parameter is non-zero, messages that are not consumed by
+          the
+
+          client within the specified TTL will be dropped by the service. This parameter
+
+          can help when the client''s bandwidth is limited.'
+        required: false
+        schema:
+          type: integer
+          format: int32
+          maximum: 300
+      requestBody:
+        $ref: '#/components/requestBodies/SendToAllMessage'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/users/{userId}/groups:
+    delete:
+      operationId: RemoveUserFromAllGroups
+      summary: Remove a user from all groups.
+      description: Remove a user from all groups.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: userId
+        in: path
+        description: Target user Id.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /api/hubs/{hub}/users/{userId}/groups/{group}:
+    put:
+      operationId: AddUserToGroup
+      summary: Add a user to the target group.
+      description: Add a user to the target group.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: group
+        in: path
+        description: Target group name, which length should be greater than 0 and
+          less than 1025.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 1024
+          pattern: ^(?!\s+$).+$
+      - name: userId
+        in: path
+        description: Target user Id.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: The request has succeeded.
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    delete:
+      operationId: RemoveUserFromGroup
+      summary: Remove a user from the target group.
+      description: Remove a user from the target group.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: hub
+        in: path
+        description: 'Target hub name, which should start with alphabetic characters
+          and only contain
+
+          alpha-numeric characters or underscore.'
+        required: true
+        schema:
+          type: string
+          pattern: ^[A-Za-z][A-Za-z0-9_`,.[\]]{0,127}$
+      - name: group
+        in: path
+        description: Target group name, which length should be greater than 0 and
+          less than 1025.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 1024
+          pattern: ^(?!\s+$).+$
+      - name: userId
+        in: path
+        description: Target user Id.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+servers:
+- url: '{endpoint}'
+  variables:
+    endpoint:
+      description: HTTP or HTTPS endpoint for the Web PubSub service instance
+      format: uri
+      x-ms-skip-url-encoding: true
+      default: none
+components:
+  parameters:
+    Azure.Core.Foundations.ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      x-ms-parameter-location: method
+      x-ms-client-name: apiVersion
+      schema:
+        type: string
+        minLength: 1
+  requestBodies:
+    SendToAllMessage:
+      content:
+        application/json:
+          schema:
+            type: string
+            format: byte
+        application/octet-stream:
+          schema:
+            type: string
+            format: byte
+        text/plain:
+          schema:
+            type: string
+            format: byte
+      description: The payload body.
+      required: true
+  securitySchemes:
+    OAuth2Auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            https://webpubsub.azure.com/.default: ''
+  schemas:
+    AddToGroupsRequest:
+      type: object
+      description: Request object to add connections to groups
+      properties:
+        groups:
+          type: array
+          description: Target groups
+          items:
+            type: string
+        filter:
+          type: string
+          description: Following OData filter syntax to filter out the subscribers
+            receiving the messages
+    Azure.Core.Foundations.Error:
+      type: object
+      description: The error object.
+      properties:
+        code:
+          type: string
+          description: One of a server-defined set of error codes.
+        message:
+          type: string
+          description: A human-readable representation of the error.
+        target:
+          type: string
+          description: The target of the error.
+        details:
+          type: array
+          description: An array of details about specific errors that led to this
+            reported error.
+          items:
+            $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+        innererror:
+          $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
+      required:
+      - code
+      - message
+    Azure.Core.Foundations.ErrorResponse:
+      type: object
+      description: A response containing error details.
+      properties:
+        error:
+          $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+      required:
+      - error
+    Azure.Core.Foundations.InnerError:
+      type: object
+      description: An object containing more specific information about the error.
+        As per Azure REST API guidelines - https://aka.ms/AzureRestApiGuidelines#handling-errors.
+      properties:
+        code:
+          type: string
+          description: One of a server-defined set of error codes.
+        innererror:
+          $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
+    ClientDetail:
+      type: object
+      description: Details about the client.
+      properties:
+        userId:
+          type: string
+          description: User Id
+        roles:
+          type: array
+          description: Roles that the connection with the user id has
+          items:
+            type: string
+    ClientTokenResponse:
+      type: object
+      description: The response object containing the client access token
+      properties:
+        token:
+          type: string
+          description: Access token for the client to connect Azure Web PubSub service
+    ContentType:
+      type: string
+      description: Content type for upload
+      enum:
+      - application/json
+      - application/octet-stream
+      - text/plain
+      x-ms-enum:
+        name: ContentType
+        modelAsString: true
+        values:
+        - name: application/json
+          value: application/json
+          description: Content Type 'application/json'
+        - name: application/octet-stream
+          value: application/octet-stream
+          description: Content Type 'application/octet-stream'
+        - name: text/plain
+          value: text/plain
+          description: Content Type 'text/plain'
+    GroupMember:
+      type: object
+      description: Group member
+      properties:
+        connectionId:
+          type: string
+          description: Connection Id
+        userId:
+          type: string
+          description: User Id
+      required:
+      - connectionId
+    GroupMemberPagedValues:
+      type: object
+      description: Paged response for group members
+      properties:
+        value:
+          type: array
+          description: The group members
+          items:
+            $ref: '#/components/schemas/GroupMember'
+        nextLink:
+          type: string
+          description: The link to the next page of results
+    MessageContentType:
+      type: string
+      description: Content type for HTTP headers in message operations (closed union
+        for HTTP compliance)
+      enum:
+      - application/json
+      - application/octet-stream
+      - text/plain
+      x-ms-enum:
+        name: MessageContentType
+        modelAsString: false
+        values:
+        - name: application/json
+          value: application/json
+          description: Content Type 'application/json'
+        - name: application/octet-stream
+          value: application/octet-stream
+          description: Content Type 'application/octet-stream'
+        - name: text/plain
+          value: text/plain
+          description: Content Type 'text/plain'
+    RemoveFromGroupsRequest:
+      type: object
+      description: Request object to remove connections from groups
+      properties:
+        groups:
+          type: array
+          description: Target groups
+          items:
+            type: string
+        filter:
+          type: string
+          description: Following OData filter syntax to filter out the subscribers
+            receiving the messages
+    ResponseContentType:
+      type: string
+      description: Content type for response headers (closed union for HTTP compliance)
+      enum:
+      - application/json
+      - text/json
+      x-ms-enum:
+        name: ResponseContentType
+        modelAsString: false
+        values:
+        - name: application/json
+          value: application/json
+          description: Content Type 'application/json'
+        - name: text/json
+          value: text/json
+          description: Content Type 'text/json'
+    WebPubSubClientType:
+      type: string
+      description: Web PubSub client type
+      enum:
+      - Default
+      - MQTT
+      x-ms-enum:
+        name: WebPubSubClientType
+        modelAsString: true
+        values:
+        - name: Default
+          value: Default
+          description: Default value.
+        - name: MQTT
+          value: MQTT
+          description: MQTT client.
+    WebPubSubPermission:
+      type: string
+      description: Web PubSub permission
+      enum:
+      - sendToGroup
+      - joinLeaveGroup
+      x-ms-enum:
+        name: WebPubSubPermission
+        modelAsString: true
+        values:
+        - name: SendToGroup
+          value: sendToGroup
+          description: The permission to send messages to groups.
+        - name: JoinLeaveGroup
+          value: joinLeaveGroup
+          description: The permission to join/leave groups.

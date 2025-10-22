@@ -1,0 +1,2508 @@
+openapi: 3.0.0
+info:
+  version: 1.1.0
+  title: Azure Video Analyzer for Edge
+  description: Azure Video Analyzer helpers for IoT Edge direct method calls.
+  contact:
+    email: videoanalyzerhelp@microsoft.com
+security:
+- sharedAccessSignature: []
+paths: {}
+components:
+  securitySchemes:
+    sharedAccessSignature:
+      type: apiKey
+      name: Authorization
+      in: header
+  schemas:
+    MethodRequest:
+      type: object
+      required:
+      - methodName
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+      discriminator:
+        propertyName: methodName
+      description: Base class for direct method calls.
+    PipelineTopologySetRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        pipelineTopology:
+          type: object
+          required:
+          - name
+          properties:
+            name:
+              type: string
+              description: Pipeline topology unique identifier.
+            systemData:
+              description: Read-only system metadata associated with this object.
+              type: object
+              properties:
+                createdAt:
+                  type: string
+                  format: date-time
+                  description: Date and time when this resource was first created.
+                    Value is represented in UTC according to the ISO8601 date format.
+                lastModifiedAt:
+                  type: string
+                  format: date-time
+                  description: Date and time when this resource was last modified.
+                    Value is represented in UTC according to the ISO8601 date format.
+            properties:
+              description: Pipeline topology properties.
+              type: object
+              properties:
+                description:
+                  type: string
+                  description: An optional description of the pipeline topology. It
+                    is recommended that the expected use of the topology to be described
+                    here.
+                parameters:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - name
+                    - type
+                    properties:
+                      name:
+                        type: string
+                        description: Name of the parameter.
+                        maxLength: 64
+                      type:
+                        type: string
+                        description: Type of the parameter.
+                        enum:
+                        - string
+                        - secretString
+                        - int
+                        - double
+                        - bool
+                        x-ms-enum:
+                          name: parameterType
+                          values:
+                          - value: string
+                            description: The parameter's value is a string.
+                          - value: secretString
+                            description: The parameter's value is a string that holds
+                              sensitive information.
+                          - value: int
+                            description: The parameter's value is a 32-bit signed
+                              integer.
+                          - value: double
+                            description: The parameter's value is a 64-bit double-precision
+                              floating point.
+                          - value: bool
+                            description: The parameter's value is a boolean value
+                              that is either true or false.
+                          modelAsString: true
+                      description:
+                        type: string
+                        description: Description of the parameter.
+                      default:
+                        type: string
+                        description: The default value for the parameter to be used
+                          if the live pipeline does not specify a value.
+                    description: Single topology parameter declaration. Declared parameters
+                      can and must be referenced throughout the topology and can optionally
+                      have default values to be used when they are not defined in
+                      the pipeline instances.
+                  description: List of the topology parameter declarations. Parameters
+                    declared here can be referenced throughout the topology nodes
+                    through the use of "${PARAMETER_NAME}" string pattern. Parameters
+                    can have optional default values and can later be defined in individual
+                    instances of the pipeline.
+                sources:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - '@type'
+                    - name
+                    discriminator:
+                      propertyName: '@type'
+                    properties:
+                      '@type':
+                        type: string
+                        description: Type discriminator for the derived types.
+                      name:
+                        type: string
+                        description: Node name. Must be unique within the topology.
+                    description: Base class for topology source nodes.
+                  description: List of the topology source nodes. Source nodes enable
+                    external data to be ingested by the pipeline.
+                processors:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - '@type'
+                    - inputs
+                    - name
+                    discriminator:
+                      propertyName: '@type'
+                    properties:
+                      '@type':
+                        type: string
+                        description: Type discriminator for the derived types.
+                      name:
+                        type: string
+                        description: Node name. Must be unique within the topology.
+                      inputs:
+                        type: array
+                        description: An array of upstream node references within the
+                          topology to be used as inputs for this node.
+                        items:
+                          type: object
+                          required:
+                          - nodeName
+                          properties:
+                            nodeName:
+                              type: string
+                              description: The name of the upstream node in the pipeline
+                                which output is used as input of the current node.
+                            outputSelectors:
+                              type: array
+                              description: Allows for the selection of specific data
+                                streams (eg. video only) from another node.
+                              items:
+                                type: object
+                                properties:
+                                  property:
+                                    type: string
+                                    description: The property of the data stream to
+                                      be used as the selection criteria.
+                                    enum:
+                                    - mediaType
+                                    x-ms-enum:
+                                      name: outputSelectorProperty
+                                      values:
+                                      - value: mediaType
+                                        description: 'The stream''s MIME type or subtype:
+                                          audio, video or application'
+                                      modelAsString: true
+                                  operator:
+                                    type: string
+                                    description: The operator to compare properties
+                                      by.
+                                    enum:
+                                    - is
+                                    - isNot
+                                    x-ms-enum:
+                                      name: outputSelectorOperator
+                                      values:
+                                      - value: is
+                                        description: The property is of the type defined
+                                          by value.
+                                      - value: isNot
+                                        description: The property is not of the type
+                                          defined by value.
+                                      modelAsString: true
+                                  value:
+                                    type: string
+                                    description: Value to compare against.
+                                description: Allows for the selection of particular
+                                  streams from another node.
+                          description: Describes an input signal to be used on a pipeline
+                            node.
+                    description: Base class for topology processor nodes.
+                  description: List of the topology processor nodes. Processor nodes
+                    enable pipeline data to be analyzed, processed or transformed.
+                sinks:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                    - '@type'
+                    - inputs
+                    - name
+                    discriminator:
+                      propertyName: '@type'
+                    properties:
+                      '@type':
+                        type: string
+                        description: Type discriminator for the derived types.
+                      name:
+                        type: string
+                        description: Node name. Must be unique within the topology.
+                      inputs:
+                        type: array
+                        description: An array of upstream node references within the
+                          topology to be used as inputs for this node.
+                        items:
+                          type: object
+                          required:
+                          - nodeName
+                          properties:
+                            nodeName:
+                              type: string
+                              description: The name of the upstream node in the pipeline
+                                which output is used as input of the current node.
+                            outputSelectors:
+                              type: array
+                              description: Allows for the selection of specific data
+                                streams (eg. video only) from another node.
+                              items:
+                                type: object
+                                properties:
+                                  property:
+                                    type: string
+                                    description: The property of the data stream to
+                                      be used as the selection criteria.
+                                    enum:
+                                    - mediaType
+                                    x-ms-enum:
+                                      name: outputSelectorProperty
+                                      values:
+                                      - value: mediaType
+                                        description: 'The stream''s MIME type or subtype:
+                                          audio, video or application'
+                                      modelAsString: true
+                                  operator:
+                                    type: string
+                                    description: The operator to compare properties
+                                      by.
+                                    enum:
+                                    - is
+                                    - isNot
+                                    x-ms-enum:
+                                      name: outputSelectorOperator
+                                      values:
+                                      - value: is
+                                        description: The property is of the type defined
+                                          by value.
+                                      - value: isNot
+                                        description: The property is not of the type
+                                          defined by value.
+                                      modelAsString: true
+                                  value:
+                                    type: string
+                                    description: Value to compare against.
+                                description: Allows for the selection of particular
+                                  streams from another node.
+                          description: Describes an input signal to be used on a pipeline
+                            node.
+                    description: Base class for topology sink nodes.
+                  description: List of the topology sink nodes. Sink nodes allow pipeline
+                    data to be stored or exported.
+          description: "Pipeline topology describes the processing steps to be applied\
+            \ when processing media for a particular outcome. The topology should\
+            \ be defined according to the scenario to be achieved and can be reused\
+            \ across many pipeline instances which share the same processing characteristics.\
+            \ For instance, a pipeline topology which acquires data from a RTSP camera,\
+            \ process it with an specific AI model and stored the data on the cloud\
+            \ can be reused across many different cameras, as long as the same processing\
+            \ should be applied across all the cameras. Individual instance properties\
+            \ can be defined through the use of user-defined parameters, which allow\
+            \ for a topology to be parameterized, thus allowing individual pipelines\
+            \ to refer to different values, such as individual cameras RTSP endpoints\
+            \ and credentials. Overall a topology is composed of the following:\r\n\
+            \r\n  - Parameters: list of user defined parameters that can be references\
+            \ across the topology nodes.\r\n  - Sources: list of one or more data\
+            \ sources nodes such as an RTSP source which allows for media to be ingested\
+            \ from cameras.\r\n  - Processors: list of nodes which perform data analysis\
+            \ or transformations.\r\n  -Sinks: list of one or more data sinks which\
+            \ allow for data to be stored or exported to other destinations."
+      required:
+      - methodName
+      - pipelineTopology
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: pipelineTopologySet
+    PipelineTopologySetRequestBody:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        name:
+          type: string
+          description: Pipeline topology unique identifier.
+        systemData:
+          description: Read-only system metadata associated with this object.
+          type: object
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+              description: Date and time when this resource was first created. Value
+                is represented in UTC according to the ISO8601 date format.
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: Date and time when this resource was last modified. Value
+                is represented in UTC according to the ISO8601 date format.
+        properties:
+          description: Pipeline topology properties.
+          type: object
+          properties:
+            description:
+              type: string
+              description: An optional description of the pipeline topology. It is
+                recommended that the expected use of the topology to be described
+                here.
+            parameters:
+              type: array
+              items:
+                type: object
+                required:
+                - name
+                - type
+                properties:
+                  name:
+                    type: string
+                    description: Name of the parameter.
+                    maxLength: 64
+                  type:
+                    type: string
+                    description: Type of the parameter.
+                    enum:
+                    - string
+                    - secretString
+                    - int
+                    - double
+                    - bool
+                    x-ms-enum:
+                      name: parameterType
+                      values:
+                      - value: string
+                        description: The parameter's value is a string.
+                      - value: secretString
+                        description: The parameter's value is a string that holds
+                          sensitive information.
+                      - value: int
+                        description: The parameter's value is a 32-bit signed integer.
+                      - value: double
+                        description: The parameter's value is a 64-bit double-precision
+                          floating point.
+                      - value: bool
+                        description: The parameter's value is a boolean value that
+                          is either true or false.
+                      modelAsString: true
+                  description:
+                    type: string
+                    description: Description of the parameter.
+                  default:
+                    type: string
+                    description: The default value for the parameter to be used if
+                      the live pipeline does not specify a value.
+                description: Single topology parameter declaration. Declared parameters
+                  can and must be referenced throughout the topology and can optionally
+                  have default values to be used when they are not defined in the
+                  pipeline instances.
+              description: List of the topology parameter declarations. Parameters
+                declared here can be referenced throughout the topology nodes through
+                the use of "${PARAMETER_NAME}" string pattern. Parameters can have
+                optional default values and can later be defined in individual instances
+                of the pipeline.
+            sources:
+              type: array
+              items:
+                type: object
+                required:
+                - '@type'
+                - name
+                discriminator:
+                  propertyName: '@type'
+                properties:
+                  '@type':
+                    type: string
+                    description: Type discriminator for the derived types.
+                  name:
+                    type: string
+                    description: Node name. Must be unique within the topology.
+                description: Base class for topology source nodes.
+              description: List of the topology source nodes. Source nodes enable
+                external data to be ingested by the pipeline.
+            processors:
+              type: array
+              items:
+                type: object
+                required:
+                - '@type'
+                - inputs
+                - name
+                discriminator:
+                  propertyName: '@type'
+                properties:
+                  '@type':
+                    type: string
+                    description: Type discriminator for the derived types.
+                  name:
+                    type: string
+                    description: Node name. Must be unique within the topology.
+                  inputs:
+                    type: array
+                    description: An array of upstream node references within the topology
+                      to be used as inputs for this node.
+                    items:
+                      type: object
+                      required:
+                      - nodeName
+                      properties:
+                        nodeName:
+                          type: string
+                          description: The name of the upstream node in the pipeline
+                            which output is used as input of the current node.
+                        outputSelectors:
+                          type: array
+                          description: Allows for the selection of specific data streams
+                            (eg. video only) from another node.
+                          items:
+                            type: object
+                            properties:
+                              property:
+                                type: string
+                                description: The property of the data stream to be
+                                  used as the selection criteria.
+                                enum:
+                                - mediaType
+                                x-ms-enum:
+                                  name: outputSelectorProperty
+                                  values:
+                                  - value: mediaType
+                                    description: 'The stream''s MIME type or subtype:
+                                      audio, video or application'
+                                  modelAsString: true
+                              operator:
+                                type: string
+                                description: The operator to compare properties by.
+                                enum:
+                                - is
+                                - isNot
+                                x-ms-enum:
+                                  name: outputSelectorOperator
+                                  values:
+                                  - value: is
+                                    description: The property is of the type defined
+                                      by value.
+                                  - value: isNot
+                                    description: The property is not of the type defined
+                                      by value.
+                                  modelAsString: true
+                              value:
+                                type: string
+                                description: Value to compare against.
+                            description: Allows for the selection of particular streams
+                              from another node.
+                      description: Describes an input signal to be used on a pipeline
+                        node.
+                description: Base class for topology processor nodes.
+              description: List of the topology processor nodes. Processor nodes enable
+                pipeline data to be analyzed, processed or transformed.
+            sinks:
+              type: array
+              items:
+                type: object
+                required:
+                - '@type'
+                - inputs
+                - name
+                discriminator:
+                  propertyName: '@type'
+                properties:
+                  '@type':
+                    type: string
+                    description: Type discriminator for the derived types.
+                  name:
+                    type: string
+                    description: Node name. Must be unique within the topology.
+                  inputs:
+                    type: array
+                    description: An array of upstream node references within the topology
+                      to be used as inputs for this node.
+                    items:
+                      type: object
+                      required:
+                      - nodeName
+                      properties:
+                        nodeName:
+                          type: string
+                          description: The name of the upstream node in the pipeline
+                            which output is used as input of the current node.
+                        outputSelectors:
+                          type: array
+                          description: Allows for the selection of specific data streams
+                            (eg. video only) from another node.
+                          items:
+                            type: object
+                            properties:
+                              property:
+                                type: string
+                                description: The property of the data stream to be
+                                  used as the selection criteria.
+                                enum:
+                                - mediaType
+                                x-ms-enum:
+                                  name: outputSelectorProperty
+                                  values:
+                                  - value: mediaType
+                                    description: 'The stream''s MIME type or subtype:
+                                      audio, video or application'
+                                  modelAsString: true
+                              operator:
+                                type: string
+                                description: The operator to compare properties by.
+                                enum:
+                                - is
+                                - isNot
+                                x-ms-enum:
+                                  name: outputSelectorOperator
+                                  values:
+                                  - value: is
+                                    description: The property is of the type defined
+                                      by value.
+                                  - value: isNot
+                                    description: The property is not of the type defined
+                                      by value.
+                                  modelAsString: true
+                              value:
+                                type: string
+                                description: Value to compare against.
+                            description: Allows for the selection of particular streams
+                              from another node.
+                      description: Describes an input signal to be used on a pipeline
+                        node.
+                description: Base class for topology sink nodes.
+              description: List of the topology sink nodes. Sink nodes allow pipeline
+                data to be stored or exported.
+      required:
+      - methodName
+      - name
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+    LivePipelineSetRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        livePipeline:
+          type: object
+          required:
+          - name
+          properties:
+            name:
+              type: string
+              description: Live pipeline unique identifier.
+            systemData:
+              description: Read-only system metadata associated with this object.
+              type: object
+              properties:
+                createdAt:
+                  type: string
+                  format: date-time
+                  description: Date and time when this resource was first created.
+                    Value is represented in UTC according to the ISO8601 date format.
+                lastModifiedAt:
+                  type: string
+                  format: date-time
+                  description: Date and time when this resource was last modified.
+                    Value is represented in UTC according to the ISO8601 date format.
+            properties:
+              description: Live pipeline properties.
+              type: object
+              properties:
+                description:
+                  type: string
+                  description: An optional description of the live pipeline.
+                topologyName:
+                  type: string
+                  description: The reference to an existing pipeline topology defined
+                    for real-time content processing. When activated, this live pipeline
+                    will process content according to the pipeline topology definition.
+                parameters:
+                  type: array
+                  description: List of the instance level parameter values for the
+                    user-defined topology parameters. A pipeline can only define or
+                    override parameters values for parameters which have been declared
+                    in the referenced topology. Topology parameters without a default
+                    value must be defined. Topology parameters with a default value
+                    can be optionally be overridden.
+                  items:
+                    type: object
+                    required:
+                    - name
+                    properties:
+                      name:
+                        type: string
+                        description: Name of the parameter declared in the pipeline
+                          topology.
+                      value:
+                        type: string
+                        description: Parameter value to be applied on this specific
+                          live pipeline.
+                    description: Defines the parameter value of an specific pipeline
+                      topology parameter. See pipeline topology parameters for more
+                      information.
+                state:
+                  type: string
+                  description: Current pipeline state (read-only).
+                  enum:
+                  - inactive
+                  - activating
+                  - active
+                  - deactivating
+                  x-ms-enum:
+                    name: livePipelineState
+                    values:
+                    - value: inactive
+                      description: The live pipeline is idle and not processing media.
+                    - value: activating
+                      description: The live pipeline is transitioning into the active
+                        state.
+                    - value: active
+                      description: The live pipeline is active and able to process
+                        media. If your data source is not available, for instance,
+                        if your RTSP camera is powered off or unreachable, the pipeline
+                        will still be active and periodically retrying the connection.
+                        Your Azure subscription will be billed for the duration in
+                        which the live pipeline is in the active state.
+                    - value: deactivating
+                      description: The live pipeline is transitioning into the inactive
+                        state.
+                    modelAsString: true
+          description: Live Pipeline represents an unique instance of a pipeline topology
+            which is used for real-time content ingestion and analysis.
+      required:
+      - methodName
+      - livePipeline
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: livePipelineSet
+    LivePipelineSetRequestBody:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        name:
+          type: string
+          description: Live pipeline unique identifier.
+        systemData:
+          description: Read-only system metadata associated with this object.
+          type: object
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+              description: Date and time when this resource was first created. Value
+                is represented in UTC according to the ISO8601 date format.
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: Date and time when this resource was last modified. Value
+                is represented in UTC according to the ISO8601 date format.
+        properties:
+          description: Live pipeline properties.
+          type: object
+          properties:
+            description:
+              type: string
+              description: An optional description of the live pipeline.
+            topologyName:
+              type: string
+              description: The reference to an existing pipeline topology defined
+                for real-time content processing. When activated, this live pipeline
+                will process content according to the pipeline topology definition.
+            parameters:
+              type: array
+              description: List of the instance level parameter values for the user-defined
+                topology parameters. A pipeline can only define or override parameters
+                values for parameters which have been declared in the referenced topology.
+                Topology parameters without a default value must be defined. Topology
+                parameters with a default value can be optionally be overridden.
+              items:
+                type: object
+                required:
+                - name
+                properties:
+                  name:
+                    type: string
+                    description: Name of the parameter declared in the pipeline topology.
+                  value:
+                    type: string
+                    description: Parameter value to be applied on this specific live
+                      pipeline.
+                description: Defines the parameter value of an specific pipeline topology
+                  parameter. See pipeline topology parameters for more information.
+            state:
+              type: string
+              description: Current pipeline state (read-only).
+              enum:
+              - inactive
+              - activating
+              - active
+              - deactivating
+              x-ms-enum:
+                name: livePipelineState
+                values:
+                - value: inactive
+                  description: The live pipeline is idle and not processing media.
+                - value: activating
+                  description: The live pipeline is transitioning into the active
+                    state.
+                - value: active
+                  description: The live pipeline is active and able to process media.
+                    If your data source is not available, for instance, if your RTSP
+                    camera is powered off or unreachable, the pipeline will still
+                    be active and periodically retrying the connection. Your Azure
+                    subscription will be billed for the duration in which the live
+                    pipeline is in the active state.
+                - value: deactivating
+                  description: The live pipeline is transitioning into the inactive
+                    state.
+                modelAsString: true
+      required:
+      - methodName
+      - name
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+    MethodRequestEmptyBodyBase:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        name:
+          type: string
+          description: Resource name.
+      required:
+      - methodName
+      - name
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+    PipelineTopologyListRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+      required:
+      - methodName
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: pipelineTopologyList
+    PipelineTopologyGetRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        name:
+          type: string
+          description: Resource name.
+      required:
+      - methodName
+      - name
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: pipelineTopologyGet
+    PipelineTopologyDeleteRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        name:
+          type: string
+          description: Resource name.
+      required:
+      - methodName
+      - name
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: pipelineTopologyDelete
+    LivePipelineListRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+      required:
+      - methodName
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: livePipelineList
+    LivePipelineGetRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        name:
+          type: string
+          description: Resource name.
+      required:
+      - methodName
+      - name
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: livePipelineGet
+    LivePipelineActivateRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        name:
+          type: string
+          description: Resource name.
+      required:
+      - methodName
+      - name
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: livePipelineActivate
+    LivePipelineDeactivateRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        name:
+          type: string
+          description: Resource name.
+      required:
+      - methodName
+      - name
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: livePipelineDeactivate
+    LivePipelineDeleteRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        name:
+          type: string
+          description: Resource name.
+      required:
+      - methodName
+      - name
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: livePipelineDelete
+    RemoteDeviceAdapterSetRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        remoteDeviceAdapter:
+          type: object
+          required:
+          - name
+          properties:
+            name:
+              type: string
+              description: The unique identifier for the remote device adapter.
+            systemData:
+              description: Read-only system metadata associated with this object.
+              type: object
+              properties:
+                createdAt:
+                  type: string
+                  format: date-time
+                  description: Date and time when this resource was first created.
+                    Value is represented in UTC according to the ISO8601 date format.
+                lastModifiedAt:
+                  type: string
+                  format: date-time
+                  description: Date and time when this resource was last modified.
+                    Value is represented in UTC according to the ISO8601 date format.
+            properties:
+              description: Properties of the remote device adapter.
+              type: object
+              properties:
+                description:
+                  description: An optional description for the remote device adapter.
+                  type: string
+                target:
+                  description: The IoT device to which this remote device will connect.
+                  type: object
+                  properties:
+                    host:
+                      description: Hostname or IP address of the remote device.
+                      type: string
+                  required:
+                  - host
+                iotHubDeviceConnection:
+                  description: Information that enables communication between the
+                    IoT Hub and the IoT device - allowing this edge module to act
+                    as a transparent gateway between the two.
+                  type: object
+                  properties:
+                    deviceId:
+                      description: The name of the IoT device configured and managed
+                        in IoT Hub. (case-sensitive)
+                      type: string
+                    credentials:
+                      description: IoT device connection credentials. Currently IoT
+                        device symmetric key credentials are supported.
+                      type: object
+                      required:
+                      - '@type'
+                      discriminator:
+                        propertyName: '@type'
+                      properties:
+                        '@type':
+                          type: string
+                          description: Type discriminator for the derived types.
+                  required:
+                  - deviceId
+              required:
+              - target
+              - iotHubDeviceConnection
+          description: The Video Analyzer edge module can act as a transparent gateway
+            for video, enabling IoT devices to send video to the cloud from behind
+            a firewall. A remote device adapter should be created for each such IoT
+            device. Communication between the cloud and IoT device would then flow
+            via the Video Analyzer edge module.
+      required:
+      - methodName
+      - remoteDeviceAdapter
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: remoteDeviceAdapterSet
+    RemoteDeviceAdapterSetRequestBody:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        name:
+          type: string
+          description: The unique identifier for the remote device adapter.
+        systemData:
+          description: Read-only system metadata associated with this object.
+          type: object
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+              description: Date and time when this resource was first created. Value
+                is represented in UTC according to the ISO8601 date format.
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: Date and time when this resource was last modified. Value
+                is represented in UTC according to the ISO8601 date format.
+        properties:
+          description: Properties of the remote device adapter.
+          type: object
+          properties:
+            description:
+              description: An optional description for the remote device adapter.
+              type: string
+            target:
+              description: The IoT device to which this remote device will connect.
+              type: object
+              properties:
+                host:
+                  description: Hostname or IP address of the remote device.
+                  type: string
+              required:
+              - host
+            iotHubDeviceConnection:
+              description: Information that enables communication between the IoT
+                Hub and the IoT device - allowing this edge module to act as a transparent
+                gateway between the two.
+              type: object
+              properties:
+                deviceId:
+                  description: The name of the IoT device configured and managed in
+                    IoT Hub. (case-sensitive)
+                  type: string
+                credentials:
+                  description: IoT device connection credentials. Currently IoT device
+                    symmetric key credentials are supported.
+                  type: object
+                  required:
+                  - '@type'
+                  discriminator:
+                    propertyName: '@type'
+                  properties:
+                    '@type':
+                      type: string
+                      description: Type discriminator for the derived types.
+              required:
+              - deviceId
+          required:
+          - target
+          - iotHubDeviceConnection
+      required:
+      - methodName
+      - name
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+    RemoteDeviceAdapterListRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+      required:
+      - methodName
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: remoteDeviceAdapterList
+    RemoteDeviceAdapterGetRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        name:
+          type: string
+          description: Resource name.
+      required:
+      - methodName
+      - name
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: remoteDeviceAdapterGet
+    RemoteDeviceAdapterDeleteRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        name:
+          type: string
+          description: Resource name.
+      required:
+      - methodName
+      - name
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: remoteDeviceAdapterDelete
+    OnvifDeviceDiscoverRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        discoveryDuration:
+          type: string
+          description: The amount of time that the ONVIF device discovery will wait
+            for supported device responses.
+      required:
+      - methodName
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: onvifDeviceDiscover
+    OnvifDeviceGetRequest:
+      type: object
+      properties:
+        methodName:
+          type: string
+          description: Direct method method name.
+          readOnly: true
+        '@apiVersion':
+          type: string
+          description: Video Analyzer API version.
+          enum:
+          - '1.1'
+          x-ms-enum:
+            name: apiVersionEnum
+            modelAsString: false
+          x-ms-client-default: '1.1'
+        endpoint:
+          type: object
+          required:
+          - '@type'
+          - url
+          discriminator:
+            propertyName: '@type'
+          properties:
+            '@type':
+              type: string
+              description: Type discriminator for the derived types.
+            credentials:
+              description: Credentials to be presented to the endpoint.
+              type: object
+              required:
+              - '@type'
+              discriminator:
+                propertyName: '@type'
+              properties:
+                '@type':
+                  type: string
+                  description: Type discriminator for the derived types.
+            url:
+              type: string
+              description: The endpoint URL for Video Analyzer to connect to.
+          description: Base class for endpoints.
+      required:
+      - methodName
+      - endpoint
+      description: Base class for direct method calls.
+      discriminator:
+        propertyName: methodName
+      x-ms-discriminator-value: onvifDeviceGet
+    SystemData:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+          description: Date and time when this resource was first created. Value is
+            represented in UTC according to the ISO8601 date format.
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: Date and time when this resource was last modified. Value is
+            represented in UTC according to the ISO8601 date format.
+      description: Read-only system metadata associated with a resource.
+    ParameterDeclaration:
+      type: object
+      required:
+      - name
+      - type
+      properties:
+        name:
+          type: string
+          description: Name of the parameter.
+          maxLength: 64
+        type:
+          type: string
+          description: Type of the parameter.
+          enum:
+          - string
+          - secretString
+          - int
+          - double
+          - bool
+          x-ms-enum:
+            name: parameterType
+            values:
+            - value: string
+              description: The parameter's value is a string.
+            - value: secretString
+              description: The parameter's value is a string that holds sensitive
+                information.
+            - value: int
+              description: The parameter's value is a 32-bit signed integer.
+            - value: double
+              description: The parameter's value is a 64-bit double-precision floating
+                point.
+            - value: bool
+              description: The parameter's value is a boolean value that is either
+                true or false.
+            modelAsString: true
+        description:
+          type: string
+          description: Description of the parameter.
+        default:
+          type: string
+          description: The default value for the parameter to be used if the live
+            pipeline does not specify a value.
+      description: Single topology parameter declaration. Declared parameters can
+        and must be referenced throughout the topology and can optionally have default
+        values to be used when they are not defined in the pipeline instances.
+    SourceNodeBase:
+      type: object
+      required:
+      - '@type'
+      - name
+      discriminator:
+        propertyName: '@type'
+      properties:
+        '@type':
+          type: string
+          description: Type discriminator for the derived types.
+        name:
+          type: string
+          description: Node name. Must be unique within the topology.
+      description: Base class for topology source nodes.
+    OutputSelector:
+      type: object
+      properties:
+        property:
+          type: string
+          description: The property of the data stream to be used as the selection
+            criteria.
+          enum:
+          - mediaType
+          x-ms-enum:
+            name: outputSelectorProperty
+            values:
+            - value: mediaType
+              description: 'The stream''s MIME type or subtype: audio, video or application'
+            modelAsString: true
+        operator:
+          type: string
+          description: The operator to compare properties by.
+          enum:
+          - is
+          - isNot
+          x-ms-enum:
+            name: outputSelectorOperator
+            values:
+            - value: is
+              description: The property is of the type defined by value.
+            - value: isNot
+              description: The property is not of the type defined by value.
+            modelAsString: true
+        value:
+          type: string
+          description: Value to compare against.
+      description: Allows for the selection of particular streams from another node.
+    NodeInput:
+      type: object
+      required:
+      - nodeName
+      properties:
+        nodeName:
+          type: string
+          description: The name of the upstream node in the pipeline which output
+            is used as input of the current node.
+        outputSelectors:
+          type: array
+          description: Allows for the selection of specific data streams (eg. video
+            only) from another node.
+          items:
+            type: object
+            properties:
+              property:
+                type: string
+                description: The property of the data stream to be used as the selection
+                  criteria.
+                enum:
+                - mediaType
+                x-ms-enum:
+                  name: outputSelectorProperty
+                  values:
+                  - value: mediaType
+                    description: 'The stream''s MIME type or subtype: audio, video
+                      or application'
+                  modelAsString: true
+              operator:
+                type: string
+                description: The operator to compare properties by.
+                enum:
+                - is
+                - isNot
+                x-ms-enum:
+                  name: outputSelectorOperator
+                  values:
+                  - value: is
+                    description: The property is of the type defined by value.
+                  - value: isNot
+                    description: The property is not of the type defined by value.
+                  modelAsString: true
+              value:
+                type: string
+                description: Value to compare against.
+            description: Allows for the selection of particular streams from another
+              node.
+      description: Describes an input signal to be used on a pipeline node.
+    ProcessorNodeBase:
+      type: object
+      required:
+      - '@type'
+      - inputs
+      - name
+      discriminator:
+        propertyName: '@type'
+      properties:
+        '@type':
+          type: string
+          description: Type discriminator for the derived types.
+        name:
+          type: string
+          description: Node name. Must be unique within the topology.
+        inputs:
+          type: array
+          description: An array of upstream node references within the topology to
+            be used as inputs for this node.
+          items:
+            type: object
+            required:
+            - nodeName
+            properties:
+              nodeName:
+                type: string
+                description: The name of the upstream node in the pipeline which output
+                  is used as input of the current node.
+              outputSelectors:
+                type: array
+                description: Allows for the selection of specific data streams (eg.
+                  video only) from another node.
+                items:
+                  type: object
+                  properties:
+                    property:
+                      type: string
+                      description: The property of the data stream to be used as the
+                        selection criteria.
+                      enum:
+                      - mediaType
+                      x-ms-enum:
+                        name: outputSelectorProperty
+                        values:
+                        - value: mediaType
+                          description: 'The stream''s MIME type or subtype: audio,
+                            video or application'
+                        modelAsString: true
+                    operator:
+                      type: string
+                      description: The operator to compare properties by.
+                      enum:
+                      - is
+                      - isNot
+                      x-ms-enum:
+                        name: outputSelectorOperator
+                        values:
+                        - value: is
+                          description: The property is of the type defined by value.
+                        - value: isNot
+                          description: The property is not of the type defined by
+                            value.
+                        modelAsString: true
+                    value:
+                      type: string
+                      description: Value to compare against.
+                  description: Allows for the selection of particular streams from
+                    another node.
+            description: Describes an input signal to be used on a pipeline node.
+      description: Base class for topology processor nodes.
+    SinkNodeBase:
+      type: object
+      required:
+      - '@type'
+      - inputs
+      - name
+      discriminator:
+        propertyName: '@type'
+      properties:
+        '@type':
+          type: string
+          description: Type discriminator for the derived types.
+        name:
+          type: string
+          description: Node name. Must be unique within the topology.
+        inputs:
+          type: array
+          description: An array of upstream node references within the topology to
+            be used as inputs for this node.
+          items:
+            type: object
+            required:
+            - nodeName
+            properties:
+              nodeName:
+                type: string
+                description: The name of the upstream node in the pipeline which output
+                  is used as input of the current node.
+              outputSelectors:
+                type: array
+                description: Allows for the selection of specific data streams (eg.
+                  video only) from another node.
+                items:
+                  type: object
+                  properties:
+                    property:
+                      type: string
+                      description: The property of the data stream to be used as the
+                        selection criteria.
+                      enum:
+                      - mediaType
+                      x-ms-enum:
+                        name: outputSelectorProperty
+                        values:
+                        - value: mediaType
+                          description: 'The stream''s MIME type or subtype: audio,
+                            video or application'
+                        modelAsString: true
+                    operator:
+                      type: string
+                      description: The operator to compare properties by.
+                      enum:
+                      - is
+                      - isNot
+                      x-ms-enum:
+                        name: outputSelectorOperator
+                        values:
+                        - value: is
+                          description: The property is of the type defined by value.
+                        - value: isNot
+                          description: The property is not of the type defined by
+                            value.
+                        modelAsString: true
+                    value:
+                      type: string
+                      description: Value to compare against.
+                  description: Allows for the selection of particular streams from
+                    another node.
+            description: Describes an input signal to be used on a pipeline node.
+      description: Base class for topology sink nodes.
+    PipelineTopologyProperties:
+      type: object
+      properties:
+        description:
+          type: string
+          description: An optional description of the pipeline topology. It is recommended
+            that the expected use of the topology to be described here.
+        parameters:
+          type: array
+          items:
+            type: object
+            required:
+            - name
+            - type
+            properties:
+              name:
+                type: string
+                description: Name of the parameter.
+                maxLength: 64
+              type:
+                type: string
+                description: Type of the parameter.
+                enum:
+                - string
+                - secretString
+                - int
+                - double
+                - bool
+                x-ms-enum:
+                  name: parameterType
+                  values:
+                  - value: string
+                    description: The parameter's value is a string.
+                  - value: secretString
+                    description: The parameter's value is a string that holds sensitive
+                      information.
+                  - value: int
+                    description: The parameter's value is a 32-bit signed integer.
+                  - value: double
+                    description: The parameter's value is a 64-bit double-precision
+                      floating point.
+                  - value: bool
+                    description: The parameter's value is a boolean value that is
+                      either true or false.
+                  modelAsString: true
+              description:
+                type: string
+                description: Description of the parameter.
+              default:
+                type: string
+                description: The default value for the parameter to be used if the
+                  live pipeline does not specify a value.
+            description: Single topology parameter declaration. Declared parameters
+              can and must be referenced throughout the topology and can optionally
+              have default values to be used when they are not defined in the pipeline
+              instances.
+          description: List of the topology parameter declarations. Parameters declared
+            here can be referenced throughout the topology nodes through the use of
+            "${PARAMETER_NAME}" string pattern. Parameters can have optional default
+            values and can later be defined in individual instances of the pipeline.
+        sources:
+          type: array
+          items:
+            type: object
+            required:
+            - '@type'
+            - name
+            discriminator:
+              propertyName: '@type'
+            properties:
+              '@type':
+                type: string
+                description: Type discriminator for the derived types.
+              name:
+                type: string
+                description: Node name. Must be unique within the topology.
+            description: Base class for topology source nodes.
+          description: List of the topology source nodes. Source nodes enable external
+            data to be ingested by the pipeline.
+        processors:
+          type: array
+          items:
+            type: object
+            required:
+            - '@type'
+            - inputs
+            - name
+            discriminator:
+              propertyName: '@type'
+            properties:
+              '@type':
+                type: string
+                description: Type discriminator for the derived types.
+              name:
+                type: string
+                description: Node name. Must be unique within the topology.
+              inputs:
+                type: array
+                description: An array of upstream node references within the topology
+                  to be used as inputs for this node.
+                items:
+                  type: object
+                  required:
+                  - nodeName
+                  properties:
+                    nodeName:
+                      type: string
+                      description: The name of the upstream node in the pipeline which
+                        output is used as input of the current node.
+                    outputSelectors:
+                      type: array
+                      description: Allows for the selection of specific data streams
+                        (eg. video only) from another node.
+                      items:
+                        type: object
+                        properties:
+                          property:
+                            type: string
+                            description: The property of the data stream to be used
+                              as the selection criteria.
+                            enum:
+                            - mediaType
+                            x-ms-enum:
+                              name: outputSelectorProperty
+                              values:
+                              - value: mediaType
+                                description: 'The stream''s MIME type or subtype:
+                                  audio, video or application'
+                              modelAsString: true
+                          operator:
+                            type: string
+                            description: The operator to compare properties by.
+                            enum:
+                            - is
+                            - isNot
+                            x-ms-enum:
+                              name: outputSelectorOperator
+                              values:
+                              - value: is
+                                description: The property is of the type defined by
+                                  value.
+                              - value: isNot
+                                description: The property is not of the type defined
+                                  by value.
+                              modelAsString: true
+                          value:
+                            type: string
+                            description: Value to compare against.
+                        description: Allows for the selection of particular streams
+                          from another node.
+                  description: Describes an input signal to be used on a pipeline
+                    node.
+            description: Base class for topology processor nodes.
+          description: List of the topology processor nodes. Processor nodes enable
+            pipeline data to be analyzed, processed or transformed.
+        sinks:
+          type: array
+          items:
+            type: object
+            required:
+            - '@type'
+            - inputs
+            - name
+            discriminator:
+              propertyName: '@type'
+            properties:
+              '@type':
+                type: string
+                description: Type discriminator for the derived types.
+              name:
+                type: string
+                description: Node name. Must be unique within the topology.
+              inputs:
+                type: array
+                description: An array of upstream node references within the topology
+                  to be used as inputs for this node.
+                items:
+                  type: object
+                  required:
+                  - nodeName
+                  properties:
+                    nodeName:
+                      type: string
+                      description: The name of the upstream node in the pipeline which
+                        output is used as input of the current node.
+                    outputSelectors:
+                      type: array
+                      description: Allows for the selection of specific data streams
+                        (eg. video only) from another node.
+                      items:
+                        type: object
+                        properties:
+                          property:
+                            type: string
+                            description: The property of the data stream to be used
+                              as the selection criteria.
+                            enum:
+                            - mediaType
+                            x-ms-enum:
+                              name: outputSelectorProperty
+                              values:
+                              - value: mediaType
+                                description: 'The stream''s MIME type or subtype:
+                                  audio, video or application'
+                              modelAsString: true
+                          operator:
+                            type: string
+                            description: The operator to compare properties by.
+                            enum:
+                            - is
+                            - isNot
+                            x-ms-enum:
+                              name: outputSelectorOperator
+                              values:
+                              - value: is
+                                description: The property is of the type defined by
+                                  value.
+                              - value: isNot
+                                description: The property is not of the type defined
+                                  by value.
+                              modelAsString: true
+                          value:
+                            type: string
+                            description: Value to compare against.
+                        description: Allows for the selection of particular streams
+                          from another node.
+                  description: Describes an input signal to be used on a pipeline
+                    node.
+            description: Base class for topology sink nodes.
+          description: List of the topology sink nodes. Sink nodes allow pipeline
+            data to be stored or exported.
+      description: Pipeline topology properties.
+    PipelineTopology:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: Pipeline topology unique identifier.
+        systemData:
+          description: Read-only system metadata associated with this object.
+          type: object
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+              description: Date and time when this resource was first created. Value
+                is represented in UTC according to the ISO8601 date format.
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: Date and time when this resource was last modified. Value
+                is represented in UTC according to the ISO8601 date format.
+        properties:
+          description: Pipeline topology properties.
+          type: object
+          properties:
+            description:
+              type: string
+              description: An optional description of the pipeline topology. It is
+                recommended that the expected use of the topology to be described
+                here.
+            parameters:
+              type: array
+              items:
+                type: object
+                required:
+                - name
+                - type
+                properties:
+                  name:
+                    type: string
+                    description: Name of the parameter.
+                    maxLength: 64
+                  type:
+                    type: string
+                    description: Type of the parameter.
+                    enum:
+                    - string
+                    - secretString
+                    - int
+                    - double
+                    - bool
+                    x-ms-enum:
+                      name: parameterType
+                      values:
+                      - value: string
+                        description: The parameter's value is a string.
+                      - value: secretString
+                        description: The parameter's value is a string that holds
+                          sensitive information.
+                      - value: int
+                        description: The parameter's value is a 32-bit signed integer.
+                      - value: double
+                        description: The parameter's value is a 64-bit double-precision
+                          floating point.
+                      - value: bool
+                        description: The parameter's value is a boolean value that
+                          is either true or false.
+                      modelAsString: true
+                  description:
+                    type: string
+                    description: Description of the parameter.
+                  default:
+                    type: string
+                    description: The default value for the parameter to be used if
+                      the live pipeline does not specify a value.
+                description: Single topology parameter declaration. Declared parameters
+                  can and must be referenced throughout the topology and can optionally
+                  have default values to be used when they are not defined in the
+                  pipeline instances.
+              description: List of the topology parameter declarations. Parameters
+                declared here can be referenced throughout the topology nodes through
+                the use of "${PARAMETER_NAME}" string pattern. Parameters can have
+                optional default values and can later be defined in individual instances
+                of the pipeline.
+            sources:
+              type: array
+              items:
+                type: object
+                required:
+                - '@type'
+                - name
+                discriminator:
+                  propertyName: '@type'
+                properties:
+                  '@type':
+                    type: string
+                    description: Type discriminator for the derived types.
+                  name:
+                    type: string
+                    description: Node name. Must be unique within the topology.
+                description: Base class for topology source nodes.
+              description: List of the topology source nodes. Source nodes enable
+                external data to be ingested by the pipeline.
+            processors:
+              type: array
+              items:
+                type: object
+                required:
+                - '@type'
+                - inputs
+                - name
+                discriminator:
+                  propertyName: '@type'
+                properties:
+                  '@type':
+                    type: string
+                    description: Type discriminator for the derived types.
+                  name:
+                    type: string
+                    description: Node name. Must be unique within the topology.
+                  inputs:
+                    type: array
+                    description: An array of upstream node references within the topology
+                      to be used as inputs for this node.
+                    items:
+                      type: object
+                      required:
+                      - nodeName
+                      properties:
+                        nodeName:
+                          type: string
+                          description: The name of the upstream node in the pipeline
+                            which output is used as input of the current node.
+                        outputSelectors:
+                          type: array
+                          description: Allows for the selection of specific data streams
+                            (eg. video only) from another node.
+                          items:
+                            type: object
+                            properties:
+                              property:
+                                type: string
+                                description: The property of the data stream to be
+                                  used as the selection criteria.
+                                enum:
+                                - mediaType
+                                x-ms-enum:
+                                  name: outputSelectorProperty
+                                  values:
+                                  - value: mediaType
+                                    description: 'The stream''s MIME type or subtype:
+                                      audio, video or application'
+                                  modelAsString: true
+                              operator:
+                                type: string
+                                description: The operator to compare properties by.
+                                enum:
+                                - is
+                                - isNot
+                                x-ms-enum:
+                                  name: outputSelectorOperator
+                                  values:
+                                  - value: is
+                                    description: The property is of the type defined
+                                      by value.
+                                  - value: isNot
+                                    description: The property is not of the type defined
+                                      by value.
+                                  modelAsString: true
+                              value:
+                                type: string
+                                description: Value to compare against.
+                            description: Allows for the selection of particular streams
+                              from another node.
+                      description: Describes an input signal to be used on a pipeline
+                        node.
+                description: Base class for topology processor nodes.
+              description: List of the topology processor nodes. Processor nodes enable
+                pipeline data to be analyzed, processed or transformed.
+            sinks:
+              type: array
+              items:
+                type: object
+                required:
+                - '@type'
+                - inputs
+                - name
+                discriminator:
+                  propertyName: '@type'
+                properties:
+                  '@type':
+                    type: string
+                    description: Type discriminator for the derived types.
+                  name:
+                    type: string
+                    description: Node name. Must be unique within the topology.
+                  inputs:
+                    type: array
+                    description: An array of upstream node references within the topology
+                      to be used as inputs for this node.
+                    items:
+                      type: object
+                      required:
+                      - nodeName
+                      properties:
+                        nodeName:
+                          type: string
+                          description: The name of the upstream node in the pipeline
+                            which output is used as input of the current node.
+                        outputSelectors:
+                          type: array
+                          description: Allows for the selection of specific data streams
+                            (eg. video only) from another node.
+                          items:
+                            type: object
+                            properties:
+                              property:
+                                type: string
+                                description: The property of the data stream to be
+                                  used as the selection criteria.
+                                enum:
+                                - mediaType
+                                x-ms-enum:
+                                  name: outputSelectorProperty
+                                  values:
+                                  - value: mediaType
+                                    description: 'The stream''s MIME type or subtype:
+                                      audio, video or application'
+                                  modelAsString: true
+                              operator:
+                                type: string
+                                description: The operator to compare properties by.
+                                enum:
+                                - is
+                                - isNot
+                                x-ms-enum:
+                                  name: outputSelectorOperator
+                                  values:
+                                  - value: is
+                                    description: The property is of the type defined
+                                      by value.
+                                  - value: isNot
+                                    description: The property is not of the type defined
+                                      by value.
+                                  modelAsString: true
+                              value:
+                                type: string
+                                description: Value to compare against.
+                            description: Allows for the selection of particular streams
+                              from another node.
+                      description: Describes an input signal to be used on a pipeline
+                        node.
+                description: Base class for topology sink nodes.
+              description: List of the topology sink nodes. Sink nodes allow pipeline
+                data to be stored or exported.
+      description: "Pipeline topology describes the processing steps to be applied\
+        \ when processing media for a particular outcome. The topology should be defined\
+        \ according to the scenario to be achieved and can be reused across many pipeline\
+        \ instances which share the same processing characteristics. For instance,\
+        \ a pipeline topology which acquires data from a RTSP camera, process it with\
+        \ an specific AI model and stored the data on the cloud can be reused across\
+        \ many different cameras, as long as the same processing should be applied\
+        \ across all the cameras. Individual instance properties can be defined through\
+        \ the use of user-defined parameters, which allow for a topology to be parameterized,\
+        \ thus allowing individual pipelines to refer to different values, such as\
+        \ individual cameras RTSP endpoints and credentials. Overall a topology is\
+        \ composed of the following:\r\n\r\n  - Parameters: list of user defined parameters\
+        \ that can be references across the topology nodes.\r\n  - Sources: list of\
+        \ one or more data sources nodes such as an RTSP source which allows for media\
+        \ to be ingested from cameras.\r\n  - Processors: list of nodes which perform\
+        \ data analysis or transformations.\r\n  -Sinks: list of one or more data\
+        \ sinks which allow for data to be stored or exported to other destinations."
+    ParameterDefinition:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: Name of the parameter declared in the pipeline topology.
+        value:
+          type: string
+          description: Parameter value to be applied on this specific live pipeline.
+      description: Defines the parameter value of an specific pipeline topology parameter.
+        See pipeline topology parameters for more information.
+    LivePipelineProperties:
+      type: object
+      properties:
+        description:
+          type: string
+          description: An optional description of the live pipeline.
+        topologyName:
+          type: string
+          description: The reference to an existing pipeline topology defined for
+            real-time content processing. When activated, this live pipeline will
+            process content according to the pipeline topology definition.
+        parameters:
+          type: array
+          description: List of the instance level parameter values for the user-defined
+            topology parameters. A pipeline can only define or override parameters
+            values for parameters which have been declared in the referenced topology.
+            Topology parameters without a default value must be defined. Topology
+            parameters with a default value can be optionally be overridden.
+          items:
+            type: object
+            required:
+            - name
+            properties:
+              name:
+                type: string
+                description: Name of the parameter declared in the pipeline topology.
+              value:
+                type: string
+                description: Parameter value to be applied on this specific live pipeline.
+            description: Defines the parameter value of an specific pipeline topology
+              parameter. See pipeline topology parameters for more information.
+        state:
+          type: string
+          description: Current pipeline state (read-only).
+          enum:
+          - inactive
+          - activating
+          - active
+          - deactivating
+          x-ms-enum:
+            name: livePipelineState
+            values:
+            - value: inactive
+              description: The live pipeline is idle and not processing media.
+            - value: activating
+              description: The live pipeline is transitioning into the active state.
+            - value: active
+              description: The live pipeline is active and able to process media.
+                If your data source is not available, for instance, if your RTSP camera
+                is powered off or unreachable, the pipeline will still be active and
+                periodically retrying the connection. Your Azure subscription will
+                be billed for the duration in which the live pipeline is in the active
+                state.
+            - value: deactivating
+              description: The live pipeline is transitioning into the inactive state.
+            modelAsString: true
+      description: Live pipeline properties.
+    LivePipeline:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: Live pipeline unique identifier.
+        systemData:
+          description: Read-only system metadata associated with this object.
+          type: object
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+              description: Date and time when this resource was first created. Value
+                is represented in UTC according to the ISO8601 date format.
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: Date and time when this resource was last modified. Value
+                is represented in UTC according to the ISO8601 date format.
+        properties:
+          description: Live pipeline properties.
+          type: object
+          properties:
+            description:
+              type: string
+              description: An optional description of the live pipeline.
+            topologyName:
+              type: string
+              description: The reference to an existing pipeline topology defined
+                for real-time content processing. When activated, this live pipeline
+                will process content according to the pipeline topology definition.
+            parameters:
+              type: array
+              description: List of the instance level parameter values for the user-defined
+                topology parameters. A pipeline can only define or override parameters
+                values for parameters which have been declared in the referenced topology.
+                Topology parameters without a default value must be defined. Topology
+                parameters with a default value can be optionally be overridden.
+              items:
+                type: object
+                required:
+                - name
+                properties:
+                  name:
+                    type: string
+                    description: Name of the parameter declared in the pipeline topology.
+                  value:
+                    type: string
+                    description: Parameter value to be applied on this specific live
+                      pipeline.
+                description: Defines the parameter value of an specific pipeline topology
+                  parameter. See pipeline topology parameters for more information.
+            state:
+              type: string
+              description: Current pipeline state (read-only).
+              enum:
+              - inactive
+              - activating
+              - active
+              - deactivating
+              x-ms-enum:
+                name: livePipelineState
+                values:
+                - value: inactive
+                  description: The live pipeline is idle and not processing media.
+                - value: activating
+                  description: The live pipeline is transitioning into the active
+                    state.
+                - value: active
+                  description: The live pipeline is active and able to process media.
+                    If your data source is not available, for instance, if your RTSP
+                    camera is powered off or unreachable, the pipeline will still
+                    be active and periodically retrying the connection. Your Azure
+                    subscription will be billed for the duration in which the live
+                    pipeline is in the active state.
+                - value: deactivating
+                  description: The live pipeline is transitioning into the inactive
+                    state.
+                modelAsString: true
+      description: Live Pipeline represents an unique instance of a pipeline topology
+        which is used for real-time content ingestion and analysis.
+    RemoteDeviceAdapterTarget:
+      type: object
+      properties:
+        host:
+          description: Hostname or IP address of the remote device.
+          type: string
+      required:
+      - host
+      description: Properties of the remote device adapter target.
+    CredentialsBase:
+      type: object
+      required:
+      - '@type'
+      discriminator:
+        propertyName: '@type'
+      properties:
+        '@type':
+          type: string
+          description: Type discriminator for the derived types.
+      description: Base class for credential objects.
+    IotHubDeviceConnection:
+      type: object
+      properties:
+        deviceId:
+          description: The name of the IoT device configured and managed in IoT Hub.
+            (case-sensitive)
+          type: string
+        credentials:
+          description: IoT device connection credentials. Currently IoT device symmetric
+            key credentials are supported.
+          type: object
+          required:
+          - '@type'
+          discriminator:
+            propertyName: '@type'
+          properties:
+            '@type':
+              type: string
+              description: Type discriminator for the derived types.
+      required:
+      - deviceId
+      description: Information that enables communication between the IoT Hub and
+        the IoT device - allowing this edge module to act as a transparent gateway
+        between the two.
+    RemoteDeviceAdapterProperties:
+      type: object
+      properties:
+        description:
+          description: An optional description for the remote device adapter.
+          type: string
+        target:
+          description: The IoT device to which this remote device will connect.
+          type: object
+          properties:
+            host:
+              description: Hostname or IP address of the remote device.
+              type: string
+          required:
+          - host
+        iotHubDeviceConnection:
+          description: Information that enables communication between the IoT Hub
+            and the IoT device - allowing this edge module to act as a transparent
+            gateway between the two.
+          type: object
+          properties:
+            deviceId:
+              description: The name of the IoT device configured and managed in IoT
+                Hub. (case-sensitive)
+              type: string
+            credentials:
+              description: IoT device connection credentials. Currently IoT device
+                symmetric key credentials are supported.
+              type: object
+              required:
+              - '@type'
+              discriminator:
+                propertyName: '@type'
+              properties:
+                '@type':
+                  type: string
+                  description: Type discriminator for the derived types.
+          required:
+          - deviceId
+      required:
+      - target
+      - iotHubDeviceConnection
+      description: Remote device adapter properties.
+    RemoteDeviceAdapter:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The unique identifier for the remote device adapter.
+        systemData:
+          description: Read-only system metadata associated with this object.
+          type: object
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+              description: Date and time when this resource was first created. Value
+                is represented in UTC according to the ISO8601 date format.
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: Date and time when this resource was last modified. Value
+                is represented in UTC according to the ISO8601 date format.
+        properties:
+          description: Properties of the remote device adapter.
+          type: object
+          properties:
+            description:
+              description: An optional description for the remote device adapter.
+              type: string
+            target:
+              description: The IoT device to which this remote device will connect.
+              type: object
+              properties:
+                host:
+                  description: Hostname or IP address of the remote device.
+                  type: string
+              required:
+              - host
+            iotHubDeviceConnection:
+              description: Information that enables communication between the IoT
+                Hub and the IoT device - allowing this edge module to act as a transparent
+                gateway between the two.
+              type: object
+              properties:
+                deviceId:
+                  description: The name of the IoT device configured and managed in
+                    IoT Hub. (case-sensitive)
+                  type: string
+                credentials:
+                  description: IoT device connection credentials. Currently IoT device
+                    symmetric key credentials are supported.
+                  type: object
+                  required:
+                  - '@type'
+                  discriminator:
+                    propertyName: '@type'
+                  properties:
+                    '@type':
+                      type: string
+                      description: Type discriminator for the derived types.
+              required:
+              - deviceId
+          required:
+          - target
+          - iotHubDeviceConnection
+      description: The Video Analyzer edge module can act as a transparent gateway
+        for video, enabling IoT devices to send video to the cloud from behind a firewall.
+        A remote device adapter should be created for each such IoT device. Communication
+        between the cloud and IoT device would then flow via the Video Analyzer edge
+        module.
+    EndpointBase:
+      type: object
+      required:
+      - '@type'
+      - url
+      discriminator:
+        propertyName: '@type'
+      properties:
+        '@type':
+          type: string
+          description: Type discriminator for the derived types.
+        credentials:
+          description: Credentials to be presented to the endpoint.
+          type: object
+          required:
+          - '@type'
+          discriminator:
+            propertyName: '@type'
+          properties:
+            '@type':
+              type: string
+              description: Type discriminator for the derived types.
+        url:
+          type: string
+          description: The endpoint URL for Video Analyzer to connect to.
+      description: Base class for endpoints.

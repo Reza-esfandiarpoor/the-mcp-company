@@ -1,0 +1,792 @@
+openapi: 3.0.0
+info:
+  title: Microsoft.App Dynamic Sessions service
+  version: 2025-02-02-preview
+  x-typespec-generated:
+  - emitter: '@azure-tools/typespec-autorest'
+security:
+- AadOauth2Auth:
+  - https://dynamicsessions.io/.default
+tags: []
+paths:
+  /executions:
+    post:
+      operationId: CodeExecution_Execute
+      description: Execute code in a session.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - $ref: '#/components/parameters/ExecutionOperationIdHeader'
+      - $ref: '#/components/parameters/SessionIdentifier'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionCodeExecutionRequest'
+        description: The request to execute code.
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            Operation-Location:
+              description: The location for monitoring the operation state.
+              schema:
+                type: string
+                format: uri
+            operation-id:
+              description: The id of this execution operation.
+              schema:
+                type: string
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionCodeExecutionResource'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-long-running-operation-options:
+        final-state-via: operation-location
+      x-ms-long-running-operation: true
+  /executions/{executionId}:
+    get:
+      operationId: CodeExecution_Get
+      description: Get the code execution result.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: executionId
+        in: path
+        description: Session code execution id.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/SessionIdentifier'
+      responses:
+        '200':
+          description: The request has succeeded.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionCodeExecutionResource'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /files:
+    get:
+      operationId: SessionResourceFiles_List
+      description: List the file resources.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - $ref: '#/components/parameters/SessionIdentifier'
+      - $ref: '#/components/parameters/SessionResourceFilePathQueryParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedSessionResourceFile'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+      x-ms-pageable:
+        nextLinkName: nextLink
+    post:
+      operationId: SessionResourceFiles_Upload
+      description: Upload a file to a session.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - $ref: '#/components/parameters/SessionIdentifier'
+      - $ref: '#/components/parameters/SessionResourceFilePathQueryParameter'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  description: The file to upload.
+                  type: string
+                  format: binary
+              required:
+              - file
+        required: true
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResourceFile'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /files/{name}:
+    get:
+      operationId: SessionResourceFiles_Get
+      description: Get the file resource.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: name
+        in: path
+        description: The name of the file.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/SessionIdentifier'
+      - $ref: '#/components/parameters/SessionResourceFilePathQueryParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionResourceFile'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    delete:
+      operationId: SessionResourceFiles_Delete
+      description: Delete the file.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: name
+        in: path
+        description: The name of the file.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/SessionIdentifier'
+      - $ref: '#/components/parameters/SessionResourceFilePathQueryParameter'
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers
+            may be useful. '
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /files/{name}/content:
+    get:
+      operationId: SessionResourceFiles_GetContent
+      description: Get the content of the file.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: name
+        in: path
+        description: The name of the file.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/SessionIdentifier'
+      - $ref: '#/components/parameters/SessionResourceFilePathQueryParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+            application/json:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /listSessions:
+    get:
+      operationId: ListSessions_Get
+      description: List the sessions.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - name: skip
+        in: query
+        description: The offset for pagination purpose.
+        required: false
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionsListResponse'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /metadata:
+    get:
+      operationId: SessionPoolMetadata_Get
+      description: Get the metadata information.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionPoolMetadataResponse'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+  /session:
+    get:
+      operationId: SessionManagement_Get
+      description: Get the session.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - $ref: '#/components/parameters/SessionIdentifier'
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Session'
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+    delete:
+      operationId: SessionManagement_Delete
+      description: Delete the session.
+      parameters:
+      - $ref: '#/components/parameters/Azure.Core.Foundations.ApiVersionParameter'
+      - $ref: '#/components/parameters/SessionIdentifier'
+      responses:
+        '204':
+          description: There is no content to send for this request, but the headers
+            may be useful.
+        default:
+          description: An unexpected error response.
+          headers:
+            x-ms-error-code:
+              description: String error code indicating what went wrong.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+servers:
+- url: '{endpoint}'
+  variables:
+    endpoint:
+      description: The management endpoint of the session pool.
+      default: none
+components:
+  parameters:
+    Azure.Core.Foundations.ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      x-ms-parameter-location: method
+      x-ms-client-name: apiVersion
+      schema:
+        type: string
+        minLength: 1
+    ExecutionOperationIdHeader:
+      name: operation-id
+      in: header
+      description: The id of this execution operation.
+      required: false
+      x-ms-parameter-location: method
+      x-ms-client-name: operationId
+      schema:
+        type: string
+    SessionIdentifier:
+      name: identifier
+      in: query
+      description: The user-assigned identifier of the session.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 256
+        pattern: ^[a-zA-Z0-9_|}{\[\]\:"";'<>?\/.,@#$%\^&*()_\-+=!~`]{4,128}$
+    SessionResourceFilePathQueryParameter:
+      name: path
+      in: query
+      description: The path of the file after uploaded.
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: string
+  securitySchemes:
+    AadOauth2Auth:
+      type: oauth2
+      description: The Azure Active Directory OAuth2 Flow
+      flows:
+        authorizationCode:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          tokenUrl: https://login.microsoftonline.com/common/oauth2/token
+          scopes:
+            https://dynamicsessions.io/.default: ''
+  schemas:
+    Azure.Core.Foundations.Error:
+      type: object
+      description: The error object.
+      properties:
+        code:
+          type: string
+          description: One of a server-defined set of error codes.
+        message:
+          type: string
+          description: A human-readable representation of the error.
+        target:
+          type: string
+          description: The target of the error.
+        details:
+          type: array
+          description: An array of details about specific errors that led to this
+            reported error.
+          items:
+            $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+        innererror:
+          $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
+      required:
+      - code
+      - message
+    Azure.Core.Foundations.ErrorResponse:
+      type: object
+      description: A response containing error details.
+      properties:
+        error:
+          $ref: '#/components/schemas/Azure.Core.Foundations.Error'
+      required:
+      - error
+    Azure.Core.Foundations.InnerError:
+      type: object
+      description: An object containing more specific information about the error.
+        As per Azure REST API guidelines - https://aka.ms/AzureRestApiGuidelines#handling-errors.
+      properties:
+        code:
+          type: string
+          description: One of a server-defined set of error codes.
+        innererror:
+          $ref: '#/components/schemas/Azure.Core.Foundations.InnerError'
+    Azure.Core.Foundations.OperationState:
+      type: string
+      description: Enum describing allowed operation states.
+      enum:
+      - NotStarted
+      - Running
+      - Succeeded
+      - Failed
+      - Canceled
+      x-ms-enum:
+        name: OperationState
+        modelAsString: true
+        values:
+        - name: NotStarted
+          value: NotStarted
+          description: The operation has not started.
+        - name: Running
+          value: Running
+          description: The operation is in progress.
+        - name: Succeeded
+          value: Succeeded
+          description: The operation has completed successfully.
+        - name: Failed
+          value: Failed
+          description: The operation has failed.
+        - name: Canceled
+          value: Canceled
+          description: The operation has been canceled by the user.
+    Azure.Core.eTag:
+      type: string
+      description: 'The ETag (or entity tag) HTTP response header is an identifier
+        for a specific version of a resource.
+
+        It lets caches be more efficient and save bandwidth, as a web server does
+        not need to resend a full response if the content was not changed.
+
+
+        It is a string of ASCII characters placed between double quotes, like "675af34563dc-tr34".'
+    CodeExecutionIdentifier:
+      type: object
+      description: Session code execution identifier path parameter.
+      properties:
+        executionId:
+          type: string
+          description: The identifier of code execution.
+      required:
+      - executionId
+    CodeInputType:
+      type: string
+      description: Code input type.
+      enum:
+      - Inline
+      - InlineBase64
+      - InlineText
+      x-ms-enum:
+        name: CodeInputType
+        modelAsString: true
+        values:
+        - name: inline
+          value: Inline
+          description: Inline.
+        - name: inlineBase64
+          value: InlineBase64
+          description: InlineBase64.
+        - name: inlineText
+          value: InlineText
+          description: InlineText.
+    ExecutionType:
+      type: string
+      description: Execution Type
+      enum:
+      - Synchronous
+      - Asynchronous
+      x-ms-enum:
+        name: ExecutionType
+        modelAsString: true
+        values:
+        - name: synchronous
+          value: Synchronous
+          description: Synchronous
+        - name: asynchronous
+          value: Asynchronous
+          description: Asynchronous
+    JupyterKernel:
+      type: object
+      description: Jupyter kernel information.
+      properties:
+        name:
+          type: string
+          description: Name of the kernel.
+        version:
+          type: string
+          description: Version of the kernel.
+        projectUrl:
+          type: string
+          format: uri
+          description: Project URL of the kernel.
+        description:
+          type: string
+          description: Description of the kernel.
+      required:
+      - name
+      - version
+      - projectUrl
+      - description
+    Package:
+      type: object
+      description: Package information.
+      properties:
+        name:
+          type: string
+          description: Name of the package.
+        version:
+          type: string
+          description: Version of the package.
+      required:
+      - name
+      - version
+    PagedSessionResourceFile:
+      type: object
+      description: Paged collection of SessionResourceFile items
+      properties:
+        value:
+          type: array
+          description: The SessionResourceFile items on this page
+          items:
+            $ref: '#/components/schemas/SessionResourceFile'
+        nextLink:
+          type: string
+          format: uri
+          description: The link to the next page of items
+      required:
+      - value
+    Runtime:
+      type: object
+      description: Runtime information.
+      properties:
+        name:
+          type: string
+          description: Name of the runtime.
+        version:
+          type: string
+          description: Version of the runtime.
+      required:
+      - name
+      - version
+    Session:
+      type: object
+      description: The session resource.
+      properties:
+        identifier:
+          type: string
+          description: The identifier of the session.
+        createdAt:
+          type: string
+          format: date-time
+          description: The date and time when the session was created.
+        lastAccessedAt:
+          type: string
+          format: date-time
+          description: The date and time when the session was last accessed.
+        expireAt:
+          type: string
+          format: date-time
+          description: The date and time when the session will expire.
+        etag:
+          $ref: '#/components/schemas/Azure.Core.eTag'
+      required:
+      - identifier
+      - createdAt
+      - lastAccessedAt
+      - expireAt
+      - etag
+    SessionCodeExecutionRequest:
+      type: object
+      description: The request to execute code.
+      properties:
+        codeInputType:
+          $ref: '#/components/schemas/CodeInputType'
+        executionType:
+          $ref: '#/components/schemas/ExecutionType'
+        code:
+          type: string
+          description: The string of the code to execute, based on CodeInputType.
+        timeoutInSeconds:
+          type: integer
+          format: int32
+          description: Code execution timeout in seconds.
+      required:
+      - codeInputType
+      - executionType
+      - code
+      - timeoutInSeconds
+    SessionCodeExecutionResource:
+      type: object
+      description: The session code execution resource.
+      properties:
+        id:
+          type: string
+          description: Session code execution id.
+          readOnly: true
+        identifier:
+          type: string
+          description: The identifier of the session.
+        executionType:
+          $ref: '#/components/schemas/ExecutionType'
+        status:
+          $ref: '#/components/schemas/Azure.Core.Foundations.OperationState'
+        error:
+          $ref: '#/components/schemas/Azure.Core.Foundations.ErrorResponse'
+        result:
+          $ref: '#/components/schemas/SessionCodeExecutionResult'
+      required:
+      - id
+      - identifier
+      - executionType
+      - status
+    SessionCodeExecutionResult:
+      type: object
+      description: The result of the code execution.
+      properties:
+        stdout:
+          type: string
+          description: The standard output of the code execution.
+        stderr:
+          type: string
+          description: The standard error of the code execution.
+        executionResult:
+          description: The result of the code execution. The type of this field is
+            same as the type of actual result of the code execution after being Json
+            serialized.
+        executionTimeInMilliseconds:
+          type: integer
+          format: int64
+          description: The execution time of the code in milliseconds.
+    SessionPoolMetadataResponse:
+      type: object
+      description: SessionPool Metadata.
+      properties:
+        runtimes:
+          type: array
+          description: List of runtimes.
+          items:
+            $ref: '#/components/schemas/Runtime'
+        preInstalledPackages:
+          type: array
+          description: List of pre-installed packages.
+          items:
+            $ref: '#/components/schemas/Package'
+        createdAt:
+          type: string
+          format: date-time
+          description: Creation date in RFC3339 format.
+        lastUpdatedAt:
+          type: string
+          format: date-time
+          description: Last updated date in RFC3339 format.
+        jupyterKernel:
+          $ref: '#/components/schemas/JupyterKernel'
+      required:
+      - runtimes
+      - preInstalledPackages
+      - createdAt
+      - lastUpdatedAt
+      - jupyterKernel
+    SessionResourceFile:
+      type: object
+      description: Code execution file resource.
+      properties:
+        name:
+          type: string
+          description: The name of the file.
+          x-ms-mutability:
+          - read
+          - update
+          - create
+        type:
+          type: string
+          description: The type of the session resource file.
+        contentType:
+          type: string
+          description: The type of the content of this file.
+        sizeInBytes:
+          type: integer
+          format: int64
+          description: The size of the file.
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The date time in RFC3339 format when the file was last modified.
+      required:
+      - name
+      - type
+      - lastModifiedAt
+    SessionResourceFileCollection:
+      type: object
+      description: Code execution file resource collection.
+      properties:
+        value:
+          type: array
+          description: The files uploaded.
+          items:
+            $ref: '#/components/schemas/SessionResourceFile'
+      required:
+      - value
+    SessionResourceFileNamePathParameter:
+      type: object
+      description: The session resource file name parameter.
+      properties:
+        name:
+          type: string
+          description: The name of the file.
+      required:
+      - name
+    SessionsListResponse:
+      type: object
+      description: The sessions list response.
+      properties:
+        sessions:
+          type: array
+          description: The list of sessions.
+          items:
+            $ref: '#/components/schemas/Session'
+        nextLink:
+          type: string
+          format: uri
+          description: The link to the next page of sessions.
+      required:
+      - sessions

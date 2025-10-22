@@ -1,0 +1,970 @@
+openapi: 3.0.0
+info:
+  title: Azure Resource Graph
+  description: Azure Resource Graph API Reference
+  version: 2024-04-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  /providers/Microsoft.ResourceGraph/resources:
+    post:
+      tags:
+      - Resources
+      operationId: Resources
+      description: Queries the resources managed by Azure Resource Manager for scopes
+        specified in the request.
+      externalDocs:
+        description: Learn more about the query syntax here
+        url: https://aka.ms/resource-graph/learntoquery
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Describes a query to be executed.
+              type: object
+              properties:
+                subscriptions:
+                  description: Azure subscriptions against which to execute the query.
+                  type: array
+                  items:
+                    type: string
+                    description: Subscription Id.
+                managementGroups:
+                  description: 'Azure management groups against which to execute the
+                    query. Example: [ ''mg1'', ''mg2'' ]'
+                  type: array
+                  items:
+                    type: string
+                    description: The name of Management group.
+                query:
+                  description: The resources query.
+                  type: string
+                options:
+                  description: The query evaluation options
+                  properties:
+                    $skipToken:
+                      description: Continuation token for pagination, capturing the
+                        next page size and offset, as well as the context of the query.
+                      type: string
+                    $top:
+                      description: The maximum number of rows that the query should
+                        return. Overrides the page size when ```$skipToken``` property
+                        is present.
+                      type: integer
+                      format: int32
+                      minimum: 1
+                      maximum: 1000
+                    $skip:
+                      description: The number of rows to skip from the beginning of
+                        the results. Overrides the next page offset when ```$skipToken```
+                        property is present.
+                      type: integer
+                      format: int32
+                      minimum: 0
+                    resultFormat:
+                      description: Defines in which format query result returned.
+                      type: string
+                      enum:
+                      - table
+                      - objectArray
+                      default: objectArray
+                      x-ms-enum:
+                        name: ResultFormat
+                        modelAsString: false
+                    allowPartialScopes:
+                      description: Only applicable for tenant and management group
+                        level queries to decide whether to allow partial scopes for
+                        result in case the number of subscriptions exceed allowed
+                        limits.
+                      type: boolean
+                      default: false
+                    authorizationScopeFilter:
+                      description: Defines what level of authorization resources should
+                        be returned based on the which subscriptions and management
+                        groups are passed as scopes.
+                      type: string
+                      enum:
+                      - AtScopeAndBelow
+                      - AtScopeAndAbove
+                      - AtScopeExact
+                      - AtScopeAboveAndBelow
+                      default: AtScopeAndBelow
+                      x-ms-enum:
+                        name: AuthorizationScopeFilter
+                        modelAsString: false
+                facets:
+                  description: An array of facet requests to be computed against the
+                    query result.
+                  type: array
+                  items:
+                    description: A request to compute additional statistics (facets)
+                      over the query results.
+                    type: object
+                    properties:
+                      expression:
+                        description: The column or list of columns to summarize by
+                        type: string
+                      options:
+                        description: The options for facet evaluation
+                        properties:
+                          sortBy:
+                            description: The column name or query expression to sort
+                              on. Defaults to count if not present.
+                            type: string
+                          sortOrder:
+                            description: The sorting order by the selected column
+                              (count by default).
+                            type: string
+                            default: desc
+                            enum:
+                            - asc
+                            - desc
+                            x-ms-enum:
+                              name: FacetSortOrder
+                              modelAsString: false
+                          filter:
+                            description: Specifies the filter condition for the 'where'
+                              clause which will be run on main query's result, just
+                              before the actual faceting.
+                            type: string
+                          $top:
+                            description: The maximum number of facet rows that should
+                              be returned.
+                            type: integer
+                            format: int32
+                            minimum: 1
+                            maximum: 1000
+                    required:
+                    - expression
+              required:
+              - query
+        description: Request specifying query and its options.
+        required: true
+      responses:
+        '200':
+          description: Result of the query operation
+          content:
+            application/json:
+              schema:
+                description: Query result.
+                type: object
+                properties:
+                  totalRecords:
+                    description: Number of total records matching the query.
+                    type: integer
+                    format: int64
+                  count:
+                    description: Number of records returned in the current response.
+                      In the case of paging, this is the number of records in the
+                      current page.
+                    type: integer
+                    format: int64
+                  resultTruncated:
+                    description: Indicates whether the query results are truncated.
+                    type: string
+                    enum:
+                    - 'true'
+                    - 'false'
+                    x-ms-enum:
+                      name: ResultTruncated
+                      modelAsString: false
+                  $skipToken:
+                    description: When present, the value can be passed to a subsequent
+                      query call (together with the same query and scopes used in
+                      the current request) to retrieve the next page of data.
+                    type: string
+                  data:
+                    description: Query output in JObject array or Table format.
+                    type: object
+                  facets:
+                    description: Query facets.
+                    type: array
+                    items:
+                      description: A facet containing additional statistics on the
+                        response of a query. Can be either FacetResult or FacetError.
+                      type: object
+                      properties:
+                        expression:
+                          description: Facet expression, same as in the corresponding
+                            facet request.
+                          type: string
+                        resultType:
+                          description: Result type
+                          type: string
+                      required:
+                      - expression
+                      - resultType
+                      discriminator:
+                        propertyName: resultType
+                required:
+                - totalRecords
+                - count
+                - resultTruncated
+                - data
+        default:
+          description: An error occurred while processing the request. See the error.code
+            parameter to identify the specific error.
+          content:
+            application/json:
+              schema:
+                title: Error response.
+                type: object
+                description: An error response from the API.
+                properties:
+                  error:
+                    description: Error information.
+                    title: Error info.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: Error code identifying the specific error.
+                      message:
+                        type: string
+                        description: A human readable error message.
+                      details:
+                        type: array
+                        description: Error details
+                        items:
+                          title: Error details.
+                          type: object
+                          properties:
+                            code:
+                              type: string
+                              description: Error code identifying the specific error.
+                            message:
+                              type: string
+                              description: A human readable error message.
+                          additionalProperties:
+                            type: object
+                          required:
+                          - code
+                          - message
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+  /providers/Microsoft.ResourceGraph/operations:
+    get:
+      tags:
+      - Operations
+      description: Lists all of the available REST API operations.
+      operationId: Operations_List
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: OK. The request has succeeded.
+          content:
+            application/json:
+              schema:
+                description: Result of the request to list Resource Graph operations.
+                  It contains a list of operations and a URL link to get the next
+                  set of results.
+                properties:
+                  value:
+                    type: array
+                    items:
+                      description: Resource Graph REST API operation definition.
+                      properties:
+                        name:
+                          description: 'Operation name: {provider}/{resource}/{operation}'
+                          type: string
+                        display:
+                          description: Display metadata associated with the operation.
+                          properties:
+                            provider:
+                              description: 'Service provider: Microsoft Resource Graph.'
+                              type: string
+                            resource:
+                              description: Resource on which the operation is performed
+                                etc.
+                              type: string
+                            operation:
+                              description: 'Type of operation: get, read, delete,
+                                etc.'
+                              type: string
+                            description:
+                              description: Description for the operation.
+                              type: string
+                        origin:
+                          type: string
+                          description: The origin of operations.
+                    description: List of Resource Graph operations supported by the
+                      Resource Graph resource provider.
+        default:
+          description: An error occurred while processing the request. See the error.code
+            parameter to identify the specific error.
+          content:
+            application/json:
+              schema:
+                title: Error response.
+                type: object
+                description: An error response from the API.
+                properties:
+                  error:
+                    description: Error information.
+                    title: Error info.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: Error code identifying the specific error.
+                      message:
+                        type: string
+                        description: A human readable error message.
+                      details:
+                        type: array
+                        description: Error details
+                        items:
+                          title: Error details.
+                          type: object
+                          properties:
+                            code:
+                              type: string
+                              description: Error code identifying the specific error.
+                            message:
+                              type: string
+                              description: A human readable error message.
+                          additionalProperties:
+                            type: object
+                          required:
+                          - code
+                          - message
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+      x-ms-pageable: {}
+components:
+  parameters:
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    QueryRequest:
+      description: Describes a query to be executed.
+      type: object
+      properties:
+        subscriptions:
+          description: Azure subscriptions against which to execute the query.
+          type: array
+          items:
+            type: string
+            description: Subscription Id.
+        managementGroups:
+          description: 'Azure management groups against which to execute the query.
+            Example: [ ''mg1'', ''mg2'' ]'
+          type: array
+          items:
+            type: string
+            description: The name of Management group.
+        query:
+          description: The resources query.
+          type: string
+        options:
+          description: The query evaluation options
+          properties:
+            $skipToken:
+              description: Continuation token for pagination, capturing the next page
+                size and offset, as well as the context of the query.
+              type: string
+            $top:
+              description: The maximum number of rows that the query should return.
+                Overrides the page size when ```$skipToken``` property is present.
+              type: integer
+              format: int32
+              minimum: 1
+              maximum: 1000
+            $skip:
+              description: The number of rows to skip from the beginning of the results.
+                Overrides the next page offset when ```$skipToken``` property is present.
+              type: integer
+              format: int32
+              minimum: 0
+            resultFormat:
+              description: Defines in which format query result returned.
+              type: string
+              enum:
+              - table
+              - objectArray
+              default: objectArray
+              x-ms-enum:
+                name: ResultFormat
+                modelAsString: false
+            allowPartialScopes:
+              description: Only applicable for tenant and management group level queries
+                to decide whether to allow partial scopes for result in case the number
+                of subscriptions exceed allowed limits.
+              type: boolean
+              default: false
+            authorizationScopeFilter:
+              description: Defines what level of authorization resources should be
+                returned based on the which subscriptions and management groups are
+                passed as scopes.
+              type: string
+              enum:
+              - AtScopeAndBelow
+              - AtScopeAndAbove
+              - AtScopeExact
+              - AtScopeAboveAndBelow
+              default: AtScopeAndBelow
+              x-ms-enum:
+                name: AuthorizationScopeFilter
+                modelAsString: false
+        facets:
+          description: An array of facet requests to be computed against the query
+            result.
+          type: array
+          items:
+            description: A request to compute additional statistics (facets) over
+              the query results.
+            type: object
+            properties:
+              expression:
+                description: The column or list of columns to summarize by
+                type: string
+              options:
+                description: The options for facet evaluation
+                properties:
+                  sortBy:
+                    description: The column name or query expression to sort on. Defaults
+                      to count if not present.
+                    type: string
+                  sortOrder:
+                    description: The sorting order by the selected column (count by
+                      default).
+                    type: string
+                    default: desc
+                    enum:
+                    - asc
+                    - desc
+                    x-ms-enum:
+                      name: FacetSortOrder
+                      modelAsString: false
+                  filter:
+                    description: Specifies the filter condition for the 'where' clause
+                      which will be run on main query's result, just before the actual
+                      faceting.
+                    type: string
+                  $top:
+                    description: The maximum number of facet rows that should be returned.
+                    type: integer
+                    format: int32
+                    minimum: 1
+                    maximum: 1000
+            required:
+            - expression
+      required:
+      - query
+    QueryRequestOptions:
+      description: The options for query evaluation
+      properties:
+        $skipToken:
+          description: Continuation token for pagination, capturing the next page
+            size and offset, as well as the context of the query.
+          type: string
+        $top:
+          description: The maximum number of rows that the query should return. Overrides
+            the page size when ```$skipToken``` property is present.
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 1000
+        $skip:
+          description: The number of rows to skip from the beginning of the results.
+            Overrides the next page offset when ```$skipToken``` property is present.
+          type: integer
+          format: int32
+          minimum: 0
+        resultFormat:
+          description: Defines in which format query result returned.
+          type: string
+          enum:
+          - table
+          - objectArray
+          default: objectArray
+          x-ms-enum:
+            name: ResultFormat
+            modelAsString: false
+        allowPartialScopes:
+          description: Only applicable for tenant and management group level queries
+            to decide whether to allow partial scopes for result in case the number
+            of subscriptions exceed allowed limits.
+          type: boolean
+          default: false
+        authorizationScopeFilter:
+          description: Defines what level of authorization resources should be returned
+            based on the which subscriptions and management groups are passed as scopes.
+          type: string
+          enum:
+          - AtScopeAndBelow
+          - AtScopeAndAbove
+          - AtScopeExact
+          - AtScopeAboveAndBelow
+          default: AtScopeAndBelow
+          x-ms-enum:
+            name: AuthorizationScopeFilter
+            modelAsString: false
+    FacetRequest:
+      description: A request to compute additional statistics (facets) over the query
+        results.
+      type: object
+      properties:
+        expression:
+          description: The column or list of columns to summarize by
+          type: string
+        options:
+          description: The options for facet evaluation
+          properties:
+            sortBy:
+              description: The column name or query expression to sort on. Defaults
+                to count if not present.
+              type: string
+            sortOrder:
+              description: The sorting order by the selected column (count by default).
+              type: string
+              default: desc
+              enum:
+              - asc
+              - desc
+              x-ms-enum:
+                name: FacetSortOrder
+                modelAsString: false
+            filter:
+              description: Specifies the filter condition for the 'where' clause which
+                will be run on main query's result, just before the actual faceting.
+              type: string
+            $top:
+              description: The maximum number of facet rows that should be returned.
+              type: integer
+              format: int32
+              minimum: 1
+              maximum: 1000
+      required:
+      - expression
+    FacetRequestOptions:
+      description: The options for facet evaluation
+      properties:
+        sortBy:
+          description: The column name or query expression to sort on. Defaults to
+            count if not present.
+          type: string
+        sortOrder:
+          description: The sorting order by the selected column (count by default).
+          type: string
+          default: desc
+          enum:
+          - asc
+          - desc
+          x-ms-enum:
+            name: FacetSortOrder
+            modelAsString: false
+        filter:
+          description: Specifies the filter condition for the 'where' clause which
+            will be run on main query's result, just before the actual faceting.
+          type: string
+        $top:
+          description: The maximum number of facet rows that should be returned.
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 1000
+    QueryResponse:
+      description: Query result.
+      type: object
+      properties:
+        totalRecords:
+          description: Number of total records matching the query.
+          type: integer
+          format: int64
+        count:
+          description: Number of records returned in the current response. In the
+            case of paging, this is the number of records in the current page.
+          type: integer
+          format: int64
+        resultTruncated:
+          description: Indicates whether the query results are truncated.
+          type: string
+          enum:
+          - 'true'
+          - 'false'
+          x-ms-enum:
+            name: ResultTruncated
+            modelAsString: false
+        $skipToken:
+          description: When present, the value can be passed to a subsequent query
+            call (together with the same query and scopes used in the current request)
+            to retrieve the next page of data.
+          type: string
+        data:
+          description: Query output in JObject array or Table format.
+          type: object
+        facets:
+          description: Query facets.
+          type: array
+          items:
+            description: A facet containing additional statistics on the response
+              of a query. Can be either FacetResult or FacetError.
+            type: object
+            properties:
+              expression:
+                description: Facet expression, same as in the corresponding facet
+                  request.
+                type: string
+              resultType:
+                description: Result type
+                type: string
+            required:
+            - expression
+            - resultType
+            discriminator:
+              propertyName: resultType
+      required:
+      - totalRecords
+      - count
+      - resultTruncated
+      - data
+    Table:
+      description: Query output in tabular format.
+      type: object
+      properties:
+        columns:
+          description: Query result column descriptors.
+          type: array
+          items:
+            description: Column descriptor.
+            type: object
+            properties:
+              name:
+                description: Column name.
+                type: string
+              type:
+                description: Column data type.
+                type: string
+                enum:
+                - string
+                - integer
+                - number
+                - boolean
+                - object
+                - datetime
+                x-ms-enum:
+                  name: ColumnDataType
+                  modelAsString: false
+            required:
+            - name
+            - type
+        rows:
+          description: Query result rows.
+          type: array
+          items:
+            description: Query result row.
+            type: array
+            items:
+              type: object
+              description: Cell value.
+      required:
+      - columns
+      - rows
+    Column:
+      description: Query result column descriptor.
+      type: object
+      properties:
+        name:
+          description: Column name.
+          type: string
+        type:
+          description: Column data type.
+          type: string
+          enum:
+          - string
+          - integer
+          - number
+          - boolean
+          - object
+          - datetime
+          x-ms-enum:
+            name: ColumnDataType
+            modelAsString: false
+      required:
+      - name
+      - type
+    ColumnDataType:
+      description: Data type of a column in a table.
+      type: string
+      enum:
+      - string
+      - integer
+      - number
+      - boolean
+      - object
+      - datetime
+      x-ms-enum:
+        name: ColumnDataType
+        modelAsString: false
+    Row:
+      description: Query result row.
+      type: array
+      items:
+        type: object
+        description: Cell value.
+    Facet:
+      description: A facet containing additional statistics on the response of a query.
+        Can be either FacetResult or FacetError.
+      type: object
+      properties:
+        expression:
+          description: Facet expression, same as in the corresponding facet request.
+          type: string
+        resultType:
+          description: Result type
+          type: string
+      required:
+      - expression
+      - resultType
+      discriminator:
+        propertyName: resultType
+    FacetResult:
+      type: object
+      properties:
+        expression:
+          description: Facet expression, same as in the corresponding facet request.
+          type: string
+        resultType:
+          description: Result type
+          type: string
+        totalRecords:
+          description: Number of total records in the facet results.
+          type: integer
+          format: int64
+        count:
+          description: Number of records returned in the facet response.
+          type: integer
+          format: int32
+        data:
+          description: A JObject array or Table containing the desired facets. Only
+            present if the facet is valid.
+          type: object
+      required:
+      - expression
+      - resultType
+      - totalRecords
+      - count
+      - data
+      description: A facet containing additional statistics on the response of a query.
+        Can be either FacetResult or FacetError.
+      discriminator:
+        propertyName: resultType
+      x-ms-discriminator-value: FacetResult
+    FacetError:
+      type: object
+      properties:
+        expression:
+          description: Facet expression, same as in the corresponding facet request.
+          type: string
+        resultType:
+          description: Result type
+          type: string
+        errors:
+          description: An array containing detected facet errors with details.
+          type: array
+          items:
+            title: Error details.
+            type: object
+            properties:
+              code:
+                type: string
+                description: Error code identifying the specific error.
+              message:
+                type: string
+                description: A human readable error message.
+            additionalProperties:
+              type: object
+            required:
+            - code
+            - message
+      required:
+      - expression
+      - resultType
+      - errors
+      description: A facet containing additional statistics on the response of a query.
+        Can be either FacetResult or FacetError.
+      discriminator:
+        propertyName: resultType
+      x-ms-discriminator-value: FacetError
+    ErrorResponse:
+      title: Error response.
+      type: object
+      description: An error response from the API.
+      properties:
+        error:
+          description: Error information.
+          title: Error info.
+          type: object
+          properties:
+            code:
+              type: string
+              description: Error code identifying the specific error.
+            message:
+              type: string
+              description: A human readable error message.
+            details:
+              type: array
+              description: Error details
+              items:
+                title: Error details.
+                type: object
+                properties:
+                  code:
+                    type: string
+                    description: Error code identifying the specific error.
+                  message:
+                    type: string
+                    description: A human readable error message.
+                additionalProperties:
+                  type: object
+                required:
+                - code
+                - message
+          required:
+          - code
+          - message
+      required:
+      - error
+    Error:
+      title: Error info.
+      type: object
+      description: Error details.
+      properties:
+        code:
+          type: string
+          description: Error code identifying the specific error.
+        message:
+          type: string
+          description: A human readable error message.
+        details:
+          type: array
+          description: Error details
+          items:
+            title: Error details.
+            type: object
+            properties:
+              code:
+                type: string
+                description: Error code identifying the specific error.
+              message:
+                type: string
+                description: A human readable error message.
+            additionalProperties:
+              type: object
+            required:
+            - code
+            - message
+      required:
+      - code
+      - message
+    ErrorDetails:
+      title: Error details.
+      type: object
+      properties:
+        code:
+          type: string
+          description: Error code identifying the specific error.
+        message:
+          type: string
+          description: A human readable error message.
+      additionalProperties:
+        type: object
+      required:
+      - code
+      - message
+    OperationListResult:
+      description: Result of the request to list Resource Graph operations. It contains
+        a list of operations and a URL link to get the next set of results.
+      properties:
+        value:
+          type: array
+          items:
+            description: Resource Graph REST API operation definition.
+            properties:
+              name:
+                description: 'Operation name: {provider}/{resource}/{operation}'
+                type: string
+              display:
+                description: Display metadata associated with the operation.
+                properties:
+                  provider:
+                    description: 'Service provider: Microsoft Resource Graph.'
+                    type: string
+                  resource:
+                    description: Resource on which the operation is performed etc.
+                    type: string
+                  operation:
+                    description: 'Type of operation: get, read, delete, etc.'
+                    type: string
+                  description:
+                    description: Description for the operation.
+                    type: string
+              origin:
+                type: string
+                description: The origin of operations.
+          description: List of Resource Graph operations supported by the Resource
+            Graph resource provider.
+    Operation:
+      description: Resource Graph REST API operation definition.
+      properties:
+        name:
+          description: 'Operation name: {provider}/{resource}/{operation}'
+          type: string
+        display:
+          description: Display metadata associated with the operation.
+          properties:
+            provider:
+              description: 'Service provider: Microsoft Resource Graph.'
+              type: string
+            resource:
+              description: Resource on which the operation is performed etc.
+              type: string
+            operation:
+              description: 'Type of operation: get, read, delete, etc.'
+              type: string
+            description:
+              description: Description for the operation.
+              type: string
+        origin:
+          type: string
+          description: The origin of operations.

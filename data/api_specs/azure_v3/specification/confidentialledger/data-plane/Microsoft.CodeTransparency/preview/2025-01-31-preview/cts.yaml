@@ -1,0 +1,1409 @@
+openapi: 3.0.0
+info:
+  title: Microsoft Code Transparency Service
+  version: 2025-01-31-preview
+  x-typespec-generated:
+  - emitter: '@azure-tools/typespec-autorest'
+servers:
+- url: '{endpoint}'
+  variables:
+    endpoint:
+      format: uri
+      x-ms-skip-url-encoding: true
+      default: none
+tags: []
+paths:
+  /.well-known/transparency-configuration:
+    get:
+      operationId: GetTransparencyConfigCbor
+      description: Get the transparency service configuration, mandatory in IETF SCITT
+        draft
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-client-name: apiVersion
+        schema:
+          type: string
+          minLength: 1
+      - name: accept
+        in: header
+        description: Accept header
+        required: true
+        x-ms-enum:
+          modelAsString: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - application/cbor
+      responses:
+        '200':
+          description: Transparency configuration, see IETF SCITT draft.
+          content:
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '500':
+          description: Server error response
+          content:
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '503':
+          description: Service unavailable error response
+          headers:
+            Retry-After:
+              description: Retry the same request after a suggested number of seconds
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+  /entries:
+    post:
+      operationId: CreateEntry
+      description: Post an entry to be registered on the CodeTransparency instance,
+        mandatory in IETF SCITT draft
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-client-name: apiVersion
+        schema:
+          type: string
+          minLength: 1
+      - name: accept
+        in: header
+        description: Accept header
+        required: true
+        x-ms-enum:
+          modelAsString: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - application/cose; application/cbor
+      requestBody:
+        content:
+          application/cose:
+            schema:
+              type: string
+              format: binary
+        description: CoseSign1 signature envelope
+        required: true
+        x-ms-parameter-location: method
+      responses:
+        '201':
+          description: Response of entry submission if the response can be served
+            immediately, mandatory in IETF SCITT draft
+          headers:
+            Location:
+              description: Location of the receipt
+              schema:
+                type: string
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '202':
+          description: Response of entry submission containing the operation id, mandatory
+            in IETF SCITT draft
+          headers:
+            Location:
+              description: Location of the operation
+              schema:
+                type: string
+            Retry-After:
+              description: Retry-After seconds value to help with polling
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Validation error response
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Not found error response
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '429':
+          description: Not found error response
+          headers:
+            Retry-After:
+              description: Retry-After seconds value to help with polling
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '500':
+          description: Server error response
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '503':
+          description: Service unavailable error response
+          headers:
+            Retry-After:
+              description: Retry the same request after a suggested number of seconds
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+  /entries/{entryId}:
+    get:
+      operationId: GetEntry
+      description: Get receipt
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-client-name: apiVersion
+        schema:
+          type: string
+          minLength: 1
+      - name: entryId
+        in: path
+        description: ID of the entry to retrieve.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 100
+      - name: accept
+        in: header
+        description: Accept header
+        required: true
+        x-ms-enum:
+          modelAsString: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - application/cose
+      responses:
+        '200':
+          description: A ledger receipt, see IETF SCITT draft
+          headers:
+            Location:
+              description: Location of the receipt
+              schema:
+                type: string
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Validation error response
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Not found error response
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '429':
+          description: Not found error response
+          headers:
+            Retry-After:
+              description: Retry-After seconds value to help with polling
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '500':
+          description: Server error response
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '503':
+          description: Service unavailable error response
+          headers:
+            Retry-After:
+              description: Retry the same request after a suggested number of seconds
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+  /entries/{entryId}/statement:
+    get:
+      operationId: GetEntryStatement
+      description: Get the transparent statement consisting of the signed statement
+        and the receipt embedded in the header
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-client-name: apiVersion
+        schema:
+          type: string
+          minLength: 1
+      - name: entryId
+        in: path
+        description: ID of the entry to retrieve.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 100
+      - name: accept
+        in: header
+        description: Accept header
+        required: true
+        x-ms-enum:
+          modelAsString: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - application/cose
+      responses:
+        '200':
+          description: Transparent statement
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '400':
+          description: Validation error response
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Not found error response
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '429':
+          description: Not found error response
+          headers:
+            Retry-After:
+              description: Retry-After seconds value to help with polling
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '500':
+          description: Server error response
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '503':
+          description: Service unavailable error response
+          headers:
+            Retry-After:
+              description: Retry the same request after a suggested number of seconds
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/cose:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+  /jwks:
+    get:
+      operationId: GetPublicKeys
+      description: Get the public keys used by the service to sign receipts, mentioned
+        in IETF SCITT draft as part of jwks_uri implementation
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-client-name: apiVersion
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: A JWKS like document
+                properties:
+                  keys:
+                    type: array
+                    description: List of public keys used for receipt verification.
+                    items:
+                      type: object
+                      description: rfc7517 JSON Web Key representation adapted from
+                        a shared swagger definition in the common types
+                      properties:
+                        alg:
+                          type: string
+                          description: 'The "alg" (algorithm) parameter identifies
+                            the algorithm intended for
+
+                            use with the key.  The values used should either be registered
+                            in the
+
+                            IANA "JSON Web Signature and Encryption Algorithms" registry
+
+                            established by [JWA] or be a value that contains a Collision-
+
+                            Resistant Name.'
+                        crv:
+                          type: string
+                          description: The "crv" (curve) parameter identifies the
+                            curve type
+                        d:
+                          type: string
+                          description: RSA private exponent or ECC private key
+                        dp:
+                          type: string
+                          description: RSA Private Key Parameter
+                        dq:
+                          type: string
+                          description: RSA Private Key Parameter
+                        e:
+                          type: string
+                          description: RSA public exponent, in Base64
+                        k:
+                          type: string
+                          description: Symmetric key
+                        kid:
+                          type: string
+                          description: 'The "kid" (key ID) parameter is used to match
+                            a specific key.  This
+
+                            is used, for instance, to choose among a set of keys within
+                            a JWK Set
+
+                            during key rollover.  The structure of the "kid" value
+                            is
+
+                            unspecified.  When "kid" values are used within a JWK
+                            Set, different
+
+                            keys within the JWK Set SHOULD use distinct "kid" values.  (One
+
+                            example in which different keys might use the same "kid"
+                            value is if
+
+                            they have different "kty" (key type) values but are considered
+                            to be
+
+                            equivalent alternatives by the application using them.)  The
+                            "kid"
+
+                            value is a case-sensitive string.'
+                        kty:
+                          type: string
+                          description: 'The "kty" (key type) parameter identifies
+                            the cryptographic algorithm
+
+                            family used with the key, such as "RSA" or "EC". "kty"
+                            values should
+
+                            either be registered in the IANA "JSON Web Key Types"
+                            registry
+
+                            established by [JWA] or be a value that contains a Collision-
+
+                            Resistant Name.  The "kty" value is a case-sensitive string.'
+                        n:
+                          type: string
+                          description: RSA modulus, in Base64
+                        p:
+                          type: string
+                          description: RSA secret prime
+                        q:
+                          type: string
+                          description: RSA secret prime, with p < q
+                        qi:
+                          type: string
+                          description: RSA Private Key Parameter
+                        use:
+                          type: string
+                          description: 'Use ("public key use") identifies the intended
+                            use of
+
+                            the public key. The "use" parameter is employed to indicate
+                            whether
+
+                            a public key is used for encrypting data or verifying
+                            the signature
+
+                            on data. Values are commonly "sig" (signature) or "enc"
+                            (encryption).'
+                        x:
+                          type: string
+                          description: X coordinate for the Elliptic Curve point
+                        x5c:
+                          type: array
+                          description: 'The "x5c" (X.509 certificate chain) parameter
+                            contains a chain of one
+
+                            or more PKIX certificates [RFC5280].  The certificate
+                            chain is
+
+                            represented as a JSON array of certificate value strings.  Each
+
+                            string in the array is a base64-encoded (Section 4 of
+                            [RFC4648] --
+
+                            not base64url-encoded) DER [ITU.X690.1994] PKIX certificate
+                            value.
+
+                            The PKIX certificate containing the key value MUST be
+                            the first
+
+                            certificate.'
+                          items:
+                            type: string
+                        y:
+                          type: string
+                          description: Y coordinate for the Elliptic Curve point
+                      required:
+                      - kty
+                required:
+                - keys
+            application/concise-problem-details+cbor:
+              schema:
+                type: object
+                description: A JWKS like document
+                properties:
+                  keys:
+                    type: array
+                    description: List of public keys used for receipt verification.
+                    items:
+                      type: object
+                      description: rfc7517 JSON Web Key representation adapted from
+                        a shared swagger definition in the common types
+                      properties:
+                        alg:
+                          type: string
+                          description: 'The "alg" (algorithm) parameter identifies
+                            the algorithm intended for
+
+                            use with the key.  The values used should either be registered
+                            in the
+
+                            IANA "JSON Web Signature and Encryption Algorithms" registry
+
+                            established by [JWA] or be a value that contains a Collision-
+
+                            Resistant Name.'
+                        crv:
+                          type: string
+                          description: The "crv" (curve) parameter identifies the
+                            curve type
+                        d:
+                          type: string
+                          description: RSA private exponent or ECC private key
+                        dp:
+                          type: string
+                          description: RSA Private Key Parameter
+                        dq:
+                          type: string
+                          description: RSA Private Key Parameter
+                        e:
+                          type: string
+                          description: RSA public exponent, in Base64
+                        k:
+                          type: string
+                          description: Symmetric key
+                        kid:
+                          type: string
+                          description: 'The "kid" (key ID) parameter is used to match
+                            a specific key.  This
+
+                            is used, for instance, to choose among a set of keys within
+                            a JWK Set
+
+                            during key rollover.  The structure of the "kid" value
+                            is
+
+                            unspecified.  When "kid" values are used within a JWK
+                            Set, different
+
+                            keys within the JWK Set SHOULD use distinct "kid" values.  (One
+
+                            example in which different keys might use the same "kid"
+                            value is if
+
+                            they have different "kty" (key type) values but are considered
+                            to be
+
+                            equivalent alternatives by the application using them.)  The
+                            "kid"
+
+                            value is a case-sensitive string.'
+                        kty:
+                          type: string
+                          description: 'The "kty" (key type) parameter identifies
+                            the cryptographic algorithm
+
+                            family used with the key, such as "RSA" or "EC". "kty"
+                            values should
+
+                            either be registered in the IANA "JSON Web Key Types"
+                            registry
+
+                            established by [JWA] or be a value that contains a Collision-
+
+                            Resistant Name.  The "kty" value is a case-sensitive string.'
+                        n:
+                          type: string
+                          description: RSA modulus, in Base64
+                        p:
+                          type: string
+                          description: RSA secret prime
+                        q:
+                          type: string
+                          description: RSA secret prime, with p < q
+                        qi:
+                          type: string
+                          description: RSA Private Key Parameter
+                        use:
+                          type: string
+                          description: 'Use ("public key use") identifies the intended
+                            use of
+
+                            the public key. The "use" parameter is employed to indicate
+                            whether
+
+                            a public key is used for encrypting data or verifying
+                            the signature
+
+                            on data. Values are commonly "sig" (signature) or "enc"
+                            (encryption).'
+                        x:
+                          type: string
+                          description: X coordinate for the Elliptic Curve point
+                        x5c:
+                          type: array
+                          description: 'The "x5c" (X.509 certificate chain) parameter
+                            contains a chain of one
+
+                            or more PKIX certificates [RFC5280].  The certificate
+                            chain is
+
+                            represented as a JSON array of certificate value strings.  Each
+
+                            string in the array is a base64-encoded (Section 4 of
+                            [RFC4648] --
+
+                            not base64url-encoded) DER [ITU.X690.1994] PKIX certificate
+                            value.
+
+                            The PKIX certificate containing the key value MUST be
+                            the first
+
+                            certificate.'
+                          items:
+                            type: string
+                        y:
+                          type: string
+                          description: Y coordinate for the Elliptic Curve point
+                      required:
+                      - kty
+                required:
+                - keys
+        '400':
+          description: Validation error response
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Not found error response
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '429':
+          description: Not found error response
+          headers:
+            Retry-After:
+              description: Retry-After seconds value to help with polling
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '500':
+          description: Server error response
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '503':
+          description: Service unavailable error response
+          headers:
+            Retry-After:
+              description: Retry the same request after a suggested number of seconds
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+  /operations/{operationId}:
+    get:
+      operationId: GetOperation
+      description: Get status of the long running registration operation, mandatory
+        in IETF SCITT draft
+      parameters:
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-client-name: apiVersion
+        schema:
+          type: string
+          minLength: 1
+      - name: operationId
+        in: path
+        description: ID of the operation to retrieve.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 100
+      - name: accept
+        in: header
+        description: Accept header
+        required: true
+        x-ms-enum:
+          modelAsString: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - application/cbor
+      responses:
+        '200':
+          description: Provides status details for long running operation, mandatory
+            in IETF SCITT draft
+          headers:
+            Location:
+              description: Location of the entry
+              schema:
+                type: string
+          content:
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '202':
+          description: Pending response if the operation was not complete, mandatory
+            in IETF SCITT draft
+          headers:
+            Location:
+              description: Location of the operation
+              schema:
+                type: string
+            Retry-After:
+              description: Retry-After seconds value to help with polling
+              schema:
+                type: integer
+                format: int32
+        '400':
+          description: Validation error response
+          content:
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Not found error response
+          content:
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '429':
+          description: Not found error response
+          headers:
+            Retry-After:
+              description: Retry-After seconds value to help with polling
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '500':
+          description: Server error response
+          content:
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+        '503':
+          description: Service unavailable error response
+          headers:
+            Retry-After:
+              description: Retry the same request after a suggested number of seconds
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/cbor:
+              schema:
+                type: string
+                format: binary
+            application/concise-problem-details+cbor:
+              schema:
+                type: string
+                format: binary
+components:
+  parameters:
+    AcceptCborHeader:
+      name: accept
+      in: header
+      description: Accept header
+      required: true
+      x-ms-enum:
+        modelAsString: false
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        enum:
+        - application/cbor
+    AcceptCoseHeader:
+      name: accept
+      in: header
+      description: Accept header
+      required: true
+      x-ms-enum:
+        modelAsString: false
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        enum:
+        - application/cose
+    AcceptCoseOrCborHeader:
+      name: accept
+      in: header
+      description: Accept header
+      required: true
+      x-ms-enum:
+        modelAsString: false
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        enum:
+        - application/cose; application/cbor
+    Azure.Core.Foundations.ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      x-ms-parameter-location: method
+      x-ms-client-name: apiVersion
+      schema:
+        type: string
+        minLength: 1
+    EntryIdParameter:
+      name: entryId
+      in: path
+      description: ID of the entry to retrieve.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        maxLength: 100
+    OperationIdParameter:
+      name: operationId
+      in: path
+      description: ID of the operation to retrieve.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        maxLength: 100
+  schemas:
+    CreateEntryCreated:
+      type: object
+      description: Response of entry submission if the response can be served immediately,
+        mandatory in IETF SCITT draft
+      properties:
+        body:
+          type: string
+          format: byte
+          description: Receipt body in COSE format
+      required:
+      - body
+    CreateEntryPending:
+      type: object
+      description: Response of entry submission containing the operation id, mandatory
+        in IETF SCITT draft
+      properties:
+        body:
+          type: string
+          format: byte
+          description: Operation status response
+      required:
+      - body
+    JsonWebKey:
+      type: object
+      description: rfc7517 JSON Web Key representation adapted from a shared swagger
+        definition in the common types
+      properties:
+        alg:
+          type: string
+          description: 'The "alg" (algorithm) parameter identifies the algorithm intended
+            for
+
+            use with the key.  The values used should either be registered in the
+
+            IANA "JSON Web Signature and Encryption Algorithms" registry
+
+            established by [JWA] or be a value that contains a Collision-
+
+            Resistant Name.'
+        crv:
+          type: string
+          description: The "crv" (curve) parameter identifies the curve type
+        d:
+          type: string
+          description: RSA private exponent or ECC private key
+        dp:
+          type: string
+          description: RSA Private Key Parameter
+        dq:
+          type: string
+          description: RSA Private Key Parameter
+        e:
+          type: string
+          description: RSA public exponent, in Base64
+        k:
+          type: string
+          description: Symmetric key
+        kid:
+          type: string
+          description: 'The "kid" (key ID) parameter is used to match a specific key.  This
+
+            is used, for instance, to choose among a set of keys within a JWK Set
+
+            during key rollover.  The structure of the "kid" value is
+
+            unspecified.  When "kid" values are used within a JWK Set, different
+
+            keys within the JWK Set SHOULD use distinct "kid" values.  (One
+
+            example in which different keys might use the same "kid" value is if
+
+            they have different "kty" (key type) values but are considered to be
+
+            equivalent alternatives by the application using them.)  The "kid"
+
+            value is a case-sensitive string.'
+        kty:
+          type: string
+          description: 'The "kty" (key type) parameter identifies the cryptographic
+            algorithm
+
+            family used with the key, such as "RSA" or "EC". "kty" values should
+
+            either be registered in the IANA "JSON Web Key Types" registry
+
+            established by [JWA] or be a value that contains a Collision-
+
+            Resistant Name.  The "kty" value is a case-sensitive string.'
+        n:
+          type: string
+          description: RSA modulus, in Base64
+        p:
+          type: string
+          description: RSA secret prime
+        q:
+          type: string
+          description: RSA secret prime, with p < q
+        qi:
+          type: string
+          description: RSA Private Key Parameter
+        use:
+          type: string
+          description: 'Use ("public key use") identifies the intended use of
+
+            the public key. The "use" parameter is employed to indicate whether
+
+            a public key is used for encrypting data or verifying the signature
+
+            on data. Values are commonly "sig" (signature) or "enc" (encryption).'
+        x:
+          type: string
+          description: X coordinate for the Elliptic Curve point
+        x5c:
+          type: array
+          description: 'The "x5c" (X.509 certificate chain) parameter contains a chain
+            of one
+
+            or more PKIX certificates [RFC5280].  The certificate chain is
+
+            represented as a JSON array of certificate value strings.  Each
+
+            string in the array is a base64-encoded (Section 4 of [RFC4648] --
+
+            not base64url-encoded) DER [ITU.X690.1994] PKIX certificate value.
+
+            The PKIX certificate containing the key value MUST be the first
+
+            certificate.'
+          items:
+            type: string
+        y:
+          type: string
+          description: Y coordinate for the Elliptic Curve point
+      required:
+      - kty
+    JwksDocument:
+      type: object
+      description: A JWKS like document
+      properties:
+        keys:
+          type: array
+          description: List of public keys used for receipt verification.
+          items:
+            type: object
+            description: rfc7517 JSON Web Key representation adapted from a shared
+              swagger definition in the common types
+            properties:
+              alg:
+                type: string
+                description: 'The "alg" (algorithm) parameter identifies the algorithm
+                  intended for
+
+                  use with the key.  The values used should either be registered in
+                  the
+
+                  IANA "JSON Web Signature and Encryption Algorithms" registry
+
+                  established by [JWA] or be a value that contains a Collision-
+
+                  Resistant Name.'
+              crv:
+                type: string
+                description: The "crv" (curve) parameter identifies the curve type
+              d:
+                type: string
+                description: RSA private exponent or ECC private key
+              dp:
+                type: string
+                description: RSA Private Key Parameter
+              dq:
+                type: string
+                description: RSA Private Key Parameter
+              e:
+                type: string
+                description: RSA public exponent, in Base64
+              k:
+                type: string
+                description: Symmetric key
+              kid:
+                type: string
+                description: 'The "kid" (key ID) parameter is used to match a specific
+                  key.  This
+
+                  is used, for instance, to choose among a set of keys within a JWK
+                  Set
+
+                  during key rollover.  The structure of the "kid" value is
+
+                  unspecified.  When "kid" values are used within a JWK Set, different
+
+                  keys within the JWK Set SHOULD use distinct "kid" values.  (One
+
+                  example in which different keys might use the same "kid" value is
+                  if
+
+                  they have different "kty" (key type) values but are considered to
+                  be
+
+                  equivalent alternatives by the application using them.)  The "kid"
+
+                  value is a case-sensitive string.'
+              kty:
+                type: string
+                description: 'The "kty" (key type) parameter identifies the cryptographic
+                  algorithm
+
+                  family used with the key, such as "RSA" or "EC". "kty" values should
+
+                  either be registered in the IANA "JSON Web Key Types" registry
+
+                  established by [JWA] or be a value that contains a Collision-
+
+                  Resistant Name.  The "kty" value is a case-sensitive string.'
+              n:
+                type: string
+                description: RSA modulus, in Base64
+              p:
+                type: string
+                description: RSA secret prime
+              q:
+                type: string
+                description: RSA secret prime, with p < q
+              qi:
+                type: string
+                description: RSA Private Key Parameter
+              use:
+                type: string
+                description: 'Use ("public key use") identifies the intended use of
+
+                  the public key. The "use" parameter is employed to indicate whether
+
+                  a public key is used for encrypting data or verifying the signature
+
+                  on data. Values are commonly "sig" (signature) or "enc" (encryption).'
+              x:
+                type: string
+                description: X coordinate for the Elliptic Curve point
+              x5c:
+                type: array
+                description: 'The "x5c" (X.509 certificate chain) parameter contains
+                  a chain of one
+
+                  or more PKIX certificates [RFC5280].  The certificate chain is
+
+                  represented as a JSON array of certificate value strings.  Each
+
+                  string in the array is a base64-encoded (Section 4 of [RFC4648]
+                  --
+
+                  not base64url-encoded) DER [ITU.X690.1994] PKIX certificate value.
+
+                  The PKIX certificate containing the key value MUST be the first
+
+                  certificate.'
+                items:
+                  type: string
+              y:
+                type: string
+                description: Y coordinate for the Elliptic Curve point
+            required:
+            - kty
+      required:
+      - keys
+    OperationStatusComplete:
+      type: object
+      description: Provides status details for long running operation, mandatory in
+        IETF SCITT draft
+      properties:
+        body:
+          type: string
+          format: byte
+          description: Operation status response
+      required:
+      - body
+    OperationStatusPending:
+      type: object
+      description: Pending response if the operation was not complete, mandatory in
+        IETF SCITT draft
+    ReceiptEntry:
+      type: object
+      description: A ledger receipt, see IETF SCITT draft
+      properties:
+        body:
+          type: string
+          format: byte
+          description: A receipt structure in COSE format
+      required:
+      - body
+    Response400Cbor:
+      type: object
+      description: Validation error response
+      properties:
+        error:
+          type: string
+          format: byte
+          description: CBOR content of the error object
+      required:
+      - error
+    Response404Cbor:
+      type: object
+      description: Not found error response
+      properties:
+        error:
+          type: string
+          format: byte
+          description: CBOR content of the error object
+      required:
+      - error
+    Response429Cbor:
+      type: object
+      description: Not found error response
+      properties:
+        error:
+          type: string
+          format: byte
+          description: CBOR content of the error object
+      required:
+      - error
+    Response500Cbor:
+      type: object
+      description: Server error response
+      properties:
+        error:
+          type: string
+          format: byte
+          description: CBOR content of the error object
+      required:
+      - error
+    Response503Cbor:
+      type: object
+      description: Service unavailable error response
+      properties:
+        error:
+          type: string
+          format: byte
+          description: CBOR content of the error object
+      required:
+      - error
+    TransparencyConfigurationCbor:
+      type: object
+      description: Transparency configuration, see IETF SCITT draft.
+      properties:
+        body:
+          type: string
+          format: byte
+          description: CBOR content of the configuration object
+      required:
+      - body
+    TransparentStatement:
+      type: object
+      description: Transparent statement
+      properties:
+        body:
+          type: string
+          format: byte
+          description: CoseSign1 signature envelope with the receipt embedded in the
+            unprotected header
+      required:
+      - body

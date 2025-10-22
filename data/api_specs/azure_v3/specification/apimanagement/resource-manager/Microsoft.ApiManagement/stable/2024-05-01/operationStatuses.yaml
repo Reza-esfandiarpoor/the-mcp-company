@@ -1,0 +1,190 @@
+openapi: 3.0.0
+info:
+  title: ApiManagementClient
+  description: Resource provider operation status.
+  version: 2024-05-01
+paths:
+  /subscriptions/{subscriptionId}/providers/Microsoft.ApiManagement/locations/{location}/operationStatuses/{operationId}:
+    get:
+      operationId: OperationStatus_Get
+      description: Returns the current status of an async operation.
+      parameters:
+      - $ref: '#/components/parameters/ApiVersionParameter'
+      - $ref: '#/components/parameters/SubscriptionIdParameter'
+      - $ref: '#/components/parameters/LocationParameter'
+      - $ref: '#/components/parameters/OperationIdParameter'
+      responses:
+        '200':
+          description: Requested operation status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OperationStatusResult'
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /subscriptions/{subscriptionId}/providers/Microsoft.ApiManagement/locations/{location}/operationResults/{operationId}:
+    get:
+      tags:
+      - OperationResults
+      description: Returns operation results for long running operations executing
+        DELETE or PATCH on the resource.
+      operationId: OperationsResults_Get
+      parameters:
+      - $ref: '#/components/parameters/ApiVersionParameter'
+      - $ref: '#/components/parameters/SubscriptionIdParameter'
+      - $ref: '#/components/parameters/LocationParameter'
+      - $ref: '#/components/parameters/OperationIdParameter'
+      responses:
+        '200':
+          description: Successfully retrieved the operation result.
+        '202':
+          description: The operation is still in progress.
+          headers:
+            Location:
+              description: URL for determining when an operation has completed.
+              schema:
+                type: string
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+servers:
+- url: https://management.azure.com
+components:
+  parameters:
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription. The value must be an UUID.
+      required: true
+      schema:
+        type: string
+        format: uuid
+    LocationParameter:
+      name: location
+      in: path
+      description: The name of the Azure region.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+    OperationIdParameter:
+      name: operationId
+      in: path
+      description: The ID of an ongoing async operation.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+  schemas:
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            $ref: '#/components/schemas/ErrorAdditionalInfo'
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+    OperationStatusResult:
+      type: object
+      description: The current status of an async operation.
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified ID for the async operation.
+        resourceId:
+          type: string
+          format: arm-id
+          description: Fully qualified ID of the resource against which the original
+            async operation was started.
+          readOnly: true
+        name:
+          type: string
+          description: Name of the async operation.
+        status:
+          type: string
+          description: Operation status.
+        percentComplete:
+          type: number
+          description: Percent of the operation that is complete.
+          minimum: 0
+          maximum: 100
+        startTime:
+          type: string
+          format: date-time
+          description: The start time of the operation.
+        endTime:
+          type: string
+          format: date-time
+          description: The end time of the operation.
+        operations:
+          type: array
+          description: The operations list.
+          items:
+            $ref: '#/components/schemas/OperationStatusResult'
+        error:
+          $ref: '#/components/schemas/ErrorDetail'
+      required:
+      - status

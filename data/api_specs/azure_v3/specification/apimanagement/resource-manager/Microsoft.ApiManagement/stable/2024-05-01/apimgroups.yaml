@@ -1,0 +1,3679 @@
+openapi: 3.0.0
+info:
+  title: ApiManagementClient
+  description: Use these REST APIs for performing operations on Group entity in your
+    Azure API Management deployment. Groups are used to manage the visibility of products
+    to developers. Each API Management service instance comes with the following immutable
+    system groups whose membership is automatically managed by API Management.  -
+    **Administrators** - Azure subscription administrators are members of this group.
+    - **Developers** - Authenticated developer portal users fall into this group.
+    - **Guests** - Unauthenticated developer portal users are placed into this group.
+    In addition to these system groups, administrators can create custom groups or
+    [leverage external groups in associated Azure Active Directory tenants](https://docs.microsoft.com/en-us/azure/api-management/api-management-howto-aad#how-to-add-an-external-azure-active-directory-group).
+    Custom and external groups can be used alongside system groups in giving developers
+    visibility and access to API products. For example, you could create one custom
+    group for developers affiliated with a specific partner organization and allow
+    them access to the APIs from a product containing relevant APIs only. A user can
+    be a member of more than one group.
+  version: 2024-05-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/groups
+  : get:
+      tags:
+      - Group
+      operationId: Group_ListByService
+      description: Lists a collection of groups defined within a service instance.
+      externalDocs:
+        url: https://docs.microsoft.com/en-us/azure/api-management/api-management-howto-create-groups
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: $filter
+        in: query
+        required: false
+        description: '|     Field     |     Usage     |     Supported operators     |     Supported
+          functions     |</br>|-------------|-------------|-------------|-------------|</br>|
+          name | filter | ge, le, eq, ne, gt, lt | substringof, contains, startswith,
+          endswith |</br>| displayName | filter | ge, le, eq, ne, gt, lt | substringof,
+          contains, startswith, endswith |</br>| description | filter | ge, le, eq,
+          ne, gt, lt | substringof, contains, startswith, endswith |</br>| externalId
+          | filter | eq |     |</br>'
+        schema:
+          type: string
+      - name: $top
+        in: query
+        required: false
+        description: Number of records to return.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - name: $skip
+        in: query
+        required: false
+        description: Number of records to skip.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Lists a collection of Group entities.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                        name:
+                          readOnly: true
+                          type: string
+                          description: The name of the resource
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                        properties:
+                          x-ms-client-flatten: true
+                          description: Group entity contract properties.
+                          type: object
+                          properties:
+                            displayName:
+                              type: string
+                              description: Group name.
+                              maxLength: 300
+                              minLength: 1
+                            description:
+                              type: string
+                              description: Group description. Can contain HTML formatting
+                                tags.
+                              maxLength: 1000
+                            builtIn:
+                              readOnly: true
+                              type: boolean
+                              description: true if the group is one of the three system
+                                groups (Administrators, Developers, or Guests); otherwise
+                                false.
+                            type:
+                              type: string
+                              description: Group type.
+                              enum:
+                              - custom
+                              - system
+                              - external
+                              x-ms-enum:
+                                name: GroupType
+                                modelAsString: false
+                            externalId:
+                              type: string
+                              description: For external groups, this property contains
+                                the id of the group from the external identity provider,
+                                e.g. for Azure Active Directory `aad://<tenant>.onmicrosoft.com/groups/<group
+                                object id>`; otherwise the value is null.
+                          required:
+                          - displayName
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                    description: Page values.
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                  nextLink:
+                    type: string
+                    description: Next page link if any.
+                description: Paged Group list representation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+      x-ms-odata: ./definitions.json#/definitions/GroupContract
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/groups/{groupId}
+  : head:
+      tags:
+      - Group
+      operationId: Group_GetEntityTag
+      description: Gets the entity state (Etag) version of the group specified by
+        its identifier.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: groupId
+        in: path
+        required: true
+        description: Group identifier. Must be unique in the current API Management
+          service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Specified group entity exists and current entity state version
+            is present in the ETag header.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    get:
+      tags:
+      - Group
+      operationId: Group_Get
+      description: Gets the details of the group specified by its identifier.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: groupId
+        in: path
+        required: true
+        description: Group identifier. Must be unique in the current API Management
+          service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The response body contains the specified Group entity.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Group entity contract properties.
+                    type: object
+                    properties:
+                      displayName:
+                        type: string
+                        description: Group name.
+                        maxLength: 300
+                        minLength: 1
+                      description:
+                        type: string
+                        description: Group description. Can contain HTML formatting
+                          tags.
+                        maxLength: 1000
+                      builtIn:
+                        readOnly: true
+                        type: boolean
+                        description: true if the group is one of the three system
+                          groups (Administrators, Developers, or Guests); otherwise
+                          false.
+                      type:
+                        type: string
+                        description: Group type.
+                        enum:
+                        - custom
+                        - system
+                        - external
+                        x-ms-enum:
+                          name: GroupType
+                          modelAsString: false
+                      externalId:
+                        type: string
+                        description: For external groups, this property contains the
+                          id of the group from the external identity provider, e.g.
+                          for Azure Active Directory `aad://<tenant>.onmicrosoft.com/groups/<group
+                          object id>`; otherwise the value is null.
+                    required:
+                    - displayName
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    put:
+      tags:
+      - Group
+      operationId: Group_CreateOrUpdate
+      description: Creates or Updates a group.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: groupId
+        in: path
+        required: true
+        description: Group identifier. Must be unique in the current API Management
+          service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+      - name: If-Match
+        in: header
+        required: false
+        description: ETag of the Entity. Not required when creating an entity, but
+          required when updating an entity.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                properties:
+                  x-ms-client-flatten: true
+                  description: Properties supplied to Create Group operation.
+                  type: object
+                  properties:
+                    displayName:
+                      type: string
+                      description: Group name.
+                      maxLength: 300
+                      minLength: 1
+                    description:
+                      type: string
+                      description: Group description.
+                    type:
+                      type: string
+                      description: Group type.
+                      enum:
+                      - custom
+                      - system
+                      - external
+                      x-ms-enum:
+                        name: GroupType
+                        modelAsString: false
+                    externalId:
+                      type: string
+                      description: Identifier of the external groups, this property
+                        contains the id of the group from the external identity provider,
+                        e.g. for Azure Active Directory `aad://<tenant>.onmicrosoft.com/groups/<group
+                        object id>`; otherwise the value is null.
+                  required:
+                  - displayName
+              description: Parameters supplied to the Create Group operation.
+        description: Create parameters.
+        required: true
+      responses:
+        '200':
+          description: Group already exists.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Group entity contract properties.
+                    type: object
+                    properties:
+                      displayName:
+                        type: string
+                        description: Group name.
+                        maxLength: 300
+                        minLength: 1
+                      description:
+                        type: string
+                        description: Group description. Can contain HTML formatting
+                          tags.
+                        maxLength: 1000
+                      builtIn:
+                        readOnly: true
+                        type: boolean
+                        description: true if the group is one of the three system
+                          groups (Administrators, Developers, or Guests); otherwise
+                          false.
+                      type:
+                        type: string
+                        description: Group type.
+                        enum:
+                        - custom
+                        - system
+                        - external
+                        x-ms-enum:
+                          name: GroupType
+                          modelAsString: false
+                      externalId:
+                        type: string
+                        description: For external groups, this property contains the
+                          id of the group from the external identity provider, e.g.
+                          for Azure Active Directory `aad://<tenant>.onmicrosoft.com/groups/<group
+                          object id>`; otherwise the value is null.
+                    required:
+                    - displayName
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        '201':
+          description: Group was created successfully.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Group entity contract properties.
+                    type: object
+                    properties:
+                      displayName:
+                        type: string
+                        description: Group name.
+                        maxLength: 300
+                        minLength: 1
+                      description:
+                        type: string
+                        description: Group description. Can contain HTML formatting
+                          tags.
+                        maxLength: 1000
+                      builtIn:
+                        readOnly: true
+                        type: boolean
+                        description: true if the group is one of the three system
+                          groups (Administrators, Developers, or Guests); otherwise
+                          false.
+                      type:
+                        type: string
+                        description: Group type.
+                        enum:
+                        - custom
+                        - system
+                        - external
+                        x-ms-enum:
+                          name: GroupType
+                          modelAsString: false
+                      externalId:
+                        type: string
+                        description: For external groups, this property contains the
+                          id of the group from the external identity provider, e.g.
+                          for Azure Active Directory `aad://<tenant>.onmicrosoft.com/groups/<group
+                          object id>`; otherwise the value is null.
+                    required:
+                    - displayName
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    patch:
+      tags:
+      - Group
+      operationId: Group_Update
+      description: Updates the details of the group specified by its identifier.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: groupId
+        in: path
+        required: true
+        description: Group identifier. Must be unique in the current API Management
+          service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+      - name: If-Match
+        in: header
+        required: true
+        description: ETag of the Entity. ETag should match the current entity state
+          from the header response of the GET request or it should be * for unconditional
+          update.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                properties:
+                  x-ms-client-flatten: true
+                  description: Group entity update contract properties.
+                  type: object
+                  properties:
+                    displayName:
+                      type: string
+                      description: Group name.
+                      maxLength: 300
+                      minLength: 1
+                    description:
+                      type: string
+                      description: Group description.
+                    type:
+                      type: string
+                      description: Group type.
+                      enum:
+                      - custom
+                      - system
+                      - external
+                      x-ms-enum:
+                        name: GroupType
+                        modelAsString: false
+                    externalId:
+                      type: string
+                      description: Identifier of the external groups, this property
+                        contains the id of the group from the external identity provider,
+                        e.g. for Azure Active Directory `aad://<tenant>.onmicrosoft.com/groups/<group
+                        object id>`; otherwise the value is null.
+              description: Parameters supplied to the Update Group operation.
+        description: Update parameters.
+        required: true
+      responses:
+        '200':
+          description: The group details were successfully updated.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Group entity contract properties.
+                    type: object
+                    properties:
+                      displayName:
+                        type: string
+                        description: Group name.
+                        maxLength: 300
+                        minLength: 1
+                      description:
+                        type: string
+                        description: Group description. Can contain HTML formatting
+                          tags.
+                        maxLength: 1000
+                      builtIn:
+                        readOnly: true
+                        type: boolean
+                        description: true if the group is one of the three system
+                          groups (Administrators, Developers, or Guests); otherwise
+                          false.
+                      type:
+                        type: string
+                        description: Group type.
+                        enum:
+                        - custom
+                        - system
+                        - external
+                        x-ms-enum:
+                          name: GroupType
+                          modelAsString: false
+                      externalId:
+                        type: string
+                        description: For external groups, this property contains the
+                          id of the group from the external identity provider, e.g.
+                          for Azure Active Directory `aad://<tenant>.onmicrosoft.com/groups/<group
+                          object id>`; otherwise the value is null.
+                    required:
+                    - displayName
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    delete:
+      tags:
+      - Group
+      operationId: Group_Delete
+      description: Deletes specific group of the API Management service instance.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: groupId
+        in: path
+        required: true
+        description: Group identifier. Must be unique in the current API Management
+          service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+      - name: If-Match
+        in: header
+        required: true
+        description: ETag of the Entity. ETag should match the current entity state
+          from the header response of the GET request or it should be * for unconditional
+          update.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The group was successfully deleted.
+        '204':
+          description: The group was successfully deleted.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/groups/{groupId}/users
+  : get:
+      tags:
+      - GroupUser
+      operationId: GroupUser_List
+      description: Lists a collection of user entities associated with the group.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: groupId
+        in: path
+        required: true
+        description: Group identifier. Must be unique in the current API Management
+          service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+      - name: $filter
+        in: query
+        required: false
+        description: '|     Field     |     Usage     |     Supported operators     |     Supported
+          functions     |</br>|-------------|-------------|-------------|-------------|</br>|
+          name | filter | ge, le, eq, ne, gt, lt | substringof, contains, startswith,
+          endswith |</br>| firstName | filter | ge, le, eq, ne, gt, lt | substringof,
+          contains, startswith, endswith |</br>| lastName | filter | ge, le, eq, ne,
+          gt, lt | substringof, contains, startswith, endswith |</br>| email | filter
+          | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith |</br>|
+          registrationDate | filter | ge, le, eq, ne, gt, lt |     |</br>| note |
+          filter | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith
+          |</br>'
+        schema:
+          type: string
+      - name: $top
+        in: query
+        required: false
+        description: Number of records to return.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - name: $skip
+        in: query
+        required: false
+        description: Number of records to skip.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Lists a collection of user entities associated with the group.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                        name:
+                          readOnly: true
+                          type: string
+                          description: The name of the resource
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                        properties:
+                          type: object
+                          properties:
+                            state:
+                              type: string
+                              description: Account state. Specifies whether the user
+                                is active or not. Blocked users are unable to sign
+                                into the developer portal or call any APIs of subscribed
+                                products. Default state is Active.
+                              enum:
+                              - active
+                              - blocked
+                              - pending
+                              - deleted
+                              default: active
+                              x-ms-enum:
+                                name: UserState
+                                modelAsString: true
+                                values:
+                                - value: active
+                                  description: User state is active.
+                                - value: blocked
+                                  description: User is blocked. Blocked users cannot
+                                    authenticate at developer portal or call API.
+                                - value: pending
+                                  description: User account is pending. Requires identity
+                                    confirmation before it can be made active.
+                                - value: deleted
+                                  description: User account is closed. All identities
+                                    and related entities are removed.
+                            note:
+                              type: string
+                              description: Optional note about a user set by the administrator.
+                            identities:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  provider:
+                                    type: string
+                                    description: Identity provider name.
+                                  id:
+                                    type: string
+                                    description: Identifier value within provider.
+                                description: User identity details.
+                              description: Collection of user identities.
+                            firstName:
+                              type: string
+                              description: First name.
+                            lastName:
+                              type: string
+                              description: Last name.
+                            email:
+                              type: string
+                              description: Email address.
+                            registrationDate:
+                              type: string
+                              format: date-time
+                              description: 'Date of user registration. The date conforms
+                                to the following format: `yyyy-MM-ddTHH:mm:ssZ` as
+                                specified by the ISO 8601 standard.
+
+                                '
+                            groups:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  displayName:
+                                    type: string
+                                    description: Group name.
+                                    maxLength: 300
+                                    minLength: 1
+                                  description:
+                                    type: string
+                                    description: Group description. Can contain HTML
+                                      formatting tags.
+                                    maxLength: 1000
+                                  builtIn:
+                                    readOnly: true
+                                    type: boolean
+                                    description: true if the group is one of the three
+                                      system groups (Administrators, Developers, or
+                                      Guests); otherwise false.
+                                  type:
+                                    type: string
+                                    description: Group type.
+                                    enum:
+                                    - custom
+                                    - system
+                                    - external
+                                    x-ms-enum:
+                                      name: GroupType
+                                      modelAsString: false
+                                  externalId:
+                                    type: string
+                                    description: For external groups, this property
+                                      contains the id of the group from the external
+                                      identity provider, e.g. for Azure Active Directory
+                                      `aad://<tenant>.onmicrosoft.com/groups/<group
+                                      object id>`; otherwise the value is null.
+                                required:
+                                - displayName
+                                description: Group contract Properties.
+                              x-ms-identifiers:
+                              - displayName
+                              description: Collection of groups user is part of.
+                          description: User Entity Base Parameters set.
+                          x-ms-client-flatten: true
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                    description: Page values.
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                  nextLink:
+                    type: string
+                    description: Next page link if any.
+                description: Paged Users list representation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+      x-ms-odata: ./definitions.json#/definitions/UserContract
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/groups/{groupId}/users/{userId}
+  : head:
+      tags:
+      - GroupUser
+      operationId: GroupUser_CheckEntityExists
+      description: Checks that user entity specified by identifier is associated with
+        the group entity.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: groupId
+        in: path
+        required: true
+        description: Group identifier. Must be unique in the current API Management
+          service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+      - name: userId
+        in: path
+        required: true
+        description: User identifier. Must be unique in the current API Management
+          service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: Entity exists
+        '404':
+          description: Entity does not exists.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    put:
+      tags:
+      - GroupUser
+      operationId: GroupUser_Create
+      description: Add existing user to existing group
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: groupId
+        in: path
+        required: true
+        description: Group identifier. Must be unique in the current API Management
+          service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+      - name: userId
+        in: path
+        required: true
+        description: User identifier. Must be unique in the current API Management
+          service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The specified user is already a member of the specified group.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                        description: Account state. Specifies whether the user is
+                          active or not. Blocked users are unable to sign into the
+                          developer portal or call any APIs of subscribed products.
+                          Default state is Active.
+                        enum:
+                        - active
+                        - blocked
+                        - pending
+                        - deleted
+                        default: active
+                        x-ms-enum:
+                          name: UserState
+                          modelAsString: true
+                          values:
+                          - value: active
+                            description: User state is active.
+                          - value: blocked
+                            description: User is blocked. Blocked users cannot authenticate
+                              at developer portal or call API.
+                          - value: pending
+                            description: User account is pending. Requires identity
+                              confirmation before it can be made active.
+                          - value: deleted
+                            description: User account is closed. All identities and
+                              related entities are removed.
+                      note:
+                        type: string
+                        description: Optional note about a user set by the administrator.
+                      identities:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            provider:
+                              type: string
+                              description: Identity provider name.
+                            id:
+                              type: string
+                              description: Identifier value within provider.
+                          description: User identity details.
+                        description: Collection of user identities.
+                      firstName:
+                        type: string
+                        description: First name.
+                      lastName:
+                        type: string
+                        description: Last name.
+                      email:
+                        type: string
+                        description: Email address.
+                      registrationDate:
+                        type: string
+                        format: date-time
+                        description: 'Date of user registration. The date conforms
+                          to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                          by the ISO 8601 standard.
+
+                          '
+                      groups:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            displayName:
+                              type: string
+                              description: Group name.
+                              maxLength: 300
+                              minLength: 1
+                            description:
+                              type: string
+                              description: Group description. Can contain HTML formatting
+                                tags.
+                              maxLength: 1000
+                            builtIn:
+                              readOnly: true
+                              type: boolean
+                              description: true if the group is one of the three system
+                                groups (Administrators, Developers, or Guests); otherwise
+                                false.
+                            type:
+                              type: string
+                              description: Group type.
+                              enum:
+                              - custom
+                              - system
+                              - external
+                              x-ms-enum:
+                                name: GroupType
+                                modelAsString: false
+                            externalId:
+                              type: string
+                              description: For external groups, this property contains
+                                the id of the group from the external identity provider,
+                                e.g. for Azure Active Directory `aad://<tenant>.onmicrosoft.com/groups/<group
+                                object id>`; otherwise the value is null.
+                          required:
+                          - displayName
+                          description: Group contract Properties.
+                        x-ms-identifiers:
+                        - displayName
+                        description: Collection of groups user is part of.
+                    description: User Entity Base Parameters set.
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        '201':
+          description: The user was successfully added to the group.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                        description: Account state. Specifies whether the user is
+                          active or not. Blocked users are unable to sign into the
+                          developer portal or call any APIs of subscribed products.
+                          Default state is Active.
+                        enum:
+                        - active
+                        - blocked
+                        - pending
+                        - deleted
+                        default: active
+                        x-ms-enum:
+                          name: UserState
+                          modelAsString: true
+                          values:
+                          - value: active
+                            description: User state is active.
+                          - value: blocked
+                            description: User is blocked. Blocked users cannot authenticate
+                              at developer portal or call API.
+                          - value: pending
+                            description: User account is pending. Requires identity
+                              confirmation before it can be made active.
+                          - value: deleted
+                            description: User account is closed. All identities and
+                              related entities are removed.
+                      note:
+                        type: string
+                        description: Optional note about a user set by the administrator.
+                      identities:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            provider:
+                              type: string
+                              description: Identity provider name.
+                            id:
+                              type: string
+                              description: Identifier value within provider.
+                          description: User identity details.
+                        description: Collection of user identities.
+                      firstName:
+                        type: string
+                        description: First name.
+                      lastName:
+                        type: string
+                        description: Last name.
+                      email:
+                        type: string
+                        description: Email address.
+                      registrationDate:
+                        type: string
+                        format: date-time
+                        description: 'Date of user registration. The date conforms
+                          to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                          by the ISO 8601 standard.
+
+                          '
+                      groups:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            displayName:
+                              type: string
+                              description: Group name.
+                              maxLength: 300
+                              minLength: 1
+                            description:
+                              type: string
+                              description: Group description. Can contain HTML formatting
+                                tags.
+                              maxLength: 1000
+                            builtIn:
+                              readOnly: true
+                              type: boolean
+                              description: true if the group is one of the three system
+                                groups (Administrators, Developers, or Guests); otherwise
+                                false.
+                            type:
+                              type: string
+                              description: Group type.
+                              enum:
+                              - custom
+                              - system
+                              - external
+                              x-ms-enum:
+                                name: GroupType
+                                modelAsString: false
+                            externalId:
+                              type: string
+                              description: For external groups, this property contains
+                                the id of the group from the external identity provider,
+                                e.g. for Azure Active Directory `aad://<tenant>.onmicrosoft.com/groups/<group
+                                object id>`; otherwise the value is null.
+                          required:
+                          - displayName
+                          description: Group contract Properties.
+                        x-ms-identifiers:
+                        - displayName
+                        description: Collection of groups user is part of.
+                    description: User Entity Base Parameters set.
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    delete:
+      tags:
+      - GroupUser
+      operationId: GroupUser_Delete
+      description: Remove existing user from existing group.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: groupId
+        in: path
+        required: true
+        description: Group identifier. Must be unique in the current API Management
+          service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+      - name: userId
+        in: path
+        required: true
+        description: User identifier. Must be unique in the current API Management
+          service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The user was successfully removed from the group.
+        '204':
+          description: The user was successfully removed from the group.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+components:
+  parameters:
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      description: The name of the resource group. The name is case insensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    ServiceNameParameter:
+      name: serviceName
+      in: path
+      required: true
+      description: The name of the API Management service.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 50
+        pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+    TopQueryParameter:
+      name: $top
+      in: query
+      required: false
+      description: Number of records to return.
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+    SkipQueryParameter:
+      name: $skip
+      in: query
+      required: false
+      description: Number of records to skip.
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription. The value must be an UUID.
+      required: true
+      schema:
+        type: string
+        format: uuid
+    GroupIdParameter:
+      name: groupId
+      in: path
+      required: true
+      description: Group identifier. Must be unique in the current API Management
+        service instance.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 256
+    IfMatchOptionalParameter:
+      name: If-Match
+      in: header
+      required: false
+      description: ETag of the Entity. Not required when creating an entity, but required
+        when updating an entity.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    IfMatchRequiredParameter:
+      name: If-Match
+      in: header
+      required: true
+      description: ETag of the Entity. ETag should match the current entity state
+        from the header response of the GET request or it should be * for unconditional
+        update.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    UserIdParameter:
+      name: userId
+      in: path
+      required: true
+      description: User identifier. Must be unique in the current API Management service
+        instance.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 80
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+    Resource:
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    GroupContractProperties:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Group name.
+          maxLength: 300
+          minLength: 1
+        description:
+          type: string
+          description: Group description. Can contain HTML formatting tags.
+          maxLength: 1000
+        builtIn:
+          readOnly: true
+          type: boolean
+          description: true if the group is one of the three system groups (Administrators,
+            Developers, or Guests); otherwise false.
+        type:
+          type: string
+          description: Group type.
+          enum:
+          - custom
+          - system
+          - external
+          x-ms-enum:
+            name: GroupType
+            modelAsString: false
+        externalId:
+          type: string
+          description: For external groups, this property contains the id of the group
+            from the external identity provider, e.g. for Azure Active Directory `aad://<tenant>.onmicrosoft.com/groups/<group
+            object id>`; otherwise the value is null.
+      required:
+      - displayName
+      description: Group contract Properties.
+    GroupContract:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        properties:
+          x-ms-client-flatten: true
+          description: Group entity contract properties.
+          type: object
+          properties:
+            displayName:
+              type: string
+              description: Group name.
+              maxLength: 300
+              minLength: 1
+            description:
+              type: string
+              description: Group description. Can contain HTML formatting tags.
+              maxLength: 1000
+            builtIn:
+              readOnly: true
+              type: boolean
+              description: true if the group is one of the three system groups (Administrators,
+                Developers, or Guests); otherwise false.
+            type:
+              type: string
+              description: Group type.
+              enum:
+              - custom
+              - system
+              - external
+              x-ms-enum:
+                name: GroupType
+                modelAsString: false
+            externalId:
+              type: string
+              description: For external groups, this property contains the id of the
+                group from the external identity provider, e.g. for Azure Active Directory
+                `aad://<tenant>.onmicrosoft.com/groups/<group object id>`; otherwise
+                the value is null.
+          required:
+          - displayName
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    GroupCollection:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+              name:
+                readOnly: true
+                type: string
+                description: The name of the resource
+              type:
+                readOnly: true
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+              properties:
+                x-ms-client-flatten: true
+                description: Group entity contract properties.
+                type: object
+                properties:
+                  displayName:
+                    type: string
+                    description: Group name.
+                    maxLength: 300
+                    minLength: 1
+                  description:
+                    type: string
+                    description: Group description. Can contain HTML formatting tags.
+                    maxLength: 1000
+                  builtIn:
+                    readOnly: true
+                    type: boolean
+                    description: true if the group is one of the three system groups
+                      (Administrators, Developers, or Guests); otherwise false.
+                  type:
+                    type: string
+                    description: Group type.
+                    enum:
+                    - custom
+                    - system
+                    - external
+                    x-ms-enum:
+                      name: GroupType
+                      modelAsString: false
+                  externalId:
+                    type: string
+                    description: For external groups, this property contains the id
+                      of the group from the external identity provider, e.g. for Azure
+                      Active Directory `aad://<tenant>.onmicrosoft.com/groups/<group
+                      object id>`; otherwise the value is null.
+                required:
+                - displayName
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+          description: Page values.
+        count:
+          type: integer
+          format: int64
+          description: Total record count number across all pages.
+        nextLink:
+          type: string
+          description: Next page link if any.
+      description: Paged Group list representation.
+    GroupCreateParametersProperties:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Group name.
+          maxLength: 300
+          minLength: 1
+        description:
+          type: string
+          description: Group description.
+        type:
+          type: string
+          description: Group type.
+          enum:
+          - custom
+          - system
+          - external
+          x-ms-enum:
+            name: GroupType
+            modelAsString: false
+        externalId:
+          type: string
+          description: Identifier of the external groups, this property contains the
+            id of the group from the external identity provider, e.g. for Azure Active
+            Directory `aad://<tenant>.onmicrosoft.com/groups/<group object id>`; otherwise
+            the value is null.
+      required:
+      - displayName
+      description: Parameters supplied to the Create Group operation.
+    GroupCreateParameters:
+      type: object
+      properties:
+        properties:
+          x-ms-client-flatten: true
+          description: Properties supplied to Create Group operation.
+          type: object
+          properties:
+            displayName:
+              type: string
+              description: Group name.
+              maxLength: 300
+              minLength: 1
+            description:
+              type: string
+              description: Group description.
+            type:
+              type: string
+              description: Group type.
+              enum:
+              - custom
+              - system
+              - external
+              x-ms-enum:
+                name: GroupType
+                modelAsString: false
+            externalId:
+              type: string
+              description: Identifier of the external groups, this property contains
+                the id of the group from the external identity provider, e.g. for
+                Azure Active Directory `aad://<tenant>.onmicrosoft.com/groups/<group
+                object id>`; otherwise the value is null.
+          required:
+          - displayName
+      description: Parameters supplied to the Create Group operation.
+    GroupUpdateParametersProperties:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Group name.
+          maxLength: 300
+          minLength: 1
+        description:
+          type: string
+          description: Group description.
+        type:
+          type: string
+          description: Group type.
+          enum:
+          - custom
+          - system
+          - external
+          x-ms-enum:
+            name: GroupType
+            modelAsString: false
+        externalId:
+          type: string
+          description: Identifier of the external groups, this property contains the
+            id of the group from the external identity provider, e.g. for Azure Active
+            Directory `aad://<tenant>.onmicrosoft.com/groups/<group object id>`; otherwise
+            the value is null.
+      description: Parameters supplied to the Update Group operation.
+    GroupUpdateParameters:
+      type: object
+      properties:
+        properties:
+          x-ms-client-flatten: true
+          description: Group entity update contract properties.
+          type: object
+          properties:
+            displayName:
+              type: string
+              description: Group name.
+              maxLength: 300
+              minLength: 1
+            description:
+              type: string
+              description: Group description.
+            type:
+              type: string
+              description: Group type.
+              enum:
+              - custom
+              - system
+              - external
+              x-ms-enum:
+                name: GroupType
+                modelAsString: false
+            externalId:
+              type: string
+              description: Identifier of the external groups, this property contains
+                the id of the group from the external identity provider, e.g. for
+                Azure Active Directory `aad://<tenant>.onmicrosoft.com/groups/<group
+                object id>`; otherwise the value is null.
+      description: Parameters supplied to the Update Group operation.
+    UserIdentityContract:
+      type: object
+      properties:
+        provider:
+          type: string
+          description: Identity provider name.
+        id:
+          type: string
+          description: Identifier value within provider.
+      description: User identity details.
+    UserEntityBaseParameters:
+      type: object
+      properties:
+        state:
+          type: string
+          description: Account state. Specifies whether the user is active or not.
+            Blocked users are unable to sign into the developer portal or call any
+            APIs of subscribed products. Default state is Active.
+          enum:
+          - active
+          - blocked
+          - pending
+          - deleted
+          default: active
+          x-ms-enum:
+            name: UserState
+            modelAsString: true
+            values:
+            - value: active
+              description: User state is active.
+            - value: blocked
+              description: User is blocked. Blocked users cannot authenticate at developer
+                portal or call API.
+            - value: pending
+              description: User account is pending. Requires identity confirmation
+                before it can be made active.
+            - value: deleted
+              description: User account is closed. All identities and related entities
+                are removed.
+        note:
+          type: string
+          description: Optional note about a user set by the administrator.
+        identities:
+          type: array
+          items:
+            type: object
+            properties:
+              provider:
+                type: string
+                description: Identity provider name.
+              id:
+                type: string
+                description: Identifier value within provider.
+            description: User identity details.
+          description: Collection of user identities.
+      description: User Entity Base Parameters set.
+    UserContractProperties:
+      type: object
+      properties:
+        state:
+          type: string
+          description: Account state. Specifies whether the user is active or not.
+            Blocked users are unable to sign into the developer portal or call any
+            APIs of subscribed products. Default state is Active.
+          enum:
+          - active
+          - blocked
+          - pending
+          - deleted
+          default: active
+          x-ms-enum:
+            name: UserState
+            modelAsString: true
+            values:
+            - value: active
+              description: User state is active.
+            - value: blocked
+              description: User is blocked. Blocked users cannot authenticate at developer
+                portal or call API.
+            - value: pending
+              description: User account is pending. Requires identity confirmation
+                before it can be made active.
+            - value: deleted
+              description: User account is closed. All identities and related entities
+                are removed.
+        note:
+          type: string
+          description: Optional note about a user set by the administrator.
+        identities:
+          type: array
+          items:
+            type: object
+            properties:
+              provider:
+                type: string
+                description: Identity provider name.
+              id:
+                type: string
+                description: Identifier value within provider.
+            description: User identity details.
+          description: Collection of user identities.
+        firstName:
+          type: string
+          description: First name.
+        lastName:
+          type: string
+          description: Last name.
+        email:
+          type: string
+          description: Email address.
+        registrationDate:
+          type: string
+          format: date-time
+          description: 'Date of user registration. The date conforms to the following
+            format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601 standard.
+
+            '
+        groups:
+          readOnly: true
+          type: array
+          items:
+            type: object
+            properties:
+              displayName:
+                type: string
+                description: Group name.
+                maxLength: 300
+                minLength: 1
+              description:
+                type: string
+                description: Group description. Can contain HTML formatting tags.
+                maxLength: 1000
+              builtIn:
+                readOnly: true
+                type: boolean
+                description: true if the group is one of the three system groups (Administrators,
+                  Developers, or Guests); otherwise false.
+              type:
+                type: string
+                description: Group type.
+                enum:
+                - custom
+                - system
+                - external
+                x-ms-enum:
+                  name: GroupType
+                  modelAsString: false
+              externalId:
+                type: string
+                description: For external groups, this property contains the id of
+                  the group from the external identity provider, e.g. for Azure Active
+                  Directory `aad://<tenant>.onmicrosoft.com/groups/<group object id>`;
+                  otherwise the value is null.
+            required:
+            - displayName
+            description: Group contract Properties.
+          x-ms-identifiers:
+          - displayName
+          description: Collection of groups user is part of.
+      description: User Entity Base Parameters set.
+    UserContract:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        properties:
+          type: object
+          properties:
+            state:
+              type: string
+              description: Account state. Specifies whether the user is active or
+                not. Blocked users are unable to sign into the developer portal or
+                call any APIs of subscribed products. Default state is Active.
+              enum:
+              - active
+              - blocked
+              - pending
+              - deleted
+              default: active
+              x-ms-enum:
+                name: UserState
+                modelAsString: true
+                values:
+                - value: active
+                  description: User state is active.
+                - value: blocked
+                  description: User is blocked. Blocked users cannot authenticate
+                    at developer portal or call API.
+                - value: pending
+                  description: User account is pending. Requires identity confirmation
+                    before it can be made active.
+                - value: deleted
+                  description: User account is closed. All identities and related
+                    entities are removed.
+            note:
+              type: string
+              description: Optional note about a user set by the administrator.
+            identities:
+              type: array
+              items:
+                type: object
+                properties:
+                  provider:
+                    type: string
+                    description: Identity provider name.
+                  id:
+                    type: string
+                    description: Identifier value within provider.
+                description: User identity details.
+              description: Collection of user identities.
+            firstName:
+              type: string
+              description: First name.
+            lastName:
+              type: string
+              description: Last name.
+            email:
+              type: string
+              description: Email address.
+            registrationDate:
+              type: string
+              format: date-time
+              description: 'Date of user registration. The date conforms to the following
+                format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601 standard.
+
+                '
+            groups:
+              readOnly: true
+              type: array
+              items:
+                type: object
+                properties:
+                  displayName:
+                    type: string
+                    description: Group name.
+                    maxLength: 300
+                    minLength: 1
+                  description:
+                    type: string
+                    description: Group description. Can contain HTML formatting tags.
+                    maxLength: 1000
+                  builtIn:
+                    readOnly: true
+                    type: boolean
+                    description: true if the group is one of the three system groups
+                      (Administrators, Developers, or Guests); otherwise false.
+                  type:
+                    type: string
+                    description: Group type.
+                    enum:
+                    - custom
+                    - system
+                    - external
+                    x-ms-enum:
+                      name: GroupType
+                      modelAsString: false
+                  externalId:
+                    type: string
+                    description: For external groups, this property contains the id
+                      of the group from the external identity provider, e.g. for Azure
+                      Active Directory `aad://<tenant>.onmicrosoft.com/groups/<group
+                      object id>`; otherwise the value is null.
+                required:
+                - displayName
+                description: Group contract Properties.
+              x-ms-identifiers:
+              - displayName
+              description: Collection of groups user is part of.
+          description: User Entity Base Parameters set.
+          x-ms-client-flatten: true
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    UserCollection:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+              name:
+                readOnly: true
+                type: string
+                description: The name of the resource
+              type:
+                readOnly: true
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+              properties:
+                type: object
+                properties:
+                  state:
+                    type: string
+                    description: Account state. Specifies whether the user is active
+                      or not. Blocked users are unable to sign into the developer
+                      portal or call any APIs of subscribed products. Default state
+                      is Active.
+                    enum:
+                    - active
+                    - blocked
+                    - pending
+                    - deleted
+                    default: active
+                    x-ms-enum:
+                      name: UserState
+                      modelAsString: true
+                      values:
+                      - value: active
+                        description: User state is active.
+                      - value: blocked
+                        description: User is blocked. Blocked users cannot authenticate
+                          at developer portal or call API.
+                      - value: pending
+                        description: User account is pending. Requires identity confirmation
+                          before it can be made active.
+                      - value: deleted
+                        description: User account is closed. All identities and related
+                          entities are removed.
+                  note:
+                    type: string
+                    description: Optional note about a user set by the administrator.
+                  identities:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        provider:
+                          type: string
+                          description: Identity provider name.
+                        id:
+                          type: string
+                          description: Identifier value within provider.
+                      description: User identity details.
+                    description: Collection of user identities.
+                  firstName:
+                    type: string
+                    description: First name.
+                  lastName:
+                    type: string
+                    description: Last name.
+                  email:
+                    type: string
+                    description: Email address.
+                  registrationDate:
+                    type: string
+                    format: date-time
+                    description: 'Date of user registration. The date conforms to
+                      the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified by
+                      the ISO 8601 standard.
+
+                      '
+                  groups:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        displayName:
+                          type: string
+                          description: Group name.
+                          maxLength: 300
+                          minLength: 1
+                        description:
+                          type: string
+                          description: Group description. Can contain HTML formatting
+                            tags.
+                          maxLength: 1000
+                        builtIn:
+                          readOnly: true
+                          type: boolean
+                          description: true if the group is one of the three system
+                            groups (Administrators, Developers, or Guests); otherwise
+                            false.
+                        type:
+                          type: string
+                          description: Group type.
+                          enum:
+                          - custom
+                          - system
+                          - external
+                          x-ms-enum:
+                            name: GroupType
+                            modelAsString: false
+                        externalId:
+                          type: string
+                          description: For external groups, this property contains
+                            the id of the group from the external identity provider,
+                            e.g. for Azure Active Directory `aad://<tenant>.onmicrosoft.com/groups/<group
+                            object id>`; otherwise the value is null.
+                      required:
+                      - displayName
+                      description: Group contract Properties.
+                    x-ms-identifiers:
+                    - displayName
+                    description: Collection of groups user is part of.
+                description: User Entity Base Parameters set.
+                x-ms-client-flatten: true
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+          description: Page values.
+        count:
+          type: integer
+          format: int64
+          description: Total record count number across all pages.
+        nextLink:
+          type: string
+          description: Next page link if any.
+      description: Paged Users list representation.

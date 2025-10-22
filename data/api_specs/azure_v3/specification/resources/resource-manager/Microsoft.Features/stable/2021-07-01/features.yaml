@@ -1,0 +1,1433 @@
+openapi: 3.0.0
+info:
+  title: FeatureClient
+  version: 2021-07-01
+  description: Azure Feature Exposure Control (AFEC) provides a mechanism for the
+    resource providers to control feature exposure to users. Resource providers typically
+    use this mechanism to provide public/private preview for new features prior to
+    making them generally available. Users need to explicitly register for AFEC features
+    to get access to such functionality.
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  /providers/Microsoft.Features/operations:
+    get:
+      tags:
+      - Operations
+      operationId: ListOperations
+      description: Lists all of the available Microsoft.Features REST API operations.
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK. The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Result of the request to list Microsoft.Features operations.
+                  It contains a list of operations and a URL link to get the next
+                  set of results.
+                properties:
+                  value:
+                    type: array
+                    items:
+                      description: Microsoft.Features operation
+                      type: object
+                      properties:
+                        name:
+                          description: 'Operation name: {provider}/{resource}/{operation}'
+                          type: string
+                        display:
+                          type: object
+                          description: The object that represents the operation.
+                          properties:
+                            provider:
+                              description: 'Service provider: Microsoft.Features'
+                              type: string
+                            resource:
+                              description: 'Resource on which the operation is performed:
+                                Profile, endpoint, etc.'
+                              type: string
+                            operation:
+                              description: 'Operation type: Read, write, delete, etc.'
+                              type: string
+                    x-ms-identifiers:
+                    - name
+                    description: List of Microsoft.Features operations.
+                  nextLink:
+                    type: string
+                    description: URL to get the next set of operation list results
+                      if there are any.
+            text/json:
+              schema:
+                type: object
+                description: Result of the request to list Microsoft.Features operations.
+                  It contains a list of operations and a URL link to get the next
+                  set of results.
+                properties:
+                  value:
+                    type: array
+                    items:
+                      description: Microsoft.Features operation
+                      type: object
+                      properties:
+                        name:
+                          description: 'Operation name: {provider}/{resource}/{operation}'
+                          type: string
+                        display:
+                          type: object
+                          description: The object that represents the operation.
+                          properties:
+                            provider:
+                              description: 'Service provider: Microsoft.Features'
+                              type: string
+                            resource:
+                              description: 'Resource on which the operation is performed:
+                                Profile, endpoint, etc.'
+                              type: string
+                            operation:
+                              description: 'Operation type: Read, write, delete, etc.'
+                              type: string
+                    x-ms-identifiers:
+                    - name
+                    description: List of Microsoft.Features operations.
+                  nextLink:
+                    type: string
+                    description: URL to get the next set of operation list results
+                      if there are any.
+        default:
+          description: Error response describing the reason for operation failure.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Error response indicates that the service is not able
+                  to process the incoming request.
+                properties:
+                  error:
+                    description: The error details.
+                    type: object
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          type: object
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                type: object
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                        x-ms-identifiers: []
+            text/json:
+              schema:
+                type: object
+                description: Error response indicates that the service is not able
+                  to process the incoming request.
+                properties:
+                  error:
+                    description: The error details.
+                    type: object
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          type: object
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                type: object
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /subscriptions/{subscriptionId}/providers/Microsoft.Features/features:
+    get:
+      tags:
+      - Features
+      operationId: Features_ListAll
+      description: Gets all the preview features that are available through AFEC for
+        the subscription.
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK - Returns an array containing metadata for each feature.
+            The metadata includes the name of the feature, the registration state,
+            the resource ID, and resource type.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: The name of the feature.
+                        properties:
+                          description: Properties of the previewed feature.
+                          type: object
+                          properties:
+                            state:
+                              type: string
+                              description: The registration state of the feature for
+                                the subscription.
+                        id:
+                          type: string
+                          description: The resource ID of the feature.
+                        type:
+                          type: string
+                          description: The resource type of the feature.
+                      description: Previewed feature information.
+                    description: The array of features.
+                  nextLink:
+                    type: string
+                    description: The URL to use for getting the next set of results.
+                description: List of previewed features.
+            text/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: The name of the feature.
+                        properties:
+                          description: Properties of the previewed feature.
+                          type: object
+                          properties:
+                            state:
+                              type: string
+                              description: The registration state of the feature for
+                                the subscription.
+                        id:
+                          type: string
+                          description: The resource ID of the feature.
+                        type:
+                          type: string
+                          description: The resource type of the feature.
+                      description: Previewed feature information.
+                    description: The array of features.
+                  nextLink:
+                    type: string
+                    description: The URL to use for getting the next set of results.
+                description: List of previewed features.
+        default:
+          description: Error response describing the reason for operation failure.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Error response indicates that the service is not able
+                  to process the incoming request.
+                properties:
+                  error:
+                    description: The error details.
+                    type: object
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          type: object
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                type: object
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                        x-ms-identifiers: []
+            text/json:
+              schema:
+                type: object
+                description: Error response indicates that the service is not able
+                  to process the incoming request.
+                properties:
+                  error:
+                    description: The error details.
+                    type: object
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          type: object
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                type: object
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /subscriptions/{subscriptionId}/providers/Microsoft.Features/providers/{resourceProviderNamespace}/features:
+    get:
+      tags:
+      - Features
+      operationId: Features_List
+      description: Gets all the preview features in a provider namespace that are
+        available through AFEC for the subscription.
+      parameters:
+      - name: resourceProviderNamespace
+        in: path
+        required: true
+        description: The namespace of the resource provider for getting features.
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK - Returns an array containing metadata for each feature
+            in the resource provider. The metadata includes the name of the feature,
+            the registration state, the resource ID, and resource type.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: The name of the feature.
+                        properties:
+                          description: Properties of the previewed feature.
+                          type: object
+                          properties:
+                            state:
+                              type: string
+                              description: The registration state of the feature for
+                                the subscription.
+                        id:
+                          type: string
+                          description: The resource ID of the feature.
+                        type:
+                          type: string
+                          description: The resource type of the feature.
+                      description: Previewed feature information.
+                    description: The array of features.
+                  nextLink:
+                    type: string
+                    description: The URL to use for getting the next set of results.
+                description: List of previewed features.
+            text/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: The name of the feature.
+                        properties:
+                          description: Properties of the previewed feature.
+                          type: object
+                          properties:
+                            state:
+                              type: string
+                              description: The registration state of the feature for
+                                the subscription.
+                        id:
+                          type: string
+                          description: The resource ID of the feature.
+                        type:
+                          type: string
+                          description: The resource type of the feature.
+                      description: Previewed feature information.
+                    description: The array of features.
+                  nextLink:
+                    type: string
+                    description: The URL to use for getting the next set of results.
+                description: List of previewed features.
+        default:
+          description: Error response describing the reason for operation failure.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Error response indicates that the service is not able
+                  to process the incoming request.
+                properties:
+                  error:
+                    description: The error details.
+                    type: object
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          type: object
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                type: object
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                        x-ms-identifiers: []
+            text/json:
+              schema:
+                type: object
+                description: Error response indicates that the service is not able
+                  to process the incoming request.
+                properties:
+                  error:
+                    description: The error details.
+                    type: object
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          type: object
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                type: object
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /subscriptions/{subscriptionId}/providers/Microsoft.Features/providers/{resourceProviderNamespace}/features/{featureName}:
+    get:
+      tags:
+      - Features
+      operationId: Features_Get
+      description: Gets the preview feature with the specified name.
+      parameters:
+      - name: resourceProviderNamespace
+        in: path
+        required: true
+        description: The resource provider namespace for the feature.
+        schema:
+          type: string
+      - name: featureName
+        in: path
+        required: true
+        description: The name of the feature to get.
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK - Returns metadata about the feature. The metadata includes
+            the name of the feature, the registration state, the resource ID, and
+            resource type.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the feature.
+                  properties:
+                    description: Properties of the previewed feature.
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                        description: The registration state of the feature for the
+                          subscription.
+                  id:
+                    type: string
+                    description: The resource ID of the feature.
+                  type:
+                    type: string
+                    description: The resource type of the feature.
+                description: Previewed feature information.
+            text/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the feature.
+                  properties:
+                    description: Properties of the previewed feature.
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                        description: The registration state of the feature for the
+                          subscription.
+                  id:
+                    type: string
+                    description: The resource ID of the feature.
+                  type:
+                    type: string
+                    description: The resource type of the feature.
+                description: Previewed feature information.
+        default:
+          description: Error response describing the reason for operation failure.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Error response indicates that the service is not able
+                  to process the incoming request.
+                properties:
+                  error:
+                    description: The error details.
+                    type: object
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          type: object
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                type: object
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                        x-ms-identifiers: []
+            text/json:
+              schema:
+                type: object
+                description: Error response indicates that the service is not able
+                  to process the incoming request.
+                properties:
+                  error:
+                    description: The error details.
+                    type: object
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          type: object
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                type: object
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                        x-ms-identifiers: []
+  ? /subscriptions/{subscriptionId}/providers/Microsoft.Features/providers/{resourceProviderNamespace}/features/{featureName}/register
+  : post:
+      tags:
+      - Features
+      operationId: Features_Register
+      description: Registers the preview feature for the subscription.
+      parameters:
+      - name: resourceProviderNamespace
+        in: path
+        required: true
+        description: The namespace of the resource provider.
+        schema:
+          type: string
+      - name: featureName
+        in: path
+        required: true
+        description: The name of the feature to register.
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK - Returns metadata about the registered feature. The metadata
+            includes the name of the feature, the registration state, the resource
+            ID, and resource type.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the feature.
+                  properties:
+                    description: Properties of the previewed feature.
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                        description: The registration state of the feature for the
+                          subscription.
+                  id:
+                    type: string
+                    description: The resource ID of the feature.
+                  type:
+                    type: string
+                    description: The resource type of the feature.
+                description: Previewed feature information.
+            text/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the feature.
+                  properties:
+                    description: Properties of the previewed feature.
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                        description: The registration state of the feature for the
+                          subscription.
+                  id:
+                    type: string
+                    description: The resource ID of the feature.
+                  type:
+                    type: string
+                    description: The resource type of the feature.
+                description: Previewed feature information.
+        default:
+          description: Error response describing the reason for operation failure.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Error response indicates that the service is not able
+                  to process the incoming request.
+                properties:
+                  error:
+                    description: The error details.
+                    type: object
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          type: object
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                type: object
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                        x-ms-identifiers: []
+            text/json:
+              schema:
+                type: object
+                description: Error response indicates that the service is not able
+                  to process the incoming request.
+                properties:
+                  error:
+                    description: The error details.
+                    type: object
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          type: object
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                type: object
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                        x-ms-identifiers: []
+  ? /subscriptions/{subscriptionId}/providers/Microsoft.Features/providers/{resourceProviderNamespace}/features/{featureName}/unregister
+  : post:
+      tags:
+      - Features
+      operationId: Features_Unregister
+      description: Unregisters the preview feature for the subscription.
+      parameters:
+      - name: resourceProviderNamespace
+        in: path
+        required: true
+        description: The namespace of the resource provider.
+        schema:
+          type: string
+      - name: featureName
+        in: path
+        required: true
+        description: The name of the feature to unregister.
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK - Returns metadata about the unregistered feature. The metadata
+            includes the name of the feature, the registration state, the resource
+            ID, and resource type.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the feature.
+                  properties:
+                    description: Properties of the previewed feature.
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                        description: The registration state of the feature for the
+                          subscription.
+                  id:
+                    type: string
+                    description: The resource ID of the feature.
+                  type:
+                    type: string
+                    description: The resource type of the feature.
+                description: Previewed feature information.
+            text/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    description: The name of the feature.
+                  properties:
+                    description: Properties of the previewed feature.
+                    type: object
+                    properties:
+                      state:
+                        type: string
+                        description: The registration state of the feature for the
+                          subscription.
+                  id:
+                    type: string
+                    description: The resource ID of the feature.
+                  type:
+                    type: string
+                    description: The resource type of the feature.
+                description: Previewed feature information.
+        default:
+          description: Error response describing the reason for operation failure.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Error response indicates that the service is not able
+                  to process the incoming request.
+                properties:
+                  error:
+                    description: The error details.
+                    type: object
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          type: object
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                type: object
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                        x-ms-identifiers: []
+            text/json:
+              schema:
+                type: object
+                description: Error response indicates that the service is not able
+                  to process the incoming request.
+                properties:
+                  error:
+                    description: The error details.
+                    type: object
+                    properties:
+                      code:
+                        description: Service specific error code which serves as the
+                          substatus for the HTTP error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Description of the error.
+                        type: string
+                        readOnly: true
+                      details:
+                        description: Internal error details.
+                        type: array
+                        items:
+                          description: Error definition.
+                          type: object
+                          properties:
+                            code:
+                              description: Service specific error code which serves
+                                as the substatus for the HTTP error code.
+                              type: string
+                              readOnly: true
+                            message:
+                              description: Description of the error.
+                              type: string
+                              readOnly: true
+                            details:
+                              description: Internal error details.
+                              type: array
+                              items:
+                                description: Error definition.
+                                type: object
+                                properties:
+                                  code:
+                                    description: Service specific error code which
+                                      serves as the substatus for the HTTP error code.
+                                    type: string
+                                    readOnly: true
+                                  message:
+                                    description: Description of the error.
+                                    type: string
+                                    readOnly: true
+                              x-ms-identifiers: []
+                        x-ms-identifiers: []
+components:
+  parameters:
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      required: true
+      description: The Azure subscription ID.
+      schema:
+        type: string
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    FeatureProperties:
+      type: object
+      properties:
+        state:
+          type: string
+          description: The registration state of the feature for the subscription.
+      description: Information about feature.
+    FeatureResult:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the feature.
+        properties:
+          description: Properties of the previewed feature.
+          type: object
+          properties:
+            state:
+              type: string
+              description: The registration state of the feature for the subscription.
+        id:
+          type: string
+          description: The resource ID of the feature.
+        type:
+          type: string
+          description: The resource type of the feature.
+      description: Previewed feature information.
+    FeatureOperationsListResult:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The name of the feature.
+              properties:
+                description: Properties of the previewed feature.
+                type: object
+                properties:
+                  state:
+                    type: string
+                    description: The registration state of the feature for the subscription.
+              id:
+                type: string
+                description: The resource ID of the feature.
+              type:
+                type: string
+                description: The resource type of the feature.
+            description: Previewed feature information.
+          description: The array of features.
+        nextLink:
+          type: string
+          description: The URL to use for getting the next set of results.
+      description: List of previewed features.
+    Operation:
+      description: Microsoft.Features operation
+      type: object
+      properties:
+        name:
+          description: 'Operation name: {provider}/{resource}/{operation}'
+          type: string
+        display:
+          type: object
+          description: The object that represents the operation.
+          properties:
+            provider:
+              description: 'Service provider: Microsoft.Features'
+              type: string
+            resource:
+              description: 'Resource on which the operation is performed: Profile,
+                endpoint, etc.'
+              type: string
+            operation:
+              description: 'Operation type: Read, write, delete, etc.'
+              type: string
+    OperationListResult:
+      type: object
+      description: Result of the request to list Microsoft.Features operations. It
+        contains a list of operations and a URL link to get the next set of results.
+      properties:
+        value:
+          type: array
+          items:
+            description: Microsoft.Features operation
+            type: object
+            properties:
+              name:
+                description: 'Operation name: {provider}/{resource}/{operation}'
+                type: string
+              display:
+                type: object
+                description: The object that represents the operation.
+                properties:
+                  provider:
+                    description: 'Service provider: Microsoft.Features'
+                    type: string
+                  resource:
+                    description: 'Resource on which the operation is performed: Profile,
+                      endpoint, etc.'
+                    type: string
+                  operation:
+                    description: 'Operation type: Read, write, delete, etc.'
+                    type: string
+          x-ms-identifiers:
+          - name
+          description: List of Microsoft.Features operations.
+        nextLink:
+          type: string
+          description: URL to get the next set of operation list results if there
+            are any.
+    ErrorResponse:
+      type: object
+      description: Error response indicates that the service is not able to process
+        the incoming request.
+      properties:
+        error:
+          description: The error details.
+          type: object
+          properties:
+            code:
+              description: Service specific error code which serves as the substatus
+                for the HTTP error code.
+              type: string
+              readOnly: true
+            message:
+              description: Description of the error.
+              type: string
+              readOnly: true
+            details:
+              description: Internal error details.
+              type: array
+              items:
+                description: Error definition.
+                type: object
+                properties:
+                  code:
+                    description: Service specific error code which serves as the substatus
+                      for the HTTP error code.
+                    type: string
+                    readOnly: true
+                  message:
+                    description: Description of the error.
+                    type: string
+                    readOnly: true
+                  details:
+                    description: Internal error details.
+                    type: array
+                    items:
+                      description: Error definition.
+                      type: object
+                      properties:
+                        code:
+                          description: Service specific error code which serves as
+                            the substatus for the HTTP error code.
+                          type: string
+                          readOnly: true
+                        message:
+                          description: Description of the error.
+                          type: string
+                          readOnly: true
+                    x-ms-identifiers: []
+              x-ms-identifiers: []
+    ErrorDefinition:
+      description: Error definition.
+      type: object
+      properties:
+        code:
+          description: Service specific error code which serves as the substatus for
+            the HTTP error code.
+          type: string
+          readOnly: true
+        message:
+          description: Description of the error.
+          type: string
+          readOnly: true
+        details:
+          description: Internal error details.
+          type: array
+          items:
+            description: Error definition.
+            type: object
+            properties:
+              code:
+                description: Service specific error code which serves as the substatus
+                  for the HTTP error code.
+                type: string
+                readOnly: true
+              message:
+                description: Description of the error.
+                type: string
+                readOnly: true
+              details:
+                description: Internal error details.
+                type: array
+                items:
+                  description: Error definition.
+                  type: object
+                  properties:
+                    code:
+                      description: Service specific error code which serves as the
+                        substatus for the HTTP error code.
+                      type: string
+                      readOnly: true
+                    message:
+                      description: Description of the error.
+                      type: string
+                      readOnly: true
+                x-ms-identifiers: []
+          x-ms-identifiers: []

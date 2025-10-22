@@ -1,0 +1,2761 @@
+openapi: 3.0.0
+info:
+  title: MobileNetworkManagementClient
+  description: The resources in this API specification will be used to manage packet
+    capture resources
+  version: 2024-04-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MobileNetwork/packetCoreControlPlanes/{packetCoreControlPlaneName}/packetCaptures/{packetCaptureName}
+  : put:
+      tags:
+      - PacketCaptures
+      operationId: PacketCaptures_CreateOrUpdate
+      description: Creates or updates a packet capture.
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: packetCoreControlPlaneName
+        in: path
+        required: true
+        description: The name of the packet core control plane.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
+      - name: packetCaptureName
+        in: path
+        required: true
+        description: The name of the packet capture session.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: arm-id
+                  description: Fully qualified resource ID for the resource. E.g.
+                    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                  readOnly: true
+                name:
+                  type: string
+                  description: The name of the resource
+                  readOnly: true
+                type:
+                  type: string
+                  description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                    or "Microsoft.Storage/storageAccounts"
+                  readOnly: true
+                systemData:
+                  description: Azure Resource Manager metadata containing createdBy
+                    and modifiedBy information.
+                  readOnly: true
+                  type: object
+                  properties:
+                    createdBy:
+                      type: string
+                      description: The identity that created the resource.
+                    createdByType:
+                      type: string
+                      description: The type of identity that created the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource creation (UTC).
+                    lastModifiedBy:
+                      type: string
+                      description: The identity that last modified the resource.
+                    lastModifiedByType:
+                      type: string
+                      description: The type of identity that last modified the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    lastModifiedAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource last modification (UTC)
+                properties:
+                  x-ms-client-flatten: true
+                  description: Packet capture session properties. Packet capture file(s)
+                    derived from the name of this session will be uploaded to the
+                    Storage Account Container URL in the packet core control plane
+                    properties
+                  type: object
+                  properties:
+                    provisioningState:
+                      readOnly: true
+                      description: The provisioning state of the packet capture session
+                        resource.
+                      type: string
+                      enum:
+                      - Unknown
+                      - Succeeded
+                      - Accepted
+                      - Deleting
+                      - Failed
+                      - Canceled
+                      - Deleted
+                      x-ms-enum:
+                        name: ProvisioningState
+                        modelAsString: true
+                        values:
+                        - value: Unknown
+                        - value: Succeeded
+                        - value: Accepted
+                        - value: Deleting
+                        - value: Failed
+                        - value: Canceled
+                        - value: Deleted
+                    status:
+                      readOnly: true
+                      type: string
+                      enum:
+                      - NotStarted
+                      - Running
+                      - Stopped
+                      - Error
+                      x-ms-enum:
+                        name: PacketCaptureStatus
+                        modelAsString: true
+                      description: The status of the packet capture session.
+                    reason:
+                      readOnly: true
+                      type: string
+                      description: The reason the current packet capture session state.
+                    captureStartTime:
+                      readOnly: true
+                      type: string
+                      format: date-time
+                      description: The start time of the packet capture session.
+                    networkInterfaces:
+                      type: array
+                      items:
+                        type: string
+                      uniqueItems: true
+                      minItems: 1
+                      description: List of network interfaces to capture on.
+                    bytesToCapturePerPacket:
+                      type: integer
+                      format: int64
+                      minimum: 0
+                      maximum: 4294967295
+                      default: 0
+                      description: Number of bytes captured per packet, the remaining
+                        bytes are truncated. The default "0" means the entire packet
+                        is captured.
+                    totalBytesPerSession:
+                      type: integer
+                      format: int64
+                      minimum: 1000
+                      maximum: 4294967295
+                      default: 67108864
+                      description: Maximum size of the capture output.
+                    timeLimitInSeconds:
+                      type: integer
+                      format: int32
+                      minimum: 5
+                      maximum: 18000
+                      default: 18000
+                      description: Maximum duration of the capture session in seconds.
+                    outputFiles:
+                      readOnly: true
+                      type: array
+                      items:
+                        type: string
+                      description: The list of output files of a packet capture session.
+              title: Resource
+              description: Common fields that are returned in the response for all
+                Azure Resource Manager resources
+              x-ms-azure-resource: true
+              required:
+              - properties
+        description: Parameters supplied to the create or update packet capture operation.
+        required: true
+      responses:
+        '200':
+          description: Update successful. The operation returns information about
+            the packet capture session.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: arm-id
+                    description: Fully qualified resource ID for the resource. E.g.
+                      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                    readOnly: true
+                  name:
+                    type: string
+                    description: The name of the resource
+                    readOnly: true
+                  type:
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                    readOnly: true
+                  systemData:
+                    description: Azure Resource Manager metadata containing createdBy
+                      and modifiedBy information.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Packet capture session properties. Packet capture
+                      file(s) derived from the name of this session will be uploaded
+                      to the Storage Account Container URL in the packet core control
+                      plane properties
+                    type: object
+                    properties:
+                      provisioningState:
+                        readOnly: true
+                        description: The provisioning state of the packet capture
+                          session resource.
+                        type: string
+                        enum:
+                        - Unknown
+                        - Succeeded
+                        - Accepted
+                        - Deleting
+                        - Failed
+                        - Canceled
+                        - Deleted
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: true
+                          values:
+                          - value: Unknown
+                          - value: Succeeded
+                          - value: Accepted
+                          - value: Deleting
+                          - value: Failed
+                          - value: Canceled
+                          - value: Deleted
+                      status:
+                        readOnly: true
+                        type: string
+                        enum:
+                        - NotStarted
+                        - Running
+                        - Stopped
+                        - Error
+                        x-ms-enum:
+                          name: PacketCaptureStatus
+                          modelAsString: true
+                        description: The status of the packet capture session.
+                      reason:
+                        readOnly: true
+                        type: string
+                        description: The reason the current packet capture session
+                          state.
+                      captureStartTime:
+                        readOnly: true
+                        type: string
+                        format: date-time
+                        description: The start time of the packet capture session.
+                      networkInterfaces:
+                        type: array
+                        items:
+                          type: string
+                        uniqueItems: true
+                        minItems: 1
+                        description: List of network interfaces to capture on.
+                      bytesToCapturePerPacket:
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        maximum: 4294967295
+                        default: 0
+                        description: Number of bytes captured per packet, the remaining
+                          bytes are truncated. The default "0" means the entire packet
+                          is captured.
+                      totalBytesPerSession:
+                        type: integer
+                        format: int64
+                        minimum: 1000
+                        maximum: 4294967295
+                        default: 67108864
+                        description: Maximum size of the capture output.
+                      timeLimitInSeconds:
+                        type: integer
+                        format: int32
+                        minimum: 5
+                        maximum: 18000
+                        default: 18000
+                        description: Maximum duration of the capture session in seconds.
+                      outputFiles:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: string
+                        description: The list of output files of a packet capture
+                          session.
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - properties
+        '201':
+          description: Create successful. The operation returns information about
+            the packet capture session.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: arm-id
+                    description: Fully qualified resource ID for the resource. E.g.
+                      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                    readOnly: true
+                  name:
+                    type: string
+                    description: The name of the resource
+                    readOnly: true
+                  type:
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                    readOnly: true
+                  systemData:
+                    description: Azure Resource Manager metadata containing createdBy
+                      and modifiedBy information.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Packet capture session properties. Packet capture
+                      file(s) derived from the name of this session will be uploaded
+                      to the Storage Account Container URL in the packet core control
+                      plane properties
+                    type: object
+                    properties:
+                      provisioningState:
+                        readOnly: true
+                        description: The provisioning state of the packet capture
+                          session resource.
+                        type: string
+                        enum:
+                        - Unknown
+                        - Succeeded
+                        - Accepted
+                        - Deleting
+                        - Failed
+                        - Canceled
+                        - Deleted
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: true
+                          values:
+                          - value: Unknown
+                          - value: Succeeded
+                          - value: Accepted
+                          - value: Deleting
+                          - value: Failed
+                          - value: Canceled
+                          - value: Deleted
+                      status:
+                        readOnly: true
+                        type: string
+                        enum:
+                        - NotStarted
+                        - Running
+                        - Stopped
+                        - Error
+                        x-ms-enum:
+                          name: PacketCaptureStatus
+                          modelAsString: true
+                        description: The status of the packet capture session.
+                      reason:
+                        readOnly: true
+                        type: string
+                        description: The reason the current packet capture session
+                          state.
+                      captureStartTime:
+                        readOnly: true
+                        type: string
+                        format: date-time
+                        description: The start time of the packet capture session.
+                      networkInterfaces:
+                        type: array
+                        items:
+                          type: string
+                        uniqueItems: true
+                        minItems: 1
+                        description: List of network interfaces to capture on.
+                      bytesToCapturePerPacket:
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        maximum: 4294967295
+                        default: 0
+                        description: Number of bytes captured per packet, the remaining
+                          bytes are truncated. The default "0" means the entire packet
+                          is captured.
+                      totalBytesPerSession:
+                        type: integer
+                        format: int64
+                        minimum: 1000
+                        maximum: 4294967295
+                        default: 67108864
+                        description: Maximum size of the capture output.
+                      timeLimitInSeconds:
+                        type: integer
+                        format: int32
+                        minimum: 5
+                        maximum: 18000
+                        default: 18000
+                        description: Maximum duration of the capture session in seconds.
+                      outputFiles:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: string
+                        description: The list of output files of a packet capture
+                          session.
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - properties
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: azure-async-operation
+    get:
+      tags:
+      - PacketCaptures
+      operationId: PacketCaptures_Get
+      description: Gets information about the specified packet capture session.
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: packetCoreControlPlaneName
+        in: path
+        required: true
+        description: The name of the packet core control plane.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
+      - name: packetCaptureName
+        in: path
+        required: true
+        description: The name of the packet capture session.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Request successful. The operation returns information about
+            the packet capture session.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: arm-id
+                    description: Fully qualified resource ID for the resource. E.g.
+                      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                    readOnly: true
+                  name:
+                    type: string
+                    description: The name of the resource
+                    readOnly: true
+                  type:
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                    readOnly: true
+                  systemData:
+                    description: Azure Resource Manager metadata containing createdBy
+                      and modifiedBy information.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    x-ms-client-flatten: true
+                    description: Packet capture session properties. Packet capture
+                      file(s) derived from the name of this session will be uploaded
+                      to the Storage Account Container URL in the packet core control
+                      plane properties
+                    type: object
+                    properties:
+                      provisioningState:
+                        readOnly: true
+                        description: The provisioning state of the packet capture
+                          session resource.
+                        type: string
+                        enum:
+                        - Unknown
+                        - Succeeded
+                        - Accepted
+                        - Deleting
+                        - Failed
+                        - Canceled
+                        - Deleted
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: true
+                          values:
+                          - value: Unknown
+                          - value: Succeeded
+                          - value: Accepted
+                          - value: Deleting
+                          - value: Failed
+                          - value: Canceled
+                          - value: Deleted
+                      status:
+                        readOnly: true
+                        type: string
+                        enum:
+                        - NotStarted
+                        - Running
+                        - Stopped
+                        - Error
+                        x-ms-enum:
+                          name: PacketCaptureStatus
+                          modelAsString: true
+                        description: The status of the packet capture session.
+                      reason:
+                        readOnly: true
+                        type: string
+                        description: The reason the current packet capture session
+                          state.
+                      captureStartTime:
+                        readOnly: true
+                        type: string
+                        format: date-time
+                        description: The start time of the packet capture session.
+                      networkInterfaces:
+                        type: array
+                        items:
+                          type: string
+                        uniqueItems: true
+                        minItems: 1
+                        description: List of network interfaces to capture on.
+                      bytesToCapturePerPacket:
+                        type: integer
+                        format: int64
+                        minimum: 0
+                        maximum: 4294967295
+                        default: 0
+                        description: Number of bytes captured per packet, the remaining
+                          bytes are truncated. The default "0" means the entire packet
+                          is captured.
+                      totalBytesPerSession:
+                        type: integer
+                        format: int64
+                        minimum: 1000
+                        maximum: 4294967295
+                        default: 67108864
+                        description: Maximum size of the capture output.
+                      timeLimitInSeconds:
+                        type: integer
+                        format: int32
+                        minimum: 5
+                        maximum: 18000
+                        default: 18000
+                        description: Maximum duration of the capture session in seconds.
+                      outputFiles:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: string
+                        description: The list of output files of a packet capture
+                          session.
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - properties
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    delete:
+      tags:
+      - PacketCaptures
+      operationId: PacketCaptures_Delete
+      description: Deletes the specified packet capture.
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: packetCoreControlPlaneName
+        in: path
+        required: true
+        description: The name of the packet core control plane.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
+      - name: packetCaptureName
+        in: path
+        required: true
+        description: The name of the packet capture session.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Delete successful.
+        '202':
+          description: Accepted. Sets 'Deleting' provisioningState until the operation
+            completes. Returns an operation URI that can be queried to find the current
+            state of the operation.
+        '204':
+          description: Request successful. Resource does not exist.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: location
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MobileNetwork/packetCoreControlPlanes/{packetCoreControlPlaneName}/packetCaptures/{packetCaptureName}/stop
+  : post:
+      tags:
+      - PacketCaptures
+      operationId: PacketCaptures_Stop
+      description: Stop a packet capture session.
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: packetCoreControlPlaneName
+        in: path
+        required: true
+        description: The name of the packet core control plane.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
+      - name: packetCaptureName
+        in: path
+        required: true
+        description: The name of the packet capture session.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Async operation completed.
+          content:
+            application/json:
+              schema:
+                description: The current status of an async operation.
+                type: object
+                properties:
+                  id:
+                    description: Fully qualified ID for the async operation.
+                    type: string
+                  name:
+                    description: Name of the async operation.
+                    type: string
+                  status:
+                    description: The operation status.
+                    type: string
+                  resourceId:
+                    description: Fully qualified ID for the resource that this async
+                      operation status relates to.
+                    type: string
+                  startTime:
+                    description: The start time of the operation.
+                    type: string
+                    format: date-time
+                  endTime:
+                    description: The end time of the operation.
+                    type: string
+                    format: date-time
+                  percentComplete:
+                    description: Percentage of the operation that is complete.
+                    type: number
+                    format: double
+                    minimum: 0
+                    maximum: 100
+                  properties:
+                    description: Properties returned by the resource provider on a
+                      successful operation
+                    type: object
+                  error:
+                    description: If present, details of the operation error.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+                required:
+                - status
+        '202':
+          description: Accepted. Returns an operation URI that can be queried to find
+            the current state of the operation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: location
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.MobileNetwork/packetCoreControlPlanes/{packetCoreControlPlaneName}/packetCaptures
+  : get:
+      tags:
+      - PacketCaptures
+      operationId: PacketCaptures_ListByPacketCoreControlPlane
+      description: Lists all the packet capture sessions under a packet core control
+        plane.
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: packetCoreControlPlaneName
+        in: path
+        required: true
+        description: The name of the packet core control plane.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          maxLength: 64
+          pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Request successful. The operation returns a list of packet
+            capture sessions.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: arm-id
+                          description: Fully qualified resource ID for the resource.
+                            E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                          readOnly: true
+                        name:
+                          type: string
+                          description: The name of the resource
+                          readOnly: true
+                        type:
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                          readOnly: true
+                        systemData:
+                          description: Azure Resource Manager metadata containing
+                            createdBy and modifiedBy information.
+                          readOnly: true
+                          type: object
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource last modification
+                                (UTC)
+                        properties:
+                          x-ms-client-flatten: true
+                          description: Packet capture session properties. Packet capture
+                            file(s) derived from the name of this session will be
+                            uploaded to the Storage Account Container URL in the packet
+                            core control plane properties
+                          type: object
+                          properties:
+                            provisioningState:
+                              readOnly: true
+                              description: The provisioning state of the packet capture
+                                session resource.
+                              type: string
+                              enum:
+                              - Unknown
+                              - Succeeded
+                              - Accepted
+                              - Deleting
+                              - Failed
+                              - Canceled
+                              - Deleted
+                              x-ms-enum:
+                                name: ProvisioningState
+                                modelAsString: true
+                                values:
+                                - value: Unknown
+                                - value: Succeeded
+                                - value: Accepted
+                                - value: Deleting
+                                - value: Failed
+                                - value: Canceled
+                                - value: Deleted
+                            status:
+                              readOnly: true
+                              type: string
+                              enum:
+                              - NotStarted
+                              - Running
+                              - Stopped
+                              - Error
+                              x-ms-enum:
+                                name: PacketCaptureStatus
+                                modelAsString: true
+                              description: The status of the packet capture session.
+                            reason:
+                              readOnly: true
+                              type: string
+                              description: The reason the current packet capture session
+                                state.
+                            captureStartTime:
+                              readOnly: true
+                              type: string
+                              format: date-time
+                              description: The start time of the packet capture session.
+                            networkInterfaces:
+                              type: array
+                              items:
+                                type: string
+                              uniqueItems: true
+                              minItems: 1
+                              description: List of network interfaces to capture on.
+                            bytesToCapturePerPacket:
+                              type: integer
+                              format: int64
+                              minimum: 0
+                              maximum: 4294967295
+                              default: 0
+                              description: Number of bytes captured per packet, the
+                                remaining bytes are truncated. The default "0" means
+                                the entire packet is captured.
+                            totalBytesPerSession:
+                              type: integer
+                              format: int64
+                              minimum: 1000
+                              maximum: 4294967295
+                              default: 67108864
+                              description: Maximum size of the capture output.
+                            timeLimitInSeconds:
+                              type: integer
+                              format: int32
+                              minimum: 5
+                              maximum: 18000
+                              default: 18000
+                              description: Maximum duration of the capture session
+                                in seconds.
+                            outputFiles:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: string
+                              description: The list of output files of a packet capture
+                                session.
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                      required:
+                      - properties
+                    description: A list of packet capture sessions under a packet
+                      core control plane.
+                  nextLink:
+                    type: string
+                    readOnly: true
+                    description: The URL to get the next set of results.
+                description: Response for packet capture API service call.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+components:
+  parameters:
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription. The value must be an UUID.
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      description: The name of the resource group. The name is case insensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    PacketCoreControlPlaneNameParameter:
+      name: packetCoreControlPlaneName
+      in: path
+      required: true
+      description: The name of the packet core control plane.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        maxLength: 64
+        pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
+    PacketCaptureNameParameter:
+      name: packetCaptureName
+      in: path
+      required: true
+      description: The name of the packet capture session.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        maxLength: 64
+        pattern: ^[a-zA-Z0-9][a-zA-Z0-9_-]*$
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    PacketCapture:
+      type: object
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+        properties:
+          x-ms-client-flatten: true
+          description: Packet capture session properties. Packet capture file(s) derived
+            from the name of this session will be uploaded to the Storage Account
+            Container URL in the packet core control plane properties
+          type: object
+          properties:
+            provisioningState:
+              readOnly: true
+              description: The provisioning state of the packet capture session resource.
+              type: string
+              enum:
+              - Unknown
+              - Succeeded
+              - Accepted
+              - Deleting
+              - Failed
+              - Canceled
+              - Deleted
+              x-ms-enum:
+                name: ProvisioningState
+                modelAsString: true
+                values:
+                - value: Unknown
+                - value: Succeeded
+                - value: Accepted
+                - value: Deleting
+                - value: Failed
+                - value: Canceled
+                - value: Deleted
+            status:
+              readOnly: true
+              type: string
+              enum:
+              - NotStarted
+              - Running
+              - Stopped
+              - Error
+              x-ms-enum:
+                name: PacketCaptureStatus
+                modelAsString: true
+              description: The status of the packet capture session.
+            reason:
+              readOnly: true
+              type: string
+              description: The reason the current packet capture session state.
+            captureStartTime:
+              readOnly: true
+              type: string
+              format: date-time
+              description: The start time of the packet capture session.
+            networkInterfaces:
+              type: array
+              items:
+                type: string
+              uniqueItems: true
+              minItems: 1
+              description: List of network interfaces to capture on.
+            bytesToCapturePerPacket:
+              type: integer
+              format: int64
+              minimum: 0
+              maximum: 4294967295
+              default: 0
+              description: Number of bytes captured per packet, the remaining bytes
+                are truncated. The default "0" means the entire packet is captured.
+            totalBytesPerSession:
+              type: integer
+              format: int64
+              minimum: 1000
+              maximum: 4294967295
+              default: 67108864
+              description: Maximum size of the capture output.
+            timeLimitInSeconds:
+              type: integer
+              format: int32
+              minimum: 5
+              maximum: 18000
+              default: 18000
+              description: Maximum duration of the capture session in seconds.
+            outputFiles:
+              readOnly: true
+              type: array
+              items:
+                type: string
+              description: The list of output files of a packet capture session.
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+      required:
+      - properties
+    PacketCapturePropertiesFormat:
+      description: Packet capture session properties.
+      type: object
+      properties:
+        provisioningState:
+          readOnly: true
+          description: The provisioning state of the packet capture session resource.
+          type: string
+          enum:
+          - Unknown
+          - Succeeded
+          - Accepted
+          - Deleting
+          - Failed
+          - Canceled
+          - Deleted
+          x-ms-enum:
+            name: ProvisioningState
+            modelAsString: true
+            values:
+            - value: Unknown
+            - value: Succeeded
+            - value: Accepted
+            - value: Deleting
+            - value: Failed
+            - value: Canceled
+            - value: Deleted
+        status:
+          readOnly: true
+          type: string
+          enum:
+          - NotStarted
+          - Running
+          - Stopped
+          - Error
+          x-ms-enum:
+            name: PacketCaptureStatus
+            modelAsString: true
+          description: The status of the packet capture session.
+        reason:
+          readOnly: true
+          type: string
+          description: The reason the current packet capture session state.
+        captureStartTime:
+          readOnly: true
+          type: string
+          format: date-time
+          description: The start time of the packet capture session.
+        networkInterfaces:
+          type: array
+          items:
+            type: string
+          uniqueItems: true
+          minItems: 1
+          description: List of network interfaces to capture on.
+        bytesToCapturePerPacket:
+          type: integer
+          format: int64
+          minimum: 0
+          maximum: 4294967295
+          default: 0
+          description: Number of bytes captured per packet, the remaining bytes are
+            truncated. The default "0" means the entire packet is captured.
+        totalBytesPerSession:
+          type: integer
+          format: int64
+          minimum: 1000
+          maximum: 4294967295
+          default: 67108864
+          description: Maximum size of the capture output.
+        timeLimitInSeconds:
+          type: integer
+          format: int32
+          minimum: 5
+          maximum: 18000
+          default: 18000
+          description: Maximum duration of the capture session in seconds.
+        outputFiles:
+          readOnly: true
+          type: array
+          items:
+            type: string
+          description: The list of output files of a packet capture session.
+    PacketCaptureListResult:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: arm-id
+                description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                readOnly: true
+              name:
+                type: string
+                description: The name of the resource
+                readOnly: true
+              type:
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+                readOnly: true
+              systemData:
+                description: Azure Resource Manager metadata containing createdBy
+                  and modifiedBy information.
+                readOnly: true
+                type: object
+                properties:
+                  createdBy:
+                    type: string
+                    description: The identity that created the resource.
+                  createdByType:
+                    type: string
+                    description: The type of identity that created the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource creation (UTC).
+                  lastModifiedBy:
+                    type: string
+                    description: The identity that last modified the resource.
+                  lastModifiedByType:
+                    type: string
+                    description: The type of identity that last modified the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  lastModifiedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource last modification (UTC)
+              properties:
+                x-ms-client-flatten: true
+                description: Packet capture session properties. Packet capture file(s)
+                  derived from the name of this session will be uploaded to the Storage
+                  Account Container URL in the packet core control plane properties
+                type: object
+                properties:
+                  provisioningState:
+                    readOnly: true
+                    description: The provisioning state of the packet capture session
+                      resource.
+                    type: string
+                    enum:
+                    - Unknown
+                    - Succeeded
+                    - Accepted
+                    - Deleting
+                    - Failed
+                    - Canceled
+                    - Deleted
+                    x-ms-enum:
+                      name: ProvisioningState
+                      modelAsString: true
+                      values:
+                      - value: Unknown
+                      - value: Succeeded
+                      - value: Accepted
+                      - value: Deleting
+                      - value: Failed
+                      - value: Canceled
+                      - value: Deleted
+                  status:
+                    readOnly: true
+                    type: string
+                    enum:
+                    - NotStarted
+                    - Running
+                    - Stopped
+                    - Error
+                    x-ms-enum:
+                      name: PacketCaptureStatus
+                      modelAsString: true
+                    description: The status of the packet capture session.
+                  reason:
+                    readOnly: true
+                    type: string
+                    description: The reason the current packet capture session state.
+                  captureStartTime:
+                    readOnly: true
+                    type: string
+                    format: date-time
+                    description: The start time of the packet capture session.
+                  networkInterfaces:
+                    type: array
+                    items:
+                      type: string
+                    uniqueItems: true
+                    minItems: 1
+                    description: List of network interfaces to capture on.
+                  bytesToCapturePerPacket:
+                    type: integer
+                    format: int64
+                    minimum: 0
+                    maximum: 4294967295
+                    default: 0
+                    description: Number of bytes captured per packet, the remaining
+                      bytes are truncated. The default "0" means the entire packet
+                      is captured.
+                  totalBytesPerSession:
+                    type: integer
+                    format: int64
+                    minimum: 1000
+                    maximum: 4294967295
+                    default: 67108864
+                    description: Maximum size of the capture output.
+                  timeLimitInSeconds:
+                    type: integer
+                    format: int32
+                    minimum: 5
+                    maximum: 18000
+                    default: 18000
+                    description: Maximum duration of the capture session in seconds.
+                  outputFiles:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: string
+                    description: The list of output files of a packet capture session.
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+            required:
+            - properties
+          description: A list of packet capture sessions under a packet core control
+            plane.
+        nextLink:
+          type: string
+          readOnly: true
+          description: The URL to get the next set of results.
+      description: Response for packet capture API service call.
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+    systemData:
+      type: object
+      description: Metadata pertaining to creation and last modification of the resource.
+      properties:
+        createdBy:
+          type: string
+          description: The identity that created the resource.
+        createdByType:
+          type: string
+          description: The type of identity that created the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource creation (UTC).
+        lastModifiedBy:
+          type: string
+          description: The identity that last modified the resource.
+        lastModifiedByType:
+          type: string
+          description: The type of identity that last modified the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource last modification (UTC)
+      readOnly: true
+    Resource:
+      type: object
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    ProvisioningState:
+      type: string
+      readOnly: true
+      description: The current provisioning state.
+      enum:
+      - Unknown
+      - Succeeded
+      - Accepted
+      - Deleting
+      - Failed
+      - Canceled
+      - Deleted
+      x-ms-enum:
+        name: ProvisioningState
+        modelAsString: true
+        values:
+        - value: Unknown
+        - value: Succeeded
+        - value: Accepted
+        - value: Deleting
+        - value: Failed
+        - value: Canceled
+        - value: Deleted
+    AsyncOperationStatus:
+      description: The current status of an async operation.
+      type: object
+      properties:
+        id:
+          description: Fully qualified ID for the async operation.
+          type: string
+        name:
+          description: Name of the async operation.
+          type: string
+        status:
+          description: The operation status.
+          type: string
+        resourceId:
+          description: Fully qualified ID for the resource that this async operation
+            status relates to.
+          type: string
+        startTime:
+          description: The start time of the operation.
+          type: string
+          format: date-time
+        endTime:
+          description: The end time of the operation.
+          type: string
+          format: date-time
+        percentComplete:
+          description: Percentage of the operation that is complete.
+          type: number
+          format: double
+          minimum: 0
+          maximum: 100
+        properties:
+          description: Properties returned by the resource provider on a successful
+            operation
+          type: object
+        error:
+          description: If present, details of the operation error.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+      required:
+      - status

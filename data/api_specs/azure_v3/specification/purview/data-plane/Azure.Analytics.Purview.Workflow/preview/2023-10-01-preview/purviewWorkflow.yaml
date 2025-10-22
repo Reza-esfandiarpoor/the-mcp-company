@@ -1,0 +1,4749 @@
+openapi: 3.0.0
+info:
+  title: Purview Workflow Service
+  version: 2023-10-01-preview
+  description: Workflows are automated, repeatable business processes which allow
+    organizations to track changes, enforce policy compliance, and ensure quality
+    data across their data landscape.Workflow service is a micro service within Microsoft
+    Purview to validate and orchestrate CUD (create, update, delete) operations on
+    their data entities. This spec defines REST API of Purview Workflow Service, which
+    could used for creating Purview workflow client.
+servers:
+- url: https://purview.azure.com/workflow
+- url: '{endpoint}/workflow'
+  variables:
+    endpoint:
+      description: 'The account endpoint of your Purview account. Example: https://{accountName}.purview.azure.com/'
+      x-ms-parameter-location: client
+      format: url
+      x-ms-skip-url-encoding: true
+      default: none
+security:
+- azure_auth:
+  - https://purview.azure.net/.default
+paths:
+  /workflows:
+    get:
+      tags:
+      - Workflows
+      description: List all workflows.
+      operationId: Workflows_List
+      x-ms-pageable:
+        nextLinkName: nextLink
+      parameters:
+      - name: api-version
+        description: Version of Purview APIs
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                description: The workflow list.
+                properties:
+                  value:
+                    type: array
+                    items:
+                      description: The workflow metadata, action DAGs are not included.
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                          description: The id of workflow.
+                        triggers:
+                          type: array
+                          description: 'It describes under what condition a workflow
+                            will run.  '
+                          items:
+                            type: object
+                            description: Describes under what condition a workflow
+                              will run.
+                            properties:
+                              type:
+                                type: string
+                                enum:
+                                - when_term_creation_is_requested
+                                - when_term_deletion_is_requested
+                                - when_term_update_is_requested
+                                - when_terms_import_is_requested
+                                - when_data_access_grant_is_requested
+                                - when_asset_update_is_requested
+                                x-ms-enum:
+                                  name: TriggerType
+                                  modelAsString: true
+                              underGlossaryHierarchy:
+                                type: string
+                                description: Glossary term hierarchy path.
+                              underCollection:
+                                type: string
+                                description: The collection name.
+                              underGlossary:
+                                type: string
+                                description: The glossary guid.
+                            required:
+                            - type
+                        createdTime:
+                          type: string
+                          format: date-time
+                          description: The created time of workflow.
+                        createdBy:
+                          type: string
+                          description: The person who created the workflow.
+                        lastUpdateTime:
+                          type: string
+                          format: date-time
+                          description: The last update time.
+                        updatedBy:
+                          type: string
+                          description: The person who updated the workflow.
+                        name:
+                          type: string
+                          description: The name of a workflow.
+                        isEnabled:
+                          type: boolean
+                          description: Whether the workflow is enabled or not.
+                        description:
+                          type: string
+                          description: Description of a workflow.
+                      required:
+                      - id
+                      - triggers
+                      - name
+                      - isEnabled
+                      - description
+                    description: The value of workflow list.
+                  nextLink:
+                    type: string
+                    description: The URL to get the next set of results.
+                required:
+                - value
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Default error response model
+                type: object
+                properties:
+                  error:
+                    description: Default error model
+                    type: object
+                    properties:
+                      code:
+                        description: Gets or sets the code.
+                        type: string
+                      details:
+                        description: Gets or sets the details.
+                        uniqueItems: false
+                        type: array
+                        items:
+                          description: Default error model
+                          type: object
+                          properties:
+                            code:
+                              description: Gets or sets the code.
+                              type: string
+                            details:
+                              description: Gets or sets the details.
+                              uniqueItems: false
+                              type: array
+                              items:
+                                description: Default error model
+                                type: object
+                                properties:
+                                  code:
+                                    description: Gets or sets the code.
+                                    type: string
+                                required:
+                                - code
+                                - message
+                              x-ms-identifiers:
+                              - code
+                            message:
+                              description: Gets or sets the messages.
+                              type: string
+                            target:
+                              description: Gets or sets the target.
+                              type: string
+                          required:
+                          - code
+                          - message
+                        x-ms-identifiers:
+                        - code
+                      message:
+                        description: Gets or sets the messages.
+                        type: string
+                      target:
+                        description: Gets or sets the target.
+                        type: string
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+  /workflows/{workflowId}:
+    get:
+      tags:
+      - Workflows
+      description: Get a specific workflow.
+      operationId: Workflow_Get
+      parameters:
+      - name: workflowId
+        in: path
+        required: true
+        description: The workflow id.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          format: uuid
+      - name: api-version
+        description: Version of Purview APIs
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    description: The id of workflow.
+                  triggers:
+                    type: array
+                    description: 'It describes under what condition a workflow will
+                      run.  '
+                    items:
+                      type: object
+                      description: Describes under what condition a workflow will
+                        run.
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                          - when_term_creation_is_requested
+                          - when_term_deletion_is_requested
+                          - when_term_update_is_requested
+                          - when_terms_import_is_requested
+                          - when_data_access_grant_is_requested
+                          - when_asset_update_is_requested
+                          x-ms-enum:
+                            name: TriggerType
+                            modelAsString: true
+                        underGlossaryHierarchy:
+                          type: string
+                          description: Glossary term hierarchy path.
+                        underCollection:
+                          type: string
+                          description: The collection name.
+                        underGlossary:
+                          type: string
+                          description: The glossary guid.
+                      required:
+                      - type
+                  createdTime:
+                    type: string
+                    format: date-time
+                    description: The created time of workflow.
+                  createdBy:
+                    type: string
+                    description: The person who created the workflow.
+                  lastUpdateTime:
+                    type: string
+                    format: date-time
+                    description: The last update time.
+                  updatedBy:
+                    type: string
+                    description: The person who updated the workflow.
+                  name:
+                    type: string
+                    description: The name of a workflow.
+                  isEnabled:
+                    type: boolean
+                    description: Whether the workflow is enabled or not.
+                  description:
+                    type: string
+                    description: Description of a workflow.
+                  actionDag:
+                    type: object
+                    description: The action DAG(Directed Acyclic Graph), it defines
+                      steps to be executed in a workflow run and their order.
+                required:
+                - id
+                - triggers
+                - name
+                - isEnabled
+                - description
+                - actionDag
+                description: The workflow metadata, action DAGs are not included.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Default error response model
+                type: object
+                properties:
+                  error:
+                    description: Default error model
+                    type: object
+                    properties:
+                      code:
+                        description: Gets or sets the code.
+                        type: string
+                      details:
+                        description: Gets or sets the details.
+                        uniqueItems: false
+                        type: array
+                        items:
+                          description: Default error model
+                          type: object
+                          properties:
+                            code:
+                              description: Gets or sets the code.
+                              type: string
+                            details:
+                              description: Gets or sets the details.
+                              uniqueItems: false
+                              type: array
+                              items:
+                                description: Default error model
+                                type: object
+                                properties:
+                                  code:
+                                    description: Gets or sets the code.
+                                    type: string
+                                required:
+                                - code
+                                - message
+                              x-ms-identifiers:
+                              - code
+                            message:
+                              description: Gets or sets the messages.
+                              type: string
+                            target:
+                              description: Gets or sets the target.
+                              type: string
+                          required:
+                          - code
+                          - message
+                        x-ms-identifiers:
+                        - code
+                      message:
+                        description: Gets or sets the messages.
+                        type: string
+                      target:
+                        description: Gets or sets the target.
+                        type: string
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+    put:
+      tags:
+      - Workflows
+      description: Create or replace a workflow.
+      operationId: Workflow_CreateOrReplace
+      parameters:
+      - name: workflowId
+        in: path
+        required: true
+        description: The workflow id.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          format: uuid
+      - name: api-version
+        description: Version of Purview APIs
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Create or update workflow payload.
+              properties:
+                triggers:
+                  type: array
+                  description: 'It describes under what condition a workflow will
+                    run.  '
+                  items:
+                    type: object
+                    description: Describes under what condition a workflow will run.
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                        - when_term_creation_is_requested
+                        - when_term_deletion_is_requested
+                        - when_term_update_is_requested
+                        - when_terms_import_is_requested
+                        - when_data_access_grant_is_requested
+                        - when_asset_update_is_requested
+                        x-ms-enum:
+                          name: TriggerType
+                          modelAsString: true
+                      underGlossaryHierarchy:
+                        type: string
+                        description: Glossary term hierarchy path.
+                      underCollection:
+                        type: string
+                        description: The collection name.
+                      underGlossary:
+                        type: string
+                        description: The glossary guid.
+                    required:
+                    - type
+                name:
+                  type: string
+                  description: The workflow name.
+                isEnabled:
+                  type: boolean
+                  description: Whether the workflow enabled or not.
+                description:
+                  type: string
+                  description: Description of a workflow.
+                actionDag:
+                  type: object
+                  description: The action DAG(Directed Acyclic Graph), it defines
+                    actual flow.
+              required:
+              - triggers
+              - name
+              - isEnabled
+              - description
+        description: Create or update workflow payload.
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    description: The id of workflow.
+                  triggers:
+                    type: array
+                    description: 'It describes under what condition a workflow will
+                      run.  '
+                    items:
+                      type: object
+                      description: Describes under what condition a workflow will
+                        run.
+                      properties:
+                        type:
+                          type: string
+                          enum:
+                          - when_term_creation_is_requested
+                          - when_term_deletion_is_requested
+                          - when_term_update_is_requested
+                          - when_terms_import_is_requested
+                          - when_data_access_grant_is_requested
+                          - when_asset_update_is_requested
+                          x-ms-enum:
+                            name: TriggerType
+                            modelAsString: true
+                        underGlossaryHierarchy:
+                          type: string
+                          description: Glossary term hierarchy path.
+                        underCollection:
+                          type: string
+                          description: The collection name.
+                        underGlossary:
+                          type: string
+                          description: The glossary guid.
+                      required:
+                      - type
+                  createdTime:
+                    type: string
+                    format: date-time
+                    description: The created time of workflow.
+                  createdBy:
+                    type: string
+                    description: The person who created the workflow.
+                  lastUpdateTime:
+                    type: string
+                    format: date-time
+                    description: The last update time.
+                  updatedBy:
+                    type: string
+                    description: The person who updated the workflow.
+                  name:
+                    type: string
+                    description: The name of a workflow.
+                  isEnabled:
+                    type: boolean
+                    description: Whether the workflow is enabled or not.
+                  description:
+                    type: string
+                    description: Description of a workflow.
+                  actionDag:
+                    type: object
+                    description: The action DAG(Directed Acyclic Graph), it defines
+                      steps to be executed in a workflow run and their order.
+                required:
+                - id
+                - triggers
+                - name
+                - isEnabled
+                - description
+                - actionDag
+                description: The workflow metadata, action DAGs are not included.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Default error response model
+                type: object
+                properties:
+                  error:
+                    description: Default error model
+                    type: object
+                    properties:
+                      code:
+                        description: Gets or sets the code.
+                        type: string
+                      details:
+                        description: Gets or sets the details.
+                        uniqueItems: false
+                        type: array
+                        items:
+                          description: Default error model
+                          type: object
+                          properties:
+                            code:
+                              description: Gets or sets the code.
+                              type: string
+                            details:
+                              description: Gets or sets the details.
+                              uniqueItems: false
+                              type: array
+                              items:
+                                description: Default error model
+                                type: object
+                                properties:
+                                  code:
+                                    description: Gets or sets the code.
+                                    type: string
+                                required:
+                                - code
+                                - message
+                              x-ms-identifiers:
+                              - code
+                            message:
+                              description: Gets or sets the messages.
+                              type: string
+                            target:
+                              description: Gets or sets the target.
+                              type: string
+                          required:
+                          - code
+                          - message
+                        x-ms-identifiers:
+                        - code
+                      message:
+                        description: Gets or sets the messages.
+                        type: string
+                      target:
+                        description: Gets or sets the target.
+                        type: string
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+    delete:
+      tags:
+      - Workflows
+      description: Delete a workflow.
+      operationId: Workflow_Delete
+      parameters:
+      - name: workflowId
+        in: path
+        required: true
+        description: The workflow id.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          format: uuid
+      - name: api-version
+        description: Version of Purview APIs
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No Content
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Default error response model
+                type: object
+                properties:
+                  error:
+                    description: Default error model
+                    type: object
+                    properties:
+                      code:
+                        description: Gets or sets the code.
+                        type: string
+                      details:
+                        description: Gets or sets the details.
+                        uniqueItems: false
+                        type: array
+                        items:
+                          description: Default error model
+                          type: object
+                          properties:
+                            code:
+                              description: Gets or sets the code.
+                              type: string
+                            details:
+                              description: Gets or sets the details.
+                              uniqueItems: false
+                              type: array
+                              items:
+                                description: Default error model
+                                type: object
+                                properties:
+                                  code:
+                                    description: Gets or sets the code.
+                                    type: string
+                                required:
+                                - code
+                                - message
+                              x-ms-identifiers:
+                              - code
+                            message:
+                              description: Gets or sets the messages.
+                              type: string
+                            target:
+                              description: Gets or sets the target.
+                              type: string
+                          required:
+                          - code
+                          - message
+                        x-ms-identifiers:
+                        - code
+                      message:
+                        description: Gets or sets the messages.
+                        type: string
+                      target:
+                        description: Gets or sets the target.
+                        type: string
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+  /workflows/{workflowId}/validate:
+    post:
+      tags:
+      - Workflows
+      description: Validate a workflow.
+      operationId: Workflow_Validate
+      parameters:
+      - name: workflowId
+        in: path
+        required: true
+        description: The workflow id.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          format: uuid
+      - name: api-version
+        description: Version of Purview APIs
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Create or update workflow payload.
+              properties:
+                triggers:
+                  type: array
+                  description: 'It describes under what condition a workflow will
+                    run.  '
+                  items:
+                    type: object
+                    description: Describes under what condition a workflow will run.
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                        - when_term_creation_is_requested
+                        - when_term_deletion_is_requested
+                        - when_term_update_is_requested
+                        - when_terms_import_is_requested
+                        - when_data_access_grant_is_requested
+                        - when_asset_update_is_requested
+                        x-ms-enum:
+                          name: TriggerType
+                          modelAsString: true
+                      underGlossaryHierarchy:
+                        type: string
+                        description: Glossary term hierarchy path.
+                      underCollection:
+                        type: string
+                        description: The collection name.
+                      underGlossary:
+                        type: string
+                        description: The glossary guid.
+                    required:
+                    - type
+                name:
+                  type: string
+                  description: The workflow name.
+                isEnabled:
+                  type: boolean
+                  description: Whether the workflow enabled or not.
+                description:
+                  type: string
+                  description: Description of a workflow.
+                actionDag:
+                  type: object
+                  description: The action DAG(Directed Acyclic Graph), it defines
+                    actual flow.
+              required:
+              - triggers
+              - name
+              - isEnabled
+              - description
+        description: Check workflow payload.
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      description: The detail of validation rule violated in a workflow.
+                      properties:
+                        severity:
+                          type: string
+                          description: The severity of the validation rule.
+                          enum:
+                          - error
+                          - warning
+                          x-ms-enum:
+                            name: ValidationRuleSeverity
+                            modelAsString: true
+                        location:
+                          type: object
+                          description: The location where the violation happens.
+                          properties:
+                            type:
+                              type: string
+                              description: The validation violation location type.
+                              enum:
+                              - workflow
+                              - action
+                              - actionParameter
+                              x-ms-enum:
+                                name: ValidationRuleViolationLocation
+                                modelAsString: true
+                            actionName:
+                              type: string
+                              description: The name of the action where the violation
+                                happens.
+                            parameterKey:
+                              type: string
+                              description: The key of the action parameter where the
+                                violation happens.
+                          required:
+                          - type
+                        message:
+                          type: string
+                          description: The detail about how the validation rule is
+                            violated.
+                      required:
+                      - severity
+                      - location
+                      - message
+                    description: The value of violated validation rule list.
+                required:
+                - value
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Default error response model
+                type: object
+                properties:
+                  error:
+                    description: Default error model
+                    type: object
+                    properties:
+                      code:
+                        description: Gets or sets the code.
+                        type: string
+                      details:
+                        description: Gets or sets the details.
+                        uniqueItems: false
+                        type: array
+                        items:
+                          description: Default error model
+                          type: object
+                          properties:
+                            code:
+                              description: Gets or sets the code.
+                              type: string
+                            details:
+                              description: Gets or sets the details.
+                              uniqueItems: false
+                              type: array
+                              items:
+                                description: Default error model
+                                type: object
+                                properties:
+                                  code:
+                                    description: Gets or sets the code.
+                                    type: string
+                                required:
+                                - code
+                                - message
+                              x-ms-identifiers:
+                              - code
+                            message:
+                              description: Gets or sets the messages.
+                              type: string
+                            target:
+                              description: Gets or sets the target.
+                              type: string
+                          required:
+                          - code
+                          - message
+                        x-ms-identifiers:
+                        - code
+                      message:
+                        description: Gets or sets the messages.
+                        type: string
+                      target:
+                        description: Gets or sets the target.
+                        type: string
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+  /userrequests:
+    post:
+      tags:
+      - UserRequests
+      description: Submit a user request for requestor, a user  request describes
+        user ask to do operation(s) on Purview. If any workflow's trigger matches
+        with an operation in request, a run of the workflow is created.
+      operationId: UserRequests_Submit
+      parameters:
+      - name: api-version
+        description: Version of Purview APIs
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                operations:
+                  type: array
+                  description: The list of operations user want to submit, each operation
+                    matches one Purview API call and will do the operation directly.
+                  items:
+                    type: object
+                    description: The operation user wants to perform.
+                    properties:
+                      type:
+                        type: string
+                        description: The operation type.
+                        enum:
+                        - CreateTerm
+                        - UpdateTerm
+                        - DeleteTerm
+                        - ImportTerms
+                        - UpdateAsset
+                        - GrantDataAccess
+                        x-ms-enum:
+                          name: OperationType
+                          modelAsString: true
+                      payload:
+                        type: object
+                        description: The payload of each operation which user want
+                          to submit.
+                    required:
+                    - type
+                    - payload
+                comment:
+                  type: string
+                  description: The comment when submit a user request.
+              required:
+              - operations
+        description: The payload of submitting a user request.
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: Describes user ask to do operation(s) on Purview.
+                type: object
+                properties:
+                  requestId:
+                    type: string
+                    format: uuid
+                    description: The user request id.
+                  requestor:
+                    type: string
+                    format: uuid
+                    description: The person who submitted the user request.
+                  operations:
+                    type: array
+                    description: The list of operations user want to submit, each
+                      operation matches one Purview API call and will do the operation
+                      directly.
+                    items:
+                      type: object
+                      description: The operation user wants to perform.
+                      properties:
+                        type:
+                          type: string
+                          description: The operation type.
+                          enum:
+                          - CreateTerm
+                          - UpdateTerm
+                          - DeleteTerm
+                          - ImportTerms
+                          - UpdateAsset
+                          - GrantDataAccess
+                          x-ms-enum:
+                            name: OperationType
+                            modelAsString: true
+                        payload:
+                          type: object
+                          description: The payload of each operation which user want
+                            to submit.
+                        workflowRunIds:
+                          type: array
+                          items:
+                            type: string
+                            format: uuid
+                            description: The workflow run id.
+                      required:
+                      - type
+                      - payload
+                  comment:
+                    type: string
+                    description: The comment when submit a user request.
+                  status:
+                    type: string
+                    description: The status.
+                    enum:
+                    - NotStarted
+                    - InProgress
+                    - Failed
+                    - Completed
+                    - Canceling
+                    - CancellationFailed
+                    - Canceled
+                    x-ms-enum:
+                      name: UserRequestStatus
+                      modelAsString: true
+                required:
+                - requestId
+                - requestor
+                - operations
+                - status
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Default error response model
+                type: object
+                properties:
+                  error:
+                    description: Default error model
+                    type: object
+                    properties:
+                      code:
+                        description: Gets or sets the code.
+                        type: string
+                      details:
+                        description: Gets or sets the details.
+                        uniqueItems: false
+                        type: array
+                        items:
+                          description: Default error model
+                          type: object
+                          properties:
+                            code:
+                              description: Gets or sets the code.
+                              type: string
+                            details:
+                              description: Gets or sets the details.
+                              uniqueItems: false
+                              type: array
+                              items:
+                                description: Default error model
+                                type: object
+                                properties:
+                                  code:
+                                    description: Gets or sets the code.
+                                    type: string
+                                required:
+                                - code
+                                - message
+                              x-ms-identifiers:
+                              - code
+                            message:
+                              description: Gets or sets the messages.
+                              type: string
+                            target:
+                              description: Gets or sets the target.
+                              type: string
+                          required:
+                          - code
+                          - message
+                        x-ms-identifiers:
+                        - code
+                      message:
+                        description: Gets or sets the messages.
+                        type: string
+                      target:
+                        description: Gets or sets the target.
+                        type: string
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+  /workflowruns:
+    get:
+      tags:
+      - WorkflowRuns
+      description: List workflow runs.
+      operationId: WorkflowRuns_List
+      x-ms-pageable:
+        nextLinkName: nextLink
+      parameters:
+      - name: api-version
+        description: Version of Purview APIs
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: viewMode
+        in: query
+        required: false
+        description: To filter user's workflow runs or view as admin.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          items:
+            type: string
+            enum:
+            - admin
+            - mine
+            x-ms-enum:
+              name: status
+              modelAsString: true
+      - name: timeWindow
+        in: query
+        required: false
+        x-ms-enum:
+          name: TimeWindow
+          modelAsString: true
+        description: Time window of filtering items.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - 1d
+          - 7d
+          - 30d
+          - 90d
+      - name: orderby
+        in: query
+        required: false
+        x-ms-enum:
+          name: orderby
+          modelAsString: true
+        description: The key word which used to sort the results.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - status desc
+          - status asc
+          - requestor desc
+          - requestor asc
+          - startTime desc
+          - startTime asc
+      - name: runStatuses
+        in: query
+        required: false
+        description: Filter workflow runs by workflow run status.
+        x-ms-parameter-location: method
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - InProgress
+            - Failed
+            - Completed
+            - NotStarted
+            - Canceling
+            - CancellationFailed
+            - Canceled
+            x-ms-enum:
+              name: status
+              modelAsString: true
+      - name: workflowIds
+        in: query
+        required: false
+        description: Filter items by workflow id list.
+        x-ms-parameter-location: method
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: requestors
+        in: query
+        required: false
+        description: Requestors' ids to filter.
+        x-ms-parameter-location: method
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: maxpagesize
+        in: query
+        required: false
+        description: The maximum page size to get the items at one time. The default
+          value is 100.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      description: 'The execution of a workflow. It includes status
+                        of the entire run and other properties of a run. '
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                          description: The workflow run id.
+                        workflowId:
+                          type: string
+                          format: uuid
+                          description: The workflow id.
+                        startTime:
+                          type: string
+                          description: Workflow run start time.
+                          format: date-time
+                        requestor:
+                          type: string
+                          format: uuid
+                          description: The person who submitted the user request.
+                        userRequestId:
+                          type: string
+                          format: uuid
+                          description: The user request id.
+                        runPayload:
+                          type: object
+                          description: 'The input of a workflow run. Align with operation
+                            in user request. '
+                          properties:
+                            type:
+                              type: string
+                              description: The workflow run payload type.
+                              enum:
+                              - CreateTerm
+                              - UpdateTerm
+                              - DeleteTerm
+                              - ImportTerms
+                              - UpdateAsset
+                              - GrantDataAccess
+                              x-ms-enum:
+                                name: WorkflowRunPayloadType
+                                modelAsString: true
+                            targetValue:
+                              type: string
+                              description: The target value which need involve workflow
+                                to update.
+                          required:
+                          - type
+                          - targetValue
+                        status:
+                          type: string
+                          description: The status.
+                          enum:
+                          - NotStarted
+                          - InProgress
+                          - Failed
+                          - Completed
+                          - Canceling
+                          - CancellationFailed
+                          - Canceled
+                          x-ms-enum:
+                            name: UserRequestStatus
+                            modelAsString: true
+                        endTime:
+                          type: string
+                          format: date-time
+                          description: The time of workflow run completed.
+                        cancelTime:
+                          type: string
+                          format: date-time
+                          description: The time of workflow run be canceled.
+                        cancelComment:
+                          type: string
+                          description: The comment when cancel a workflow run.
+                      required:
+                      - id
+                      - workflowId
+                      - startTime
+                      - requestor
+                      - runPayload
+                      - status
+                    description: The value of workflow run list.
+                  nextLink:
+                    type: string
+                    description: The URL to get the next set of results.
+                required:
+                - value
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Default error response model
+                type: object
+                properties:
+                  error:
+                    description: Default error model
+                    type: object
+                    properties:
+                      code:
+                        description: Gets or sets the code.
+                        type: string
+                      details:
+                        description: Gets or sets the details.
+                        uniqueItems: false
+                        type: array
+                        items:
+                          description: Default error model
+                          type: object
+                          properties:
+                            code:
+                              description: Gets or sets the code.
+                              type: string
+                            details:
+                              description: Gets or sets the details.
+                              uniqueItems: false
+                              type: array
+                              items:
+                                description: Default error model
+                                type: object
+                                properties:
+                                  code:
+                                    description: Gets or sets the code.
+                                    type: string
+                                required:
+                                - code
+                                - message
+                              x-ms-identifiers:
+                              - code
+                            message:
+                              description: Gets or sets the messages.
+                              type: string
+                            target:
+                              description: Gets or sets the target.
+                              type: string
+                          required:
+                          - code
+                          - message
+                        x-ms-identifiers:
+                        - code
+                      message:
+                        description: Gets or sets the messages.
+                        type: string
+                      target:
+                        description: Gets or sets the target.
+                        type: string
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+  /workflowruns/{workflowRunId}:
+    get:
+      tags:
+      - WorkflowRuns
+      description: Get a workflow run.
+      operationId: WorkflowRun_Get
+      parameters:
+      - name: api-version
+        description: Version of Purview APIs
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: workflowRunId
+        in: path
+        required: true
+        description: The workflow run id.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: 'The execution of a workflow. It includes workflow action
+                  DAG at run time (action DAG snapshot), run payload, status of the
+                  entire run and other properties of a run. '
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    description: The workflow run id.
+                  workflowId:
+                    type: string
+                    format: uuid
+                    description: The workflow id.
+                  startTime:
+                    type: string
+                    description: Workflow run start time.
+                    format: date-time
+                  requestor:
+                    type: string
+                    format: uuid
+                    description: The person who submitted the user request.
+                  userRequestId:
+                    type: string
+                    format: uuid
+                    description: The user request id.
+                  runPayload:
+                    type: object
+                    description: 'The input of a workflow run. Align with operation
+                      in user request. '
+                    properties:
+                      type:
+                        type: string
+                        description: The workflow run payload type.
+                        enum:
+                        - CreateTerm
+                        - UpdateTerm
+                        - DeleteTerm
+                        - ImportTerms
+                        - UpdateAsset
+                        - GrantDataAccess
+                        x-ms-enum:
+                          name: WorkflowRunPayloadType
+                          modelAsString: true
+                      targetValue:
+                        type: string
+                        description: The target value which need involve workflow
+                          to update.
+                      payload:
+                        type: object
+                        description: The payload of each operation which user want
+                          to submit.
+                    required:
+                    - type
+                    - targetValue
+                    - payload
+                  status:
+                    type: string
+                    description: The status.
+                    enum:
+                    - NotStarted
+                    - InProgress
+                    - Failed
+                    - Completed
+                    - Canceling
+                    - CancellationFailed
+                    - Canceled
+                    x-ms-enum:
+                      name: UserRequestStatus
+                      modelAsString: true
+                  endTime:
+                    type: string
+                    format: date-time
+                    description: The time of workflow run completed.
+                  cancelTime:
+                    type: string
+                    format: date-time
+                    description: The time of workflow run be canceled.
+                  cancelComment:
+                    type: string
+                    description: The comment when cancel a workflow run.
+                  actionDag:
+                    type: object
+                    description: The action DAG(Directed Acyclic Graph), it defines
+                      actual flow.
+                  detail:
+                    type: object
+                    description: It refers to the "detail" property of a workflow
+                      run object, which contains run context and runtime information
+                      of actions.
+                    properties:
+                      runInput:
+                        description: 'Built-in variables starts with @runInput. Its
+                          properties are determined by trigger type at workflow run
+                          time. '
+                        type: object
+                      actions:
+                        type: object
+                    required:
+                    - runInput
+                    - actions
+                required:
+                - actionDag
+                - detail
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Default error response model
+                type: object
+                properties:
+                  error:
+                    description: Default error model
+                    type: object
+                    properties:
+                      code:
+                        description: Gets or sets the code.
+                        type: string
+                      details:
+                        description: Gets or sets the details.
+                        uniqueItems: false
+                        type: array
+                        items:
+                          description: Default error model
+                          type: object
+                          properties:
+                            code:
+                              description: Gets or sets the code.
+                              type: string
+                            details:
+                              description: Gets or sets the details.
+                              uniqueItems: false
+                              type: array
+                              items:
+                                description: Default error model
+                                type: object
+                                properties:
+                                  code:
+                                    description: Gets or sets the code.
+                                    type: string
+                                required:
+                                - code
+                                - message
+                              x-ms-identifiers:
+                              - code
+                            message:
+                              description: Gets or sets the messages.
+                              type: string
+                            target:
+                              description: Gets or sets the target.
+                              type: string
+                          required:
+                          - code
+                          - message
+                        x-ms-identifiers:
+                        - code
+                      message:
+                        description: Gets or sets the messages.
+                        type: string
+                      target:
+                        description: Gets or sets the target.
+                        type: string
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+  /workflowruns/{workflowRunId}/cancel:
+    post:
+      tags:
+      - WorkflowRuns
+      description: Cancel a workflow run.
+      operationId: WorkflowRun_Cancel
+      parameters:
+      - name: api-version
+        description: Version of Purview APIs
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: workflowRunId
+        in: path
+        required: true
+        description: The workflow run id.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+                  description: The comment of canceling a workflow run.
+        description: Reply of canceling a workflow run.
+        required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Default error response model
+                type: object
+                properties:
+                  error:
+                    description: Default error model
+                    type: object
+                    properties:
+                      code:
+                        description: Gets or sets the code.
+                        type: string
+                      details:
+                        description: Gets or sets the details.
+                        uniqueItems: false
+                        type: array
+                        items:
+                          description: Default error model
+                          type: object
+                          properties:
+                            code:
+                              description: Gets or sets the code.
+                              type: string
+                            details:
+                              description: Gets or sets the details.
+                              uniqueItems: false
+                              type: array
+                              items:
+                                description: Default error model
+                                type: object
+                                properties:
+                                  code:
+                                    description: Gets or sets the code.
+                                    type: string
+                                required:
+                                - code
+                                - message
+                              x-ms-identifiers:
+                              - code
+                            message:
+                              description: Gets or sets the messages.
+                              type: string
+                            target:
+                              description: Gets or sets the target.
+                              type: string
+                          required:
+                          - code
+                          - message
+                        x-ms-identifiers:
+                        - code
+                      message:
+                        description: Gets or sets the messages.
+                        type: string
+                      target:
+                        description: Gets or sets the target.
+                        type: string
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+  /workflowtasks:
+    get:
+      tags:
+      - WorkflowTasks
+      description: Get all workflow tasks.
+      operationId: WorkflowTasks_List
+      x-ms-pageable:
+        nextLinkName: nextLink
+      parameters:
+      - name: api-version
+        description: Version of Purview APIs
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: viewMode
+        in: query
+        required: false
+        description: To filter user's sent, received or history workflow tasks.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          items:
+            type: string
+            enum:
+            - sent
+            - received
+            - history
+            - mine
+            x-ms-enum:
+              name: status
+              modelAsString: true
+      - name: workflowIds
+        in: query
+        required: false
+        description: Filter items by workflow id list.
+        x-ms-parameter-location: method
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: timeWindow
+        in: query
+        required: false
+        x-ms-enum:
+          name: TimeWindow
+          modelAsString: true
+        description: Time window of filtering items.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - 1d
+          - 7d
+          - 30d
+          - 90d
+      - name: maxpagesize
+        in: query
+        required: false
+        description: The maximum page size to get the items at one time. The default
+          value is 100.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+      - name: orderby
+        in: query
+        required: false
+        x-ms-enum:
+          name: orderby
+          modelAsString: true
+        description: The key word which used to sort the results.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - createdTime desc
+          - createdTime asc
+          - requestor desc
+          - requestor asc
+      - name: taskTypes
+        in: query
+        required: false
+        description: Filter items by workflow task type.
+        x-ms-parameter-location: method
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - approval
+            - simpleTask
+            x-ms-enum:
+              name: TaskType
+              modelAsString: true
+      - name: taskStatuses
+        in: query
+        required: false
+        description: Filter workflow tasks by status.
+        x-ms-parameter-location: method
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - Pending
+            - Approved
+            - Rejected
+            - Canceled
+            - NotStarted
+            - InProgress
+            - Completed
+            x-ms-enum:
+              name: status
+              modelAsString: true
+      - name: requestors
+        in: query
+        required: false
+        description: Requestors' ids to filter.
+        x-ms-parameter-location: method
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: assignees
+        in: query
+        required: false
+        description: Assignees' ids to filter.
+        x-ms-parameter-location: method
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+      - name: workflowNameKeyword
+        in: query
+        required: false
+        description: The key word which could used to filter workflow item with related
+          workflow.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      discriminator:
+                        propertyName: type
+                      type: object
+                      description: An actionable item assigned to assignees. It is
+                        created when approval or task action starts to execute. Approval
+                        is one kind of task.
+                      properties:
+                        type:
+                          type: string
+                          description: The workflow task type.
+                          enum:
+                          - Approval
+                          - SimpleTask
+                          x-ms-enum:
+                            name: TaskType
+                            modelAsString: true
+                        id:
+                          type: string
+                          format: uuid
+                          description: The workflow task id.
+                        title:
+                          type: string
+                          description: The workflow task title.
+                        workflowRunId:
+                          type: string
+                          format: uuid
+                          description: The workflow run id.
+                        workflowId:
+                          type: string
+                          format: uuid
+                          description: The workflow id.
+                        requestor:
+                          type: string
+                          format: uuid
+                          description: The person who submitted the user request.
+                        createdTime:
+                          type: string
+                          format: date-time
+                          description: The created time.
+                        lastUpdateTime:
+                          type: string
+                          format: date-time
+                          description: The last update time.
+                        payload:
+                          type: object
+                          description: Info and material that helps assignees to take
+                            action.
+                          properties:
+                            type:
+                              type: string
+                              description: The task payload type.
+                              enum:
+                              - CreateTerm
+                              - UpdateTerm
+                              - DeleteTerm
+                              - ImportTerms
+                              - UpdateAsset
+                              - GrantDataAccess
+                              x-ms-enum:
+                                name: TaskPayloadType
+                                modelAsString: true
+                            targetValue:
+                              type: string
+                              description: The target value of entity which user want
+                                to involve workflow to update.
+                            payload:
+                              type: object
+                              description: The payload of the task.
+                          required:
+                          - type
+                          - targetValue
+                        reminderInfo:
+                          type: object
+                          description: Info of task reminder.
+                          properties:
+                            lastRemindTime:
+                              type: string
+                              format: date-time
+                              description: The last update time.
+                            nextRemindTime:
+                              type: string
+                              format: date-time
+                              description: The next remind time.
+                            reminderSettings:
+                              type: object
+                              description: The reminder settings.
+                          required:
+                          - nextRemindTime
+                          - reminderSettings
+                        expiryInfo:
+                          type: object
+                          description: Info of task expiry.
+                          properties:
+                            lastExpiryNotificationTime:
+                              type: string
+                              format: date-time
+                              description: The last expiry notification time.
+                            nextExpiryNotificationTime:
+                              type: string
+                              format: date-time
+                              description: The next expiry notification time.
+                            expiryTime:
+                              type: string
+                              format: date-time
+                              description: The expiry time.
+                            expirySettings:
+                              type: object
+                              properties:
+                                expireAfter:
+                                  type: object
+                                  description: The time of expiry.
+                                notifyOnExpiration:
+                                  type: array
+                                  items:
+                                    type: string
+                                    format: uuid
+                                    description: Notify user on expiration.
+                              required:
+                              - expireAfter
+                          required:
+                          - nextExpiryNotificationTime
+                          - expiryTime
+                          - expirySettings
+                      required:
+                      - type
+                      - id
+                      - workflowRunId
+                      - workflowId
+                      - requestor
+                      - createdTime
+                      - lastUpdateTime
+                      - payload
+                    description: The value of workflow tasks list.
+                  nextLink:
+                    type: string
+                    description: The URL to get the next set of results.
+                required:
+                - value
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Default error response model
+                type: object
+                properties:
+                  error:
+                    description: Default error model
+                    type: object
+                    properties:
+                      code:
+                        description: Gets or sets the code.
+                        type: string
+                      details:
+                        description: Gets or sets the details.
+                        uniqueItems: false
+                        type: array
+                        items:
+                          description: Default error model
+                          type: object
+                          properties:
+                            code:
+                              description: Gets or sets the code.
+                              type: string
+                            details:
+                              description: Gets or sets the details.
+                              uniqueItems: false
+                              type: array
+                              items:
+                                description: Default error model
+                                type: object
+                                properties:
+                                  code:
+                                    description: Gets or sets the code.
+                                    type: string
+                                required:
+                                - code
+                                - message
+                              x-ms-identifiers:
+                              - code
+                            message:
+                              description: Gets or sets the messages.
+                              type: string
+                            target:
+                              description: Gets or sets the target.
+                              type: string
+                          required:
+                          - code
+                          - message
+                        x-ms-identifiers:
+                        - code
+                      message:
+                        description: Gets or sets the messages.
+                        type: string
+                      target:
+                        description: Gets or sets the target.
+                        type: string
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+  /workflowtasks/{taskId}:
+    get:
+      tags:
+      - WorkflowTasks
+      description: Get a workflow task.
+      operationId: WorkflowTask_Get
+      parameters:
+      - name: taskId
+        in: path
+        required: true
+        description: The task id.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                discriminator:
+                  propertyName: type
+                type: object
+                description: An actionable item assigned to assignees. It is created
+                  when approval or task action starts to execute. Approval is one
+                  kind of task.
+                properties:
+                  type:
+                    type: string
+                    description: The workflow task type.
+                    enum:
+                    - Approval
+                    - SimpleTask
+                    x-ms-enum:
+                      name: TaskType
+                      modelAsString: true
+                  id:
+                    type: string
+                    format: uuid
+                    description: The workflow task id.
+                  title:
+                    type: string
+                    description: The workflow task title.
+                  workflowRunId:
+                    type: string
+                    format: uuid
+                    description: The workflow run id.
+                  workflowId:
+                    type: string
+                    format: uuid
+                    description: The workflow id.
+                  requestor:
+                    type: string
+                    format: uuid
+                    description: The person who submitted the user request.
+                  createdTime:
+                    type: string
+                    format: date-time
+                    description: The created time.
+                  lastUpdateTime:
+                    type: string
+                    format: date-time
+                    description: The last update time.
+                  payload:
+                    type: object
+                    description: Info and material that helps assignees to take action.
+                    properties:
+                      type:
+                        type: string
+                        description: The task payload type.
+                        enum:
+                        - CreateTerm
+                        - UpdateTerm
+                        - DeleteTerm
+                        - ImportTerms
+                        - UpdateAsset
+                        - GrantDataAccess
+                        x-ms-enum:
+                          name: TaskPayloadType
+                          modelAsString: true
+                      targetValue:
+                        type: string
+                        description: The target value of entity which user want to
+                          involve workflow to update.
+                      payload:
+                        type: object
+                        description: The payload of the task.
+                    required:
+                    - type
+                    - targetValue
+                  reminderInfo:
+                    type: object
+                    description: Info of task reminder.
+                    properties:
+                      lastRemindTime:
+                        type: string
+                        format: date-time
+                        description: The last update time.
+                      nextRemindTime:
+                        type: string
+                        format: date-time
+                        description: The next remind time.
+                      reminderSettings:
+                        type: object
+                        description: The reminder settings.
+                    required:
+                    - nextRemindTime
+                    - reminderSettings
+                  expiryInfo:
+                    type: object
+                    description: Info of task expiry.
+                    properties:
+                      lastExpiryNotificationTime:
+                        type: string
+                        format: date-time
+                        description: The last expiry notification time.
+                      nextExpiryNotificationTime:
+                        type: string
+                        format: date-time
+                        description: The next expiry notification time.
+                      expiryTime:
+                        type: string
+                        format: date-time
+                        description: The expiry time.
+                      expirySettings:
+                        type: object
+                        properties:
+                          expireAfter:
+                            type: object
+                            description: The time of expiry.
+                          notifyOnExpiration:
+                            type: array
+                            items:
+                              type: string
+                              format: uuid
+                              description: Notify user on expiration.
+                        required:
+                        - expireAfter
+                    required:
+                    - nextExpiryNotificationTime
+                    - expiryTime
+                    - expirySettings
+                required:
+                - type
+                - id
+                - workflowRunId
+                - workflowId
+                - requestor
+                - createdTime
+                - lastUpdateTime
+                - payload
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Default error response model
+                type: object
+                properties:
+                  error:
+                    description: Default error model
+                    type: object
+                    properties:
+                      code:
+                        description: Gets or sets the code.
+                        type: string
+                      details:
+                        description: Gets or sets the details.
+                        uniqueItems: false
+                        type: array
+                        items:
+                          description: Default error model
+                          type: object
+                          properties:
+                            code:
+                              description: Gets or sets the code.
+                              type: string
+                            details:
+                              description: Gets or sets the details.
+                              uniqueItems: false
+                              type: array
+                              items:
+                                description: Default error model
+                                type: object
+                                properties:
+                                  code:
+                                    description: Gets or sets the code.
+                                    type: string
+                                required:
+                                - code
+                                - message
+                              x-ms-identifiers:
+                              - code
+                            message:
+                              description: Gets or sets the messages.
+                              type: string
+                            target:
+                              description: Gets or sets the target.
+                              type: string
+                          required:
+                          - code
+                          - message
+                        x-ms-identifiers:
+                        - code
+                      message:
+                        description: Gets or sets the messages.
+                        type: string
+                      target:
+                        description: Gets or sets the target.
+                        type: string
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+  /workflowtasks/{taskId}/approve-approval:
+    post:
+      tags:
+      - WorkflowTasks
+      description: Approve an approval.
+      operationId: Approval_Approve
+      parameters:
+      - name: taskId
+        in: path
+        required: true
+        description: The task id.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          format: uuid
+      - name: api-version
+        description: Version of Purview APIs
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+                  description: The comment of approving or rejecting an approval type
+                    of workflow task.
+        description: The request body of approving an approval type of workflow task.
+        required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Default error response model
+                type: object
+                properties:
+                  error:
+                    description: Default error model
+                    type: object
+                    properties:
+                      code:
+                        description: Gets or sets the code.
+                        type: string
+                      details:
+                        description: Gets or sets the details.
+                        uniqueItems: false
+                        type: array
+                        items:
+                          description: Default error model
+                          type: object
+                          properties:
+                            code:
+                              description: Gets or sets the code.
+                              type: string
+                            details:
+                              description: Gets or sets the details.
+                              uniqueItems: false
+                              type: array
+                              items:
+                                description: Default error model
+                                type: object
+                                properties:
+                                  code:
+                                    description: Gets or sets the code.
+                                    type: string
+                                required:
+                                - code
+                                - message
+                              x-ms-identifiers:
+                              - code
+                            message:
+                              description: Gets or sets the messages.
+                              type: string
+                            target:
+                              description: Gets or sets the target.
+                              type: string
+                          required:
+                          - code
+                          - message
+                        x-ms-identifiers:
+                        - code
+                      message:
+                        description: Gets or sets the messages.
+                        type: string
+                      target:
+                        description: Gets or sets the target.
+                        type: string
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+  /workflowtasks/{taskId}/reject-approval:
+    post:
+      tags:
+      - WorkflowTasks
+      description: Reject an approval.
+      operationId: Approval_Reject
+      parameters:
+      - name: taskId
+        in: path
+        required: true
+        description: The task id.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          format: uuid
+      - name: api-version
+        description: Version of Purview APIs
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+                  description: The comment of approving or rejecting an approval type
+                    of workflow task.
+        description: The request body of rejecting an approval type of workflow task.
+        required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Default error response model
+                type: object
+                properties:
+                  error:
+                    description: Default error model
+                    type: object
+                    properties:
+                      code:
+                        description: Gets or sets the code.
+                        type: string
+                      details:
+                        description: Gets or sets the details.
+                        uniqueItems: false
+                        type: array
+                        items:
+                          description: Default error model
+                          type: object
+                          properties:
+                            code:
+                              description: Gets or sets the code.
+                              type: string
+                            details:
+                              description: Gets or sets the details.
+                              uniqueItems: false
+                              type: array
+                              items:
+                                description: Default error model
+                                type: object
+                                properties:
+                                  code:
+                                    description: Gets or sets the code.
+                                    type: string
+                                required:
+                                - code
+                                - message
+                              x-ms-identifiers:
+                              - code
+                            message:
+                              description: Gets or sets the messages.
+                              type: string
+                            target:
+                              description: Gets or sets the target.
+                              type: string
+                          required:
+                          - code
+                          - message
+                        x-ms-identifiers:
+                        - code
+                      message:
+                        description: Gets or sets the messages.
+                        type: string
+                      target:
+                        description: Gets or sets the target.
+                        type: string
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+  /workflowtasks/{taskId}/reassign:
+    post:
+      tags:
+      - WorkflowTasks
+      description: Reassign a workflow task.
+      operationId: WorkflowTask_Reassign
+      parameters:
+      - name: taskId
+        in: path
+        required: true
+        description: The task id.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          format: uuid
+      - name: api-version
+        description: Version of Purview APIs
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: The request payload of reassigning a workflow task.
+              properties:
+                reassignments:
+                  type: array
+                  description: The request body of reassigning a workflow task.
+                  items:
+                    type: object
+                    properties:
+                      reassignFrom:
+                        type: string
+                        format: uuid
+                        description: Reassign a workflow task from a user or a group.
+                      reassignTo:
+                        type: string
+                        format: uuid
+                        description: Reassign a workflow task to a user or a group.
+                    required:
+                    - reassignFrom
+                    - reassignTo
+        description: The request body of reassigning a workflow task.
+        required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Default error response model
+                type: object
+                properties:
+                  error:
+                    description: Default error model
+                    type: object
+                    properties:
+                      code:
+                        description: Gets or sets the code.
+                        type: string
+                      details:
+                        description: Gets or sets the details.
+                        uniqueItems: false
+                        type: array
+                        items:
+                          description: Default error model
+                          type: object
+                          properties:
+                            code:
+                              description: Gets or sets the code.
+                              type: string
+                            details:
+                              description: Gets or sets the details.
+                              uniqueItems: false
+                              type: array
+                              items:
+                                description: Default error model
+                                type: object
+                                properties:
+                                  code:
+                                    description: Gets or sets the code.
+                                    type: string
+                                required:
+                                - code
+                                - message
+                              x-ms-identifiers:
+                              - code
+                            message:
+                              description: Gets or sets the messages.
+                              type: string
+                            target:
+                              description: Gets or sets the target.
+                              type: string
+                          required:
+                          - code
+                          - message
+                        x-ms-identifiers:
+                        - code
+                      message:
+                        description: Gets or sets the messages.
+                        type: string
+                      target:
+                        description: Gets or sets the target.
+                        type: string
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+  /workflowtasks/{taskId}/change-task-status:
+    post:
+      tags:
+      - WorkflowTasks
+      description: Update the status of a workflow task request.
+      operationId: TaskStatus_Update
+      parameters:
+      - name: taskId
+        in: path
+        required: true
+        description: The task id.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          format: uuid
+      - name: api-version
+        description: Version of Purview APIs
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newStatus:
+                  type: string
+                  description: The new status will be used to update the task.
+                  enum:
+                  - NotStarted
+                  - InProgress
+                  - Completed
+                  - Canceled
+                  x-ms-enum:
+                    name: TaskStatus
+                    modelAsString: true
+                comment:
+                  type: string
+                  description: The comment when update a task.
+              required:
+              - newStatus
+        description: Request body of updating workflow task request.
+        required: true
+      responses:
+        '200':
+          description: OK
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Default error response model
+                type: object
+                properties:
+                  error:
+                    description: Default error model
+                    type: object
+                    properties:
+                      code:
+                        description: Gets or sets the code.
+                        type: string
+                      details:
+                        description: Gets or sets the details.
+                        uniqueItems: false
+                        type: array
+                        items:
+                          description: Default error model
+                          type: object
+                          properties:
+                            code:
+                              description: Gets or sets the code.
+                              type: string
+                            details:
+                              description: Gets or sets the details.
+                              uniqueItems: false
+                              type: array
+                              items:
+                                description: Default error model
+                                type: object
+                                properties:
+                                  code:
+                                    description: Gets or sets the code.
+                                    type: string
+                                required:
+                                - code
+                                - message
+                              x-ms-identifiers:
+                              - code
+                            message:
+                              description: Gets or sets the messages.
+                              type: string
+                            target:
+                              description: Gets or sets the target.
+                              type: string
+                          required:
+                          - code
+                          - message
+                        x-ms-identifiers:
+                        - code
+                      message:
+                        description: Gets or sets the messages.
+                        type: string
+                      target:
+                        description: Gets or sets the target.
+                        type: string
+                    required:
+                    - code
+                    - message
+                required:
+                - error
+components:
+  parameters:
+    api-version:
+      name: api-version
+      description: Version of Purview APIs
+      in: query
+      required: true
+      x-ms-parameter-location: client
+      schema:
+        type: string
+    endpoint:
+      name: endpoint
+      description: 'The account endpoint of your Purview account. Example: https://{accountName}.purview.azure.com/'
+      x-ms-parameter-location: client
+      required: true
+      in: path
+      x-ms-skip-url-encoding: true
+      schema:
+        type: string
+        format: url
+    workflowId:
+      name: workflowId
+      in: path
+      required: true
+      description: The workflow id.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        format: uuid
+    requestId:
+      name: requestId
+      in: path
+      required: true
+      description: The request id.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        format: uuid
+    workflowRunId:
+      name: workflowRunId
+      in: path
+      required: true
+      description: The workflow run id.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        format: uuid
+    taskId:
+      name: taskId
+      in: path
+      required: true
+      description: The task id.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        format: uuid
+    timeWindow:
+      name: timeWindow
+      in: query
+      required: false
+      x-ms-enum:
+        name: TimeWindow
+        modelAsString: true
+      description: Time window of filtering items.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        enum:
+        - 1d
+        - 7d
+        - 30d
+        - 90d
+    maxpagesize:
+      name: maxpagesize
+      in: query
+      required: false
+      description: The maximum page size to get the items at one time. The default
+        value is 100.
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+    taskTypes:
+      name: taskTypes
+      in: query
+      required: false
+      description: Filter items by workflow task type.
+      x-ms-parameter-location: method
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - approval
+          - simpleTask
+          x-ms-enum:
+            name: TaskType
+            modelAsString: true
+    workflowIds:
+      name: workflowIds
+      in: query
+      required: false
+      description: Filter items by workflow id list.
+      x-ms-parameter-location: method
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+    runStatuses:
+      name: runStatuses
+      in: query
+      required: false
+      description: Filter workflow runs by workflow run status.
+      x-ms-parameter-location: method
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - InProgress
+          - Failed
+          - Completed
+          - NotStarted
+          - Canceling
+          - CancellationFailed
+          - Canceled
+          x-ms-enum:
+            name: status
+            modelAsString: true
+    taskStatuses:
+      name: taskStatuses
+      in: query
+      required: false
+      description: Filter workflow tasks by status.
+      x-ms-parameter-location: method
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - Pending
+          - Approved
+          - Rejected
+          - Canceled
+          - NotStarted
+          - InProgress
+          - Completed
+          x-ms-enum:
+            name: status
+            modelAsString: true
+    requestors:
+      name: requestors
+      in: query
+      required: false
+      description: Requestors' ids to filter.
+      x-ms-parameter-location: method
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+    assignees:
+      name: assignees
+      in: query
+      required: false
+      description: Assignees' ids to filter.
+      x-ms-parameter-location: method
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+    workflowNameKeyword:
+      name: workflowNameKeyword
+      in: query
+      required: false
+      description: The key word which could used to filter workflow item with related
+        workflow.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    viewMode:
+      name: viewMode
+      in: query
+      required: false
+      description: To filter user's sent, received or history workflow tasks.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        items:
+          type: string
+          enum:
+          - sent
+          - received
+          - history
+          - mine
+          x-ms-enum:
+            name: status
+            modelAsString: true
+    workflowRunViewMode:
+      name: viewMode
+      in: query
+      required: false
+      description: To filter user's workflow runs or view as admin.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        items:
+          type: string
+          enum:
+          - admin
+          - mine
+          x-ms-enum:
+            name: status
+            modelAsString: true
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            https://purview.azure.net/.default: Default authorization scope.
+  schemas:
+    WorkflowMetadataList:
+      type: object
+      description: The workflow list.
+      properties:
+        value:
+          type: array
+          items:
+            description: The workflow metadata, action DAGs are not included.
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: The id of workflow.
+              triggers:
+                type: array
+                description: 'It describes under what condition a workflow will run.  '
+                items:
+                  type: object
+                  description: Describes under what condition a workflow will run.
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                      - when_term_creation_is_requested
+                      - when_term_deletion_is_requested
+                      - when_term_update_is_requested
+                      - when_terms_import_is_requested
+                      - when_data_access_grant_is_requested
+                      - when_asset_update_is_requested
+                      x-ms-enum:
+                        name: TriggerType
+                        modelAsString: true
+                    underGlossaryHierarchy:
+                      type: string
+                      description: Glossary term hierarchy path.
+                    underCollection:
+                      type: string
+                      description: The collection name.
+                    underGlossary:
+                      type: string
+                      description: The glossary guid.
+                  required:
+                  - type
+              createdTime:
+                type: string
+                format: date-time
+                description: The created time of workflow.
+              createdBy:
+                type: string
+                description: The person who created the workflow.
+              lastUpdateTime:
+                type: string
+                format: date-time
+                description: The last update time.
+              updatedBy:
+                type: string
+                description: The person who updated the workflow.
+              name:
+                type: string
+                description: The name of a workflow.
+              isEnabled:
+                type: boolean
+                description: Whether the workflow is enabled or not.
+              description:
+                type: string
+                description: Description of a workflow.
+            required:
+            - id
+            - triggers
+            - name
+            - isEnabled
+            - description
+          description: The value of workflow list.
+        nextLink:
+          type: string
+          description: The URL to get the next set of results.
+      required:
+      - value
+    WorkflowMetadata:
+      description: The workflow metadata, action DAGs are not included.
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The id of workflow.
+        triggers:
+          type: array
+          description: 'It describes under what condition a workflow will run.  '
+          items:
+            type: object
+            description: Describes under what condition a workflow will run.
+            properties:
+              type:
+                type: string
+                enum:
+                - when_term_creation_is_requested
+                - when_term_deletion_is_requested
+                - when_term_update_is_requested
+                - when_terms_import_is_requested
+                - when_data_access_grant_is_requested
+                - when_asset_update_is_requested
+                x-ms-enum:
+                  name: TriggerType
+                  modelAsString: true
+              underGlossaryHierarchy:
+                type: string
+                description: Glossary term hierarchy path.
+              underCollection:
+                type: string
+                description: The collection name.
+              underGlossary:
+                type: string
+                description: The glossary guid.
+            required:
+            - type
+        createdTime:
+          type: string
+          format: date-time
+          description: The created time of workflow.
+        createdBy:
+          type: string
+          description: The person who created the workflow.
+        lastUpdateTime:
+          type: string
+          format: date-time
+          description: The last update time.
+        updatedBy:
+          type: string
+          description: The person who updated the workflow.
+        name:
+          type: string
+          description: The name of a workflow.
+        isEnabled:
+          type: boolean
+          description: Whether the workflow is enabled or not.
+        description:
+          type: string
+          description: Description of a workflow.
+      required:
+      - id
+      - triggers
+      - name
+      - isEnabled
+      - description
+    Triggers:
+      type: array
+      description: 'It describes under what condition a workflow will run.  '
+      items:
+        type: object
+        description: Describes under what condition a workflow will run.
+        properties:
+          type:
+            type: string
+            enum:
+            - when_term_creation_is_requested
+            - when_term_deletion_is_requested
+            - when_term_update_is_requested
+            - when_terms_import_is_requested
+            - when_data_access_grant_is_requested
+            - when_asset_update_is_requested
+            x-ms-enum:
+              name: TriggerType
+              modelAsString: true
+          underGlossaryHierarchy:
+            type: string
+            description: Glossary term hierarchy path.
+          underCollection:
+            type: string
+            description: The collection name.
+          underGlossary:
+            type: string
+            description: The glossary guid.
+        required:
+        - type
+    Trigger:
+      type: object
+      description: Describes under what condition a workflow will run.
+      properties:
+        type:
+          type: string
+          enum:
+          - when_term_creation_is_requested
+          - when_term_deletion_is_requested
+          - when_term_update_is_requested
+          - when_terms_import_is_requested
+          - when_data_access_grant_is_requested
+          - when_asset_update_is_requested
+          x-ms-enum:
+            name: TriggerType
+            modelAsString: true
+        underGlossaryHierarchy:
+          type: string
+          description: Glossary term hierarchy path.
+        underCollection:
+          type: string
+          description: The collection name.
+        underGlossary:
+          type: string
+          description: The glossary guid.
+      required:
+      - type
+    WorkflowCreateOrUpdateCommand:
+      type: object
+      description: Create or update workflow payload.
+      properties:
+        triggers:
+          type: array
+          description: 'It describes under what condition a workflow will run.  '
+          items:
+            type: object
+            description: Describes under what condition a workflow will run.
+            properties:
+              type:
+                type: string
+                enum:
+                - when_term_creation_is_requested
+                - when_term_deletion_is_requested
+                - when_term_update_is_requested
+                - when_terms_import_is_requested
+                - when_data_access_grant_is_requested
+                - when_asset_update_is_requested
+                x-ms-enum:
+                  name: TriggerType
+                  modelAsString: true
+              underGlossaryHierarchy:
+                type: string
+                description: Glossary term hierarchy path.
+              underCollection:
+                type: string
+                description: The collection name.
+              underGlossary:
+                type: string
+                description: The glossary guid.
+            required:
+            - type
+        name:
+          type: string
+          description: The workflow name.
+        isEnabled:
+          type: boolean
+          description: Whether the workflow enabled or not.
+        description:
+          type: string
+          description: Description of a workflow.
+        actionDag:
+          type: object
+          description: The action DAG(Directed Acyclic Graph), it defines actual flow.
+      required:
+      - triggers
+      - name
+      - isEnabled
+      - description
+    Workflow:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The id of workflow.
+        triggers:
+          type: array
+          description: 'It describes under what condition a workflow will run.  '
+          items:
+            type: object
+            description: Describes under what condition a workflow will run.
+            properties:
+              type:
+                type: string
+                enum:
+                - when_term_creation_is_requested
+                - when_term_deletion_is_requested
+                - when_term_update_is_requested
+                - when_terms_import_is_requested
+                - when_data_access_grant_is_requested
+                - when_asset_update_is_requested
+                x-ms-enum:
+                  name: TriggerType
+                  modelAsString: true
+              underGlossaryHierarchy:
+                type: string
+                description: Glossary term hierarchy path.
+              underCollection:
+                type: string
+                description: The collection name.
+              underGlossary:
+                type: string
+                description: The glossary guid.
+            required:
+            - type
+        createdTime:
+          type: string
+          format: date-time
+          description: The created time of workflow.
+        createdBy:
+          type: string
+          description: The person who created the workflow.
+        lastUpdateTime:
+          type: string
+          format: date-time
+          description: The last update time.
+        updatedBy:
+          type: string
+          description: The person who updated the workflow.
+        name:
+          type: string
+          description: The name of a workflow.
+        isEnabled:
+          type: boolean
+          description: Whether the workflow is enabled or not.
+        description:
+          type: string
+          description: Description of a workflow.
+        actionDag:
+          type: object
+          description: The action DAG(Directed Acyclic Graph), it defines steps to
+            be executed in a workflow run and their order.
+      required:
+      - id
+      - triggers
+      - name
+      - isEnabled
+      - description
+      - actionDag
+      description: The workflow metadata, action DAGs are not included.
+    UserRequestPayload:
+      type: object
+      properties:
+        operations:
+          type: array
+          description: The list of operations user want to submit, each operation
+            matches one Purview API call and will do the operation directly.
+          items:
+            type: object
+            description: The operation user wants to perform.
+            properties:
+              type:
+                type: string
+                description: The operation type.
+                enum:
+                - CreateTerm
+                - UpdateTerm
+                - DeleteTerm
+                - ImportTerms
+                - UpdateAsset
+                - GrantDataAccess
+                x-ms-enum:
+                  name: OperationType
+                  modelAsString: true
+              payload:
+                type: object
+                description: The payload of each operation which user want to submit.
+            required:
+            - type
+            - payload
+        comment:
+          type: string
+          description: The comment when submit a user request.
+      required:
+      - operations
+    Operation:
+      type: object
+      description: The operation user wants to perform.
+      properties:
+        type:
+          type: string
+          description: The operation type.
+          enum:
+          - CreateTerm
+          - UpdateTerm
+          - DeleteTerm
+          - ImportTerms
+          - UpdateAsset
+          - GrantDataAccess
+          x-ms-enum:
+            name: OperationType
+            modelAsString: true
+        payload:
+          type: object
+          description: The payload of each operation which user want to submit.
+      required:
+      - type
+      - payload
+    UserRequestResponse:
+      description: Describes user ask to do operation(s) on Purview.
+      type: object
+      properties:
+        requestId:
+          type: string
+          format: uuid
+          description: The user request id.
+        requestor:
+          type: string
+          format: uuid
+          description: The person who submitted the user request.
+        operations:
+          type: array
+          description: The list of operations user want to submit, each operation
+            matches one Purview API call and will do the operation directly.
+          items:
+            type: object
+            description: The operation user wants to perform.
+            properties:
+              type:
+                type: string
+                description: The operation type.
+                enum:
+                - CreateTerm
+                - UpdateTerm
+                - DeleteTerm
+                - ImportTerms
+                - UpdateAsset
+                - GrantDataAccess
+                x-ms-enum:
+                  name: OperationType
+                  modelAsString: true
+              payload:
+                type: object
+                description: The payload of each operation which user want to submit.
+              workflowRunIds:
+                type: array
+                items:
+                  type: string
+                  format: uuid
+                  description: The workflow run id.
+            required:
+            - type
+            - payload
+        comment:
+          type: string
+          description: The comment when submit a user request.
+        status:
+          type: string
+          description: The status.
+          enum:
+          - NotStarted
+          - InProgress
+          - Failed
+          - Completed
+          - Canceling
+          - CancellationFailed
+          - Canceled
+          x-ms-enum:
+            name: UserRequestStatus
+            modelAsString: true
+      required:
+      - requestId
+      - requestor
+      - operations
+      - status
+    Status:
+      type: string
+      description: The status.
+      enum:
+      - NotStarted
+      - InProgress
+      - Failed
+      - Completed
+      - Canceling
+      - CancellationFailed
+      - Canceled
+      x-ms-enum:
+        name: UserRequestStatus
+        modelAsString: true
+    WorkflowRunId:
+      type: string
+      format: uuid
+      description: The workflow run id.
+    WorkflowId:
+      type: string
+      format: uuid
+      description: The workflow id.
+    RequestorId:
+      type: string
+      format: uuid
+      description: The person who submitted the user request.
+    WorkflowRunList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            description: 'The execution of a workflow. It includes status of the entire
+              run and other properties of a run. '
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: The workflow run id.
+              workflowId:
+                type: string
+                format: uuid
+                description: The workflow id.
+              startTime:
+                type: string
+                description: Workflow run start time.
+                format: date-time
+              requestor:
+                type: string
+                format: uuid
+                description: The person who submitted the user request.
+              userRequestId:
+                type: string
+                format: uuid
+                description: The user request id.
+              runPayload:
+                type: object
+                description: 'The input of a workflow run. Align with operation in
+                  user request. '
+                properties:
+                  type:
+                    type: string
+                    description: The workflow run payload type.
+                    enum:
+                    - CreateTerm
+                    - UpdateTerm
+                    - DeleteTerm
+                    - ImportTerms
+                    - UpdateAsset
+                    - GrantDataAccess
+                    x-ms-enum:
+                      name: WorkflowRunPayloadType
+                      modelAsString: true
+                  targetValue:
+                    type: string
+                    description: The target value which need involve workflow to update.
+                required:
+                - type
+                - targetValue
+              status:
+                type: string
+                description: The status.
+                enum:
+                - NotStarted
+                - InProgress
+                - Failed
+                - Completed
+                - Canceling
+                - CancellationFailed
+                - Canceled
+                x-ms-enum:
+                  name: UserRequestStatus
+                  modelAsString: true
+              endTime:
+                type: string
+                format: date-time
+                description: The time of workflow run completed.
+              cancelTime:
+                type: string
+                format: date-time
+                description: The time of workflow run be canceled.
+              cancelComment:
+                type: string
+                description: The comment when cancel a workflow run.
+            required:
+            - id
+            - workflowId
+            - startTime
+            - requestor
+            - runPayload
+            - status
+          description: The value of workflow run list.
+        nextLink:
+          type: string
+          description: The URL to get the next set of results.
+      required:
+      - value
+    WorkflowRunMetadata:
+      description: 'The execution of a workflow. It includes status of the entire
+        run and other properties of a run. '
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The workflow run id.
+        workflowId:
+          type: string
+          format: uuid
+          description: The workflow id.
+        startTime:
+          type: string
+          description: Workflow run start time.
+          format: date-time
+        requestor:
+          type: string
+          format: uuid
+          description: The person who submitted the user request.
+        userRequestId:
+          type: string
+          format: uuid
+          description: The user request id.
+        runPayload:
+          type: object
+          description: 'The input of a workflow run. Align with operation in user
+            request. '
+          properties:
+            type:
+              type: string
+              description: The workflow run payload type.
+              enum:
+              - CreateTerm
+              - UpdateTerm
+              - DeleteTerm
+              - ImportTerms
+              - UpdateAsset
+              - GrantDataAccess
+              x-ms-enum:
+                name: WorkflowRunPayloadType
+                modelAsString: true
+            targetValue:
+              type: string
+              description: The target value which need involve workflow to update.
+          required:
+          - type
+          - targetValue
+        status:
+          type: string
+          description: The status.
+          enum:
+          - NotStarted
+          - InProgress
+          - Failed
+          - Completed
+          - Canceling
+          - CancellationFailed
+          - Canceled
+          x-ms-enum:
+            name: UserRequestStatus
+            modelAsString: true
+        endTime:
+          type: string
+          format: date-time
+          description: The time of workflow run completed.
+        cancelTime:
+          type: string
+          format: date-time
+          description: The time of workflow run be canceled.
+        cancelComment:
+          type: string
+          description: The comment when cancel a workflow run.
+      required:
+      - id
+      - workflowId
+      - startTime
+      - requestor
+      - runPayload
+      - status
+    WorkflowRunPayload:
+      type: object
+      description: 'The input of a workflow run. Align with operation in user request. '
+      properties:
+        type:
+          type: string
+          description: The workflow run payload type.
+          enum:
+          - CreateTerm
+          - UpdateTerm
+          - DeleteTerm
+          - ImportTerms
+          - UpdateAsset
+          - GrantDataAccess
+          x-ms-enum:
+            name: WorkflowRunPayloadType
+            modelAsString: true
+        targetValue:
+          type: string
+          description: The target value which need involve workflow to update.
+      required:
+      - type
+      - targetValue
+    WorkflowRunPayloadType:
+      type: string
+      description: The workflow run payload type.
+      enum:
+      - CreateTerm
+      - UpdateTerm
+      - DeleteTerm
+      - ImportTerms
+      - UpdateAsset
+      - GrantDataAccess
+      x-ms-enum:
+        name: WorkflowRunPayloadType
+        modelAsString: true
+    WorkflowRun:
+      description: 'The execution of a workflow. It includes workflow action DAG at
+        run time (action DAG snapshot), run payload, status of the entire run and
+        other properties of a run. '
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: The workflow run id.
+        workflowId:
+          type: string
+          format: uuid
+          description: The workflow id.
+        startTime:
+          type: string
+          description: Workflow run start time.
+          format: date-time
+        requestor:
+          type: string
+          format: uuid
+          description: The person who submitted the user request.
+        userRequestId:
+          type: string
+          format: uuid
+          description: The user request id.
+        runPayload:
+          type: object
+          description: 'The input of a workflow run. Align with operation in user
+            request. '
+          properties:
+            type:
+              type: string
+              description: The workflow run payload type.
+              enum:
+              - CreateTerm
+              - UpdateTerm
+              - DeleteTerm
+              - ImportTerms
+              - UpdateAsset
+              - GrantDataAccess
+              x-ms-enum:
+                name: WorkflowRunPayloadType
+                modelAsString: true
+            targetValue:
+              type: string
+              description: The target value which need involve workflow to update.
+            payload:
+              type: object
+              description: The payload of each operation which user want to submit.
+          required:
+          - type
+          - targetValue
+          - payload
+        status:
+          type: string
+          description: The status.
+          enum:
+          - NotStarted
+          - InProgress
+          - Failed
+          - Completed
+          - Canceling
+          - CancellationFailed
+          - Canceled
+          x-ms-enum:
+            name: UserRequestStatus
+            modelAsString: true
+        endTime:
+          type: string
+          format: date-time
+          description: The time of workflow run completed.
+        cancelTime:
+          type: string
+          format: date-time
+          description: The time of workflow run be canceled.
+        cancelComment:
+          type: string
+          description: The comment when cancel a workflow run.
+        actionDag:
+          type: object
+          description: The action DAG(Directed Acyclic Graph), it defines actual flow.
+        detail:
+          type: object
+          description: It refers to the "detail" property of a workflow run object,
+            which contains run context and runtime information of actions.
+          properties:
+            runInput:
+              description: 'Built-in variables starts with @runInput. Its properties
+                are determined by trigger type at workflow run time. '
+              type: object
+            actions:
+              type: object
+          required:
+          - runInput
+          - actions
+      required:
+      - actionDag
+      - detail
+    WorkflowRunDetail:
+      type: object
+      description: It refers to the "detail" property of a workflow run object, which
+        contains run context and runtime information of actions.
+      properties:
+        runInput:
+          description: 'Built-in variables starts with @runInput. Its properties are
+            determined by trigger type at workflow run time. '
+          type: object
+        actions:
+          type: object
+      required:
+      - runInput
+      - actions
+    WorkflowRunCancelRequest:
+      type: object
+      properties:
+        comment:
+          type: string
+          description: The comment of canceling a workflow run.
+    TasksList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            discriminator:
+              propertyName: type
+            type: object
+            description: An actionable item assigned to assignees. It is created when
+              approval or task action starts to execute. Approval is one kind of task.
+            properties:
+              type:
+                type: string
+                description: The workflow task type.
+                enum:
+                - Approval
+                - SimpleTask
+                x-ms-enum:
+                  name: TaskType
+                  modelAsString: true
+              id:
+                type: string
+                format: uuid
+                description: The workflow task id.
+              title:
+                type: string
+                description: The workflow task title.
+              workflowRunId:
+                type: string
+                format: uuid
+                description: The workflow run id.
+              workflowId:
+                type: string
+                format: uuid
+                description: The workflow id.
+              requestor:
+                type: string
+                format: uuid
+                description: The person who submitted the user request.
+              createdTime:
+                type: string
+                format: date-time
+                description: The created time.
+              lastUpdateTime:
+                type: string
+                format: date-time
+                description: The last update time.
+              payload:
+                type: object
+                description: Info and material that helps assignees to take action.
+                properties:
+                  type:
+                    type: string
+                    description: The task payload type.
+                    enum:
+                    - CreateTerm
+                    - UpdateTerm
+                    - DeleteTerm
+                    - ImportTerms
+                    - UpdateAsset
+                    - GrantDataAccess
+                    x-ms-enum:
+                      name: TaskPayloadType
+                      modelAsString: true
+                  targetValue:
+                    type: string
+                    description: The target value of entity which user want to involve
+                      workflow to update.
+                  payload:
+                    type: object
+                    description: The payload of the task.
+                required:
+                - type
+                - targetValue
+              reminderInfo:
+                type: object
+                description: Info of task reminder.
+                properties:
+                  lastRemindTime:
+                    type: string
+                    format: date-time
+                    description: The last update time.
+                  nextRemindTime:
+                    type: string
+                    format: date-time
+                    description: The next remind time.
+                  reminderSettings:
+                    type: object
+                    description: The reminder settings.
+                required:
+                - nextRemindTime
+                - reminderSettings
+              expiryInfo:
+                type: object
+                description: Info of task expiry.
+                properties:
+                  lastExpiryNotificationTime:
+                    type: string
+                    format: date-time
+                    description: The last expiry notification time.
+                  nextExpiryNotificationTime:
+                    type: string
+                    format: date-time
+                    description: The next expiry notification time.
+                  expiryTime:
+                    type: string
+                    format: date-time
+                    description: The expiry time.
+                  expirySettings:
+                    type: object
+                    properties:
+                      expireAfter:
+                        type: object
+                        description: The time of expiry.
+                      notifyOnExpiration:
+                        type: array
+                        items:
+                          type: string
+                          format: uuid
+                          description: Notify user on expiration.
+                    required:
+                    - expireAfter
+                required:
+                - nextExpiryNotificationTime
+                - expiryTime
+                - expirySettings
+            required:
+            - type
+            - id
+            - workflowRunId
+            - workflowId
+            - requestor
+            - createdTime
+            - lastUpdateTime
+            - payload
+          description: The value of workflow tasks list.
+        nextLink:
+          type: string
+          description: The URL to get the next set of results.
+      required:
+      - value
+    WorkflowValidationRuleViolationsList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            description: The detail of validation rule violated in a workflow.
+            properties:
+              severity:
+                type: string
+                description: The severity of the validation rule.
+                enum:
+                - error
+                - warning
+                x-ms-enum:
+                  name: ValidationRuleSeverity
+                  modelAsString: true
+              location:
+                type: object
+                description: The location where the violation happens.
+                properties:
+                  type:
+                    type: string
+                    description: The validation violation location type.
+                    enum:
+                    - workflow
+                    - action
+                    - actionParameter
+                    x-ms-enum:
+                      name: ValidationRuleViolationLocation
+                      modelAsString: true
+                  actionName:
+                    type: string
+                    description: The name of the action where the violation happens.
+                  parameterKey:
+                    type: string
+                    description: The key of the action parameter where the violation
+                      happens.
+                required:
+                - type
+              message:
+                type: string
+                description: The detail about how the validation rule is violated.
+            required:
+            - severity
+            - location
+            - message
+          description: The value of violated validation rule list.
+      required:
+      - value
+    WorkflowValidationRuleViolation:
+      type: object
+      description: The detail of validation rule violated in a workflow.
+      properties:
+        severity:
+          type: string
+          description: The severity of the validation rule.
+          enum:
+          - error
+          - warning
+          x-ms-enum:
+            name: ValidationRuleSeverity
+            modelAsString: true
+        location:
+          type: object
+          description: The location where the violation happens.
+          properties:
+            type:
+              type: string
+              description: The validation violation location type.
+              enum:
+              - workflow
+              - action
+              - actionParameter
+              x-ms-enum:
+                name: ValidationRuleViolationLocation
+                modelAsString: true
+            actionName:
+              type: string
+              description: The name of the action where the violation happens.
+            parameterKey:
+              type: string
+              description: The key of the action parameter where the violation happens.
+          required:
+          - type
+        message:
+          type: string
+          description: The detail about how the validation rule is violated.
+      required:
+      - severity
+      - location
+      - message
+    WorkflowTask:
+      discriminator:
+        propertyName: type
+      type: object
+      description: An actionable item assigned to assignees. It is created when approval
+        or task action starts to execute. Approval is one kind of task.
+      properties:
+        type:
+          type: string
+          description: The workflow task type.
+          enum:
+          - Approval
+          - SimpleTask
+          x-ms-enum:
+            name: TaskType
+            modelAsString: true
+        id:
+          type: string
+          format: uuid
+          description: The workflow task id.
+        title:
+          type: string
+          description: The workflow task title.
+        workflowRunId:
+          type: string
+          format: uuid
+          description: The workflow run id.
+        workflowId:
+          type: string
+          format: uuid
+          description: The workflow id.
+        requestor:
+          type: string
+          format: uuid
+          description: The person who submitted the user request.
+        createdTime:
+          type: string
+          format: date-time
+          description: The created time.
+        lastUpdateTime:
+          type: string
+          format: date-time
+          description: The last update time.
+        payload:
+          type: object
+          description: Info and material that helps assignees to take action.
+          properties:
+            type:
+              type: string
+              description: The task payload type.
+              enum:
+              - CreateTerm
+              - UpdateTerm
+              - DeleteTerm
+              - ImportTerms
+              - UpdateAsset
+              - GrantDataAccess
+              x-ms-enum:
+                name: TaskPayloadType
+                modelAsString: true
+            targetValue:
+              type: string
+              description: The target value of entity which user want to involve workflow
+                to update.
+            payload:
+              type: object
+              description: The payload of the task.
+          required:
+          - type
+          - targetValue
+        reminderInfo:
+          type: object
+          description: Info of task reminder.
+          properties:
+            lastRemindTime:
+              type: string
+              format: date-time
+              description: The last update time.
+            nextRemindTime:
+              type: string
+              format: date-time
+              description: The next remind time.
+            reminderSettings:
+              type: object
+              description: The reminder settings.
+          required:
+          - nextRemindTime
+          - reminderSettings
+        expiryInfo:
+          type: object
+          description: Info of task expiry.
+          properties:
+            lastExpiryNotificationTime:
+              type: string
+              format: date-time
+              description: The last expiry notification time.
+            nextExpiryNotificationTime:
+              type: string
+              format: date-time
+              description: The next expiry notification time.
+            expiryTime:
+              type: string
+              format: date-time
+              description: The expiry time.
+            expirySettings:
+              type: object
+              properties:
+                expireAfter:
+                  type: object
+                  description: The time of expiry.
+                notifyOnExpiration:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                    description: Notify user on expiration.
+              required:
+              - expireAfter
+          required:
+          - nextExpiryNotificationTime
+          - expiryTime
+          - expirySettings
+      required:
+      - type
+      - id
+      - workflowRunId
+      - workflowId
+      - requestor
+      - createdTime
+      - lastUpdateTime
+      - payload
+    TaskPayload:
+      type: object
+      description: Info and material that helps assignees to take action.
+      properties:
+        type:
+          type: string
+          description: The task payload type.
+          enum:
+          - CreateTerm
+          - UpdateTerm
+          - DeleteTerm
+          - ImportTerms
+          - UpdateAsset
+          - GrantDataAccess
+          x-ms-enum:
+            name: TaskPayloadType
+            modelAsString: true
+        targetValue:
+          type: string
+          description: The target value of entity which user want to involve workflow
+            to update.
+        payload:
+          type: object
+          description: The payload of the task.
+      required:
+      - type
+      - targetValue
+    TaskPayloadType:
+      type: string
+      description: The task payload type.
+      enum:
+      - CreateTerm
+      - UpdateTerm
+      - DeleteTerm
+      - ImportTerms
+      - UpdateAsset
+      - GrantDataAccess
+      x-ms-enum:
+        name: TaskPayloadType
+        modelAsString: true
+    OperationType:
+      type: string
+      description: The operation type.
+      enum:
+      - CreateTerm
+      - UpdateTerm
+      - DeleteTerm
+      - ImportTerms
+      - UpdateAsset
+      - GrantDataAccess
+      x-ms-enum:
+        name: OperationType
+        modelAsString: true
+    SubmittedTime:
+      type: string
+      format: date-time
+      description: The submitted time.
+    CreatedTime:
+      type: string
+      format: date-time
+      description: The created time.
+    LastUpdateTime:
+      type: string
+      format: date-time
+      description: The last update time.
+    Approval:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The workflow task type.
+          enum:
+          - Approval
+          - SimpleTask
+          x-ms-enum:
+            name: TaskType
+            modelAsString: true
+        id:
+          type: string
+          format: uuid
+          description: The workflow task id.
+        title:
+          type: string
+          description: The workflow task title.
+        workflowRunId:
+          type: string
+          format: uuid
+          description: The workflow run id.
+        workflowId:
+          type: string
+          format: uuid
+          description: The workflow id.
+        requestor:
+          type: string
+          format: uuid
+          description: The person who submitted the user request.
+        createdTime:
+          type: string
+          format: date-time
+          description: The created time.
+        lastUpdateTime:
+          type: string
+          format: date-time
+          description: The last update time.
+        payload:
+          type: object
+          description: Info and material that helps assignees to take action.
+          properties:
+            type:
+              type: string
+              description: The task payload type.
+              enum:
+              - CreateTerm
+              - UpdateTerm
+              - DeleteTerm
+              - ImportTerms
+              - UpdateAsset
+              - GrantDataAccess
+              x-ms-enum:
+                name: TaskPayloadType
+                modelAsString: true
+            targetValue:
+              type: string
+              description: The target value of entity which user want to involve workflow
+                to update.
+            payload:
+              type: object
+              description: The payload of the task.
+          required:
+          - type
+          - targetValue
+        reminderInfo:
+          type: object
+          description: Info of task reminder.
+          properties:
+            lastRemindTime:
+              type: string
+              format: date-time
+              description: The last update time.
+            nextRemindTime:
+              type: string
+              format: date-time
+              description: The next remind time.
+            reminderSettings:
+              type: object
+              description: The reminder settings.
+          required:
+          - nextRemindTime
+          - reminderSettings
+        expiryInfo:
+          type: object
+          description: Info of task expiry.
+          properties:
+            lastExpiryNotificationTime:
+              type: string
+              format: date-time
+              description: The last expiry notification time.
+            nextExpiryNotificationTime:
+              type: string
+              format: date-time
+              description: The next expiry notification time.
+            expiryTime:
+              type: string
+              format: date-time
+              description: The expiry time.
+            expirySettings:
+              type: object
+              properties:
+                expireAfter:
+                  type: object
+                  description: The time of expiry.
+                notifyOnExpiration:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                    description: Notify user on expiration.
+              required:
+              - expireAfter
+          required:
+          - nextExpiryNotificationTime
+          - expiryTime
+          - expirySettings
+        approvalDetail:
+          type: object
+          description: The approval details
+          properties:
+            approvalType:
+              type: string
+              description: The approval type of an approval.
+              enum:
+              - PendingOnAny
+              - PendingOnAll
+              x-ms-enum:
+                name: ApprovalType
+                modelAsString: true
+            status:
+              type: string
+              description: The status of an approval.
+              enum:
+              - Pending
+              - Approved
+              - Rejected
+              - Canceled
+              x-ms-enum:
+                name: ApprovalStatus
+                modelAsString: true
+            approvers:
+              type: object
+              additionalProperties:
+                type: object
+                description: The response of approvers for an approval type of workflow
+                  task.
+                properties:
+                  reply:
+                    type: string
+                    description: The response for an approval type of workflow task.
+                    enum:
+                    - Approved
+                    - Rejected
+                    - Pending
+                    x-ms-enum:
+                      name: ApprovalResponse
+                      modelAsString: true
+                  comment:
+                    type: string
+                    description: The comment of approving or rejecting an approval
+                      type of workflow task.
+                  responseTime:
+                    type: string
+                    format: date-time
+                    description: The reply time of approver to a workflow task.
+                required:
+                - reply
+              description: The list of approvers with reply.
+          required:
+          - approvalType
+          - status
+          - approvers
+      required:
+      - type
+      - id
+      - workflowRunId
+      - workflowId
+      - requestor
+      - createdTime
+      - lastUpdateTime
+      - payload
+      description: An actionable item assigned to assignees. It is created when approval
+        or task action starts to execute. Approval is one kind of task.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: Approval
+    ApprovalDetail:
+      type: object
+      description: The approval details
+      properties:
+        approvalType:
+          type: string
+          description: The approval type of an approval.
+          enum:
+          - PendingOnAny
+          - PendingOnAll
+          x-ms-enum:
+            name: ApprovalType
+            modelAsString: true
+        status:
+          type: string
+          description: The status of an approval.
+          enum:
+          - Pending
+          - Approved
+          - Rejected
+          - Canceled
+          x-ms-enum:
+            name: ApprovalStatus
+            modelAsString: true
+        approvers:
+          type: object
+          additionalProperties:
+            type: object
+            description: The response of approvers for an approval type of workflow
+              task.
+            properties:
+              reply:
+                type: string
+                description: The response for an approval type of workflow task.
+                enum:
+                - Approved
+                - Rejected
+                - Pending
+                x-ms-enum:
+                  name: ApprovalResponse
+                  modelAsString: true
+              comment:
+                type: string
+                description: The comment of approving or rejecting an approval type
+                  of workflow task.
+              responseTime:
+                type: string
+                format: date-time
+                description: The reply time of approver to a workflow task.
+            required:
+            - reply
+          description: The list of approvers with reply.
+      required:
+      - approvalType
+      - status
+      - approvers
+    ApproverResponse:
+      type: object
+      description: The response of approvers for an approval type of workflow task.
+      properties:
+        reply:
+          type: string
+          description: The response for an approval type of workflow task.
+          enum:
+          - Approved
+          - Rejected
+          - Pending
+          x-ms-enum:
+            name: ApprovalResponse
+            modelAsString: true
+        comment:
+          type: string
+          description: The comment of approving or rejecting an approval type of workflow
+            task.
+        responseTime:
+          type: string
+          format: date-time
+          description: The reply time of approver to a workflow task.
+      required:
+      - reply
+    SimpleTask:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The workflow task type.
+          enum:
+          - Approval
+          - SimpleTask
+          x-ms-enum:
+            name: TaskType
+            modelAsString: true
+        id:
+          type: string
+          format: uuid
+          description: The workflow task id.
+        title:
+          type: string
+          description: The workflow task title.
+        workflowRunId:
+          type: string
+          format: uuid
+          description: The workflow run id.
+        workflowId:
+          type: string
+          format: uuid
+          description: The workflow id.
+        requestor:
+          type: string
+          format: uuid
+          description: The person who submitted the user request.
+        createdTime:
+          type: string
+          format: date-time
+          description: The created time.
+        lastUpdateTime:
+          type: string
+          format: date-time
+          description: The last update time.
+        payload:
+          type: object
+          description: Info and material that helps assignees to take action.
+          properties:
+            type:
+              type: string
+              description: The task payload type.
+              enum:
+              - CreateTerm
+              - UpdateTerm
+              - DeleteTerm
+              - ImportTerms
+              - UpdateAsset
+              - GrantDataAccess
+              x-ms-enum:
+                name: TaskPayloadType
+                modelAsString: true
+            targetValue:
+              type: string
+              description: The target value of entity which user want to involve workflow
+                to update.
+            payload:
+              type: object
+              description: The payload of the task.
+          required:
+          - type
+          - targetValue
+        reminderInfo:
+          type: object
+          description: Info of task reminder.
+          properties:
+            lastRemindTime:
+              type: string
+              format: date-time
+              description: The last update time.
+            nextRemindTime:
+              type: string
+              format: date-time
+              description: The next remind time.
+            reminderSettings:
+              type: object
+              description: The reminder settings.
+          required:
+          - nextRemindTime
+          - reminderSettings
+        expiryInfo:
+          type: object
+          description: Info of task expiry.
+          properties:
+            lastExpiryNotificationTime:
+              type: string
+              format: date-time
+              description: The last expiry notification time.
+            nextExpiryNotificationTime:
+              type: string
+              format: date-time
+              description: The next expiry notification time.
+            expiryTime:
+              type: string
+              format: date-time
+              description: The expiry time.
+            expirySettings:
+              type: object
+              properties:
+                expireAfter:
+                  type: object
+                  description: The time of expiry.
+                notifyOnExpiration:
+                  type: array
+                  items:
+                    type: string
+                    format: uuid
+                    description: Notify user on expiration.
+              required:
+              - expireAfter
+          required:
+          - nextExpiryNotificationTime
+          - expiryTime
+          - expirySettings
+        taskDetail:
+          type: object
+          description: Workflow simple task details.
+          properties:
+            taskBody:
+              type: string
+              description: The simple task body.
+            assignedTo:
+              type: array
+              description: The users or groups were assigned the simple task.
+              items:
+                type: string
+                format: uuid
+            status:
+              type: string
+              description: Simple task status.
+              enum:
+              - NotStarted
+              - InProgress
+              - Completed
+              - Canceled
+              x-ms-enum:
+                name: SimpleTaskStatus
+                modelAsString: true
+            changeHistory:
+              type: array
+              items:
+                type: object
+                description: History of changes made on task.
+          required:
+          - taskBody
+          - assignedTo
+          - status
+          - changeHistory
+      required:
+      - type
+      - id
+      - workflowRunId
+      - workflowId
+      - requestor
+      - createdTime
+      - lastUpdateTime
+      - payload
+      description: An actionable item assigned to assignees. It is created when approval
+        or task action starts to execute. Approval is one kind of task.
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: SimpleTask
+    SimpleTaskDetail:
+      type: object
+      description: Workflow simple task details.
+      properties:
+        taskBody:
+          type: string
+          description: The simple task body.
+        assignedTo:
+          type: array
+          description: The users or groups were assigned the simple task.
+          items:
+            type: string
+            format: uuid
+        status:
+          type: string
+          description: Simple task status.
+          enum:
+          - NotStarted
+          - InProgress
+          - Completed
+          - Canceled
+          x-ms-enum:
+            name: SimpleTaskStatus
+            modelAsString: true
+        changeHistory:
+          type: array
+          items:
+            type: object
+            description: History of changes made on task.
+      required:
+      - taskBody
+      - assignedTo
+      - status
+      - changeHistory
+    TaskChangeEvent:
+      type: object
+      description: History of changes made on task.
+    ApprovalResponseComment:
+      type: object
+      properties:
+        comment:
+          type: string
+          description: The comment of approving or rejecting an approval type of workflow
+            task.
+    ReassignCommand:
+      type: object
+      description: The request payload of reassigning a workflow task.
+      properties:
+        reassignments:
+          type: array
+          description: The request body of reassigning a workflow task.
+          items:
+            type: object
+            properties:
+              reassignFrom:
+                type: string
+                format: uuid
+                description: Reassign a workflow task from a user or a group.
+              reassignTo:
+                type: string
+                format: uuid
+                description: Reassign a workflow task to a user or a group.
+            required:
+            - reassignFrom
+            - reassignTo
+    TaskUpdateCommand:
+      type: object
+      properties:
+        newStatus:
+          type: string
+          description: The new status will be used to update the task.
+          enum:
+          - NotStarted
+          - InProgress
+          - Completed
+          - Canceled
+          x-ms-enum:
+            name: TaskStatus
+            modelAsString: true
+        comment:
+          type: string
+          description: The comment when update a task.
+      required:
+      - newStatus
+    ErrorResponse:
+      description: Default error response model
+      type: object
+      properties:
+        error:
+          description: Default error model
+          type: object
+          properties:
+            code:
+              description: Gets or sets the code.
+              type: string
+            details:
+              description: Gets or sets the details.
+              uniqueItems: false
+              type: array
+              items:
+                description: Default error model
+                type: object
+                properties:
+                  code:
+                    description: Gets or sets the code.
+                    type: string
+                  details:
+                    description: Gets or sets the details.
+                    uniqueItems: false
+                    type: array
+                    items:
+                      description: Default error model
+                      type: object
+                      properties:
+                        code:
+                          description: Gets or sets the code.
+                          type: string
+                      required:
+                      - code
+                      - message
+                    x-ms-identifiers:
+                    - code
+                  message:
+                    description: Gets or sets the messages.
+                    type: string
+                  target:
+                    description: Gets or sets the target.
+                    type: string
+                required:
+                - code
+                - message
+              x-ms-identifiers:
+              - code
+            message:
+              description: Gets or sets the messages.
+              type: string
+            target:
+              description: Gets or sets the target.
+              type: string
+          required:
+          - code
+          - message
+      required:
+      - error
+    ErrorModel:
+      description: Default error model
+      type: object
+      properties:
+        code:
+          description: Gets or sets the code.
+          type: string
+        details:
+          description: Gets or sets the details.
+          uniqueItems: false
+          type: array
+          items:
+            description: Default error model
+            type: object
+            properties:
+              code:
+                description: Gets or sets the code.
+                type: string
+              details:
+                description: Gets or sets the details.
+                uniqueItems: false
+                type: array
+                items:
+                  description: Default error model
+                  type: object
+                  properties:
+                    code:
+                      description: Gets or sets the code.
+                      type: string
+                  required:
+                  - code
+                  - message
+                x-ms-identifiers:
+                - code
+              message:
+                description: Gets or sets the messages.
+                type: string
+              target:
+                description: Gets or sets the target.
+                type: string
+            required:
+            - code
+            - message
+          x-ms-identifiers:
+          - code
+        message:
+          description: Gets or sets the messages.
+          type: string
+        target:
+          description: Gets or sets the target.
+          type: string
+      required:
+      - code
+      - message

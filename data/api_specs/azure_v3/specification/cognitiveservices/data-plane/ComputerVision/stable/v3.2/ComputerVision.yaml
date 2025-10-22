@@ -1,0 +1,4893 @@
+openapi: 3.0.0
+info:
+  version: '3.2'
+  title: Computer Vision Client
+  description: The Computer Vision API provides state-of-the-art algorithms to process
+    images and return information. For example, it can be used to determine if an
+    image contains mature content, or it can be used to find all the faces in an image.  It
+    also has other features like estimating dominant and accent colors, categorizing
+    the content of images, and describing an image with complete English sentences.  Additionally,
+    it can also intelligently generate images thumbnails for displaying large images
+    effectively.
+servers:
+- url: https://westcentralus.api.cognitive.microsoft.com/vision/v3.2
+- url: '{Endpoint}/vision/v3.2'
+  variables:
+    Endpoint:
+      description: Supported Cognitive Services endpoints.
+      x-ms-parameter-location: client
+      x-ms-skip-url-encoding: true
+      default: none
+security:
+- apim_key: []
+paths:
+  /analyze:
+    post:
+      description: "This operation extracts a rich set of visual features based on\
+        \ the image content.\r\nTwo input methods are supported -- (1) Uploading an\
+        \ image or (2) specifying an image URL. Within your request, there is an optional\
+        \ parameter to allow you to choose which features to return. By default, image\
+        \ categories are returned in the response.\r\nA successful response will be\
+        \ returned in JSON. If the request failed, the response will contain an error\
+        \ code and a message to help understand what went wrong."
+      operationId: AnalyzeImage
+      parameters:
+      - name: visualFeatures
+        in: query
+        description: 'A string indicating what visual feature types to return. Multiple
+          values should be comma-separated. Valid visual feature types include: Categories
+          - categorizes image content according to a taxonomy defined in documentation.
+          Tags - tags the image with a detailed list of words related to the image
+          content. Description - describes the image content with a complete English
+          sentence. Faces - detects if faces are present. If present, generate coordinates,
+          gender and age. ImageType - detects if image is clipart or a line drawing.
+          Color - determines the accent color, dominant color, and whether an image
+          is black&white. Adult - detects if the image is pornographic in nature (depicts
+          nudity or a sex act), or is gory (depicts extreme violence or blood). Sexually
+          suggestive content (aka racy content) is also detected. Objects - detects
+          various objects within an image, including the approximate location. The
+          Objects argument is only available in English. Brands - detects various
+          brands within an image, including the approximate location. The Brands argument
+          is only available in English.'
+        required: false
+        x-ms-parameter-location: method
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - ImageType
+            - Faces
+            - Adult
+            - Categories
+            - Color
+            - Tags
+            - Description
+            - Objects
+            - Brands
+            x-ms-enum:
+              name: VisualFeatureTypes
+              modelAsString: false
+            nullable: false
+      - name: details
+        in: query
+        description: 'A string indicating which domain-specific details to return.
+          Multiple values should be comma-separated. Valid visual feature types include:
+          Celebrities - identifies celebrities if detected in the image, Landmarks
+          - identifies notable landmarks in the image.'
+        required: false
+        x-nullable: true
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - Celebrities
+            - Landmarks
+            x-ms-enum:
+              name: Details
+              modelAsString: false
+            nullable: false
+      - name: language
+        in: query
+        description: The desired language for output generation. If this parameter
+          is not specified, the default value is "en". See https://aka.ms/cv-languages
+          for list of supported languages.
+        required: false
+        x-ms-parameter-location: method
+        x-nullable: false
+        schema:
+          type: string
+          enum:
+          - ar
+          - az
+          - bg
+          - bs
+          - ca
+          - cs
+          - cy
+          - da
+          - de
+          - el
+          - en
+          - es
+          - et
+          - eu
+          - fi
+          - fr
+          - ga
+          - gl
+          - he
+          - hi
+          - hr
+          - hu
+          - id
+          - it
+          - ja
+          - kk
+          - ko
+          - lt
+          - lv
+          - mk
+          - ms
+          - nb
+          - nl
+          - pl
+          - prs
+          - pt
+          - pt-BR
+          - pt-PT
+          - ro
+          - ru
+          - sk
+          - sl
+          - sr-Cyrl
+          - sr-Latn
+          - sv
+          - th
+          - tr
+          - uk
+          - vi
+          - zh
+          - zh-Hans
+          - zh-Hant
+          default: en
+      - name: descriptionExclude
+        in: query
+        description: Turn off specified domain models when generating the description.
+        required: false
+        x-nullable: true
+        x-ms-parameter-location: method
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - Celebrities
+            - Landmarks
+            x-ms-enum:
+              name: DescriptionExclude
+              modelAsString: false
+            nullable: false
+      - name: model-version
+        in: query
+        description: 'Optional parameter to specify the version of the AI model. Accepted
+          values are: "latest", "2021-04-01", "2021-05-01". Defaults to "latest".'
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+          default: latest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - url
+              type: object
+              properties:
+                url:
+                  description: Publicly reachable URL of an image.
+                  type: string
+        description: A JSON document with a URL pointing to the image that is to be
+          analyzed.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-client-flatten: true
+      responses:
+        '200':
+          description: "The response include the extracted features in JSON format.\
+            \ Here is the definitions for enumeration types:\r\n ClipartType\r\n Non\
+            \ - clipart = 0, ambiguous = 1, normal - clipart = 2, good - clipart =\
+            \ 3. LineDrawingTypeNon - LineDrawing = 0, LineDrawing = 1."
+          content:
+            application/json:
+              schema:
+                description: Result of AnalyzeImage operation.
+                type: object
+                properties:
+                  categories:
+                    description: An array indicating identified categories.
+                    type: array
+                    items:
+                      description: An object describing identified category.
+                      type: object
+                      properties:
+                        name:
+                          description: Name of the category.
+                          type: string
+                          nullable: true
+                        score:
+                          format: double
+                          description: Scoring of the category.
+                          type: number
+                          nullable: false
+                        detail:
+                          description: Details of the identified category.
+                          type: object
+                          properties:
+                            celebrities:
+                              description: An array of celebrities if any identified.
+                              type: array
+                              items:
+                                description: An object describing possible celebrity
+                                  identification.
+                                type: object
+                                properties:
+                                  name:
+                                    description: Name of the celebrity.
+                                    type: string
+                                    nullable: true
+                                  confidence:
+                                    format: double
+                                    description: Confidence level for the celebrity
+                                      recognition as a value ranging from 0 to 1.
+                                    type: number
+                                    nullable: false
+                                  faceRectangle:
+                                    description: Location of the identified face in
+                                      the image.
+                                    type: object
+                                    properties:
+                                      left:
+                                        format: int32
+                                        description: X-coordinate of the top left
+                                          point of the face, in pixels.
+                                        type: integer
+                                        nullable: false
+                                      top:
+                                        format: int32
+                                        description: Y-coordinate of the top left
+                                          point of the face, in pixels.
+                                        type: integer
+                                        nullable: false
+                                      width:
+                                        format: int32
+                                        description: Width measured from the top-left
+                                          point of the face, in pixels.
+                                        type: integer
+                                        nullable: false
+                                      height:
+                                        format: int32
+                                        description: Height measured from the top-left
+                                          point of the face, in pixels.
+                                        type: integer
+                                        nullable: false
+                                    nullable: true
+                                nullable: true
+                              nullable: true
+                            landmarks:
+                              description: An array of landmarks if any identified.
+                              type: array
+                              items:
+                                description: A landmark recognized in the image.
+                                type: object
+                                properties:
+                                  name:
+                                    description: Name of the landmark.
+                                    type: string
+                                    nullable: true
+                                  confidence:
+                                    format: double
+                                    description: Confidence level for the landmark
+                                      recognition as a value ranging from 0 to 1.
+                                    type: number
+                                    nullable: false
+                                nullable: true
+                              nullable: true
+                          nullable: true
+                      nullable: true
+                    nullable: true
+                  adult:
+                    description: An object describing whether the image contains adult-oriented
+                      content and/or is racy.
+                    type: object
+                    properties:
+                      isAdultContent:
+                        description: A value indicating if the image contains adult-oriented
+                          content.
+                        type: boolean
+                        nullable: false
+                      isRacyContent:
+                        description: A value indicating if the image is racy.
+                        type: boolean
+                        nullable: false
+                      isGoryContent:
+                        description: A value indicating if the image is gory.
+                        type: boolean
+                        nullable: false
+                      adultScore:
+                        format: double
+                        description: Score from 0 to 1 that indicates how much the
+                          content is considered adult-oriented within the image.
+                        type: number
+                        nullable: false
+                      racyScore:
+                        format: double
+                        description: Score from 0 to 1 that indicates how suggestive
+                          is the image.
+                        type: number
+                        nullable: false
+                      goreScore:
+                        format: double
+                        description: Score from 0 to 1 that indicates how gory is
+                          the image.
+                        type: number
+                        nullable: false
+                    nullable: true
+                  color:
+                    description: An object providing additional metadata describing
+                      color attributes.
+                    type: object
+                    properties:
+                      dominantColorForeground:
+                        description: Possible dominant foreground color.
+                        type: string
+                        nullable: true
+                      dominantColorBackground:
+                        description: Possible dominant background color.
+                        type: string
+                        nullable: true
+                      dominantColors:
+                        description: An array of possible dominant colors.
+                        type: array
+                        items:
+                          type: string
+                          nullable: true
+                        nullable: true
+                      accentColor:
+                        description: Possible accent color.
+                        type: string
+                        nullable: true
+                      isBWImg:
+                        description: A value indicating if the image is black and
+                          white.
+                        type: boolean
+                        nullable: false
+                    nullable: true
+                  imageType:
+                    description: An object providing possible image types and matching
+                      confidence levels.
+                    type: object
+                    properties:
+                      clipArtType:
+                        format: int32
+                        description: Confidence level that the image is a clip art.
+                        type: integer
+                        nullable: false
+                      lineDrawingType:
+                        format: int32
+                        description: Confidence level that the image is a line drawing.
+                        type: integer
+                        nullable: false
+                    nullable: true
+                  tags:
+                    description: A list of tags with confidence level.
+                    type: array
+                    items:
+                      description: An entity observation in the image, along with
+                        the confidence score.
+                      type: object
+                      properties:
+                        name:
+                          description: Name of the entity.
+                          type: string
+                          nullable: true
+                        confidence:
+                          format: double
+                          description: The level of confidence that the entity was
+                            observed.
+                          type: number
+                          nullable: false
+                        hint:
+                          description: Optional hint/details for this tag.
+                          type: string
+                          nullable: true
+                      nullable: true
+                    nullable: true
+                  description:
+                    description: A collection of content tags, along with a list of
+                      captions sorted by confidence level, and image metadata.
+                    type: object
+                    properties:
+                      tags:
+                        description: A collection of image tags.
+                        type: array
+                        items:
+                          type: string
+                          nullable: true
+                        nullable: true
+                      captions:
+                        description: A list of captions, sorted by confidence level.
+                        type: array
+                        items:
+                          description: An image caption, i.e. a brief description
+                            of what the image depicts.
+                          type: object
+                          properties:
+                            text:
+                              description: The text of the caption.
+                              type: string
+                              nullable: true
+                            confidence:
+                              format: double
+                              description: The level of confidence the service has
+                                in the caption.
+                              type: number
+                              nullable: false
+                          nullable: true
+                        nullable: true
+                    nullable: true
+                  faces:
+                    description: An array of possible faces within the image.
+                    type: array
+                    items:
+                      description: An object describing a face identified in the image.
+                      type: object
+                      properties:
+                        age:
+                          format: int32
+                          description: Possible age of the face.
+                          type: integer
+                          nullable: false
+                        gender:
+                          description: Possible gender of the face.
+                          enum:
+                          - Male
+                          - Female
+                          type: string
+                          x-ms-enum:
+                            name: Gender
+                            modelAsString: false
+                          nullable: true
+                        faceRectangle:
+                          description: Rectangle in the image containing the identified
+                            face.
+                          type: object
+                          properties:
+                            left:
+                              format: int32
+                              description: X-coordinate of the top left point of the
+                                face, in pixels.
+                              type: integer
+                              nullable: false
+                            top:
+                              format: int32
+                              description: Y-coordinate of the top left point of the
+                                face, in pixels.
+                              type: integer
+                              nullable: false
+                            width:
+                              format: int32
+                              description: Width measured from the top-left point
+                                of the face, in pixels.
+                              type: integer
+                              nullable: false
+                            height:
+                              format: int32
+                              description: Height measured from the top-left point
+                                of the face, in pixels.
+                              type: integer
+                              nullable: false
+                          nullable: true
+                      nullable: true
+                    nullable: true
+                  objects:
+                    description: Array of objects describing what was detected in
+                      the image.
+                    type: array
+                    items:
+                      description: An object detected in an image.
+                      type: object
+                      properties:
+                        rectangle:
+                          description: Approximate location of the detected object.
+                          readOnly: true
+                          type: object
+                          properties:
+                            x:
+                              format: int32
+                              description: X-coordinate of the top left point of the
+                                area, in pixels.
+                              type: integer
+                              nullable: false
+                            y:
+                              format: int32
+                              description: Y-coordinate of the top left point of the
+                                area, in pixels.
+                              type: integer
+                              nullable: false
+                            w:
+                              format: int32
+                              description: Width measured from the top-left point
+                                of the area, in pixels.
+                              type: integer
+                              nullable: false
+                            h:
+                              format: int32
+                              description: Height measured from the top-left point
+                                of the area, in pixels.
+                              type: integer
+                              nullable: false
+                          nullable: false
+                        object:
+                          description: Label for the object.
+                          type: string
+                          nullable: true
+                        confidence:
+                          format: double
+                          description: Confidence score of having observed the object
+                            in the image, as a value ranging from 0 to 1.
+                          type: number
+                          nullable: false
+                        parent:
+                          description: "The parent object, from a taxonomy perspective.\r\
+                            \nThe parent object is a more generic form of this object.\
+                            \  For example, a 'bulldog' would have a parent of 'dog'."
+                          type: object
+                          properties:
+                            object:
+                              description: Label for the object.
+                              type: string
+                              nullable: true
+                            confidence:
+                              format: double
+                              description: Confidence score of having observed the
+                                object in the image, as a value ranging from 0 to
+                                1.
+                              type: number
+                              nullable: false
+                            parent:
+                              description: "The parent object, from a taxonomy perspective.\r\
+                                \nThe parent object is a more generic form of this\
+                                \ object.  For example, a 'bulldog' would have a parent\
+                                \ of 'dog'."
+                              type: object
+                              properties:
+                                object:
+                                  description: Label for the object.
+                                  type: string
+                                  nullable: true
+                                confidence:
+                                  format: double
+                                  description: Confidence score of having observed
+                                    the object in the image, as a value ranging from
+                                    0 to 1.
+                                  type: number
+                                  nullable: false
+                                parent:
+                                  description: "The parent object, from a taxonomy\
+                                    \ perspective.\r\nThe parent object is a more\
+                                    \ generic form of this object.  For example, a\
+                                    \ 'bulldog' would have a parent of 'dog'."
+                                  type: object
+                                  properties:
+                                    object:
+                                      description: Label for the object.
+                                      type: string
+                                      nullable: true
+                                    confidence:
+                                      format: double
+                                      description: Confidence score of having observed
+                                        the object in the image, as a value ranging
+                                        from 0 to 1.
+                                      type: number
+                                      nullable: false
+                                  nullable: true
+                              nullable: true
+                          nullable: true
+                      nullable: true
+                    nullable: true
+                  brands:
+                    description: Array of brands detected in the image.
+                    type: array
+                    items:
+                      description: A brand detected in an image.
+                      type: object
+                      properties:
+                        name:
+                          description: Label for the brand.
+                          type: string
+                          readOnly: true
+                          nullable: true
+                        confidence:
+                          format: double
+                          description: Confidence score of having observed the brand
+                            in the image, as a value ranging from 0 to 1.
+                          type: number
+                          readOnly: true
+                          nullable: false
+                        rectangle:
+                          description: Approximate location of the detected brand.
+                          readOnly: true
+                          type: object
+                          properties:
+                            x:
+                              format: int32
+                              description: X-coordinate of the top left point of the
+                                area, in pixels.
+                              type: integer
+                              nullable: false
+                            y:
+                              format: int32
+                              description: Y-coordinate of the top left point of the
+                                area, in pixels.
+                              type: integer
+                              nullable: false
+                            w:
+                              format: int32
+                              description: Width measured from the top-left point
+                                of the area, in pixels.
+                              type: integer
+                              nullable: false
+                            h:
+                              format: int32
+                              description: Height measured from the top-left point
+                                of the area, in pixels.
+                              type: integer
+                              nullable: false
+                          nullable: false
+                      nullable: true
+                    nullable: true
+                  requestId:
+                    description: Id of the REST API request.
+                    type: string
+                    nullable: true
+                  metadata:
+                    description: Image metadata.
+                    type: object
+                    properties:
+                      width:
+                        format: int32
+                        description: Image width, in pixels.
+                        type: integer
+                        nullable: false
+                      height:
+                        format: int32
+                        description: Image height, in pixels.
+                        type: integer
+                        nullable: false
+                      format:
+                        description: Image format.
+                        type: string
+                        nullable: true
+                    nullable: true
+                  modelVersion:
+                    description: Version of the AI model.
+                    type: string
+                    pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+                    nullable: false
+                nullable: true
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                description: The API error response.
+                type: object
+                required:
+                - error
+                properties:
+                  error:
+                    type: object
+                    description: Error contents.
+                    required:
+                    - code
+                    - message
+                    properties:
+                      code:
+                        description: The error code.
+                        type: string
+                        enum:
+                        - InvalidRequest
+                        - InvalidArgument
+                        - InternalServerError
+                        - ServiceUnavailable
+                        x-ms-enum:
+                          name: ComputerVisionErrorCodes
+                          modelAsString: true
+                      message:
+                        description: A message explaining the error reported by the
+                          service.
+                        type: string
+                      innererror:
+                        description: Inner error contains more specific information.
+                        type: object
+                        required:
+                        - code
+                        - message
+                        properties:
+                          code:
+                            description: The error code.
+                            type: string
+                            enum:
+                            - InvalidImageFormat
+                            - UnsupportedMediaType
+                            - InvalidImageUrl
+                            - NotSupportedFeature
+                            - NotSupportedImage
+                            - Timeout
+                            - InternalServerError
+                            - InvalidImageSize
+                            - BadArgument
+                            - DetectFaceError
+                            - NotSupportedLanguage
+                            - InvalidThumbnailSize
+                            - InvalidDetails
+                            - InvalidModel
+                            - CancelledRequest
+                            - NotSupportedVisualFeature
+                            - FailedToProcess
+                            - Unspecified
+                            - StorageException
+                            x-ms-enum:
+                              name: ComputerVisionInnerErrorCodeValue
+                              modelAsString: true
+                          message:
+                            type: string
+                            description: Error message.
+  /describe:
+    post:
+      description: "This operation generates a description of an image in human readable\
+        \ language with complete sentences. The description is based on a collection\
+        \ of content tags, which are also returned by the operation. More than one\
+        \ description can be generated for each image. Descriptions are ordered by\
+        \ their confidence score. Descriptions may include results from celebrity\
+        \ and landmark domain models, if applicable.\r\nTwo input methods are supported\
+        \ -- (1) Uploading an image or (2) specifying an image URL.\r\nA successful\
+        \ response will be returned in JSON. If the request failed, the response will\
+        \ contain an error code and a message to help understand what went wrong."
+      operationId: DescribeImage
+      parameters:
+      - name: maxCandidates
+        in: query
+        description: Maximum number of candidate descriptions to be returned.  The
+          default is 1.
+        required: false
+        x-nullable: true
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - name: language
+        in: query
+        description: The desired language for output generation. If this parameter
+          is not specified, the default value is "en". See https://aka.ms/cv-languages
+          for list of supported languages.
+        required: false
+        x-ms-parameter-location: method
+        x-nullable: false
+        schema:
+          type: string
+          enum:
+          - ar
+          - az
+          - bg
+          - bs
+          - ca
+          - cs
+          - cy
+          - da
+          - de
+          - el
+          - en
+          - es
+          - et
+          - eu
+          - fi
+          - fr
+          - ga
+          - gl
+          - he
+          - hi
+          - hr
+          - hu
+          - id
+          - it
+          - ja
+          - kk
+          - ko
+          - lt
+          - lv
+          - mk
+          - ms
+          - nb
+          - nl
+          - pl
+          - prs
+          - pt
+          - pt-BR
+          - pt-PT
+          - ro
+          - ru
+          - sk
+          - sl
+          - sr-Cyrl
+          - sr-Latn
+          - sv
+          - th
+          - tr
+          - uk
+          - vi
+          - zh
+          - zh-Hans
+          - zh-Hant
+          default: en
+      - name: descriptionExclude
+        in: query
+        description: Turn off specified domain models when generating the description.
+        required: false
+        x-nullable: true
+        x-ms-parameter-location: method
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - Celebrities
+            - Landmarks
+            x-ms-enum:
+              name: DescriptionExclude
+              modelAsString: false
+            nullable: false
+      - name: model-version
+        in: query
+        description: 'Optional parameter to specify the version of the AI model. Accepted
+          values are: "latest", "2021-04-01", "2021-05-01". Defaults to "latest".'
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+          default: latest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - url
+              type: object
+              properties:
+                url:
+                  description: Publicly reachable URL of an image.
+                  type: string
+        description: A JSON document with a URL pointing to the image that is to be
+          analyzed.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-client-flatten: true
+      responses:
+        '200':
+          description: Image description object.
+          content:
+            application/json:
+              schema:
+                description: A collection of content tags, along with a list of captions
+                  sorted by confidence level, and image metadata.
+                type: object
+                properties:
+                  description:
+                    description: A collection of content tags, along with a list of
+                      captions sorted by confidence level, and image metadata.
+                    x-ms-client-flatten: true
+                    type: object
+                    properties:
+                      tags:
+                        description: A collection of image tags.
+                        type: array
+                        items:
+                          type: string
+                          nullable: true
+                        nullable: true
+                      captions:
+                        description: A list of captions, sorted by confidence level.
+                        type: array
+                        items:
+                          description: An image caption, i.e. a brief description
+                            of what the image depicts.
+                          type: object
+                          properties:
+                            text:
+                              description: The text of the caption.
+                              type: string
+                              nullable: true
+                            confidence:
+                              format: double
+                              description: The level of confidence the service has
+                                in the caption.
+                              type: number
+                              nullable: false
+                          nullable: true
+                        nullable: true
+                    nullable: true
+                  requestId:
+                    description: Id of the REST API request.
+                    type: string
+                    nullable: true
+                  metadata:
+                    description: Image metadata.
+                    type: object
+                    properties:
+                      width:
+                        format: int32
+                        description: Image width, in pixels.
+                        type: integer
+                        nullable: false
+                      height:
+                        format: int32
+                        description: Image height, in pixels.
+                        type: integer
+                        nullable: false
+                      format:
+                        description: Image format.
+                        type: string
+                        nullable: true
+                    nullable: true
+                  modelVersion:
+                    description: Version of the AI model.
+                    type: string
+                    pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+                    nullable: false
+                nullable: true
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                description: The API error response.
+                type: object
+                required:
+                - error
+                properties:
+                  error:
+                    type: object
+                    description: Error contents.
+                    required:
+                    - code
+                    - message
+                    properties:
+                      code:
+                        description: The error code.
+                        type: string
+                        enum:
+                        - InvalidRequest
+                        - InvalidArgument
+                        - InternalServerError
+                        - ServiceUnavailable
+                        x-ms-enum:
+                          name: ComputerVisionErrorCodes
+                          modelAsString: true
+                      message:
+                        description: A message explaining the error reported by the
+                          service.
+                        type: string
+                      innererror:
+                        description: Inner error contains more specific information.
+                        type: object
+                        required:
+                        - code
+                        - message
+                        properties:
+                          code:
+                            description: The error code.
+                            type: string
+                            enum:
+                            - InvalidImageFormat
+                            - UnsupportedMediaType
+                            - InvalidImageUrl
+                            - NotSupportedFeature
+                            - NotSupportedImage
+                            - Timeout
+                            - InternalServerError
+                            - InvalidImageSize
+                            - BadArgument
+                            - DetectFaceError
+                            - NotSupportedLanguage
+                            - InvalidThumbnailSize
+                            - InvalidDetails
+                            - InvalidModel
+                            - CancelledRequest
+                            - NotSupportedVisualFeature
+                            - FailedToProcess
+                            - Unspecified
+                            - StorageException
+                            x-ms-enum:
+                              name: ComputerVisionInnerErrorCodeValue
+                              modelAsString: true
+                          message:
+                            type: string
+                            description: Error message.
+  /detect:
+    post:
+      description: "Performs object detection on the specified image.\r\nTwo input\
+        \ methods are supported -- (1) Uploading an image or (2) specifying an image\
+        \ URL.\r\nA successful response will be returned in JSON. If the request failed,\
+        \ the response will contain an error code and a message to help understand\
+        \ what went wrong."
+      operationId: DetectObjects
+      parameters:
+      - name: model-version
+        in: query
+        description: 'Optional parameter to specify the version of the AI model. Accepted
+          values are: "latest", "2021-04-01", "2021-05-01". Defaults to "latest".'
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+          default: latest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - url
+              type: object
+              properties:
+                url:
+                  description: Publicly reachable URL of an image.
+                  type: string
+        description: A JSON document with a URL pointing to the image that is to be
+          analyzed.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-client-flatten: true
+      responses:
+        '200':
+          description: The response include the detected objects in JSON format.
+          content:
+            application/json:
+              schema:
+                description: Result of a DetectImage call.
+                type: object
+                properties:
+                  objects:
+                    description: An array of detected objects.
+                    type: array
+                    items:
+                      description: An object detected in an image.
+                      type: object
+                      properties:
+                        rectangle:
+                          description: Approximate location of the detected object.
+                          readOnly: true
+                          type: object
+                          properties:
+                            x:
+                              format: int32
+                              description: X-coordinate of the top left point of the
+                                area, in pixels.
+                              type: integer
+                              nullable: false
+                            y:
+                              format: int32
+                              description: Y-coordinate of the top left point of the
+                                area, in pixels.
+                              type: integer
+                              nullable: false
+                            w:
+                              format: int32
+                              description: Width measured from the top-left point
+                                of the area, in pixels.
+                              type: integer
+                              nullable: false
+                            h:
+                              format: int32
+                              description: Height measured from the top-left point
+                                of the area, in pixels.
+                              type: integer
+                              nullable: false
+                          nullable: false
+                        object:
+                          description: Label for the object.
+                          type: string
+                          nullable: true
+                        confidence:
+                          format: double
+                          description: Confidence score of having observed the object
+                            in the image, as a value ranging from 0 to 1.
+                          type: number
+                          nullable: false
+                        parent:
+                          description: "The parent object, from a taxonomy perspective.\r\
+                            \nThe parent object is a more generic form of this object.\
+                            \  For example, a 'bulldog' would have a parent of 'dog'."
+                          type: object
+                          properties:
+                            object:
+                              description: Label for the object.
+                              type: string
+                              nullable: true
+                            confidence:
+                              format: double
+                              description: Confidence score of having observed the
+                                object in the image, as a value ranging from 0 to
+                                1.
+                              type: number
+                              nullable: false
+                            parent:
+                              description: "The parent object, from a taxonomy perspective.\r\
+                                \nThe parent object is a more generic form of this\
+                                \ object.  For example, a 'bulldog' would have a parent\
+                                \ of 'dog'."
+                              type: object
+                              properties:
+                                object:
+                                  description: Label for the object.
+                                  type: string
+                                  nullable: true
+                                confidence:
+                                  format: double
+                                  description: Confidence score of having observed
+                                    the object in the image, as a value ranging from
+                                    0 to 1.
+                                  type: number
+                                  nullable: false
+                                parent:
+                                  description: "The parent object, from a taxonomy\
+                                    \ perspective.\r\nThe parent object is a more\
+                                    \ generic form of this object.  For example, a\
+                                    \ 'bulldog' would have a parent of 'dog'."
+                                  type: object
+                                  properties:
+                                    object:
+                                      description: Label for the object.
+                                      type: string
+                                      nullable: true
+                                    confidence:
+                                      format: double
+                                      description: Confidence score of having observed
+                                        the object in the image, as a value ranging
+                                        from 0 to 1.
+                                      type: number
+                                      nullable: false
+                                  nullable: true
+                              nullable: true
+                          nullable: true
+                      nullable: true
+                    readOnly: true
+                    nullable: true
+                  requestId:
+                    description: Id of the REST API request.
+                    type: string
+                    nullable: true
+                  metadata:
+                    description: Image metadata.
+                    type: object
+                    properties:
+                      width:
+                        format: int32
+                        description: Image width, in pixels.
+                        type: integer
+                        nullable: false
+                      height:
+                        format: int32
+                        description: Image height, in pixels.
+                        type: integer
+                        nullable: false
+                      format:
+                        description: Image format.
+                        type: string
+                        nullable: true
+                    nullable: true
+                  modelVersion:
+                    description: Version of the AI model.
+                    type: string
+                    pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+                    nullable: false
+                nullable: true
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                description: The API error response.
+                type: object
+                required:
+                - error
+                properties:
+                  error:
+                    type: object
+                    description: Error contents.
+                    required:
+                    - code
+                    - message
+                    properties:
+                      code:
+                        description: The error code.
+                        type: string
+                        enum:
+                        - InvalidRequest
+                        - InvalidArgument
+                        - InternalServerError
+                        - ServiceUnavailable
+                        x-ms-enum:
+                          name: ComputerVisionErrorCodes
+                          modelAsString: true
+                      message:
+                        description: A message explaining the error reported by the
+                          service.
+                        type: string
+                      innererror:
+                        description: Inner error contains more specific information.
+                        type: object
+                        required:
+                        - code
+                        - message
+                        properties:
+                          code:
+                            description: The error code.
+                            type: string
+                            enum:
+                            - InvalidImageFormat
+                            - UnsupportedMediaType
+                            - InvalidImageUrl
+                            - NotSupportedFeature
+                            - NotSupportedImage
+                            - Timeout
+                            - InternalServerError
+                            - InvalidImageSize
+                            - BadArgument
+                            - DetectFaceError
+                            - NotSupportedLanguage
+                            - InvalidThumbnailSize
+                            - InvalidDetails
+                            - InvalidModel
+                            - CancelledRequest
+                            - NotSupportedVisualFeature
+                            - FailedToProcess
+                            - Unspecified
+                            - StorageException
+                            x-ms-enum:
+                              name: ComputerVisionInnerErrorCodeValue
+                              modelAsString: true
+                          message:
+                            type: string
+                            description: Error message.
+  /models:
+    get:
+      description: "This operation returns the list of domain-specific models that\
+        \ are supported by the Computer Vision API. Currently, the API supports following\
+        \ domain-specific models: celebrity recognizer, landmark recognizer.\r\nA\
+        \ successful response will be returned in JSON. If the request failed, the\
+        \ response will contain an error code and a message to help understand what\
+        \ went wrong."
+      operationId: ListModels
+      responses:
+        '200':
+          description: List of available domain models.
+          content:
+            application/json:
+              schema:
+                description: Result of the List Domain Models operation.
+                type: object
+                properties:
+                  models:
+                    description: An array of supported models.
+                    type: array
+                    items:
+                      description: An object describing supported model by name and
+                        categories.
+                      type: object
+                      properties:
+                        name:
+                          description: The name of the model.
+                          type: string
+                          nullable: true
+                        categories:
+                          description: Categories of the model.
+                          type: array
+                          items:
+                            type: string
+                            nullable: true
+                          nullable: true
+                      nullable: true
+                    readOnly: true
+                    nullable: true
+                nullable: true
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                description: The API error response.
+                type: object
+                required:
+                - error
+                properties:
+                  error:
+                    type: object
+                    description: Error contents.
+                    required:
+                    - code
+                    - message
+                    properties:
+                      code:
+                        description: The error code.
+                        type: string
+                        enum:
+                        - InvalidRequest
+                        - InvalidArgument
+                        - InternalServerError
+                        - ServiceUnavailable
+                        x-ms-enum:
+                          name: ComputerVisionErrorCodes
+                          modelAsString: true
+                      message:
+                        description: A message explaining the error reported by the
+                          service.
+                        type: string
+                      innererror:
+                        description: Inner error contains more specific information.
+                        type: object
+                        required:
+                        - code
+                        - message
+                        properties:
+                          code:
+                            description: The error code.
+                            type: string
+                            enum:
+                            - InvalidImageFormat
+                            - UnsupportedMediaType
+                            - InvalidImageUrl
+                            - NotSupportedFeature
+                            - NotSupportedImage
+                            - Timeout
+                            - InternalServerError
+                            - InvalidImageSize
+                            - BadArgument
+                            - DetectFaceError
+                            - NotSupportedLanguage
+                            - InvalidThumbnailSize
+                            - InvalidDetails
+                            - InvalidModel
+                            - CancelledRequest
+                            - NotSupportedVisualFeature
+                            - FailedToProcess
+                            - Unspecified
+                            - StorageException
+                            x-ms-enum:
+                              name: ComputerVisionInnerErrorCodeValue
+                              modelAsString: true
+                          message:
+                            type: string
+                            description: Error message.
+  /models/{model}/analyze:
+    post:
+      description: "This operation recognizes content within an image by applying\
+        \ a domain-specific model. The list of domain-specific models that are supported\
+        \ by the Computer Vision API can be retrieved using the /models GET request.\
+        \ Currently, the API provides following domain-specific models: celebrities,\
+        \ landmarks.\r\nTwo input methods are supported -- (1) Uploading an image\
+        \ or (2) specifying an image URL.\r\nA successful response will be returned\
+        \ in JSON.\r\nIf the request failed, the response will contain an error code\
+        \ and a message to help understand what went wrong."
+      operationId: AnalyzeImageByDomain
+      parameters:
+      - name: model
+        in: path
+        description: The domain-specific content to recognize.
+        required: true
+        x-nullable: true
+        schema:
+          type: string
+      - name: language
+        in: query
+        description: The desired language for output generation. If this parameter
+          is not specified, the default value is "en". See https://aka.ms/cv-languages
+          for list of supported languages.
+        required: false
+        x-ms-parameter-location: method
+        x-nullable: false
+        schema:
+          type: string
+          enum:
+          - ar
+          - az
+          - bg
+          - bs
+          - ca
+          - cs
+          - cy
+          - da
+          - de
+          - el
+          - en
+          - es
+          - et
+          - eu
+          - fi
+          - fr
+          - ga
+          - gl
+          - he
+          - hi
+          - hr
+          - hu
+          - id
+          - it
+          - ja
+          - kk
+          - ko
+          - lt
+          - lv
+          - mk
+          - ms
+          - nb
+          - nl
+          - pl
+          - prs
+          - pt
+          - pt-BR
+          - pt-PT
+          - ro
+          - ru
+          - sk
+          - sl
+          - sr-Cyrl
+          - sr-Latn
+          - sv
+          - th
+          - tr
+          - uk
+          - vi
+          - zh
+          - zh-Hans
+          - zh-Hant
+          default: en
+      - name: model-version
+        in: query
+        description: 'Optional parameter to specify the version of the AI model. Accepted
+          values are: "latest", "2021-04-01", "2021-05-01". Defaults to "latest".'
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+          default: latest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - url
+              type: object
+              properties:
+                url:
+                  description: Publicly reachable URL of an image.
+                  type: string
+        description: A JSON document with a URL pointing to the image that is to be
+          analyzed.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-client-flatten: true
+      responses:
+        '200':
+          description: Analysis result based on the domain model.
+          content:
+            application/json:
+              schema:
+                description: Result of image analysis using a specific domain model
+                  including additional metadata.
+                type: object
+                properties:
+                  result:
+                    description: Model-specific response.
+                    type: object
+                    x-ms-client-flatten: true
+                  requestId:
+                    description: Id of the REST API request.
+                    type: string
+                    nullable: true
+                  metadata:
+                    description: Image metadata.
+                    type: object
+                    properties:
+                      width:
+                        format: int32
+                        description: Image width, in pixels.
+                        type: integer
+                        nullable: false
+                      height:
+                        format: int32
+                        description: Image height, in pixels.
+                        type: integer
+                        nullable: false
+                      format:
+                        description: Image format.
+                        type: string
+                        nullable: true
+                    nullable: true
+                  modelVersion:
+                    description: Version of the AI model.
+                    type: string
+                    pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+                    nullable: false
+                nullable: true
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                description: The API error response.
+                type: object
+                required:
+                - error
+                properties:
+                  error:
+                    type: object
+                    description: Error contents.
+                    required:
+                    - code
+                    - message
+                    properties:
+                      code:
+                        description: The error code.
+                        type: string
+                        enum:
+                        - InvalidRequest
+                        - InvalidArgument
+                        - InternalServerError
+                        - ServiceUnavailable
+                        x-ms-enum:
+                          name: ComputerVisionErrorCodes
+                          modelAsString: true
+                      message:
+                        description: A message explaining the error reported by the
+                          service.
+                        type: string
+                      innererror:
+                        description: Inner error contains more specific information.
+                        type: object
+                        required:
+                        - code
+                        - message
+                        properties:
+                          code:
+                            description: The error code.
+                            type: string
+                            enum:
+                            - InvalidImageFormat
+                            - UnsupportedMediaType
+                            - InvalidImageUrl
+                            - NotSupportedFeature
+                            - NotSupportedImage
+                            - Timeout
+                            - InternalServerError
+                            - InvalidImageSize
+                            - BadArgument
+                            - DetectFaceError
+                            - NotSupportedLanguage
+                            - InvalidThumbnailSize
+                            - InvalidDetails
+                            - InvalidModel
+                            - CancelledRequest
+                            - NotSupportedVisualFeature
+                            - FailedToProcess
+                            - Unspecified
+                            - StorageException
+                            x-ms-enum:
+                              name: ComputerVisionInnerErrorCodeValue
+                              modelAsString: true
+                          message:
+                            type: string
+                            description: Error message.
+  /ocr:
+    post:
+      description: "Optical Character Recognition (OCR) detects text in an image and\
+        \ extracts the recognized characters into a machine-usable character stream.\r\
+        \nUpon success, the OCR results will be returned.\r\nUpon failure, the error\
+        \ code together with an error message will be returned. The error code can\
+        \ be one of InvalidImageUrl, InvalidImageFormat, InvalidImageSize, NotSupportedImage,\
+        \ NotSupportedLanguage, or InternalServerError."
+      operationId: RecognizePrintedText
+      parameters:
+      - name: detectOrientation
+        in: query
+        description: Whether detect the text orientation in the image. With detectOrientation=true
+          the OCR service tries to detect the image orientation and correct it before
+          further processing (e.g. if it's upside-down).
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: boolean
+          default: true
+      - name: language
+        in: query
+        description: The BCP-47 language code of the text to be detected in the image.
+          The default value is 'unk'.
+        required: false
+        x-ms-parameter-location: method
+        x-nullable: false
+        x-ms-enum:
+          name: OcrLanguages
+          modelAsString: false
+        schema:
+          type: string
+          enum:
+          - unk
+          - zh-Hans
+          - zh-Hant
+          - cs
+          - da
+          - nl
+          - en
+          - fi
+          - fr
+          - de
+          - el
+          - hu
+          - it
+          - ja
+          - ko
+          - nb
+          - pl
+          - pt
+          - ru
+          - es
+          - sv
+          - tr
+          - ar
+          - ro
+          - sr-Cyrl
+          - sr-Latn
+          - sk
+          default: unk
+      - name: model-version
+        in: query
+        description: 'Optional parameter to specify the version of the AI model. Accepted
+          values are: "latest", "2021-04-01", "2021-05-01". Defaults to "latest".'
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+          default: latest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - url
+              type: object
+              properties:
+                url:
+                  description: Publicly reachable URL of an image.
+                  type: string
+        description: A JSON document with a URL pointing to the image that is to be
+          analyzed.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-client-flatten: true
+      responses:
+        '200':
+          description: The OCR results in the hierarchy of region/line/word. The results
+            include text, bounding box for regions, lines and words. The angle, in
+            radians, of the detected text with respect to the closest horizontal or
+            vertical direction. After rotating the input image clockwise by this angle,
+            the recognized text lines become horizontal or vertical. In combination
+            with the orientation property it can be used to overlay recognition results
+            correctly on the original image, by rotating either the original image
+            or recognition results by a suitable angle around the center of the original
+            image. If the angle cannot be confidently detected, this property is not
+            present. If the image contains text at different angles, only part of
+            the text will be recognized correctly.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  language:
+                    description: The BCP-47 language code of the text in the image.
+                    type: string
+                    nullable: true
+                  textAngle:
+                    format: double
+                    description: The angle, in radians, of the detected text with
+                      respect to the closest horizontal or vertical direction. After
+                      rotating the input image clockwise by this angle, the recognized
+                      text lines become horizontal or vertical. In combination with
+                      the orientation property it can be used to overlay recognition
+                      results correctly on the original image, by rotating either
+                      the original image or recognition results by a suitable angle
+                      around the center of the original image. If the angle cannot
+                      be confidently detected, this property is not present. If the
+                      image contains text at different angles, only part of the text
+                      will be recognized correctly.
+                    type: number
+                    nullable: false
+                  orientation:
+                    description: "Orientation of the text recognized in the image,\
+                      \ if requested. The value (up, down, left, or right) refers\
+                      \ to the direction that the top of the recognized text is facing,\
+                      \ after the image has been rotated around its center according\
+                      \ to the detected text angle (see textAngle property).\r\nIf\
+                      \ detection of the orientation was not requested, or no text\
+                      \ is detected, the value is 'NotDetected'."
+                    type: string
+                    nullable: true
+                  regions:
+                    description: An array of objects, where each object represents
+                      a region of recognized text.
+                    type: array
+                    items:
+                      description: A region consists of multiple lines (e.g. a column
+                        of text in a multi-column document).
+                      type: object
+                      properties:
+                        boundingBox:
+                          description: Bounding box of a recognized region. The four
+                            integers represent the x-coordinate of the left edge,
+                            the y-coordinate of the top edge, width, and height of
+                            the bounding box, in the coordinate system of the input
+                            image, after it has been rotated around its center according
+                            to the detected text angle (see textAngle property), with
+                            the origin at the top-left corner, and the y-axis pointing
+                            down.
+                          type: string
+                          nullable: true
+                        lines:
+                          description: An array of recognized lines of text.
+                          type: array
+                          items:
+                            description: An object describing a single recognized
+                              line of text.
+                            type: object
+                            properties:
+                              boundingBox:
+                                description: Bounding box of a recognized line. The
+                                  four integers represent the x-coordinate of the
+                                  left edge, the y-coordinate of the top edge, width,
+                                  and height of the bounding box, in the coordinate
+                                  system of the input image, after it has been rotated
+                                  around its center according to the detected text
+                                  angle (see textAngle property), with the origin
+                                  at the top-left corner, and the y-axis pointing
+                                  down.
+                                type: string
+                                nullable: true
+                              words:
+                                description: An array of objects, where each object
+                                  represents a recognized word.
+                                type: array
+                                items:
+                                  description: Information on a recognized word.
+                                  type: object
+                                  properties:
+                                    boundingBox:
+                                      description: Bounding box of a recognized word.
+                                        The four integers represent the x-coordinate
+                                        of the left edge, the y-coordinate of the
+                                        top edge, width, and height of the bounding
+                                        box, in the coordinate system of the input
+                                        image, after it has been rotated around its
+                                        center according to the detected text angle
+                                        (see textAngle property), with the origin
+                                        at the top-left corner, and the y-axis pointing
+                                        down.
+                                      type: string
+                                      nullable: true
+                                    text:
+                                      description: String value of a recognized word.
+                                      type: string
+                                      nullable: true
+                                  nullable: true
+                                nullable: true
+                            nullable: true
+                          nullable: true
+                      nullable: true
+                    nullable: true
+                  modelVersion:
+                    description: Version of the AI model.
+                    type: string
+                    pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+                    nullable: false
+                nullable: true
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                description: The API error response.
+                type: object
+                required:
+                - error
+                properties:
+                  error:
+                    type: object
+                    description: Error contents.
+                    required:
+                    - code
+                    - message
+                    properties:
+                      code:
+                        description: The error code.
+                        type: string
+                        enum:
+                        - InvalidRequest
+                        - InvalidArgument
+                        - InternalServerError
+                        - ServiceUnavailable
+                        x-ms-enum:
+                          name: ComputerVisionErrorCodes
+                          modelAsString: true
+                      message:
+                        description: A message explaining the error reported by the
+                          service.
+                        type: string
+                      innererror:
+                        description: Inner error contains more specific information.
+                        type: object
+                        required:
+                        - code
+                        - message
+                        properties:
+                          code:
+                            description: The error code.
+                            type: string
+                            enum:
+                            - InvalidImageFormat
+                            - UnsupportedMediaType
+                            - InvalidImageUrl
+                            - NotSupportedFeature
+                            - NotSupportedImage
+                            - Timeout
+                            - InternalServerError
+                            - InvalidImageSize
+                            - BadArgument
+                            - DetectFaceError
+                            - NotSupportedLanguage
+                            - InvalidThumbnailSize
+                            - InvalidDetails
+                            - InvalidModel
+                            - CancelledRequest
+                            - NotSupportedVisualFeature
+                            - FailedToProcess
+                            - Unspecified
+                            - StorageException
+                            x-ms-enum:
+                              name: ComputerVisionInnerErrorCodeValue
+                              modelAsString: true
+                          message:
+                            type: string
+                            description: Error message.
+  /tag:
+    post:
+      description: "This operation generates a list of words, or tags, that are relevant\
+        \ to the content of the supplied image. The Computer Vision API can return\
+        \ tags based on objects, living beings, scenery or actions found in images.\
+        \ Unlike categories, tags are not organized according to a hierarchical classification\
+        \ system, but correspond to image content. Tags may contain hints to avoid\
+        \ ambiguity or provide context, for example the tag \"ascomycete\" may be\
+        \ accompanied by the hint \"fungus\".\r\nTwo input methods are supported --\
+        \ (1) Uploading an image or (2) specifying an image URL.\r\nA successful response\
+        \ will be returned in JSON. If the request failed, the response will contain\
+        \ an error code and a message to help understand what went wrong."
+      operationId: TagImage
+      parameters:
+      - name: language
+        in: query
+        description: The desired language for output generation. If this parameter
+          is not specified, the default value is "en". See https://aka.ms/cv-languages
+          for list of supported languages.
+        required: false
+        x-ms-parameter-location: method
+        x-nullable: false
+        schema:
+          type: string
+          enum:
+          - ar
+          - az
+          - bg
+          - bs
+          - ca
+          - cs
+          - cy
+          - da
+          - de
+          - el
+          - en
+          - es
+          - et
+          - eu
+          - fi
+          - fr
+          - ga
+          - gl
+          - he
+          - hi
+          - hr
+          - hu
+          - id
+          - it
+          - ja
+          - kk
+          - ko
+          - lt
+          - lv
+          - mk
+          - ms
+          - nb
+          - nl
+          - pl
+          - prs
+          - pt
+          - pt-BR
+          - pt-PT
+          - ro
+          - ru
+          - sk
+          - sl
+          - sr-Cyrl
+          - sr-Latn
+          - sv
+          - th
+          - tr
+          - uk
+          - vi
+          - zh
+          - zh-Hans
+          - zh-Hant
+          default: en
+      - name: model-version
+        in: query
+        description: 'Optional parameter to specify the version of the AI model. Accepted
+          values are: "latest", "2021-04-01", "2021-05-01". Defaults to "latest".'
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+          default: latest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - url
+              type: object
+              properties:
+                url:
+                  description: Publicly reachable URL of an image.
+                  type: string
+        description: A JSON document with a URL pointing to the image that is to be
+          analyzed.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-client-flatten: true
+      responses:
+        '200':
+          description: Image tags object.
+          content:
+            application/json:
+              schema:
+                description: The results of a image tag operation, including any tags
+                  and image metadata.
+                type: object
+                properties:
+                  tags:
+                    description: A list of tags with confidence level.
+                    type: array
+                    items:
+                      description: An entity observation in the image, along with
+                        the confidence score.
+                      type: object
+                      properties:
+                        name:
+                          description: Name of the entity.
+                          type: string
+                          nullable: true
+                        confidence:
+                          format: double
+                          description: The level of confidence that the entity was
+                            observed.
+                          type: number
+                          nullable: false
+                        hint:
+                          description: Optional hint/details for this tag.
+                          type: string
+                          nullable: true
+                      nullable: true
+                    nullable: true
+                  requestId:
+                    description: Id of the REST API request.
+                    type: string
+                    nullable: true
+                  metadata:
+                    description: Image metadata.
+                    type: object
+                    properties:
+                      width:
+                        format: int32
+                        description: Image width, in pixels.
+                        type: integer
+                        nullable: false
+                      height:
+                        format: int32
+                        description: Image height, in pixels.
+                        type: integer
+                        nullable: false
+                      format:
+                        description: Image format.
+                        type: string
+                        nullable: true
+                    nullable: true
+                  modelVersion:
+                    description: Version of the AI model.
+                    type: string
+                    pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+                    nullable: false
+                nullable: true
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                description: The API error response.
+                type: object
+                required:
+                - error
+                properties:
+                  error:
+                    type: object
+                    description: Error contents.
+                    required:
+                    - code
+                    - message
+                    properties:
+                      code:
+                        description: The error code.
+                        type: string
+                        enum:
+                        - InvalidRequest
+                        - InvalidArgument
+                        - InternalServerError
+                        - ServiceUnavailable
+                        x-ms-enum:
+                          name: ComputerVisionErrorCodes
+                          modelAsString: true
+                      message:
+                        description: A message explaining the error reported by the
+                          service.
+                        type: string
+                      innererror:
+                        description: Inner error contains more specific information.
+                        type: object
+                        required:
+                        - code
+                        - message
+                        properties:
+                          code:
+                            description: The error code.
+                            type: string
+                            enum:
+                            - InvalidImageFormat
+                            - UnsupportedMediaType
+                            - InvalidImageUrl
+                            - NotSupportedFeature
+                            - NotSupportedImage
+                            - Timeout
+                            - InternalServerError
+                            - InvalidImageSize
+                            - BadArgument
+                            - DetectFaceError
+                            - NotSupportedLanguage
+                            - InvalidThumbnailSize
+                            - InvalidDetails
+                            - InvalidModel
+                            - CancelledRequest
+                            - NotSupportedVisualFeature
+                            - FailedToProcess
+                            - Unspecified
+                            - StorageException
+                            x-ms-enum:
+                              name: ComputerVisionInnerErrorCodeValue
+                              modelAsString: true
+                          message:
+                            type: string
+                            description: Error message.
+  /generateThumbnail:
+    post:
+      description: "This operation generates a thumbnail image with the user-specified\
+        \ width and height. By default, the service analyzes the image, identifies\
+        \ the region of interest (ROI), and generates smart cropping coordinates based\
+        \ on the ROI. Smart cropping helps when you specify an aspect ratio that differs\
+        \ from that of the input image.\r\nA successful response contains the thumbnail\
+        \ image binary. If the request failed, the response contains an error code\
+        \ and a message to help determine what went wrong.\r\nUpon failure, the error\
+        \ code and an error message are returned. The error code could be one of InvalidImageUrl,\
+        \ InvalidImageFormat, InvalidImageSize, InvalidThumbnailSize, NotSupportedImage,\
+        \ FailedToProcess, Timeout, or InternalServerError."
+      operationId: GenerateThumbnail
+      parameters:
+      - name: width
+        in: query
+        description: Width of the thumbnail, in pixels. It must be between 1 and 1024.
+          Recommended minimum of 50.
+        required: true
+        x-nullable: false
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 1024
+      - name: height
+        in: query
+        description: Height of the thumbnail, in pixels. It must be between 1 and
+          1024. Recommended minimum of 50.
+        required: true
+        x-nullable: false
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 1024
+      - name: smartCropping
+        in: query
+        description: Boolean flag for enabling smart cropping.
+        required: false
+        x-nullable: true
+        schema:
+          type: boolean
+          default: false
+      - name: model-version
+        in: query
+        description: 'Optional parameter to specify the version of the AI model. Accepted
+          values are: "latest", "2021-04-01", "2021-05-01". Defaults to "latest".'
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+          default: latest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - url
+              type: object
+              properties:
+                url:
+                  description: Publicly reachable URL of an image.
+                  type: string
+        description: A JSON document with a URL pointing to the image that is to be
+          analyzed.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-client-flatten: true
+      responses:
+        '200':
+          description: The generated thumbnail in binary format.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: Error response.
+          content:
+            application/octet-stream:
+              schema:
+                description: The API error response.
+                type: object
+                required:
+                - error
+                properties:
+                  error:
+                    type: object
+                    description: Error contents.
+                    required:
+                    - code
+                    - message
+                    properties:
+                      code:
+                        description: The error code.
+                        type: string
+                        enum:
+                        - InvalidRequest
+                        - InvalidArgument
+                        - InternalServerError
+                        - ServiceUnavailable
+                        x-ms-enum:
+                          name: ComputerVisionErrorCodes
+                          modelAsString: true
+                      message:
+                        description: A message explaining the error reported by the
+                          service.
+                        type: string
+                      innererror:
+                        description: Inner error contains more specific information.
+                        type: object
+                        required:
+                        - code
+                        - message
+                        properties:
+                          code:
+                            description: The error code.
+                            type: string
+                            enum:
+                            - InvalidImageFormat
+                            - UnsupportedMediaType
+                            - InvalidImageUrl
+                            - NotSupportedFeature
+                            - NotSupportedImage
+                            - Timeout
+                            - InternalServerError
+                            - InvalidImageSize
+                            - BadArgument
+                            - DetectFaceError
+                            - NotSupportedLanguage
+                            - InvalidThumbnailSize
+                            - InvalidDetails
+                            - InvalidModel
+                            - CancelledRequest
+                            - NotSupportedVisualFeature
+                            - FailedToProcess
+                            - Unspecified
+                            - StorageException
+                            x-ms-enum:
+                              name: ComputerVisionInnerErrorCodeValue
+                              modelAsString: true
+                          message:
+                            type: string
+                            description: Error message.
+  /areaOfInterest:
+    post:
+      description: "This operation returns a bounding box around the most important\
+        \ area of the image.\r\nA successful response will be returned in JSON. If\
+        \ the request failed, the response contains an error code and a message to\
+        \ help determine what went wrong.\r\nUpon failure, the error code and an error\
+        \ message are returned. The error code could be one of InvalidImageUrl, InvalidImageFormat,\
+        \ InvalidImageSize, NotSupportedImage, FailedToProcess, Timeout, or InternalServerError."
+      operationId: GetAreaOfInterest
+      parameters:
+      - name: model-version
+        in: query
+        description: 'Optional parameter to specify the version of the AI model. Accepted
+          values are: "latest", "2021-04-01", "2021-05-01". Defaults to "latest".'
+        required: false
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+          default: latest
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - url
+              type: object
+              properties:
+                url:
+                  description: Publicly reachable URL of an image.
+                  type: string
+        description: A JSON document with a URL pointing to the image that is to be
+          analyzed.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-client-flatten: true
+      responses:
+        '200':
+          description: The response includes the extracted area of interest in JSON
+            format.
+          content:
+            application/json:
+              schema:
+                description: Result of AreaOfInterest operation.
+                type: object
+                properties:
+                  areaOfInterest:
+                    description: A bounding box for an area of interest inside an
+                      image.
+                    readOnly: true
+                    type: object
+                    properties:
+                      x:
+                        format: int32
+                        description: X-coordinate of the top left point of the area,
+                          in pixels.
+                        type: integer
+                        nullable: false
+                      y:
+                        format: int32
+                        description: Y-coordinate of the top left point of the area,
+                          in pixels.
+                        type: integer
+                        nullable: false
+                      w:
+                        format: int32
+                        description: Width measured from the top-left point of the
+                          area, in pixels.
+                        type: integer
+                        nullable: false
+                      h:
+                        format: int32
+                        description: Height measured from the top-left point of the
+                          area, in pixels.
+                        type: integer
+                        nullable: false
+                    nullable: false
+                  requestId:
+                    description: Id of the REST API request.
+                    type: string
+                    nullable: true
+                  metadata:
+                    description: Image metadata.
+                    type: object
+                    properties:
+                      width:
+                        format: int32
+                        description: Image width, in pixels.
+                        type: integer
+                        nullable: false
+                      height:
+                        format: int32
+                        description: Image height, in pixels.
+                        type: integer
+                        nullable: false
+                      format:
+                        description: Image format.
+                        type: string
+                        nullable: true
+                    nullable: true
+                  modelVersion:
+                    description: Version of the AI model.
+                    type: string
+                    pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+                    nullable: false
+                nullable: true
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                description: The API error response.
+                type: object
+                required:
+                - error
+                properties:
+                  error:
+                    type: object
+                    description: Error contents.
+                    required:
+                    - code
+                    - message
+                    properties:
+                      code:
+                        description: The error code.
+                        type: string
+                        enum:
+                        - InvalidRequest
+                        - InvalidArgument
+                        - InternalServerError
+                        - ServiceUnavailable
+                        x-ms-enum:
+                          name: ComputerVisionErrorCodes
+                          modelAsString: true
+                      message:
+                        description: A message explaining the error reported by the
+                          service.
+                        type: string
+                      innererror:
+                        description: Inner error contains more specific information.
+                        type: object
+                        required:
+                        - code
+                        - message
+                        properties:
+                          code:
+                            description: The error code.
+                            type: string
+                            enum:
+                            - InvalidImageFormat
+                            - UnsupportedMediaType
+                            - InvalidImageUrl
+                            - NotSupportedFeature
+                            - NotSupportedImage
+                            - Timeout
+                            - InternalServerError
+                            - InvalidImageSize
+                            - BadArgument
+                            - DetectFaceError
+                            - NotSupportedLanguage
+                            - InvalidThumbnailSize
+                            - InvalidDetails
+                            - InvalidModel
+                            - CancelledRequest
+                            - NotSupportedVisualFeature
+                            - FailedToProcess
+                            - Unspecified
+                            - StorageException
+                            x-ms-enum:
+                              name: ComputerVisionInnerErrorCodeValue
+                              modelAsString: true
+                          message:
+                            type: string
+                            description: Error message.
+components:
+  parameters:
+    Endpoint:
+      name: Endpoint
+      in: path
+      description: Supported Cognitive Services endpoints.
+      required: true
+      x-ms-parameter-location: client
+      x-ms-skip-url-encoding: true
+      schema:
+        type: string
+    ModelVersion:
+      name: model-version
+      in: query
+      description: 'Optional parameter to specify the version of the AI model. Accepted
+        values are: "latest", "2021-04-01", "2021-05-01". Defaults to "latest".'
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+        default: latest
+    ServiceLanguage:
+      name: language
+      in: query
+      description: The desired language for output generation. If this parameter is
+        not specified, the default value is "en". See https://aka.ms/cv-languages
+        for list of supported languages.
+      required: false
+      x-ms-parameter-location: method
+      x-nullable: false
+      schema:
+        type: string
+        enum:
+        - ar
+        - az
+        - bg
+        - bs
+        - ca
+        - cs
+        - cy
+        - da
+        - de
+        - el
+        - en
+        - es
+        - et
+        - eu
+        - fi
+        - fr
+        - ga
+        - gl
+        - he
+        - hi
+        - hr
+        - hu
+        - id
+        - it
+        - ja
+        - kk
+        - ko
+        - lt
+        - lv
+        - mk
+        - ms
+        - nb
+        - nl
+        - pl
+        - prs
+        - pt
+        - pt-BR
+        - pt-PT
+        - ro
+        - ru
+        - sk
+        - sl
+        - sr-Cyrl
+        - sr-Latn
+        - sv
+        - th
+        - tr
+        - uk
+        - vi
+        - zh
+        - zh-Hans
+        - zh-Hant
+        default: en
+    DescriptionExclude:
+      name: descriptionExclude
+      in: query
+      description: Turn off specified domain models when generating the description.
+      required: false
+      x-nullable: true
+      x-ms-parameter-location: method
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - Celebrities
+          - Landmarks
+          x-ms-enum:
+            name: DescriptionExclude
+            modelAsString: false
+          nullable: false
+    OcrLanguage:
+      name: language
+      in: query
+      description: The BCP-47 language code of the text to be detected in the image.
+        The default value is 'unk'.
+      required: false
+      x-ms-parameter-location: method
+      x-nullable: false
+      x-ms-enum:
+        name: OcrLanguages
+        modelAsString: false
+      schema:
+        type: string
+        enum:
+        - unk
+        - zh-Hans
+        - zh-Hant
+        - cs
+        - da
+        - nl
+        - en
+        - fi
+        - fr
+        - de
+        - el
+        - hu
+        - it
+        - ja
+        - ko
+        - nb
+        - pl
+        - pt
+        - ru
+        - es
+        - sv
+        - tr
+        - ar
+        - ro
+        - sr-Cyrl
+        - sr-Latn
+        - sk
+        default: unk
+    VisualFeatures:
+      name: visualFeatures
+      in: query
+      description: 'A string indicating what visual feature types to return. Multiple
+        values should be comma-separated. Valid visual feature types include: Categories
+        - categorizes image content according to a taxonomy defined in documentation.
+        Tags - tags the image with a detailed list of words related to the image content.
+        Description - describes the image content with a complete English sentence.
+        Faces - detects if faces are present. If present, generate coordinates, gender
+        and age. ImageType - detects if image is clipart or a line drawing. Color
+        - determines the accent color, dominant color, and whether an image is black&white.
+        Adult - detects if the image is pornographic in nature (depicts nudity or
+        a sex act), or is gory (depicts extreme violence or blood). Sexually suggestive
+        content (aka racy content) is also detected. Objects - detects various objects
+        within an image, including the approximate location. The Objects argument
+        is only available in English. Brands - detects various brands within an image,
+        including the approximate location. The Brands argument is only available
+        in English.'
+      required: false
+      x-ms-parameter-location: method
+      style: form
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - ImageType
+          - Faces
+          - Adult
+          - Categories
+          - Color
+          - Tags
+          - Description
+          - Objects
+          - Brands
+          x-ms-enum:
+            name: VisualFeatureTypes
+            modelAsString: false
+          nullable: false
+    DetectOrientation:
+      name: detectOrientation
+      in: query
+      description: Whether detect the text orientation in the image. With detectOrientation=true
+        the OCR service tries to detect the image orientation and correct it before
+        further processing (e.g. if it's upside-down).
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: boolean
+        default: true
+  requestBodies:
+    AnalyzeImageInStreamImage:
+      content:
+        application/octet-stream:
+          schema:
+            format: file
+            type: object
+        multipart/form-data:
+          schema:
+            format: file
+            type: object
+      description: An image stream.
+      required: true
+      x-ms-parameter-location: method
+    AnalyzeImageImageurl:
+      content:
+        application/json:
+          schema:
+            required:
+            - url
+            type: object
+            properties:
+              url:
+                description: Publicly reachable URL of an image.
+                type: string
+      description: A JSON document with a URL pointing to the image that is to be
+        analyzed.
+      required: true
+      x-ms-parameter-location: method
+      x-ms-client-flatten: true
+  securitySchemes:
+    apim_key:
+      type: apiKey
+      name: Ocp-Apim-Subscription-Key
+      in: header
+  schemas:
+    ImageAnalysis:
+      description: Result of AnalyzeImage operation.
+      type: object
+      properties:
+        categories:
+          description: An array indicating identified categories.
+          type: array
+          items:
+            description: An object describing identified category.
+            type: object
+            properties:
+              name:
+                description: Name of the category.
+                type: string
+                nullable: true
+              score:
+                format: double
+                description: Scoring of the category.
+                type: number
+                nullable: false
+              detail:
+                description: Details of the identified category.
+                type: object
+                properties:
+                  celebrities:
+                    description: An array of celebrities if any identified.
+                    type: array
+                    items:
+                      description: An object describing possible celebrity identification.
+                      type: object
+                      properties:
+                        name:
+                          description: Name of the celebrity.
+                          type: string
+                          nullable: true
+                        confidence:
+                          format: double
+                          description: Confidence level for the celebrity recognition
+                            as a value ranging from 0 to 1.
+                          type: number
+                          nullable: false
+                        faceRectangle:
+                          description: Location of the identified face in the image.
+                          type: object
+                          properties:
+                            left:
+                              format: int32
+                              description: X-coordinate of the top left point of the
+                                face, in pixels.
+                              type: integer
+                              nullable: false
+                            top:
+                              format: int32
+                              description: Y-coordinate of the top left point of the
+                                face, in pixels.
+                              type: integer
+                              nullable: false
+                            width:
+                              format: int32
+                              description: Width measured from the top-left point
+                                of the face, in pixels.
+                              type: integer
+                              nullable: false
+                            height:
+                              format: int32
+                              description: Height measured from the top-left point
+                                of the face, in pixels.
+                              type: integer
+                              nullable: false
+                          nullable: true
+                      nullable: true
+                    nullable: true
+                  landmarks:
+                    description: An array of landmarks if any identified.
+                    type: array
+                    items:
+                      description: A landmark recognized in the image.
+                      type: object
+                      properties:
+                        name:
+                          description: Name of the landmark.
+                          type: string
+                          nullable: true
+                        confidence:
+                          format: double
+                          description: Confidence level for the landmark recognition
+                            as a value ranging from 0 to 1.
+                          type: number
+                          nullable: false
+                      nullable: true
+                    nullable: true
+                nullable: true
+            nullable: true
+          nullable: true
+        adult:
+          description: An object describing whether the image contains adult-oriented
+            content and/or is racy.
+          type: object
+          properties:
+            isAdultContent:
+              description: A value indicating if the image contains adult-oriented
+                content.
+              type: boolean
+              nullable: false
+            isRacyContent:
+              description: A value indicating if the image is racy.
+              type: boolean
+              nullable: false
+            isGoryContent:
+              description: A value indicating if the image is gory.
+              type: boolean
+              nullable: false
+            adultScore:
+              format: double
+              description: Score from 0 to 1 that indicates how much the content is
+                considered adult-oriented within the image.
+              type: number
+              nullable: false
+            racyScore:
+              format: double
+              description: Score from 0 to 1 that indicates how suggestive is the
+                image.
+              type: number
+              nullable: false
+            goreScore:
+              format: double
+              description: Score from 0 to 1 that indicates how gory is the image.
+              type: number
+              nullable: false
+          nullable: true
+        color:
+          description: An object providing additional metadata describing color attributes.
+          type: object
+          properties:
+            dominantColorForeground:
+              description: Possible dominant foreground color.
+              type: string
+              nullable: true
+            dominantColorBackground:
+              description: Possible dominant background color.
+              type: string
+              nullable: true
+            dominantColors:
+              description: An array of possible dominant colors.
+              type: array
+              items:
+                type: string
+                nullable: true
+              nullable: true
+            accentColor:
+              description: Possible accent color.
+              type: string
+              nullable: true
+            isBWImg:
+              description: A value indicating if the image is black and white.
+              type: boolean
+              nullable: false
+          nullable: true
+        imageType:
+          description: An object providing possible image types and matching confidence
+            levels.
+          type: object
+          properties:
+            clipArtType:
+              format: int32
+              description: Confidence level that the image is a clip art.
+              type: integer
+              nullable: false
+            lineDrawingType:
+              format: int32
+              description: Confidence level that the image is a line drawing.
+              type: integer
+              nullable: false
+          nullable: true
+        tags:
+          description: A list of tags with confidence level.
+          type: array
+          items:
+            description: An entity observation in the image, along with the confidence
+              score.
+            type: object
+            properties:
+              name:
+                description: Name of the entity.
+                type: string
+                nullable: true
+              confidence:
+                format: double
+                description: The level of confidence that the entity was observed.
+                type: number
+                nullable: false
+              hint:
+                description: Optional hint/details for this tag.
+                type: string
+                nullable: true
+            nullable: true
+          nullable: true
+        description:
+          description: A collection of content tags, along with a list of captions
+            sorted by confidence level, and image metadata.
+          type: object
+          properties:
+            tags:
+              description: A collection of image tags.
+              type: array
+              items:
+                type: string
+                nullable: true
+              nullable: true
+            captions:
+              description: A list of captions, sorted by confidence level.
+              type: array
+              items:
+                description: An image caption, i.e. a brief description of what the
+                  image depicts.
+                type: object
+                properties:
+                  text:
+                    description: The text of the caption.
+                    type: string
+                    nullable: true
+                  confidence:
+                    format: double
+                    description: The level of confidence the service has in the caption.
+                    type: number
+                    nullable: false
+                nullable: true
+              nullable: true
+          nullable: true
+        faces:
+          description: An array of possible faces within the image.
+          type: array
+          items:
+            description: An object describing a face identified in the image.
+            type: object
+            properties:
+              age:
+                format: int32
+                description: Possible age of the face.
+                type: integer
+                nullable: false
+              gender:
+                description: Possible gender of the face.
+                enum:
+                - Male
+                - Female
+                type: string
+                x-ms-enum:
+                  name: Gender
+                  modelAsString: false
+                nullable: true
+              faceRectangle:
+                description: Rectangle in the image containing the identified face.
+                type: object
+                properties:
+                  left:
+                    format: int32
+                    description: X-coordinate of the top left point of the face, in
+                      pixels.
+                    type: integer
+                    nullable: false
+                  top:
+                    format: int32
+                    description: Y-coordinate of the top left point of the face, in
+                      pixels.
+                    type: integer
+                    nullable: false
+                  width:
+                    format: int32
+                    description: Width measured from the top-left point of the face,
+                      in pixels.
+                    type: integer
+                    nullable: false
+                  height:
+                    format: int32
+                    description: Height measured from the top-left point of the face,
+                      in pixels.
+                    type: integer
+                    nullable: false
+                nullable: true
+            nullable: true
+          nullable: true
+        objects:
+          description: Array of objects describing what was detected in the image.
+          type: array
+          items:
+            description: An object detected in an image.
+            type: object
+            properties:
+              rectangle:
+                description: Approximate location of the detected object.
+                readOnly: true
+                type: object
+                properties:
+                  x:
+                    format: int32
+                    description: X-coordinate of the top left point of the area, in
+                      pixels.
+                    type: integer
+                    nullable: false
+                  y:
+                    format: int32
+                    description: Y-coordinate of the top left point of the area, in
+                      pixels.
+                    type: integer
+                    nullable: false
+                  w:
+                    format: int32
+                    description: Width measured from the top-left point of the area,
+                      in pixels.
+                    type: integer
+                    nullable: false
+                  h:
+                    format: int32
+                    description: Height measured from the top-left point of the area,
+                      in pixels.
+                    type: integer
+                    nullable: false
+                nullable: false
+              object:
+                description: Label for the object.
+                type: string
+                nullable: true
+              confidence:
+                format: double
+                description: Confidence score of having observed the object in the
+                  image, as a value ranging from 0 to 1.
+                type: number
+                nullable: false
+              parent:
+                description: "The parent object, from a taxonomy perspective.\r\n\
+                  The parent object is a more generic form of this object.  For example,\
+                  \ a 'bulldog' would have a parent of 'dog'."
+                type: object
+                properties:
+                  object:
+                    description: Label for the object.
+                    type: string
+                    nullable: true
+                  confidence:
+                    format: double
+                    description: Confidence score of having observed the object in
+                      the image, as a value ranging from 0 to 1.
+                    type: number
+                    nullable: false
+                  parent:
+                    description: "The parent object, from a taxonomy perspective.\r\
+                      \nThe parent object is a more generic form of this object. \
+                      \ For example, a 'bulldog' would have a parent of 'dog'."
+                    type: object
+                    properties:
+                      object:
+                        description: Label for the object.
+                        type: string
+                        nullable: true
+                      confidence:
+                        format: double
+                        description: Confidence score of having observed the object
+                          in the image, as a value ranging from 0 to 1.
+                        type: number
+                        nullable: false
+                      parent:
+                        description: "The parent object, from a taxonomy perspective.\r\
+                          \nThe parent object is a more generic form of this object.\
+                          \  For example, a 'bulldog' would have a parent of 'dog'."
+                        type: object
+                        properties:
+                          object:
+                            description: Label for the object.
+                            type: string
+                            nullable: true
+                          confidence:
+                            format: double
+                            description: Confidence score of having observed the object
+                              in the image, as a value ranging from 0 to 1.
+                            type: number
+                            nullable: false
+                        nullable: true
+                    nullable: true
+                nullable: true
+            nullable: true
+          nullable: true
+        brands:
+          description: Array of brands detected in the image.
+          type: array
+          items:
+            description: A brand detected in an image.
+            type: object
+            properties:
+              name:
+                description: Label for the brand.
+                type: string
+                readOnly: true
+                nullable: true
+              confidence:
+                format: double
+                description: Confidence score of having observed the brand in the
+                  image, as a value ranging from 0 to 1.
+                type: number
+                readOnly: true
+                nullable: false
+              rectangle:
+                description: Approximate location of the detected brand.
+                readOnly: true
+                type: object
+                properties:
+                  x:
+                    format: int32
+                    description: X-coordinate of the top left point of the area, in
+                      pixels.
+                    type: integer
+                    nullable: false
+                  y:
+                    format: int32
+                    description: Y-coordinate of the top left point of the area, in
+                      pixels.
+                    type: integer
+                    nullable: false
+                  w:
+                    format: int32
+                    description: Width measured from the top-left point of the area,
+                      in pixels.
+                    type: integer
+                    nullable: false
+                  h:
+                    format: int32
+                    description: Height measured from the top-left point of the area,
+                      in pixels.
+                    type: integer
+                    nullable: false
+                nullable: false
+            nullable: true
+          nullable: true
+        requestId:
+          description: Id of the REST API request.
+          type: string
+          nullable: true
+        metadata:
+          description: Image metadata.
+          type: object
+          properties:
+            width:
+              format: int32
+              description: Image width, in pixels.
+              type: integer
+              nullable: false
+            height:
+              format: int32
+              description: Image height, in pixels.
+              type: integer
+              nullable: false
+            format:
+              description: Image format.
+              type: string
+              nullable: true
+          nullable: true
+        modelVersion:
+          description: Version of the AI model.
+          type: string
+          pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+          nullable: false
+      nullable: true
+    Category:
+      description: An object describing identified category.
+      type: object
+      properties:
+        name:
+          description: Name of the category.
+          type: string
+          nullable: true
+        score:
+          format: double
+          description: Scoring of the category.
+          type: number
+          nullable: false
+        detail:
+          description: Details of the identified category.
+          type: object
+          properties:
+            celebrities:
+              description: An array of celebrities if any identified.
+              type: array
+              items:
+                description: An object describing possible celebrity identification.
+                type: object
+                properties:
+                  name:
+                    description: Name of the celebrity.
+                    type: string
+                    nullable: true
+                  confidence:
+                    format: double
+                    description: Confidence level for the celebrity recognition as
+                      a value ranging from 0 to 1.
+                    type: number
+                    nullable: false
+                  faceRectangle:
+                    description: Location of the identified face in the image.
+                    type: object
+                    properties:
+                      left:
+                        format: int32
+                        description: X-coordinate of the top left point of the face,
+                          in pixels.
+                        type: integer
+                        nullable: false
+                      top:
+                        format: int32
+                        description: Y-coordinate of the top left point of the face,
+                          in pixels.
+                        type: integer
+                        nullable: false
+                      width:
+                        format: int32
+                        description: Width measured from the top-left point of the
+                          face, in pixels.
+                        type: integer
+                        nullable: false
+                      height:
+                        format: int32
+                        description: Height measured from the top-left point of the
+                          face, in pixels.
+                        type: integer
+                        nullable: false
+                    nullable: true
+                nullable: true
+              nullable: true
+            landmarks:
+              description: An array of landmarks if any identified.
+              type: array
+              items:
+                description: A landmark recognized in the image.
+                type: object
+                properties:
+                  name:
+                    description: Name of the landmark.
+                    type: string
+                    nullable: true
+                  confidence:
+                    format: double
+                    description: Confidence level for the landmark recognition as
+                      a value ranging from 0 to 1.
+                    type: number
+                    nullable: false
+                nullable: true
+              nullable: true
+          nullable: true
+      nullable: true
+    AdultInfo:
+      description: An object describing whether the image contains adult-oriented
+        content and/or is racy.
+      type: object
+      properties:
+        isAdultContent:
+          description: A value indicating if the image contains adult-oriented content.
+          type: boolean
+          nullable: false
+        isRacyContent:
+          description: A value indicating if the image is racy.
+          type: boolean
+          nullable: false
+        isGoryContent:
+          description: A value indicating if the image is gory.
+          type: boolean
+          nullable: false
+        adultScore:
+          format: double
+          description: Score from 0 to 1 that indicates how much the content is considered
+            adult-oriented within the image.
+          type: number
+          nullable: false
+        racyScore:
+          format: double
+          description: Score from 0 to 1 that indicates how suggestive is the image.
+          type: number
+          nullable: false
+        goreScore:
+          format: double
+          description: Score from 0 to 1 that indicates how gory is the image.
+          type: number
+          nullable: false
+      nullable: true
+    ColorInfo:
+      description: An object providing additional metadata describing color attributes.
+      type: object
+      properties:
+        dominantColorForeground:
+          description: Possible dominant foreground color.
+          type: string
+          nullable: true
+        dominantColorBackground:
+          description: Possible dominant background color.
+          type: string
+          nullable: true
+        dominantColors:
+          description: An array of possible dominant colors.
+          type: array
+          items:
+            type: string
+            nullable: true
+          nullable: true
+        accentColor:
+          description: Possible accent color.
+          type: string
+          nullable: true
+        isBWImg:
+          description: A value indicating if the image is black and white.
+          type: boolean
+          nullable: false
+      nullable: true
+    ImageType:
+      description: An object providing possible image types and matching confidence
+        levels.
+      type: object
+      properties:
+        clipArtType:
+          format: int32
+          description: Confidence level that the image is a clip art.
+          type: integer
+          nullable: false
+        lineDrawingType:
+          format: int32
+          description: Confidence level that the image is a line drawing.
+          type: integer
+          nullable: false
+      nullable: true
+    ImageTag:
+      description: An entity observation in the image, along with the confidence score.
+      type: object
+      properties:
+        name:
+          description: Name of the entity.
+          type: string
+          nullable: true
+        confidence:
+          format: double
+          description: The level of confidence that the entity was observed.
+          type: number
+          nullable: false
+        hint:
+          description: Optional hint/details for this tag.
+          type: string
+          nullable: true
+      nullable: true
+    ImageDescriptionDetails:
+      description: A collection of content tags, along with a list of captions sorted
+        by confidence level, and image metadata.
+      type: object
+      properties:
+        tags:
+          description: A collection of image tags.
+          type: array
+          items:
+            type: string
+            nullable: true
+          nullable: true
+        captions:
+          description: A list of captions, sorted by confidence level.
+          type: array
+          items:
+            description: An image caption, i.e. a brief description of what the image
+              depicts.
+            type: object
+            properties:
+              text:
+                description: The text of the caption.
+                type: string
+                nullable: true
+              confidence:
+                format: double
+                description: The level of confidence the service has in the caption.
+                type: number
+                nullable: false
+            nullable: true
+          nullable: true
+      nullable: true
+    FaceDescription:
+      description: An object describing a face identified in the image.
+      type: object
+      properties:
+        age:
+          format: int32
+          description: Possible age of the face.
+          type: integer
+          nullable: false
+        gender:
+          description: Possible gender of the face.
+          enum:
+          - Male
+          - Female
+          type: string
+          x-ms-enum:
+            name: Gender
+            modelAsString: false
+          nullable: true
+        faceRectangle:
+          description: Rectangle in the image containing the identified face.
+          type: object
+          properties:
+            left:
+              format: int32
+              description: X-coordinate of the top left point of the face, in pixels.
+              type: integer
+              nullable: false
+            top:
+              format: int32
+              description: Y-coordinate of the top left point of the face, in pixels.
+              type: integer
+              nullable: false
+            width:
+              format: int32
+              description: Width measured from the top-left point of the face, in
+                pixels.
+              type: integer
+              nullable: false
+            height:
+              format: int32
+              description: Height measured from the top-left point of the face, in
+                pixels.
+              type: integer
+              nullable: false
+          nullable: true
+      nullable: true
+    DetectedObject:
+      description: An object detected in an image.
+      type: object
+      properties:
+        rectangle:
+          description: Approximate location of the detected object.
+          readOnly: true
+          type: object
+          properties:
+            x:
+              format: int32
+              description: X-coordinate of the top left point of the area, in pixels.
+              type: integer
+              nullable: false
+            y:
+              format: int32
+              description: Y-coordinate of the top left point of the area, in pixels.
+              type: integer
+              nullable: false
+            w:
+              format: int32
+              description: Width measured from the top-left point of the area, in
+                pixels.
+              type: integer
+              nullable: false
+            h:
+              format: int32
+              description: Height measured from the top-left point of the area, in
+                pixels.
+              type: integer
+              nullable: false
+          nullable: false
+        object:
+          description: Label for the object.
+          type: string
+          nullable: true
+        confidence:
+          format: double
+          description: Confidence score of having observed the object in the image,
+            as a value ranging from 0 to 1.
+          type: number
+          nullable: false
+        parent:
+          description: "The parent object, from a taxonomy perspective.\r\nThe parent\
+            \ object is a more generic form of this object.  For example, a 'bulldog'\
+            \ would have a parent of 'dog'."
+          type: object
+          properties:
+            object:
+              description: Label for the object.
+              type: string
+              nullable: true
+            confidence:
+              format: double
+              description: Confidence score of having observed the object in the image,
+                as a value ranging from 0 to 1.
+              type: number
+              nullable: false
+            parent:
+              description: "The parent object, from a taxonomy perspective.\r\nThe\
+                \ parent object is a more generic form of this object.  For example,\
+                \ a 'bulldog' would have a parent of 'dog'."
+              type: object
+              properties:
+                object:
+                  description: Label for the object.
+                  type: string
+                  nullable: true
+                confidence:
+                  format: double
+                  description: Confidence score of having observed the object in the
+                    image, as a value ranging from 0 to 1.
+                  type: number
+                  nullable: false
+                parent:
+                  description: "The parent object, from a taxonomy perspective.\r\n\
+                    The parent object is a more generic form of this object.  For\
+                    \ example, a 'bulldog' would have a parent of 'dog'."
+                  type: object
+                  properties:
+                    object:
+                      description: Label for the object.
+                      type: string
+                      nullable: true
+                    confidence:
+                      format: double
+                      description: Confidence score of having observed the object
+                        in the image, as a value ranging from 0 to 1.
+                      type: number
+                      nullable: false
+                  nullable: true
+              nullable: true
+          nullable: true
+      nullable: true
+    DetectedBrand:
+      description: A brand detected in an image.
+      type: object
+      properties:
+        name:
+          description: Label for the brand.
+          type: string
+          readOnly: true
+          nullable: true
+        confidence:
+          format: double
+          description: Confidence score of having observed the brand in the image,
+            as a value ranging from 0 to 1.
+          type: number
+          readOnly: true
+          nullable: false
+        rectangle:
+          description: Approximate location of the detected brand.
+          readOnly: true
+          type: object
+          properties:
+            x:
+              format: int32
+              description: X-coordinate of the top left point of the area, in pixels.
+              type: integer
+              nullable: false
+            y:
+              format: int32
+              description: Y-coordinate of the top left point of the area, in pixels.
+              type: integer
+              nullable: false
+            w:
+              format: int32
+              description: Width measured from the top-left point of the area, in
+                pixels.
+              type: integer
+              nullable: false
+            h:
+              format: int32
+              description: Height measured from the top-left point of the area, in
+                pixels.
+              type: integer
+              nullable: false
+          nullable: false
+      nullable: true
+    ImageMetadata:
+      description: Image metadata.
+      type: object
+      properties:
+        width:
+          format: int32
+          description: Image width, in pixels.
+          type: integer
+          nullable: false
+        height:
+          format: int32
+          description: Image height, in pixels.
+          type: integer
+          nullable: false
+        format:
+          description: Image format.
+          type: string
+          nullable: true
+      nullable: true
+    ModelVersion:
+      description: Version of the AI model.
+      type: string
+      pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+      nullable: false
+    CategoryDetail:
+      description: An object describing additional category details.
+      type: object
+      properties:
+        celebrities:
+          description: An array of celebrities if any identified.
+          type: array
+          items:
+            description: An object describing possible celebrity identification.
+            type: object
+            properties:
+              name:
+                description: Name of the celebrity.
+                type: string
+                nullable: true
+              confidence:
+                format: double
+                description: Confidence level for the celebrity recognition as a value
+                  ranging from 0 to 1.
+                type: number
+                nullable: false
+              faceRectangle:
+                description: Location of the identified face in the image.
+                type: object
+                properties:
+                  left:
+                    format: int32
+                    description: X-coordinate of the top left point of the face, in
+                      pixels.
+                    type: integer
+                    nullable: false
+                  top:
+                    format: int32
+                    description: Y-coordinate of the top left point of the face, in
+                      pixels.
+                    type: integer
+                    nullable: false
+                  width:
+                    format: int32
+                    description: Width measured from the top-left point of the face,
+                      in pixels.
+                    type: integer
+                    nullable: false
+                  height:
+                    format: int32
+                    description: Height measured from the top-left point of the face,
+                      in pixels.
+                    type: integer
+                    nullable: false
+                nullable: true
+            nullable: true
+          nullable: true
+        landmarks:
+          description: An array of landmarks if any identified.
+          type: array
+          items:
+            description: A landmark recognized in the image.
+            type: object
+            properties:
+              name:
+                description: Name of the landmark.
+                type: string
+                nullable: true
+              confidence:
+                format: double
+                description: Confidence level for the landmark recognition as a value
+                  ranging from 0 to 1.
+                type: number
+                nullable: false
+            nullable: true
+          nullable: true
+      nullable: true
+    ImageCaption:
+      description: An image caption, i.e. a brief description of what the image depicts.
+      type: object
+      properties:
+        text:
+          description: The text of the caption.
+          type: string
+          nullable: true
+        confidence:
+          format: double
+          description: The level of confidence the service has in the caption.
+          type: number
+          nullable: false
+      nullable: true
+    FaceRectangle:
+      description: An object describing face rectangle.
+      type: object
+      properties:
+        left:
+          format: int32
+          description: X-coordinate of the top left point of the face, in pixels.
+          type: integer
+          nullable: false
+        top:
+          format: int32
+          description: Y-coordinate of the top left point of the face, in pixels.
+          type: integer
+          nullable: false
+        width:
+          format: int32
+          description: Width measured from the top-left point of the face, in pixels.
+          type: integer
+          nullable: false
+        height:
+          format: int32
+          description: Height measured from the top-left point of the face, in pixels.
+          type: integer
+          nullable: false
+      nullable: true
+    BoundingRect:
+      description: A bounding box for an area inside an image.
+      type: object
+      properties:
+        x:
+          format: int32
+          description: X-coordinate of the top left point of the area, in pixels.
+          type: integer
+          nullable: false
+        y:
+          format: int32
+          description: Y-coordinate of the top left point of the area, in pixels.
+          type: integer
+          nullable: false
+        w:
+          format: int32
+          description: Width measured from the top-left point of the area, in pixels.
+          type: integer
+          nullable: false
+        h:
+          format: int32
+          description: Height measured from the top-left point of the area, in pixels.
+          type: integer
+          nullable: false
+      nullable: false
+    ObjectHierarchy:
+      description: An object detected inside an image.
+      type: object
+      properties:
+        object:
+          description: Label for the object.
+          type: string
+          nullable: true
+        confidence:
+          format: double
+          description: Confidence score of having observed the object in the image,
+            as a value ranging from 0 to 1.
+          type: number
+          nullable: false
+        parent:
+          description: "The parent object, from a taxonomy perspective.\r\nThe parent\
+            \ object is a more generic form of this object.  For example, a 'bulldog'\
+            \ would have a parent of 'dog'."
+          type: object
+          properties:
+            object:
+              description: Label for the object.
+              type: string
+              nullable: true
+            confidence:
+              format: double
+              description: Confidence score of having observed the object in the image,
+                as a value ranging from 0 to 1.
+              type: number
+              nullable: false
+            parent:
+              description: "The parent object, from a taxonomy perspective.\r\nThe\
+                \ parent object is a more generic form of this object.  For example,\
+                \ a 'bulldog' would have a parent of 'dog'."
+              type: object
+              properties:
+                object:
+                  description: Label for the object.
+                  type: string
+                  nullable: true
+                confidence:
+                  format: double
+                  description: Confidence score of having observed the object in the
+                    image, as a value ranging from 0 to 1.
+                  type: number
+                  nullable: false
+              nullable: true
+          nullable: true
+      nullable: true
+    CelebritiesModel:
+      description: An object describing possible celebrity identification.
+      type: object
+      properties:
+        name:
+          description: Name of the celebrity.
+          type: string
+          nullable: true
+        confidence:
+          format: double
+          description: Confidence level for the celebrity recognition as a value ranging
+            from 0 to 1.
+          type: number
+          nullable: false
+        faceRectangle:
+          description: Location of the identified face in the image.
+          type: object
+          properties:
+            left:
+              format: int32
+              description: X-coordinate of the top left point of the face, in pixels.
+              type: integer
+              nullable: false
+            top:
+              format: int32
+              description: Y-coordinate of the top left point of the face, in pixels.
+              type: integer
+              nullable: false
+            width:
+              format: int32
+              description: Width measured from the top-left point of the face, in
+                pixels.
+              type: integer
+              nullable: false
+            height:
+              format: int32
+              description: Height measured from the top-left point of the face, in
+                pixels.
+              type: integer
+              nullable: false
+          nullable: true
+      nullable: true
+    LandmarksModel:
+      description: A landmark recognized in the image.
+      type: object
+      properties:
+        name:
+          description: Name of the landmark.
+          type: string
+          nullable: true
+        confidence:
+          format: double
+          description: Confidence level for the landmark recognition as a value ranging
+            from 0 to 1.
+          type: number
+          nullable: false
+      nullable: true
+    ImageDescription:
+      description: A collection of content tags, along with a list of captions sorted
+        by confidence level, and image metadata.
+      type: object
+      properties:
+        description:
+          description: A collection of content tags, along with a list of captions
+            sorted by confidence level, and image metadata.
+          x-ms-client-flatten: true
+          type: object
+          properties:
+            tags:
+              description: A collection of image tags.
+              type: array
+              items:
+                type: string
+                nullable: true
+              nullable: true
+            captions:
+              description: A list of captions, sorted by confidence level.
+              type: array
+              items:
+                description: An image caption, i.e. a brief description of what the
+                  image depicts.
+                type: object
+                properties:
+                  text:
+                    description: The text of the caption.
+                    type: string
+                    nullable: true
+                  confidence:
+                    format: double
+                    description: The level of confidence the service has in the caption.
+                    type: number
+                    nullable: false
+                nullable: true
+              nullable: true
+          nullable: true
+        requestId:
+          description: Id of the REST API request.
+          type: string
+          nullable: true
+        metadata:
+          description: Image metadata.
+          type: object
+          properties:
+            width:
+              format: int32
+              description: Image width, in pixels.
+              type: integer
+              nullable: false
+            height:
+              format: int32
+              description: Image height, in pixels.
+              type: integer
+              nullable: false
+            format:
+              description: Image format.
+              type: string
+              nullable: true
+          nullable: true
+        modelVersion:
+          description: Version of the AI model.
+          type: string
+          pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+          nullable: false
+      nullable: true
+    DetectResult:
+      description: Result of a DetectImage call.
+      type: object
+      properties:
+        objects:
+          description: An array of detected objects.
+          type: array
+          items:
+            description: An object detected in an image.
+            type: object
+            properties:
+              rectangle:
+                description: Approximate location of the detected object.
+                readOnly: true
+                type: object
+                properties:
+                  x:
+                    format: int32
+                    description: X-coordinate of the top left point of the area, in
+                      pixels.
+                    type: integer
+                    nullable: false
+                  y:
+                    format: int32
+                    description: Y-coordinate of the top left point of the area, in
+                      pixels.
+                    type: integer
+                    nullable: false
+                  w:
+                    format: int32
+                    description: Width measured from the top-left point of the area,
+                      in pixels.
+                    type: integer
+                    nullable: false
+                  h:
+                    format: int32
+                    description: Height measured from the top-left point of the area,
+                      in pixels.
+                    type: integer
+                    nullable: false
+                nullable: false
+              object:
+                description: Label for the object.
+                type: string
+                nullable: true
+              confidence:
+                format: double
+                description: Confidence score of having observed the object in the
+                  image, as a value ranging from 0 to 1.
+                type: number
+                nullable: false
+              parent:
+                description: "The parent object, from a taxonomy perspective.\r\n\
+                  The parent object is a more generic form of this object.  For example,\
+                  \ a 'bulldog' would have a parent of 'dog'."
+                type: object
+                properties:
+                  object:
+                    description: Label for the object.
+                    type: string
+                    nullable: true
+                  confidence:
+                    format: double
+                    description: Confidence score of having observed the object in
+                      the image, as a value ranging from 0 to 1.
+                    type: number
+                    nullable: false
+                  parent:
+                    description: "The parent object, from a taxonomy perspective.\r\
+                      \nThe parent object is a more generic form of this object. \
+                      \ For example, a 'bulldog' would have a parent of 'dog'."
+                    type: object
+                    properties:
+                      object:
+                        description: Label for the object.
+                        type: string
+                        nullable: true
+                      confidence:
+                        format: double
+                        description: Confidence score of having observed the object
+                          in the image, as a value ranging from 0 to 1.
+                        type: number
+                        nullable: false
+                      parent:
+                        description: "The parent object, from a taxonomy perspective.\r\
+                          \nThe parent object is a more generic form of this object.\
+                          \  For example, a 'bulldog' would have a parent of 'dog'."
+                        type: object
+                        properties:
+                          object:
+                            description: Label for the object.
+                            type: string
+                            nullable: true
+                          confidence:
+                            format: double
+                            description: Confidence score of having observed the object
+                              in the image, as a value ranging from 0 to 1.
+                            type: number
+                            nullable: false
+                        nullable: true
+                    nullable: true
+                nullable: true
+            nullable: true
+          readOnly: true
+          nullable: true
+        requestId:
+          description: Id of the REST API request.
+          type: string
+          nullable: true
+        metadata:
+          description: Image metadata.
+          type: object
+          properties:
+            width:
+              format: int32
+              description: Image width, in pixels.
+              type: integer
+              nullable: false
+            height:
+              format: int32
+              description: Image height, in pixels.
+              type: integer
+              nullable: false
+            format:
+              description: Image format.
+              type: string
+              nullable: true
+          nullable: true
+        modelVersion:
+          description: Version of the AI model.
+          type: string
+          pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+          nullable: false
+      nullable: true
+    ListModelsResult:
+      description: Result of the List Domain Models operation.
+      type: object
+      properties:
+        models:
+          description: An array of supported models.
+          type: array
+          items:
+            description: An object describing supported model by name and categories.
+            type: object
+            properties:
+              name:
+                description: The name of the model.
+                type: string
+                nullable: true
+              categories:
+                description: Categories of the model.
+                type: array
+                items:
+                  type: string
+                  nullable: true
+                nullable: true
+            nullable: true
+          readOnly: true
+          nullable: true
+      nullable: true
+    ModelDescription:
+      description: An object describing supported model by name and categories.
+      type: object
+      properties:
+        name:
+          description: The name of the model.
+          type: string
+          nullable: true
+        categories:
+          description: Categories of the model.
+          type: array
+          items:
+            type: string
+            nullable: true
+          nullable: true
+      nullable: true
+    DomainModelResults:
+      description: Result of image analysis using a specific domain model including
+        additional metadata.
+      type: object
+      properties:
+        result:
+          description: Model-specific response.
+          type: object
+          x-ms-client-flatten: true
+        requestId:
+          description: Id of the REST API request.
+          type: string
+          nullable: true
+        metadata:
+          description: Image metadata.
+          type: object
+          properties:
+            width:
+              format: int32
+              description: Image width, in pixels.
+              type: integer
+              nullable: false
+            height:
+              format: int32
+              description: Image height, in pixels.
+              type: integer
+              nullable: false
+            format:
+              description: Image format.
+              type: string
+              nullable: true
+          nullable: true
+        modelVersion:
+          description: Version of the AI model.
+          type: string
+          pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+          nullable: false
+      nullable: true
+    OcrResult:
+      type: object
+      properties:
+        language:
+          description: The BCP-47 language code of the text in the image.
+          type: string
+          nullable: true
+        textAngle:
+          format: double
+          description: The angle, in radians, of the detected text with respect to
+            the closest horizontal or vertical direction. After rotating the input
+            image clockwise by this angle, the recognized text lines become horizontal
+            or vertical. In combination with the orientation property it can be used
+            to overlay recognition results correctly on the original image, by rotating
+            either the original image or recognition results by a suitable angle around
+            the center of the original image. If the angle cannot be confidently detected,
+            this property is not present. If the image contains text at different
+            angles, only part of the text will be recognized correctly.
+          type: number
+          nullable: false
+        orientation:
+          description: "Orientation of the text recognized in the image, if requested.\
+            \ The value (up, down, left, or right) refers to the direction that the\
+            \ top of the recognized text is facing, after the image has been rotated\
+            \ around its center according to the detected text angle (see textAngle\
+            \ property).\r\nIf detection of the orientation was not requested, or\
+            \ no text is detected, the value is 'NotDetected'."
+          type: string
+          nullable: true
+        regions:
+          description: An array of objects, where each object represents a region
+            of recognized text.
+          type: array
+          items:
+            description: A region consists of multiple lines (e.g. a column of text
+              in a multi-column document).
+            type: object
+            properties:
+              boundingBox:
+                description: Bounding box of a recognized region. The four integers
+                  represent the x-coordinate of the left edge, the y-coordinate of
+                  the top edge, width, and height of the bounding box, in the coordinate
+                  system of the input image, after it has been rotated around its
+                  center according to the detected text angle (see textAngle property),
+                  with the origin at the top-left corner, and the y-axis pointing
+                  down.
+                type: string
+                nullable: true
+              lines:
+                description: An array of recognized lines of text.
+                type: array
+                items:
+                  description: An object describing a single recognized line of text.
+                  type: object
+                  properties:
+                    boundingBox:
+                      description: Bounding box of a recognized line. The four integers
+                        represent the x-coordinate of the left edge, the y-coordinate
+                        of the top edge, width, and height of the bounding box, in
+                        the coordinate system of the input image, after it has been
+                        rotated around its center according to the detected text angle
+                        (see textAngle property), with the origin at the top-left
+                        corner, and the y-axis pointing down.
+                      type: string
+                      nullable: true
+                    words:
+                      description: An array of objects, where each object represents
+                        a recognized word.
+                      type: array
+                      items:
+                        description: Information on a recognized word.
+                        type: object
+                        properties:
+                          boundingBox:
+                            description: Bounding box of a recognized word. The four
+                              integers represent the x-coordinate of the left edge,
+                              the y-coordinate of the top edge, width, and height
+                              of the bounding box, in the coordinate system of the
+                              input image, after it has been rotated around its center
+                              according to the detected text angle (see textAngle
+                              property), with the origin at the top-left corner, and
+                              the y-axis pointing down.
+                            type: string
+                            nullable: true
+                          text:
+                            description: String value of a recognized word.
+                            type: string
+                            nullable: true
+                        nullable: true
+                      nullable: true
+                  nullable: true
+                nullable: true
+            nullable: true
+          nullable: true
+        modelVersion:
+          description: Version of the AI model.
+          type: string
+          pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+          nullable: false
+      nullable: true
+    OcrRegion:
+      description: A region consists of multiple lines (e.g. a column of text in a
+        multi-column document).
+      type: object
+      properties:
+        boundingBox:
+          description: Bounding box of a recognized region. The four integers represent
+            the x-coordinate of the left edge, the y-coordinate of the top edge, width,
+            and height of the bounding box, in the coordinate system of the input
+            image, after it has been rotated around its center according to the detected
+            text angle (see textAngle property), with the origin at the top-left corner,
+            and the y-axis pointing down.
+          type: string
+          nullable: true
+        lines:
+          description: An array of recognized lines of text.
+          type: array
+          items:
+            description: An object describing a single recognized line of text.
+            type: object
+            properties:
+              boundingBox:
+                description: Bounding box of a recognized line. The four integers
+                  represent the x-coordinate of the left edge, the y-coordinate of
+                  the top edge, width, and height of the bounding box, in the coordinate
+                  system of the input image, after it has been rotated around its
+                  center according to the detected text angle (see textAngle property),
+                  with the origin at the top-left corner, and the y-axis pointing
+                  down.
+                type: string
+                nullable: true
+              words:
+                description: An array of objects, where each object represents a recognized
+                  word.
+                type: array
+                items:
+                  description: Information on a recognized word.
+                  type: object
+                  properties:
+                    boundingBox:
+                      description: Bounding box of a recognized word. The four integers
+                        represent the x-coordinate of the left edge, the y-coordinate
+                        of the top edge, width, and height of the bounding box, in
+                        the coordinate system of the input image, after it has been
+                        rotated around its center according to the detected text angle
+                        (see textAngle property), with the origin at the top-left
+                        corner, and the y-axis pointing down.
+                      type: string
+                      nullable: true
+                    text:
+                      description: String value of a recognized word.
+                      type: string
+                      nullable: true
+                  nullable: true
+                nullable: true
+            nullable: true
+          nullable: true
+      nullable: true
+    OcrLine:
+      description: An object describing a single recognized line of text.
+      type: object
+      properties:
+        boundingBox:
+          description: Bounding box of a recognized line. The four integers represent
+            the x-coordinate of the left edge, the y-coordinate of the top edge, width,
+            and height of the bounding box, in the coordinate system of the input
+            image, after it has been rotated around its center according to the detected
+            text angle (see textAngle property), with the origin at the top-left corner,
+            and the y-axis pointing down.
+          type: string
+          nullable: true
+        words:
+          description: An array of objects, where each object represents a recognized
+            word.
+          type: array
+          items:
+            description: Information on a recognized word.
+            type: object
+            properties:
+              boundingBox:
+                description: Bounding box of a recognized word. The four integers
+                  represent the x-coordinate of the left edge, the y-coordinate of
+                  the top edge, width, and height of the bounding box, in the coordinate
+                  system of the input image, after it has been rotated around its
+                  center according to the detected text angle (see textAngle property),
+                  with the origin at the top-left corner, and the y-axis pointing
+                  down.
+                type: string
+                nullable: true
+              text:
+                description: String value of a recognized word.
+                type: string
+                nullable: true
+            nullable: true
+          nullable: true
+      nullable: true
+    OcrWord:
+      description: Information on a recognized word.
+      type: object
+      properties:
+        boundingBox:
+          description: Bounding box of a recognized word. The four integers represent
+            the x-coordinate of the left edge, the y-coordinate of the top edge, width,
+            and height of the bounding box, in the coordinate system of the input
+            image, after it has been rotated around its center according to the detected
+            text angle (see textAngle property), with the origin at the top-left corner,
+            and the y-axis pointing down.
+          type: string
+          nullable: true
+        text:
+          description: String value of a recognized word.
+          type: string
+          nullable: true
+      nullable: true
+    TagResult:
+      description: The results of a image tag operation, including any tags and image
+        metadata.
+      type: object
+      properties:
+        tags:
+          description: A list of tags with confidence level.
+          type: array
+          items:
+            description: An entity observation in the image, along with the confidence
+              score.
+            type: object
+            properties:
+              name:
+                description: Name of the entity.
+                type: string
+                nullable: true
+              confidence:
+                format: double
+                description: The level of confidence that the entity was observed.
+                type: number
+                nullable: false
+              hint:
+                description: Optional hint/details for this tag.
+                type: string
+                nullable: true
+            nullable: true
+          nullable: true
+        requestId:
+          description: Id of the REST API request.
+          type: string
+          nullable: true
+        metadata:
+          description: Image metadata.
+          type: object
+          properties:
+            width:
+              format: int32
+              description: Image width, in pixels.
+              type: integer
+              nullable: false
+            height:
+              format: int32
+              description: Image height, in pixels.
+              type: integer
+              nullable: false
+            format:
+              description: Image format.
+              type: string
+              nullable: true
+          nullable: true
+        modelVersion:
+          description: Version of the AI model.
+          type: string
+          pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+          nullable: false
+      nullable: true
+    AreaOfInterestResult:
+      description: Result of AreaOfInterest operation.
+      type: object
+      properties:
+        areaOfInterest:
+          description: A bounding box for an area of interest inside an image.
+          readOnly: true
+          type: object
+          properties:
+            x:
+              format: int32
+              description: X-coordinate of the top left point of the area, in pixels.
+              type: integer
+              nullable: false
+            y:
+              format: int32
+              description: Y-coordinate of the top left point of the area, in pixels.
+              type: integer
+              nullable: false
+            w:
+              format: int32
+              description: Width measured from the top-left point of the area, in
+                pixels.
+              type: integer
+              nullable: false
+            h:
+              format: int32
+              description: Height measured from the top-left point of the area, in
+                pixels.
+              type: integer
+              nullable: false
+          nullable: false
+        requestId:
+          description: Id of the REST API request.
+          type: string
+          nullable: true
+        metadata:
+          description: Image metadata.
+          type: object
+          properties:
+            width:
+              format: int32
+              description: Image width, in pixels.
+              type: integer
+              nullable: false
+            height:
+              format: int32
+              description: Image height, in pixels.
+              type: integer
+              nullable: false
+            format:
+              description: Image format.
+              type: string
+              nullable: true
+          nullable: true
+        modelVersion:
+          description: Version of the AI model.
+          type: string
+          pattern: ^(latest|\d{4}-\d{2}-\d{2})(-preview)?$
+          nullable: false
+      nullable: true
+    ImageUrl:
+      required:
+      - url
+      type: object
+      properties:
+        url:
+          description: Publicly reachable URL of an image.
+          type: string
+    ComputerVisionErrorResponse:
+      description: The API error response.
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          type: object
+          description: Error contents.
+          required:
+          - code
+          - message
+          properties:
+            code:
+              description: The error code.
+              type: string
+              enum:
+              - InvalidRequest
+              - InvalidArgument
+              - InternalServerError
+              - ServiceUnavailable
+              x-ms-enum:
+                name: ComputerVisionErrorCodes
+                modelAsString: true
+            message:
+              description: A message explaining the error reported by the service.
+              type: string
+            innererror:
+              description: Inner error contains more specific information.
+              type: object
+              required:
+              - code
+              - message
+              properties:
+                code:
+                  description: The error code.
+                  type: string
+                  enum:
+                  - InvalidImageFormat
+                  - UnsupportedMediaType
+                  - InvalidImageUrl
+                  - NotSupportedFeature
+                  - NotSupportedImage
+                  - Timeout
+                  - InternalServerError
+                  - InvalidImageSize
+                  - BadArgument
+                  - DetectFaceError
+                  - NotSupportedLanguage
+                  - InvalidThumbnailSize
+                  - InvalidDetails
+                  - InvalidModel
+                  - CancelledRequest
+                  - NotSupportedVisualFeature
+                  - FailedToProcess
+                  - Unspecified
+                  - StorageException
+                  x-ms-enum:
+                    name: ComputerVisionInnerErrorCodeValue
+                    modelAsString: true
+                message:
+                  type: string
+                  description: Error message.
+    ComputerVisionError:
+      description: The API request error.
+      required:
+      - code
+      - message
+      type: object
+      properties:
+        code:
+          description: The error code.
+          type: string
+          enum:
+          - InvalidRequest
+          - InvalidArgument
+          - InternalServerError
+          - ServiceUnavailable
+          x-ms-enum:
+            name: ComputerVisionErrorCodes
+            modelAsString: true
+        message:
+          description: A message explaining the error reported by the service.
+          type: string
+        innererror:
+          description: Inner error contains more specific information.
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              description: The error code.
+              type: string
+              enum:
+              - InvalidImageFormat
+              - UnsupportedMediaType
+              - InvalidImageUrl
+              - NotSupportedFeature
+              - NotSupportedImage
+              - Timeout
+              - InternalServerError
+              - InvalidImageSize
+              - BadArgument
+              - DetectFaceError
+              - NotSupportedLanguage
+              - InvalidThumbnailSize
+              - InvalidDetails
+              - InvalidModel
+              - CancelledRequest
+              - NotSupportedVisualFeature
+              - FailedToProcess
+              - Unspecified
+              - StorageException
+              x-ms-enum:
+                name: ComputerVisionInnerErrorCodeValue
+                modelAsString: true
+            message:
+              type: string
+              description: Error message.
+    ComputerVisionInnerError:
+      description: Details about the API request error.
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          description: The error code.
+          type: string
+          enum:
+          - InvalidImageFormat
+          - UnsupportedMediaType
+          - InvalidImageUrl
+          - NotSupportedFeature
+          - NotSupportedImage
+          - Timeout
+          - InternalServerError
+          - InvalidImageSize
+          - BadArgument
+          - DetectFaceError
+          - NotSupportedLanguage
+          - InvalidThumbnailSize
+          - InvalidDetails
+          - InvalidModel
+          - CancelledRequest
+          - NotSupportedVisualFeature
+          - FailedToProcess
+          - Unspecified
+          - StorageException
+          x-ms-enum:
+            name: ComputerVisionInnerErrorCodeValue
+            modelAsString: true
+        message:
+          type: string
+          description: Error message.
+x-ms-paths:
+  /analyze?overload=stream:
+    post:
+      description: "This operation extracts a rich set of visual features based on\
+        \ the image content.\r\nTwo input methods are supported -- (1) Uploading an\
+        \ image or (2) specifying an image URL. Within your request, there is an optional\
+        \ parameter to allow you to choose which features to return. By default, image\
+        \ categories are returned in the response.\r\nA successful response will be\
+        \ returned in JSON. If the request failed, the response will contain an error\
+        \ code and a message to help understand what went wrong."
+      operationId: AnalyzeImageInStream
+      parameters:
+      - $ref: '#/components/parameters/VisualFeatures'
+      - name: details
+        in: query
+        description: 'A string indicating which domain-specific details to return.
+          Multiple values should be comma-separated. Valid visual feature types include:
+          Celebrities - identifies celebrities if detected in the image, Landmarks
+          - identifies notable landmarks in the image.'
+        required: false
+        x-nullable: true
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - Celebrities
+            - Landmarks
+            x-ms-enum:
+              name: Details
+              modelAsString: false
+            nullable: false
+      - $ref: '#/components/parameters/ServiceLanguage'
+      - $ref: '#/components/parameters/DescriptionExclude'
+      - $ref: '#/components/parameters/ModelVersion'
+      requestBody:
+        $ref: '#/components/requestBodies/AnalyzeImageInStreamImage'
+      responses:
+        '200':
+          description: "The response include the extracted features in JSON format.\
+            \ Here is the definitions for enumeration types:\r\n ClipartType\r\n Non\
+            \ - clipart = 0, ambiguous = 1, normal - clipart = 2, good - clipart =\
+            \ 3. LineDrawingTypeNon - LineDrawing = 0, LineDrawing = 1."
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageAnalysis'
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputerVisionErrorResponse'
+  /areaOfInterest?overload=stream:
+    post:
+      description: "This operation returns a bounding box around the most important\
+        \ area of the image.\r\nA successful response will be returned in JSON. If\
+        \ the request failed, the response contains an error code and a message to\
+        \ help determine what went wrong.\r\nUpon failure, the error code and an error\
+        \ message are returned. The error code could be one of InvalidImageUrl, InvalidImageFormat,\
+        \ InvalidImageSize, NotSupportedImage, FailedToProcess, Timeout, or InternalServerError."
+      operationId: GetAreaOfInterestInStream
+      parameters:
+      - $ref: '#/components/parameters/ModelVersion'
+      requestBody:
+        $ref: '#/components/requestBodies/AnalyzeImageInStreamImage'
+      responses:
+        '200':
+          description: The response includes the extracted area of interest in JSON
+            format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AreaOfInterestResult'
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputerVisionErrorResponse'
+  /describe?overload=stream:
+    post:
+      description: "This operation generates a description of an image in human readable\
+        \ language with complete sentences. The description is based on a collection\
+        \ of content tags, which are also returned by the operation. More than one\
+        \ description can be generated for each image. Descriptions are ordered by\
+        \ their confidence score. Descriptions may include results from celebrity\
+        \ and landmark domain models, if applicable.\r\nTwo input methods are supported\
+        \ -- (1) Uploading an image or (2) specifying an image URL.\r\nA successful\
+        \ response will be returned in JSON. If the request failed, the response will\
+        \ contain an error code and a message to help understand what went wrong."
+      operationId: DescribeImageInStream
+      parameters:
+      - name: maxCandidates
+        in: query
+        description: Maximum number of candidate descriptions to be returned.  The
+          default is 1.
+        required: false
+        x-nullable: true
+        schema:
+          type: integer
+          format: int32
+          default: 1
+      - $ref: '#/components/parameters/ServiceLanguage'
+      - $ref: '#/components/parameters/DescriptionExclude'
+      - $ref: '#/components/parameters/ModelVersion'
+      requestBody:
+        $ref: '#/components/requestBodies/AnalyzeImageInStreamImage'
+      responses:
+        '200':
+          description: Image description object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImageDescription'
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputerVisionErrorResponse'
+  /detect?overload=stream:
+    post:
+      description: "Performs object detection on the specified image.\r\nTwo input\
+        \ methods are supported -- (1) Uploading an image or (2) specifying an image\
+        \ URL.\r\nA successful response will be returned in JSON. If the request failed,\
+        \ the response will contain an error code and a message to help understand\
+        \ what went wrong."
+      operationId: DetectObjectsInStream
+      parameters:
+      - $ref: '#/components/parameters/ModelVersion'
+      requestBody:
+        $ref: '#/components/requestBodies/AnalyzeImageInStreamImage'
+      responses:
+        '200':
+          description: The response include the detected objects in JSON format.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DetectResult'
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputerVisionErrorResponse'
+  /generateThumbnail?overload=stream:
+    post:
+      description: "This operation generates a thumbnail image with the user-specified\
+        \ width and height. By default, the service analyzes the image, identifies\
+        \ the region of interest (ROI), and generates smart cropping coordinates based\
+        \ on the ROI. Smart cropping helps when you specify an aspect ratio that differs\
+        \ from that of the input image.\r\nA successful response contains the thumbnail\
+        \ image binary. If the request failed, the response contains an error code\
+        \ and a message to help determine what went wrong.\r\nUpon failure, the error\
+        \ code and an error message are returned. The error code could be one of InvalidImageUrl,\
+        \ InvalidImageFormat, InvalidImageSize, InvalidThumbnailSize, NotSupportedImage,\
+        \ FailedToProcess, Timeout, or InternalServerError."
+      operationId: GenerateThumbnailInStream
+      parameters:
+      - name: width
+        in: query
+        description: Width of the thumbnail, in pixels. It must be between 1 and 1024.
+          Recommended minimum of 50.
+        required: true
+        x-nullable: false
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 1024
+      - name: height
+        in: query
+        description: Height of the thumbnail, in pixels. It must be between 1 and
+          1024. Recommended minimum of 50.
+        required: true
+        x-nullable: false
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 1024
+      - name: smartCropping
+        in: query
+        description: Boolean flag for enabling smart cropping.
+        required: false
+        x-nullable: true
+        schema:
+          type: boolean
+          default: false
+      - $ref: '#/components/parameters/ModelVersion'
+      requestBody:
+        $ref: '#/components/requestBodies/AnalyzeImageInStreamImage'
+      responses:
+        '200':
+          description: The generated thumbnail in binary format.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        default:
+          description: Error response.
+          content:
+            application/octet-stream:
+              schema:
+                $ref: '#/components/schemas/ComputerVisionErrorResponse'
+  /models/{model}/analyze?overload=stream:
+    post:
+      description: "This operation recognizes content within an image by applying\
+        \ a domain-specific model. The list of domain-specific models that are supported\
+        \ by the Computer Vision API can be retrieved using the /models GET request.\
+        \ Currently, the API provides following domain-specific models: celebrities,\
+        \ landmarks.\r\nTwo input methods are supported -- (1) Uploading an image\
+        \ or (2) specifying an image URL.\r\nA successful response will be returned\
+        \ in JSON.\r\nIf the request failed, the response will contain an error code\
+        \ and a message to help understand what went wrong."
+      operationId: AnalyzeImageByDomainInStream
+      parameters:
+      - name: model
+        in: path
+        description: The domain-specific content to recognize.
+        required: true
+        x-nullable: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/ServiceLanguage'
+      - $ref: '#/components/parameters/ModelVersion'
+      requestBody:
+        $ref: '#/components/requestBodies/AnalyzeImageInStreamImage'
+      responses:
+        '200':
+          description: Analysis result based on the domain model.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainModelResults'
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputerVisionErrorResponse'
+  /ocr?overload=stream:
+    post:
+      description: "Optical Character Recognition (OCR) detects text in an image and\
+        \ extracts the recognized characters into a machine-usable character stream.\r\
+        \nUpon success, the OCR results will be returned.\r\nUpon failure, the error\
+        \ code together with an error message will be returned. The error code can\
+        \ be one of InvalidImageUrl, InvalidImageFormat, InvalidImageSize, NotSupportedImage,\
+        \ NotSupportedLanguage, or InternalServerError."
+      operationId: RecognizePrintedTextInStream
+      parameters:
+      - $ref: '#/components/parameters/DetectOrientation'
+      - $ref: '#/components/parameters/OcrLanguage'
+      - $ref: '#/components/parameters/ModelVersion'
+      requestBody:
+        $ref: '#/components/requestBodies/AnalyzeImageInStreamImage'
+      responses:
+        '200':
+          description: The OCR results in the hierarchy of region/line/word. The results
+            include text, bounding box for regions, lines and words. The angle, in
+            radians, of the detected text with respect to the closest horizontal or
+            vertical direction. After rotating the input image clockwise by this angle,
+            the recognized text lines become horizontal or vertical. In combination
+            with the orientation property it can be used to overlay recognition results
+            correctly on the original image, by rotating either the original image
+            or recognition results by a suitable angle around the center of the original
+            image. If the angle cannot be confidently detected, this property is not
+            present. If the image contains text at different angles, only part of
+            the text will be recognized correctly.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OcrResult'
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputerVisionErrorResponse'
+  /tag?overload=stream:
+    post:
+      description: "This operation generates a list of words, or tags, that are relevant\
+        \ to the content of the supplied image. The Computer Vision API can return\
+        \ tags based on objects, living beings, scenery or actions found in images.\
+        \ Unlike categories, tags are not organized according to a hierarchical classification\
+        \ system, but correspond to image content. Tags may contain hints to avoid\
+        \ ambiguity or provide context, for example the tag \"ascomycete\" may be\
+        \ accompanied by the hint \"fungus\".\r\nTwo input methods are supported --\
+        \ (1) Uploading an image or (2) specifying an image URL.\r\nA successful response\
+        \ will be returned in JSON. If the request failed, the response will contain\
+        \ an error code and a message to help understand what went wrong."
+      operationId: TagImageInStream
+      parameters:
+      - $ref: '#/components/parameters/ServiceLanguage'
+      - $ref: '#/components/parameters/ModelVersion'
+      requestBody:
+        $ref: '#/components/requestBodies/AnalyzeImageInStreamImage'
+      responses:
+        '200':
+          description: Image tags object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagResult'
+        default:
+          description: Error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputerVisionErrorResponse'

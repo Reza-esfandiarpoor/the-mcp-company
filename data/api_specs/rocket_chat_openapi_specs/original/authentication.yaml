@@ -1,0 +1,1191 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Authentication
+  # description: |-
+
+  #   Rocket.Chat provides diverse authentication methods for secure API communication, spanning from basic username and password authentication to OAuth integration with services such as Google, Facebook, and Twitter.
+
+  #   To access protected endpoints in the Rocket.Chat API, you must include the userId and a valid authentication token of the user as headers in the request. Add the authentication token as `x-Auth-Token` and the userId as `x-User-Id` in the headers of your request.
+
+  #   ### Authentication Tokens
+
+  #   Authentication tokens are unique identifiers confirming a user's active session within your Rocket.Chat workspace. These tokens validate the user's identity and permissions, providing secure access to various features and resources. When making requests to protected endpoints that mandate authentication, add this authentication token as `x-Auth-Token` header in your request.
+
+  #   In Rocket.Chat, there are primarily two types of authentication tokens: **authToken** and **personal access token**.
+
+  #   1.  **authToken**
+
+  #       `authToken` is a temporary authentication token returned to users after a successful login through any login endpoint. Additionally, workspace administrators can create `authtoken` for a user via the [Create User Token](/v1-api/apidocs/create-users-token) endpoint.
+
+  #   2.  **personal access token**
+
+  #       [Personal Access Tokens](https://docs.rocket.chat/use-rocket.chat/user-guides/user-panel/account#personal-access-tokens) are permanent authentication tokens that users can generate for themselves to access the API securely without exposing their primary credentials. Visit the Get [Personal Access Tokens API guide](https://developer.rocket.chat/reference/api/rest-api/endpoints/user-management/users-endpoints/generatepersonalaccesstoken) for more details.
+
+#     The following 2FA introduction is under the 2FA section in the published API documentation
+
+#      ## Two-Factor Authentication
+
+#    Rocket.Chat offers various methods for two-factor authentication in a workspace. Kindly refer to the official [Two-Factor Authentication guide](https://developer.rocket.chat/getting-started/two-factor-authentication) for more details.
+
+#    When making requests to endpoints that require two-factor authentication, add the following headers to the request:
+
+#    - **x-2fa-code**: (string) The 2FA code
+#    - **x-2fa-method**: (string) The desired method to check for the 2FA code, usually returned in the 2FA error.
+
+#    If you attempt to send a request to certain endpoints without the appropriate 2FA headers, you receive an error of type `totp-require`. The error message includes a `details` object, that specifies the required 2FA method. It's useful for informing the user where to obtain their 2FA code.
+#    - **method**: The required 2FA method for the user selected by the workspace. 
+#    - **codeGenerated**: Used to inform if the code was generated or if there are tokens available already. It is specific to 2FA by Email.
+#    - **codeCount**: (optional) The number of available codes already sent via email. It is specific to 2FA by Email.
+#    - **codeExpires**: (optional) A list of expiration dates of the tokens.It is specific to 2FA by Email.
+#    - **availableMethods**: The list of available 2FA methods for the user's account.
+
+#    ```
+#    {
+#      "success": false,
+#      "error": "TOTP Required [totp-required]",
+#      "errorType": "totp-required",
+#      "details": {
+#        "method": "email",
+#        "codeGenerated": false,
+#        "codeCount": 1,
+#        "codeExpires": [
+#          "2020-01-02T13:06:42.408Z"
+#        ],
+#        "availableMethods": [
+#          "email"
+#        ]
+#      }
+#    }
+#    ```
+#    If the 2FA code is wrong, a `totp-invalid` response is returned:
+
+#    ```
+#
+#      "success": false,
+#      "error": "TOTP Invalid [totp-invalid]",
+#      "errorType": "totp-invalid",
+#      "details": {
+#        "method": "email"
+#      }
+#   }
+#    ```
+#    ### Handling 2FA Method Errors
+#      It's important to note the  required TOTP **method** returned in the error response when making requests that require 2FA.
+
+#    - If it's `password`, add the hashed password of the user as the `X-2fa-Code` header parameter. 
+#    - If it's `email`, add the 2FA code sent via email as the `X-2fa-Code` header parameter.
+#    - If it's `totp`, add the code from your authenticator app as the `X-2fa-Code` header parameter.
+
+
+servers:
+  - url: 'https://apiexplorer.support.rocket.chat'
+paths:
+  /api/v1/login:
+    post:
+      tags:
+        - Authentication
+      summary: Login with Username and Password
+      description: |-
+        -  Although none of the body parameters are required, it's mandatory to include  either the `user` AND `password`  or only the `resume` parameter.
+
+        - To authenticate a request, you need to pass the `userId` and `authToken` values from this JSON response object as headers in the request. The `authToken` is passed as `X-Auth-Token` header, while the `userId` as `X-User-Id` header.
+
+        -  If LDAP authentication is enabled, you must maintain the login in the same way as you normally do. Similarly, if 2FA is enabled for an LDAP user, everything stays the same.
+          
+        ### Changelog
+        | Version      | Description | 
+         | ---------------- | ------------|
+         |1.0.0            | Added `avatarUrl` property to response       |
+         |0.64.0            | Added `me` property.      |
+         |0.60.0            | Added      |
+      operationId: post-api-v1-login
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: string
+                  description: Your user name or email.
+                  example: myusername
+                password:
+                  type: string
+                  description: Your pasword.
+                  example: my$up3erP@ssw0rd
+                resume:
+                  type: string
+                  description: Your previously issued `authToken`.
+                  example: 9HqLlyZOugoStsXCUfD_0YdwnNnunAJF8V47U3QHXSq
+                code:
+                  type: string
+                  description: The 2FA code. It is required if your account has two-factor authentication enabled .
+                  example: 2246d10
+            examples:
+              Example:
+                value:
+                  user: test@rocket.test
+                  password: vanvica32
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      authToken:
+                        type: string
+                      userId:
+                        type: string
+                      me:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                          name:
+                            type: string
+                          emails:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                address:
+                                  type: string
+                                verified:
+                                  type: boolean
+                          status:
+                            type: string
+                          statusConnection:
+                            type: string
+                          username:
+                            type: string
+                          utcOffset:
+                            type: integer
+                          active:
+                            type: boolean
+                          roles:
+                            type: array
+                            items:
+                              type: string
+                          settings:
+                            type: object
+                            properties:
+                              preferences:
+                                type: object
+                          avatarUrl:
+                            type: string
+                x-examples:
+                  Example:
+                    status: success
+                    data:
+                      authToken: 9HqLlyZOugoStsXCUfD_0YdwnNnunAJF8V47U3QHXSq
+                      userId: aobEdbYhXfu5hkeqG
+                      me:
+                        _id: aYjNnig8BEAWeQzMh
+                        name: Rocket Cat
+                        emails:
+                          - address: rocket.cat@rocket.chat
+                            verified: false
+                        status: offline
+                        statusConnection: offline
+                        username: rocket.cat
+                        utcOffset: -3
+                        active: true
+                        roles:
+                          - admin
+                        settings:
+                          preferences: {}
+                        avatarUrl: 'http://localhost:3000/avatar/test'
+              examples:
+                Login successful:
+                  value:
+                    status: success
+                    data:
+                      authToken: 9HqLlyZOugoStsXCUfD_0YdwnNnunAJF8V47U3QHXSq
+                      userId: aobEdbYhXfu5hkeqG
+                      me:
+                        _id: aYjNnig8BEAWeQzMh
+                        name: Rocket Cat
+                        emails:
+                          - address: rocket.cat@rocket.chat
+                            verified: false
+                        status: offline
+                        statusConnection: offline
+                        username: rocket.cat
+                        utcOffset: -3
+                        active: true
+                        roles:
+                          - admin
+                        settings:
+                          preferences: {}
+                        avatarUrl: 'http://localhost:3000/avatar/test'
+  /api/v1/login - with Facebook:
+    post:
+      tags:
+        - Authentication
+      summary: Login with Facebook
+      description: |-
+        ### Changelog
+        | Version      | Description | 
+         | ---------------- | ------------|
+         |1.0.0            | Added `avatarUrl` property to response       |
+         |0.64.0            | Added `me` property.      |
+         |0.63.0            | Added      |
+      operationId: post-api-v1-login-facebook
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceName:
+                  type: string
+                  description: 'The desired OAuth service name. In this case, `facebook`.'
+                  example: facebook
+                accessToken:
+                  type: string
+                  description: Access token provided by Facebook oauth.
+                  example: hash
+                secret:
+                  type: string
+                  description: The secret provided by Facebook.
+                  example: hash
+                expiresIn:
+                  type: integer
+                  description: Lifetime of token (in seconds).
+                  example: 200
+              required:
+                - serviceName
+                - accessToken
+                - secret
+                - expiresIn
+              x-examples:
+                Example:
+                  serviceName: facebook
+                  accessToken: hash
+                  secret: hash
+                  expiresIn: 200
+            examples:
+              Example:
+                value:
+                  serviceName: facebook
+                  accessToken: hash
+                  secret: hash
+                  expiresIn: 200
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      authToken:
+                        type: string
+                      userId:
+                        type: string
+                      me:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                          name:
+                            type: string
+                          emails:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                address:
+                                  type: string
+                                verified:
+                                  type: boolean
+                          status:
+                            type: string
+                          statusConnection:
+                            type: string
+                          username:
+                            type: string
+                          utcOffset:
+                            type: integer
+                          active:
+                            type: boolean
+                          roles:
+                            type: array
+                            items:
+                              type: string
+                          settings:
+                            type: object
+                            properties:
+                              preferences:
+                                type: object
+                          avatarUrl:
+                            type: string
+                x-examples:
+                  Example:
+                    status: success
+                    data:
+                      authToken: 9HqLlyZOugoStsXCUfD_0YdwnNnunAJF8V47U3QHXSq
+                      userId: aobEdbYhXfu5hkeqG
+                      me:
+                        _id: aYjNnig8BEAWeQzMh
+                        name: Rocket Cat
+                        emails:
+                          - address: rocket.cat@rocket.chat
+                            verified: false
+                        status: offline
+                        statusConnection: offline
+                        username: rocket.cat
+                        utcOffset: -3
+                        active: true
+                        roles:
+                          - admin
+                        settings:
+                          preferences: {}
+                        avatarUrl: 'http://localhost:3000/avatar/test'
+              examples:
+                Success Example:
+                  value:
+                    status: success
+                    data:
+                      authToken: 9HqLlyZOugoStsXCUfD_0YdwnNnunAJF8V47U3QHXSq
+                      userId: aobEdbYhXfu5hkeqG
+                      me:
+                        _id: aYjNnig8BEAWeQzMh
+                        name: Rocket Cat
+                        emails:
+                          - address: rocket.cat@rocket.chat
+                            verified: false
+                        status: offline
+                        statusConnection: offline
+                        username: rocket.cat
+                        utcOffset: -3
+                        active: true
+                        roles:
+                          - admin
+                        settings:
+                          preferences: {}
+                        avatarUrl: 'http://localhost:3000/avatar/test'
+  /api/v1/login - with Twitter:
+    post:
+      tags:
+        - Authentication
+      summary: Login with Twitter
+      description: |-
+        ### Changelog
+        | Version      | Description | 
+         | ---------------- | ------------|
+         |1.0.0            | Added `avatarUrl` property to response       |
+         |0.64.0            | Added `me` property.      |
+         |0.63.0            | Added      |
+      operationId: post-api-v1-login-twitter
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceName:
+                  type: string
+                  description: 'The desired OAuth service name. In this case, `twitter`.'
+                  example: twitter
+                accessToken:
+                  type: string
+                  description: Access token provided by Twitter OAuth.
+                  example: hash
+                accessTokenSecret:
+                  type: string
+                  description: The access token secret provided by Twitter OAuth.
+                  example: hash
+                appSecret:
+                  type: string
+                  description: The app secret provided by Twitter.
+                  example: hash
+                appId:
+                  type: string
+                  description: The app ID provided by Twitter.
+                  example: hash
+                expiresIn:
+                  type: integer
+                  description: Lifetime of token (in seconds).
+                  example: 200
+              required:
+                - serviceName
+                - accessToken
+                - accessTokenSecret
+                - appSecret
+                - appId
+                - expiresIn
+              x-examples:
+                Example:
+                  serviceName: twitter
+                  accessToken: hash
+                  accessTokenSecret: hash
+                  appSecret: hash
+                  appId: hash
+                  expiresIn: 200
+            examples:
+              Example:
+                value:
+                  serviceName: twitter
+                  accessToken: hash
+                  accessTokenSecret: hash
+                  appSecret: hash
+                  appId: hash
+                  expiresIn: 200
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      authToken:
+                        type: string
+                      userId:
+                        type: string
+                      me:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                          name:
+                            type: string
+                          emails:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                address:
+                                  type: string
+                                verified:
+                                  type: boolean
+                          status:
+                            type: string
+                          statusConnection:
+                            type: string
+                          username:
+                            type: string
+                          utcOffset:
+                            type: integer
+                          active:
+                            type: boolean
+                          roles:
+                            type: array
+                            items:
+                              type: string
+                          settings:
+                            type: object
+                            properties:
+                              preferences:
+                                type: object
+                          avatarUrl:
+                            type: string
+                x-examples:
+                  Example:
+                    status: success
+                    data:
+                      authToken: 9HqLlyZOugoStsXCUfD_0YdwnNnunAJF8V47U3QHXSq
+                      userId: aobEdbYhXfu5hkeqG
+                      me:
+                        _id: aYjNnig8BEAWeQzMh
+                        name: Rocket Cat
+                        emails:
+                          - address: rocket.cat@rocket.chat
+                            verified: false
+                        status: offline
+                        statusConnection: offline
+                        username: rocket.cat
+                        utcOffset: -3
+                        active: true
+                        roles:
+                          - admin
+                        settings:
+                          preferences: {}
+                        avatarUrl: 'http://localhost:3000/avatar/test'
+              examples:
+                Success Example:
+                  value:
+                    status: success
+                    data:
+                      authToken: 9HqLlyZOugoStsXCUfD_0YdwnNnunAJF8V47U3QHXSq
+                      userId: aobEdbYhXfu5hkeqG
+                      me:
+                        _id: aYjNnig8BEAWeQzMh
+                        name: Rocket Cat
+                        emails:
+                          - address: rocket.cat@rocket.chat
+                            verified: false
+                        status: offline
+                        statusConnection: offline
+                        username: rocket.cat
+                        utcOffset: -3
+                        active: true
+                        roles:
+                          - admin
+                        settings:
+                          preferences: {}
+                        avatarUrl: 'http://localhost:3000/avatar/test'
+  /api/v1/login - with Google:
+    post:
+      tags:
+        - Authentication
+      summary: Login with Google
+      description: |-
+        ### Changelog
+        | Version      | Description | 
+         | ---------------- | ------------|
+         |1.0.0            | Added `avatarUrl` property to response       |
+         |0.64.0            | Added `me` property.      |
+         |0.60.0            | Added      |
+      operationId: post-api-v1-login-google
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                serviceName:
+                  type: string
+                  description: 'The desired OAuth service name. In this case, `google`.'
+                accessToken:
+                  type: string
+                  description: Access token provided by Google OAuth.
+                idToken:
+                  type: string
+                  description: The ID token provided by Google OAuth.
+                expiresIn:
+                  type: integer
+                  description: Lifetime of token (in seconds).
+                scope:
+                  type: string
+                  description: Google scopes for API.
+              required:
+                - serviceName
+                - accessToken
+                - idToken
+                - expiresIn
+              x-examples:
+                Example:
+                  serviceName: google
+                  accessToken: hash
+                  idToken: hash
+                  expiresIn: 200
+                  scope: profile
+            examples:
+              Example:
+                value:
+                  serviceName: google
+                  accessToken: hash
+                  idToken: hash
+                  expiresIn: 200
+                  scope: profile
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      authToken:
+                        type: string
+                      userId:
+                        type: string
+                      me:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                          name:
+                            type: string
+                          emails:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                address:
+                                  type: string
+                                verified:
+                                  type: boolean
+                          status:
+                            type: string
+                          statusConnection:
+                            type: string
+                          username:
+                            type: string
+                          utcOffset:
+                            type: integer
+                          active:
+                            type: boolean
+                          roles:
+                            type: array
+                            items:
+                              type: string
+                          settings:
+                            type: object
+                            properties:
+                              preferences:
+                                type: object
+                          avatarUrl:
+                            type: string
+                x-examples:
+                  Login successful:
+                    status: success
+                    data:
+                      authToken: 9HqLlyZOugoStsXCUfD_0YdwnNnunAJF8V47U3QHXSq
+                      userId: aobEdbYhXfu5hkeqG
+                      me:
+                        _id: aYjNnig8BEAWeQzMh
+                        name: Rocket Cat
+                        emails:
+                          - address: rocket.cat@rocket.chat
+                            verified: false
+                        status: offline
+                        statusConnection: offline
+                        username: rocket.cat
+                        utcOffset: -3
+                        active: true
+                        roles:
+                          - admin
+                        settings:
+                          preferences: {}
+                        avatarUrl: 'http://localhost:3000/avatar/test'
+              examples:
+                Success Example:
+                  value:
+                    status: success
+                    data:
+                      authToken: 9HqLlyZOugoStsXCUfD_0YdwnNnunAJF8V47U3QHXSq
+                      userId: aobEdbYhXfu5hkeqG
+                      me:
+                        _id: aYjNnig8BEAWeQzMh
+                        name: Rocket Cat
+                        emails:
+                          - address: rocket.cat@rocket.chat
+                            verified: false
+                        status: offline
+                        statusConnection: offline
+                        username: rocket.cat
+                        utcOffset: -3
+                        active: true
+                        roles:
+                          - admin
+                        settings:
+                          preferences: {}
+                        avatarUrl: 'http://localhost:3000/avatar/test'
+  /api/v1/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Logout
+      description: Invalidate your REST API authentication token.
+      operationId: post-api-v1-logout
+      parameters:
+        - name: X-Auth-Token
+          in: header
+          description: The authorization token of the user
+          required: true
+          schema:
+            type: string
+        - name: X-User-Id
+          in: header
+          description: The user id of the user
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+              examples:
+                Example:
+                  value:
+                    status: success
+                    data:
+                      message: You've been logged out!
+  /api/v1/me:
+    get:
+      tags:
+        - Authentication
+      summary: Get Profile Information
+      description: |-
+        Quick information about the authenticated user.
+        ### Changelog
+         | Version      | Description | 
+         | ---------------- | ------------|
+         |1.0.0            | Added `avatarUrl` property to response       |
+         |0.68.0            | Added `customFields` property.      |
+         |0.48.0            | Added      |
+      operationId: get-api-v1-me
+      parameters:
+        - name: X-User-Id
+          in: header
+          description: The user ID of the user.
+          required: true
+          schema:
+            type: string
+        - name: X-Auth-Token
+          in: header
+          description: The authorization token of the user.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: |-
+            OK 
+
+            The `customFields` parameter won't be returned if it doesn't exist on the workspace.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  name:
+                    type: string
+                  emails:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        address:
+                          type: string
+                        verified:
+                          type: boolean
+                  status:
+                    type: string
+                  statusConnection:
+                    type: string
+                  username:
+                    type: string
+                  utcOffset:
+                    type: integer
+                  active:
+                    type: boolean
+                  roles:
+                    type: array
+                    items:
+                      type: string
+                  settings:
+                    type: object
+                    properties:
+                      preferences:
+                        type: object
+                        properties:
+                          enableAutoAway:
+                            type: boolean
+                          idleTimeoutLimit:
+                            type: integer
+                          desktopNotificationDuration:
+                            type: integer
+                          audioNotifications:
+                            type: string
+                          desktopNotifications:
+                            type: string
+                          mobileNotifications:
+                            type: string
+                          unreadAlert:
+                            type: boolean
+                          useEmojis:
+                            type: boolean
+                          convertAsciiEmoji:
+                            type: boolean
+                          autoImageLoad:
+                            type: boolean
+                          saveMobileBandwidth:
+                            type: boolean
+                          collapseMediaByDefault:
+                            type: boolean
+                          hideUsernames:
+                            type: boolean
+                          hideRoles:
+                            type: boolean
+                          hideFlexTab:
+                            type: boolean
+                          hideAvatars:
+                            type: boolean
+                          roomsListExhibitionMode:
+                            type: string
+                          sidebarViewMode:
+                            type: string
+                          sidebarHideAvatar:
+                            type: boolean
+                          sidebarShowUnread:
+                            type: boolean
+                          sidebarShowFavorites:
+                            type: boolean
+                          sendOnEnter:
+                            type: string
+                          messageViewMode:
+                            type: integer
+                          emailNotificationMode:
+                            type: string
+                          roomCounterSidebar:
+                            type: boolean
+                          newRoomNotification:
+                            type: string
+                          newMessageNotification:
+                            type: string
+                          muteFocusedConversations:
+                            type: boolean
+                          notificationsSoundVolume:
+                            type: integer
+                  customFields:
+                    type: object
+                    properties:
+                      twitter:
+                        type: string
+                  avatarUrl:
+                    type: string
+                  success:
+                    type: boolean
+                x-examples:
+                  Example 1:
+                    _id: aobEdbYhXfu5hkeqG
+                    name: Example User
+                    emails:
+                      - address: example@example.com
+                        verified: true
+                    status: offline
+                    statusConnection: offline
+                    username: example
+                    utcOffset: 0
+                    active: true
+                    roles:
+                      - user
+                      - admin
+                    settings:
+                      preferences:
+                        enableAutoAway: false
+                        idleTimeoutLimit: 300
+                        desktopNotificationDuration: 0
+                        audioNotifications: mentions
+                        desktopNotifications: mentions
+                        mobileNotifications: mentions
+                        unreadAlert: true
+                        useEmojis: true
+                        convertAsciiEmoji: true
+                        autoImageLoad: true
+                        saveMobileBandwidth: true
+                        collapseMediaByDefault: false
+                        hideUsernames: false
+                        hideRoles: false
+                        hideFlexTab: false
+                        hideAvatars: false
+                        roomsListExhibitionMode: category
+                        sidebarViewMode: medium
+                        sidebarHideAvatar: false
+                        sidebarShowUnread: false
+                        sidebarShowFavorites: true
+                        sendOnEnter: normal
+                        messageViewMode: 0
+                        emailNotificationMode: all
+                        roomCounterSidebar: false
+                        newRoomNotification: door
+                        newMessageNotification: chime
+                        muteFocusedConversations: true
+                        notificationsSoundVolume: 100
+                    customFields:
+                      twitter: '@userstwi'
+                    avatarUrl: 'http://localhost:3000/avatar/test'
+                    success: true
+              examples:
+                User profile:
+                  value:
+                    _id: aobEdbYhXfu5hkeqG
+                    name: Example User
+                    emails:
+                      - address: example@example.com
+                        verified: true
+                    status: offline
+                    statusConnection: offline
+                    username: example
+                    utcOffset: 0
+                    active: true
+                    roles:
+                      - user
+                      - admin
+                    settings:
+                      preferences:
+                        enableAutoAway: false
+                        idleTimeoutLimit: 300
+                        desktopNotificationDuration: 0
+                        audioNotifications: mentions
+                        desktopNotifications: mentions
+                        mobileNotifications: mentions
+                        unreadAlert: true
+                        useEmojis: true
+                        convertAsciiEmoji: true
+                        autoImageLoad: true
+                        saveMobileBandwidth: true
+                        collapseMediaByDefault: false
+                        hideUsernames: false
+                        hideRoles: false
+                        hideFlexTab: false
+                        hideAvatars: false
+                        roomsListExhibitionMode: category
+                        sidebarViewMode: medium
+                        sidebarHideAvatar: false
+                        sidebarShowUnread: false
+                        sidebarShowFavorites: true
+                        sendOnEnter: normal
+                        messageViewMode: 0
+                        emailNotificationMode: all
+                        roomCounterSidebar: false
+                        newRoomNotification: door
+                        newMessageNotification: chime
+                        muteFocusedConversations: true
+                        notificationsSoundVolume: 100
+                    customFields:
+                      twitter: '@userstwi'
+                    avatarUrl: 'http://localhost:3000/avatar/test'
+                    success: true
+  /api/v1/users.2fa.enableEmail:
+    post:
+      tags:
+        - Two-Factor Authentication
+      summary: Enable 2FA via Email
+      description: 'Enable email two-factor authentication for your account. This endpoint only works if the user has at least one verified email. '
+      operationId: post-api-v1-users.2fa.enableEmail
+      parameters:
+        - $ref: '#/components/parameters/Auth-Token'
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          $ref: '#/components/responses/trueSuccess'
+        '401':
+          $ref: '#/components/responses/authorizationError'
+  /api/v1/users.2fa.sendEmailCode:
+    parameters: []
+    post:
+      summary: Send 2FA Email Code
+      operationId: post-api-v1-users.2fa.sendEmailCode
+      responses:
+        '200':
+          $ref: '#/components/responses/trueSuccess'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorType:
+                    type: string
+              examples:
+                Example 1:
+                  value:
+                    success: false
+                    error: 'emailOrUsername is required [error-parameter-required]'
+                    errorType: error-parameter-required
+        '401':
+          $ref: '#/components/responses/authorizationError'
+      description: ''
+      parameters:
+        - $ref: '#/components/parameters/Auth-TokenNotRequired'
+        - $ref: '#/components/parameters/UserIdNotRequired'
+      tags:
+        - Two-Factor Authentication
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                emailOrUsername:
+                  type: string
+                  description: Enter the email or username.
+                  example: test@email.com
+              required:
+                - emailOrUsername
+            examples:
+              Example 1:
+                value:
+                  emailOrUsername: test@email.com
+  /api/v1/users.2fa.disableEmail:
+    post:
+      tags:
+        - Two-Factor Authentication
+      summary: Disable 2FA via Email
+      description: Disable two-factor authentication via email. The 2FA code is required.
+      operationId: post-api-v1-users.2fa.disableEmail
+      parameters:
+        - $ref: '#/components/parameters/Auth-Token'
+        - $ref: '#/components/parameters/UserId'
+        - name: X-2fa-Code
+          in: header
+          description: 'The 2FA code. '
+          required: true
+          schema:
+            type: string
+        - schema:
+            type: string
+          in: header
+          name: X-2fa-method
+          description: 'The 2FA method. It can be `email`, `totp`, or `password`.'
+          required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/trueSuccess'
+        '400':
+          description: |-
+            TOTP Required 
+
+            The 2FA code is passed as the `X-2fa-Code` query parameter.
+
+            It's important to note the **required TOTP method** returned from the response.
+
+            - If it's `password`, add the hashed password of the user as the `X-2fa-Code` header parameter. 
+            - If it's `email`, add the 2FA code sent via email as the `X-2fa-Code` header parameter.
+            - If it's `totp`, add the code from your authenticator app as the `X-2fa-Code` header parameter.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  error:
+                    type: string
+                  errorType:
+                    type: string
+                  details:
+                    type: object
+                    properties:
+                      method:
+                        type: string
+                      codeGenerated:
+                        type: boolean
+                      availableMethods:
+                        type: array
+                        items:
+                          type: object                   
+              examples:
+                TOTP Required:
+                  value:
+                    success: false
+                    error: 'TOTP Required [totp-required]'
+                    errorType: totp-required
+                    details:
+                      method: password
+                      codeGenerated: false
+                      availableMethods: []
+tags:
+  - name: Authentication
+  - name: Two-Factor Authentication
+components:
+  parameters:
+    Auth-Token:
+      name: X-Auth-Token
+      in: header
+      description: The `authToken` of the authenticated user.
+      required: true
+      schema:
+        type: string
+        example: RScctEHSmLGZGywfIhWyRpyofhKOiMoUIpimhvheU3f
+    Auth-TokenNotRequired:
+      name: X-Auth-Token
+      in: header
+      description: The `authToken` of the authenticated user.
+      required: false
+      schema:
+        type: string
+        example: RScctEHSmLGZGywfIhWyRpyofhKOiMoUIpimhvheU3f
+    UserId:
+      name: X-User-Id
+      in: header
+      description: The `userId` of the authenticated user.
+      required: true
+      schema:
+        type: string
+        example: rbAXPnMktTFbNpwtJ
+    UserIdNotRequired:
+      name: X-User-Id
+      in: header
+      description: The `userId` of the authenticated user.
+      required: false
+      schema:
+        type: string
+        example: rbAXPnMktTFbNpwtJ
+  responses:
+    trueSuccess:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+            x-examples:
+              Success:
+                success: true
+          examples:
+            Success:
+              value:
+                success: true
+    authorizationError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              message:
+                type: string
+            x-examples:
+              Authorization Error:
+                status: error
+                message: You must be logged in to do this.
+          examples:
+            Authorization Error:
+              value:
+                status: error
+                message: You must be logged in to do this.

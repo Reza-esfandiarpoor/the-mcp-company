@@ -1,0 +1,386 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: RoomsP2
+#  description: |-
+#    Conversations take place in rooms. This section includes the following:
+#    * **Groups**: Organize discussions with groups or channels.
+#    * **Channels**: Create and manage dedicated [channels](https://docs.rocket.chat/use-rocket.chat/user-guides/rooms/channels) for various topics.
+#    * **Rooms**: Manage rooms and modify room settings.
+#    * **Teams**: Create and manage [teams](https://docs.rocket.chat/use-rocket.chat/user-guides/rooms/teams) and team members.
+#    * **Directory**: Search workspace users, teams, and channels.
+servers:
+  - url: https://apiexplorer.support.rocket.chat
+paths:
+  /api/v1/channels.invite:
+    post:
+      tags:
+        - Channels
+      summary: Add Users to Channel
+      description: |-
+        Add bulk users to a channel.
+
+        For a user to invite other users, they must match at least one of the following premises:
+        - The user is part of a room of any type and has the `add-user-to-joined-room` permission.
+        - The user is part of a public room `(t: 'c')` and has the `add-user-to-any-c-room` permission.
+        - The user is part of a private room `(t: 'p')` and has the `add-user-to-any-p-room` permission.
+
+        ### Changelog
+
+        | Version | Description               |
+        | ------- | ------------------------- |
+        | 0.48.0  | Added                  |
+      operationId: post-api-v1-channels.inviteBulk
+      parameters:
+        - $ref: '#/components/parameters/Auth-Token'
+        - $ref: '#/components/parameters/UserId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                roomId:
+                  type: string
+                  description: The channel's id
+                  example: nSYqWzZ4GsKTX4dyK
+                userIds:
+                  type: array
+                  description: An array of the userId of users to be invited
+                  items:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                      value:
+                        type: string
+              required:
+                - roomId
+                - userIds
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  channel:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      fname:
+                        type: string
+                      customFields:
+                        type: object
+                      description:
+                        type: string
+                      broadcast:
+                        type: boolean
+                      encrypted:
+                        type: boolean
+                      federated:
+                        type: boolean
+                      name:
+                        type: string
+                      t:
+                        type: string
+                      msgs:
+                        type: integer
+                      usersCount:
+                        type: integer
+                      u:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                          username:
+                            type: string
+                      ts:
+                        type: string
+                      ro:
+                        type: boolean
+                      default:
+                        type: boolean
+                      sysMes:
+                        type: boolean
+                      _updatedAt:
+                        type: string
+                      lm:
+                        type: string
+                      lastMessage:
+                        type: object
+                        properties:
+                          _id:
+                            type: string
+                          t:
+                            type: string
+                          msg:
+                            type: string
+                          groupable:
+                            type: boolean
+                          blocks:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                type:
+                                  type: string
+                                blockId:
+                                  type: string
+                                callId:
+                                  type: string
+                                appId:
+                                  type: string
+                          ts:
+                            type: string
+                          u:
+                            type: object
+                            properties:
+                              _id:
+                                type: string
+                              username:
+                                type: string
+                              name:
+                                type: string
+                          rid:
+                            type: string
+                          _updatedAt:
+                            type: string
+                          urls:
+                            type: array
+                            items:
+                              type: object
+                          mentions:
+                            type: array
+                            items:
+                              type: object
+                          channels:
+                            type: array
+                            items:
+                              type: object
+                  success:
+                    type: boolean
+              examples:
+                Add bulk users:
+                  value:
+                    channel:
+                      _id: ByehQjC44FwMeiLbX
+                      ts: '2016-11-30T21:23:04.737Z'
+                      t: c
+                      name: testing
+                      usernames:
+                        - testing
+                        - testing1
+                      msgs: 1
+                      _updatedAt: '2016-12-09T12:50:51.575Z'
+                      lm: '2016-12-09T12:50:51.555Z'
+                    success: true
+        '401':
+          $ref: '#/components/responses/authorizationError'
+tags:
+  - name: Channels
+  - name: Directory
+  - name: Groups
+  - name: Rooms
+  - name: Teams
+
+components:
+  schemas:
+    Attachment:
+      type: object
+      properties:
+        ts:
+          type: string
+          example: 1970-01-01T00:00:00.000Z
+        title:
+          type: string
+        title_link:
+          type: string
+        title_link_download:
+          type: boolean
+        image_dimensions:
+          type: object
+          properties:
+            width:
+              type: integer
+              example: 444
+            height:
+              type: integer
+              example: 360
+        image_preview:
+          type: string
+          example: /9j/2wBDAAYEBQ...
+        image_url:
+          type: string
+          example: /file-upload/PNTaE9SBQasdpAwk2/img_1.jpg
+        image_type:
+          type: string
+          example: image/jpeg
+        image_size:
+          type: integer
+          example: 26674
+        type:
+          type: string
+          example: file
+        description:
+          type: string
+          example: ''
+  parameters:
+    Optional-RoomId:
+      name: roomId
+      in: query
+      description: The room ID. It is required if the `roomName` is not provided.
+      schema:
+        type: string
+      example: dlpfuijw7ej
+    Optional-RoomName:
+      name: roomName
+      in: query
+      description: The room name.  It is required if the `roomId` is not provided.
+      required: false
+      schema:
+        type: string
+      example: general
+    RoomId:
+      name: roomId
+      in: query
+      description: The room id.
+      required: true
+      schema:
+        type: string
+      example: jdiue8TGkodp
+    Optional-TeamId:
+      name: teamId
+      in: query
+      description: The team id.  It is required if the `teamName` is not provided.
+      schema:
+        type: string
+      example: 63f3efc4b000b6b6d86704b2
+    Optional-TeamName:
+      name: teamName
+      in: query
+      description: The team name.  It is required if the `teamId` is not provided.
+      required: false
+      schema:
+        type: string
+      example: livestream
+    offset:
+      name: offset
+      in: query
+      description: 'Number of items to "skip" in the query, i.e. requests return count items, skipping the first offset items. Refer to the [official documentation](https://developer.rocket.chat/apidocs/query-parameters#pagination) to learn more.'
+      required: false
+      schema:
+        type: integer
+      example: 50
+    count:
+      name: count
+      in: query
+      description: 'The number of items to return. Refer to the [official documentation](https://developer.rocket.chat/apidocs/query-parameters#pagination) to learn more.'
+      required: false
+      schema:
+        type: integer
+      example: 50
+    sort:
+      name: sort
+      in: query
+      description: 'List of fields to order by, and in which direction. This is a JSON object, with properties listed in desired order, with values of 1 for ascending, or -1 for descending. For example, {"value": -1, "_id": 1}. Refer to the [official documentation](https://developer.rocket.chat/apidocs/query-parameters#pagination) to learn more.'
+      required: false
+      schema: { }
+    query:
+      name: query
+      in: query
+      description: 'This parameter allows you to use MongoDB query operators to search for specific data. For example, to query users with a name that contains the letter "g": `query={ "name": { "$regex": "g" } }`. Refer to the [official documentation](https://developer.rocket.chat/apidocs/query-parameters#query-and-fields) to learn more.'
+      required: false
+      schema: { }
+    fields:
+      name: fields
+      in: query
+      description: 'This parameter accepts a JSON object with properties that have a value of 1 or 0 to include or exclude them in the response. For example, to only retrieve the usernames of users: `fields={ "username": 1 }`. Refer to the [official documentation](https://developer.rocket.chat/apidocs/query-parameters#query-and-fields) to learn more.'
+      required: false
+      schema:
+        type: string
+    Auth-Token:
+      name: X-Auth-Token
+      in: header
+      description: The `authToken` of the authenticated user.
+      required: true
+      schema:
+        type: string
+      example: RScctEHSmLGZGywfIhWyRpyofhKOiMoUIpimhvheU3f
+    UserId:
+      name: X-User-Id
+      in: header
+      description: The `userId` of the authenticated user.
+      required: true
+      schema:
+        type: string
+      example: rbAXPnMktTFbNpwtJ
+    filterName:
+      name: name
+      in: query
+      description: The name of the file to search for.
+      schema:
+        type: string
+      example: logo
+    filterTypeGroup:
+      name: typeGroup
+      in: query
+      description: |-
+        Filter results by the type of file. Available options:
+        - `all`: Return all file types.
+        - `image`: Filter by image files.
+        - `video`: Filter by video files.
+        - `audio`: Filter by audio files.
+        - `text`: Filter by text documents.
+        - `application`: Filter by other file types.
+      schema:
+        type: string
+      example: images
+  responses:
+    trueSuccess:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+          examples:
+            Success:
+              value:
+                success: true
+    authorizationError:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              message:
+                type: string
+          examples:
+            Authorization Error:
+              value:
+                status: error
+                message: You must be logged in to do this.
+    forbiddenError:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+              error:
+                type: string
+          examples:
+            Permission Error:
+              value:
+                success: false
+                error: 'User does not have the permissions required for this action [error-unauthorized]'

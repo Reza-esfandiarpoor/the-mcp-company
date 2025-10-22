@@ -1,0 +1,754 @@
+openapi: 3.0.0
+info:
+  version: 2022-06-01
+  title: Azure Stack Azure Bridge Client
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  /providers/Microsoft.AzureStack/operations:
+    get:
+      description: Returns the list of supported REST operations.
+      tags:
+      - AzureStack
+      operationId: Operations_List
+      parameters:
+      - name: api-version
+        in: query
+        description: Client API Version.
+        required: true
+        schema:
+          type: string
+          default: 2017-06-01
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: List of Operations
+                properties:
+                  value:
+                    description: Array of operations
+                    type: array
+                    items:
+                      description: Describes the supported REST operation.
+                      properties:
+                        name:
+                          description: The name of the operation being performed on
+                            this particular object.
+                          type: string
+                        display:
+                          description: Contains the localized display information
+                            for this particular operation or action.
+                          properties:
+                            provider:
+                              description: The localized, friendly version of the
+                                resource provider name.
+                              type: string
+                            resource:
+                              description: The localized, friendly version of the
+                                resource type related to this action or operation;
+                                the resource type should match the public documentation
+                                for the resource provider.
+                              type: string
+                            operation:
+                              description: The localized, friendly name for the operation.
+                                Use the name as it will displayed to the user.
+                              type: string
+                            description:
+                              description: The localized, friendly description for
+                                the operation. The description will be displayed to
+                                the user. It should be thorough and concise for used
+                                in both tooltips and detailed views.
+                              type: string
+                        origin:
+                          description: The intended executor of the operation.
+                          type: string
+                    x-ms-identifiers:
+                    - name
+                  nextLink:
+                    description: URI to the next page of operations.
+                    type: string
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response indicates that the service is not able
+                  to process the incoming request. The reason is provided in the error
+                  message.
+                type: object
+                properties:
+                  error:
+                    description: The details of the error.
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                        readOnly: true
+                      target:
+                        description: The target of the particular error.
+                        type: string
+                        readOnly: true
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /providers/Microsoft.AzureStack/cloudManifestFiles:
+    get:
+      tags:
+      - AzureStack
+      description: Returns a cloud specific manifest JSON file with latest version.
+      operationId: CloudManifestFile_List
+      parameters:
+      - name: api-version
+        in: query
+        description: Client API Version.
+        required: true
+        schema:
+          type: string
+          default: 2017-06-01
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    description: ID of the resource.
+                    type: string
+                  name:
+                    readOnly: true
+                    description: Name of the resource.
+                    type: string
+                  type:
+                    readOnly: true
+                    description: Type of Resource.
+                    type: string
+                  etag:
+                    description: The entity tag used for optimistic concurrency when
+                      modifying the resource.
+                    type: string
+                  properties:
+                    description: Cloud specific manifest data.
+                    type: object
+                    properties:
+                      deploymentData:
+                        description: Cloud specific manifest data.
+                        type: object
+                        properties:
+                          externalDsmsCertificates:
+                            description: Dsms external certificates.
+                            type: string
+                          customCloudVerificationKey:
+                            description: Signing verification public key.
+                            type: string
+                          customEnvironmentEndpoints:
+                            description: Environment endpoints.
+                            x-ms-client-flatten: true
+                            type: object
+                            properties:
+                              customCloudArmEndpoint:
+                                description: ARM endpoint.
+                                type: string
+                              externalDsmsEndpoint:
+                                description: Dsms endpoint.
+                                type: string
+                      signature:
+                        description: Signature of the cloud specific manifest data.
+                        type: string
+                description: Base resource object.
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response indicates that the service is not able
+                  to process the incoming request. The reason is provided in the error
+                  message.
+                type: object
+                properties:
+                  error:
+                    description: The details of the error.
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                        readOnly: true
+                      target:
+                        description: The target of the particular error.
+                        type: string
+                        readOnly: true
+  /providers/Microsoft.AzureStack/cloudManifestFiles/{verificationVersion}:
+    get:
+      tags:
+      - AzureStack
+      description: Returns a cloud specific manifest JSON file.
+      operationId: CloudManifestFile_Get
+      parameters:
+      - name: verificationVersion
+        in: path
+        description: Signing verification key version.
+        required: true
+        schema:
+          type: string
+      - name: versionCreationDate
+        in: query
+        description: Signing verification key version creation date.
+        required: false
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: Client API Version.
+        required: true
+        schema:
+          type: string
+          default: 2017-06-01
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    description: ID of the resource.
+                    type: string
+                  name:
+                    readOnly: true
+                    description: Name of the resource.
+                    type: string
+                  type:
+                    readOnly: true
+                    description: Type of Resource.
+                    type: string
+                  etag:
+                    description: The entity tag used for optimistic concurrency when
+                      modifying the resource.
+                    type: string
+                  properties:
+                    description: Cloud specific manifest data.
+                    type: object
+                    properties:
+                      deploymentData:
+                        description: Cloud specific manifest data.
+                        type: object
+                        properties:
+                          externalDsmsCertificates:
+                            description: Dsms external certificates.
+                            type: string
+                          customCloudVerificationKey:
+                            description: Signing verification public key.
+                            type: string
+                          customEnvironmentEndpoints:
+                            description: Environment endpoints.
+                            x-ms-client-flatten: true
+                            type: object
+                            properties:
+                              customCloudArmEndpoint:
+                                description: ARM endpoint.
+                                type: string
+                              externalDsmsEndpoint:
+                                description: Dsms endpoint.
+                                type: string
+                      signature:
+                        description: Signature of the cloud specific manifest data.
+                        type: string
+                description: Base resource object.
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response indicates that the service is not able
+                  to process the incoming request. The reason is provided in the error
+                  message.
+                type: object
+                properties:
+                  error:
+                    description: The details of the error.
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                        readOnly: true
+                      target:
+                        description: The target of the particular error.
+                        type: string
+                        readOnly: true
+  /subscriptions/{subscriptionId}/providers/Microsoft.AzureStack/generateDeploymentLicense:
+    post:
+      tags:
+      - AzureStack
+      description: Creates a license that can be used to deploy an Azure Stack device.
+      operationId: DeploymentLicense_Create
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: Subscription credentials that uniquely identify Microsoft Azure
+          subscription. The subscription ID forms part of the URI for every service
+          call.
+        required: true
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: Client API Version.
+        required: true
+        schema:
+          type: string
+          default: 2017-06-01
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Request details for generating a deployment license.
+              type: object
+              properties:
+                verificationVersion:
+                  description: Signing verification public key version.
+                  type: string
+        description: Request body for creating a deployment license.
+        required: true
+        x-ms-parameter-location: method
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: A license that can be used to deploy an Azure Stack device.
+                type: object
+                properties:
+                  temporaryLicenseChain:
+                    description: A license chain that can be used to temporarily activate
+                      an Azure Stack device.
+                    type: array
+                    items:
+                      description: An intermediate or leaf license item.
+                      type: string
+                  signature:
+                    description: Signature of the license chain.
+                    type: string
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: Error response indicates that the service is not able
+                  to process the incoming request. The reason is provided in the error
+                  message.
+                type: object
+                properties:
+                  error:
+                    description: The details of the error.
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                        readOnly: true
+                      target:
+                        description: The target of the particular error.
+                        type: string
+                        readOnly: true
+components:
+  parameters:
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: Subscription credentials that uniquely identify Microsoft Azure
+        subscription. The subscription ID forms part of the URI for every service
+        call.
+      required: true
+      schema:
+        type: string
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: Client API Version.
+      required: true
+      schema:
+        type: string
+        default: 2017-06-01
+    ResourceGroupNameParameter:
+      description: Name of the resource group.
+      name: resourceGroup
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    RegistrationNameParameter:
+      description: Name of the Azure Stack registration.
+      name: registrationName
+      in: path
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Authorization uses an Azure Active Directory OAuth2 flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    Resource:
+      description: Base resource object.
+      type: object
+      properties:
+        id:
+          readOnly: true
+          description: ID of the resource.
+          type: string
+        name:
+          readOnly: true
+          description: Name of the resource.
+          type: string
+        type:
+          readOnly: true
+          description: Type of Resource.
+          type: string
+        etag:
+          description: The entity tag used for optimistic concurrency when modifying
+            the resource.
+          type: string
+      x-ms-azure-resource: true
+    TrackedResource:
+      description: Base resource object.
+      type: object
+      properties:
+        id:
+          readOnly: true
+          description: ID of the resource.
+          type: string
+        name:
+          readOnly: true
+          description: Name of the resource.
+          type: string
+        type:
+          readOnly: true
+          description: Type of Resource.
+          type: string
+        location:
+          description: Location of the resource.
+          type: string
+          enum:
+          - global
+          x-ms-enum:
+            name: Location
+            modelAsString: true
+          x-ms-mutability:
+          - create
+          - read
+        tags:
+          description: Custom tags for the resource.
+          type: object
+          additionalProperties:
+            type: string
+        etag:
+          description: The entity tag used for optimistic concurrency when modifying
+            the resource.
+          type: string
+      required:
+      - location
+      x-ms-azure-resource: true
+    ProvisioningState:
+      description: The provisioning state of the resource.
+      enum:
+      - Creating
+      - Failed
+      - Succeeded
+      - Canceled
+      type: string
+      x-ms-enum:
+        name: ProvisioningState
+    Operation:
+      description: Describes the supported REST operation.
+      properties:
+        name:
+          description: The name of the operation being performed on this particular
+            object.
+          type: string
+        display:
+          description: Contains the localized display information for this particular
+            operation or action.
+          properties:
+            provider:
+              description: The localized, friendly version of the resource provider
+                name.
+              type: string
+            resource:
+              description: The localized, friendly version of the resource type related
+                to this action or operation; the resource type should match the public
+                documentation for the resource provider.
+              type: string
+            operation:
+              description: The localized, friendly name for the operation. Use the
+                name as it will displayed to the user.
+              type: string
+            description:
+              description: The localized, friendly description for the operation.
+                The description will be displayed to the user. It should be thorough
+                and concise for used in both tooltips and detailed views.
+              type: string
+        origin:
+          description: The intended executor of the operation.
+          type: string
+    Display:
+      description: Contains the localized display information for this particular
+        operation or action.
+      properties:
+        provider:
+          description: The localized, friendly version of the resource provider name.
+          type: string
+        resource:
+          description: The localized, friendly version of the resource type related
+            to this action or operation; the resource type should match the public
+            documentation for the resource provider.
+          type: string
+        operation:
+          description: The localized, friendly name for the operation. Use the name
+            as it will displayed to the user.
+          type: string
+        description:
+          description: The localized, friendly description for the operation. The
+            description will be displayed to the user. It should be thorough and concise
+            for used in both tooltips and detailed views.
+          type: string
+    OperationList:
+      description: List of Operations
+      properties:
+        value:
+          description: Array of operations
+          type: array
+          items:
+            description: Describes the supported REST operation.
+            properties:
+              name:
+                description: The name of the operation being performed on this particular
+                  object.
+                type: string
+              display:
+                description: Contains the localized display information for this particular
+                  operation or action.
+                properties:
+                  provider:
+                    description: The localized, friendly version of the resource provider
+                      name.
+                    type: string
+                  resource:
+                    description: The localized, friendly version of the resource type
+                      related to this action or operation; the resource type should
+                      match the public documentation for the resource provider.
+                    type: string
+                  operation:
+                    description: The localized, friendly name for the operation. Use
+                      the name as it will displayed to the user.
+                    type: string
+                  description:
+                    description: The localized, friendly description for the operation.
+                      The description will be displayed to the user. It should be
+                      thorough and concise for used in both tooltips and detailed
+                      views.
+                    type: string
+              origin:
+                description: The intended executor of the operation.
+                type: string
+          x-ms-identifiers:
+          - name
+        nextLink:
+          description: URI to the next page of operations.
+          type: string
+    CloudManifestFileResponse:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          description: ID of the resource.
+          type: string
+        name:
+          readOnly: true
+          description: Name of the resource.
+          type: string
+        type:
+          readOnly: true
+          description: Type of Resource.
+          type: string
+        etag:
+          description: The entity tag used for optimistic concurrency when modifying
+            the resource.
+          type: string
+        properties:
+          description: Cloud specific manifest data.
+          type: object
+          properties:
+            deploymentData:
+              description: Cloud specific manifest data.
+              type: object
+              properties:
+                externalDsmsCertificates:
+                  description: Dsms external certificates.
+                  type: string
+                customCloudVerificationKey:
+                  description: Signing verification public key.
+                  type: string
+                customEnvironmentEndpoints:
+                  description: Environment endpoints.
+                  x-ms-client-flatten: true
+                  type: object
+                  properties:
+                    customCloudArmEndpoint:
+                      description: ARM endpoint.
+                      type: string
+                    externalDsmsEndpoint:
+                      description: Dsms endpoint.
+                      type: string
+            signature:
+              description: Signature of the cloud specific manifest data.
+              type: string
+      description: Base resource object.
+      x-ms-azure-resource: true
+    CloudManifestFileProperties:
+      description: Cloud specific manifest JSON properties.
+      type: object
+      properties:
+        deploymentData:
+          description: Cloud specific manifest data.
+          type: object
+          properties:
+            externalDsmsCertificates:
+              description: Dsms external certificates.
+              type: string
+            customCloudVerificationKey:
+              description: Signing verification public key.
+              type: string
+            customEnvironmentEndpoints:
+              description: Environment endpoints.
+              x-ms-client-flatten: true
+              type: object
+              properties:
+                customCloudArmEndpoint:
+                  description: ARM endpoint.
+                  type: string
+                externalDsmsEndpoint:
+                  description: Dsms endpoint.
+                  type: string
+        signature:
+          description: Signature of the cloud specific manifest data.
+          type: string
+    CloudManifestFileDeploymentData:
+      description: Cloud specific manifest data for AzureStack deployment.
+      type: object
+      properties:
+        externalDsmsCertificates:
+          description: Dsms external certificates.
+          type: string
+        customCloudVerificationKey:
+          description: Signing verification public key.
+          type: string
+        customEnvironmentEndpoints:
+          description: Environment endpoints.
+          x-ms-client-flatten: true
+          type: object
+          properties:
+            customCloudArmEndpoint:
+              description: ARM endpoint.
+              type: string
+            externalDsmsEndpoint:
+              description: Dsms endpoint.
+              type: string
+    CloudManifestFileEnvironmentEndpoints:
+      description: Cloud specific environment endpoints for AzureStack deployment.
+      type: object
+      properties:
+        customCloudArmEndpoint:
+          description: ARM endpoint.
+          type: string
+        externalDsmsEndpoint:
+          description: Dsms endpoint.
+          type: string
+    DeploymentLicenseRequest:
+      description: Request details for generating a deployment license.
+      type: object
+      properties:
+        verificationVersion:
+          description: Signing verification public key version.
+          type: string
+    DeploymentLicenseResponse:
+      description: A license that can be used to deploy an Azure Stack device.
+      type: object
+      properties:
+        temporaryLicenseChain:
+          description: A license chain that can be used to temporarily activate an
+            Azure Stack device.
+          type: array
+          items:
+            description: An intermediate or leaf license item.
+            type: string
+        signature:
+          description: Signature of the license chain.
+          type: string
+    ErrorDetails:
+      description: The details of the error.
+      properties:
+        code:
+          description: Error code.
+          type: string
+          readOnly: true
+        message:
+          description: Error message indicating why the operation failed.
+          type: string
+          readOnly: true
+        target:
+          description: The target of the particular error.
+          type: string
+          readOnly: true
+    ErrorResponse:
+      description: Error response indicates that the service is not able to process
+        the incoming request. The reason is provided in the error message.
+      type: object
+      properties:
+        error:
+          description: The details of the error.
+          properties:
+            code:
+              description: Error code.
+              type: string
+              readOnly: true
+            message:
+              description: Error message indicating why the operation failed.
+              type: string
+              readOnly: true
+            target:
+              description: The target of the particular error.
+              type: string
+              readOnly: true

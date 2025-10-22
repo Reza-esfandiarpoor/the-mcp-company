@@ -1,0 +1,495 @@
+openapi: 3.0.0
+info:
+  title: CommunicationIdentityClient
+  description: Azure Communication Identity Service
+  version: 2025-06-30
+paths:
+  /identities:
+    post:
+      tags:
+      - Identity
+      summary: Create a new identity, and optionally, an access token.
+      operationId: CommunicationIdentity_Create
+      parameters:
+      - $ref: '#/components/parameters/ApiVersionParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunicationIdentityCreateRequest'
+        description: If specified, creates also a Communication Identity access token
+          associated with the identity and containing the requested scopes.
+      responses:
+        '201':
+          description: Created - Returns the created identity.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationIdentityAccessTokenResult'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationErrorResponse'
+  /identities/{id}:
+    delete:
+      tags:
+      - Identity
+      summary: Delete the identity, revoke all tokens for the identity and delete
+        all associated data.
+      operationId: CommunicationIdentity_Delete
+      parameters:
+      - in: path
+        name: id
+        description: Identifier of the identity to be deleted.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '204':
+          description: No Content
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationErrorResponse'
+  /identities/{id}/:revokeAccessTokens:
+    post:
+      tags:
+      - Identity
+      summary: Revoke all access tokens for the specific identity.
+      operationId: CommunicationIdentity_RevokeAccessTokens
+      parameters:
+      - in: path
+        name: id
+        description: Identifier of the identity.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '204':
+          description: No Content
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationErrorResponse'
+  /teamsUser/:exchangeAccessToken:
+    post:
+      tags:
+      - TeamsUser
+      summary: Exchange an Entra ID access token of a Teams user for a new Communication
+        Identity access token with a matching expiration time.
+      operationId: CommunicationIdentity_ExchangeTeamsUserAccessToken
+      parameters:
+      - $ref: '#/components/parameters/ApiVersionParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamsUserExchangeTokenRequest'
+        description: Request payload for the token exchange.
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationIdentityAccessToken'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationErrorResponse'
+  /identities/{id}/:issueAccessToken:
+    post:
+      tags:
+      - Token
+      summary: Issue a new token for an identity.
+      operationId: CommunicationIdentity_IssueAccessToken
+      parameters:
+      - in: path
+        name: id
+        description: Identifier of the identity to issue token for.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/ApiVersionParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommunicationIdentityAccessTokenRequest'
+        description: Requested scopes for the new token.
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationIdentityAccessToken'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationErrorResponse'
+  /access/teamsExtension/:exchangeAccessToken:
+    post:
+      tags:
+      - TeamsExtension
+      summary: Exchanges a Teams Phone token for an ACS user access token.
+      operationId: TeamsExtensionToken_Exchange
+      parameters:
+      - $ref: '#/components/parameters/ApiVersionParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamsExtensionExchangeTokenRequest'
+        description: Request payload for the token exchange.
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationIdentityAccessTokenResult'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationErrorResponse'
+  /access/teamsExtension/tenants/{tenantId}/assignments/{objectId}:
+    get:
+      tags:
+      - TeamsExtension
+      summary: Get Teams Phone access assignment by object id.
+      operationId: TeamsExtensionAssignment_Get
+      parameters:
+      - in: path
+        name: tenantId
+        description: Tenant Id we want to get the assignment for.
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: objectId
+        description: Object Id we want to get the assignment for.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamsExtensionAssignmentResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationErrorResponse'
+    put:
+      tags:
+      - TeamsExtension
+      summary: Creates or replaces a Teams Phone access assignment.
+      operationId: TeamsExtensionAssignment_Upsert
+      parameters:
+      - in: path
+        name: tenantId
+        description: Tenant Id we want to update the assignment for.
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: objectId
+        description: Object Id we want to update the assignment for.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/ApiVersionParameter'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamsExtensionAssignmentCreateOrUpdateRequest'
+        description: Values we want to set.
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamsExtensionAssignmentResponse'
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TeamsExtensionAssignmentResponse'
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationErrorResponse'
+    delete:
+      tags:
+      - TeamsExtension
+      summary: Removes a Teams Phone access assignment.
+      operationId: TeamsExtensionAssignment_Delete
+      parameters:
+      - in: path
+        name: tenantId
+        description: Tenant Id we want to remove the assignment for.
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: objectId
+        description: Object Id we want to remove the assignment for.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/ApiVersionParameter'
+      responses:
+        '204':
+          description: No Content
+        default:
+          description: Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationErrorResponse'
+servers:
+- url: '{endpoint}'
+  variables:
+    endpoint:
+      description: The communication resource, for example https://my-resource.communication.azure.com
+      format: url
+      x-ms-skip-url-encoding: true
+      x-ms-parameter-location: client
+      default: none
+components:
+  parameters:
+    ApiVersionParameter:
+      x-ms-parameter-location: client
+      in: query
+      name: api-version
+      description: Version of API to invoke.
+      required: true
+      schema:
+        type: string
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    CommunicationIdentity:
+      description: A communication identity.
+      required:
+      - id
+      type: object
+      properties:
+        id:
+          description: Identifier of the identity.
+          type: string
+    CommunicationIdentityAccessToken:
+      description: An access token.
+      required:
+      - expiresOn
+      - token
+      type: object
+      properties:
+        token:
+          description: The access token issued for the identity.
+          type: string
+        expiresOn:
+          format: date-time
+          description: The expiry time of the token.
+          type: string
+    CommunicationIdentityAccessTokenRequest:
+      required:
+      - scopes
+      type: object
+      properties:
+        scopes:
+          description: List of scopes attached to the token.
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunicationIdentityTokenScope'
+        expiresInMinutes:
+          format: int32
+          description: Optional custom validity period of the token within [60,1440]
+            minutes range. If not provided, the default value of 1440 minutes (24
+            hours) will be used.
+          type: integer
+          minimum: 60
+          maximum: 1440
+          default: 1440
+    CommunicationIdentityAccessTokenResult:
+      description: A communication identity with access token.
+      required:
+      - identity
+      type: object
+      properties:
+        identity:
+          $ref: '#/components/schemas/CommunicationIdentity'
+        accessToken:
+          $ref: '#/components/schemas/CommunicationIdentityAccessToken'
+    CommunicationIdentityCreateRequest:
+      type: object
+      properties:
+        createTokenWithScopes:
+          description: Also create access token for the created identity.
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunicationIdentityTokenScope'
+        expiresInMinutes:
+          format: int32
+          description: Optional custom validity period of the token within [60,1440]
+            minutes range. If not provided, the default value of 1440 minutes (24
+            hours) will be used.
+          type: integer
+          minimum: 60
+          maximum: 1440
+          default: 1440
+    CommunicationIdentityTokenScope:
+      description: List of scopes for an access token.
+      enum:
+      - chat
+      - voip
+      - chat.join
+      - chat.join.limited
+      - voip.join
+      type: string
+      x-ms-enum:
+        name: CommunicationIdentityTokenScope
+        modelAsString: true
+        values:
+        - value: chat
+          description: Use this for full access to Chat APIs.
+        - value: voip
+          description: Use this for full access to Calling APIs.
+        - value: chat.join
+          description: Access to Chat APIs but without the authorization to create,
+            delete or update chat threads.
+        - value: chat.join.limited
+          description: A more limited version of chat.join that doesn't allow to add
+            or remove participants. Use this scope when the token bearer is not fully
+            trusted, for example in guest scenarios.
+        - value: voip.join
+          description: Access to Calling APIs but without the authorization to start
+            new calls.
+    TeamsUserExchangeTokenRequest:
+      description: A request to create or update a Teams Phone assignment.
+      required:
+      - appId
+      - token
+      - userId
+      type: object
+      properties:
+        token:
+          description: Entra ID access token of a Teams User to acquire a new Communication
+            Identity access token.
+          type: string
+        appId:
+          description: Client ID of an Entra ID application to be verified against
+            the appid claim in the Entra ID access token.
+          type: string
+        userId:
+          description: Object ID of an Entra ID user (Teams User) to be verified against
+            the oid claim in the Entra ID access token.
+          type: string
+    TeamsExtensionExchangeTokenRequest:
+      type: object
+      properties: {}
+    TeamsExtensionAssignmentCreateOrUpdateRequest:
+      required:
+      - principalType
+      type: object
+      properties:
+        principalType:
+          $ref: '#/components/schemas/TeamsExtensionPrincipalType'
+        clientIds:
+          type: array
+          items:
+            type: string
+    TeamsExtensionAssignmentResponse:
+      required:
+      - objectId
+      - principalType
+      - tenantId
+      type: object
+      properties:
+        objectId:
+          type: string
+        tenantId:
+          type: string
+        principalType:
+          $ref: '#/components/schemas/TeamsExtensionPrincipalType'
+        clientIds:
+          type: array
+          items:
+            type: string
+    TeamsExtensionPrincipalType:
+      description: The type of principal the assignment is for.
+      enum:
+      - resourceAccount
+      - user
+      type: string
+      x-ms-enum:
+        name: TeamsExtensionPrincipalType
+        modelAsString: true
+    CommunicationError:
+      description: The Communication Services error.
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: The error code.
+        message:
+          type: string
+          description: The error message.
+        target:
+          type: string
+          readOnly: true
+          description: The error target.
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunicationError'
+          readOnly: true
+          description: Further details about specific errors that led to this error.
+        innererror:
+          $ref: '#/components/schemas/CommunicationError'
+    CommunicationErrorResponse:
+      description: The Communication Services error.
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          $ref: '#/components/schemas/CommunicationError'

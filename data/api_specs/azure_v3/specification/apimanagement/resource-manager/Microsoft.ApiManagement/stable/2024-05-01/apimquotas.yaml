@@ -1,0 +1,1377 @@
+openapi: 3.0.0
+info:
+  title: ApiManagementClient
+  description: Use these REST APIs for performing operations on Quota entity associated
+    with your Azure API Management deployment. To configure call rate limit and quota
+    policies refer to [how to configure call rate limit and quota](https://docs.microsoft.com/en-us/azure/api-management/api-management-howto-product-with-rules#a-namepolicies-ato-configure-call-rate-limit-and-quota-policies).
+  version: 2024-05-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/quotas/{quotaCounterKey}
+  : get:
+      tags:
+      - QuotaByCounterKeys
+      operationId: QuotaByCounterKeys_ListByService
+      description: Lists a collection of current quota counter periods associated
+        with the counter-key configured in the policy on the specified service instance.
+        The api does not support paging yet.
+      externalDocs:
+        url: https://docs.microsoft.com/en-us/azure/api-management/api-management-howto-product-with-rules#a-namepolicies-ato-configure-call-rate-limit-and-quota-policies
+        description: Document describing how to configure the quota policies.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: quotaCounterKey
+        in: path
+        required: true
+        description: "Quota counter key identifier.This is the result of expression\
+          \ defined in counter-key attribute of the quota-by-key policy.For Example,\
+          \ if you specify counter-key=\"boo\" in the policy, then it\u2019s accessible\
+          \ by \"boo\" counter key. But if it\u2019s defined as counter-key=\"@(\"\
+          b\"+\"a\")\" then it will be accessible by \"ba\" key"
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Lists a collection of the quota counter values.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        counterKey:
+                          type: string
+                          description: The Key value of the Counter. Must not be empty.
+                          minLength: 1
+                        periodKey:
+                          type: string
+                          description: Identifier of the Period for which the counter
+                            was collected. Must not be empty.
+                          minLength: 1
+                        periodStartTime:
+                          type: string
+                          format: date-time
+                          description: 'The date of the start of Counter Period. The
+                            date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                            as specified by the ISO 8601 standard.
+
+                            '
+                        periodEndTime:
+                          type: string
+                          format: date-time
+                          description: 'The date of the end of Counter Period. The
+                            date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                            as specified by the ISO 8601 standard.
+
+                            '
+                        value:
+                          description: Quota Value Properties
+                          type: object
+                          properties:
+                            callsCount:
+                              type: integer
+                              format: int32
+                              description: Number of times Counter was called.
+                            kbTransferred:
+                              type: number
+                              format: double
+                              description: Data Transferred in KiloBytes.
+                      required:
+                      - counterKey
+                      - periodKey
+                      - periodStartTime
+                      - periodEndTime
+                      description: Quota counter details.
+                    x-ms-identifiers:
+                    - counterKey
+                    - periodKey
+                    description: Quota counter values.
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                  nextLink:
+                    type: string
+                    description: Next page link if any.
+                description: Paged Quota Counter list representation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    patch:
+      tags:
+      - QuotaByCounterKeys
+      operationId: QuotaByCounterKeys_Update
+      description: Updates all the quota counter values specified with the existing
+        quota counter key to a value in the specified service instance. This should
+        be used for reset of the quota counter values.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: quotaCounterKey
+        in: path
+        required: true
+        description: "Quota counter key identifier.This is the result of expression\
+          \ defined in counter-key attribute of the quota-by-key policy.For Example,\
+          \ if you specify counter-key=\"boo\" in the policy, then it\u2019s accessible\
+          \ by \"boo\" counter key. But if it\u2019s defined as counter-key=\"@(\"\
+          b\"+\"a\")\" then it will be accessible by \"ba\" key"
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                properties:
+                  x-ms-client-flatten: true
+                  description: Quota counter value details.
+                  type: object
+                  properties:
+                    callsCount:
+                      type: integer
+                      format: int32
+                      description: Number of times Counter was called.
+                    kbTransferred:
+                      type: number
+                      format: double
+                      description: Data Transferred in KiloBytes.
+              description: Quota counter value details.
+        description: The value of the quota counter to be applied to all quota counter
+          periods.
+        required: true
+      responses:
+        '200':
+          description: Updated Quota Counter Values.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        counterKey:
+                          type: string
+                          description: The Key value of the Counter. Must not be empty.
+                          minLength: 1
+                        periodKey:
+                          type: string
+                          description: Identifier of the Period for which the counter
+                            was collected. Must not be empty.
+                          minLength: 1
+                        periodStartTime:
+                          type: string
+                          format: date-time
+                          description: 'The date of the start of Counter Period. The
+                            date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                            as specified by the ISO 8601 standard.
+
+                            '
+                        periodEndTime:
+                          type: string
+                          format: date-time
+                          description: 'The date of the end of Counter Period. The
+                            date conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ`
+                            as specified by the ISO 8601 standard.
+
+                            '
+                        value:
+                          description: Quota Value Properties
+                          type: object
+                          properties:
+                            callsCount:
+                              type: integer
+                              format: int32
+                              description: Number of times Counter was called.
+                            kbTransferred:
+                              type: number
+                              format: double
+                              description: Data Transferred in KiloBytes.
+                      required:
+                      - counterKey
+                      - periodKey
+                      - periodStartTime
+                      - periodEndTime
+                      description: Quota counter details.
+                    x-ms-identifiers:
+                    - counterKey
+                    - periodKey
+                    description: Quota counter values.
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                  nextLink:
+                    type: string
+                    description: Next page link if any.
+                description: Paged Quota Counter list representation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/quotas/{quotaCounterKey}/periods/{quotaPeriodKey}
+  : get:
+      tags:
+      - QuotaByPeriodKeys
+      operationId: QuotaByPeriodKeys_Get
+      description: Gets the value of the quota counter associated with the counter-key
+        in the policy for the specific period in service instance.
+      externalDocs:
+        url: https://docs.microsoft.com/en-us/azure/api-management/api-management-howto-product-with-rules#a-namepolicies-ato-configure-call-rate-limit-and-quota-policies
+        description: Document describing how to configure the quota policies.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: quotaCounterKey
+        in: path
+        required: true
+        description: "Quota counter key identifier.This is the result of expression\
+          \ defined in counter-key attribute of the quota-by-key policy.For Example,\
+          \ if you specify counter-key=\"boo\" in the policy, then it\u2019s accessible\
+          \ by \"boo\" counter key. But if it\u2019s defined as counter-key=\"@(\"\
+          b\"+\"a\")\" then it will be accessible by \"ba\" key"
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: quotaPeriodKey
+        in: path
+        required: true
+        description: Quota period key identifier.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The response body contains the Quota counter details for the
+            specified period.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  counterKey:
+                    type: string
+                    description: The Key value of the Counter. Must not be empty.
+                    minLength: 1
+                  periodKey:
+                    type: string
+                    description: Identifier of the Period for which the counter was
+                      collected. Must not be empty.
+                    minLength: 1
+                  periodStartTime:
+                    type: string
+                    format: date-time
+                    description: 'The date of the start of Counter Period. The date
+                      conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ` as
+                      specified by the ISO 8601 standard.
+
+                      '
+                  periodEndTime:
+                    type: string
+                    format: date-time
+                    description: 'The date of the end of Counter Period. The date
+                      conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ` as
+                      specified by the ISO 8601 standard.
+
+                      '
+                  value:
+                    description: Quota Value Properties
+                    type: object
+                    properties:
+                      callsCount:
+                        type: integer
+                        format: int32
+                        description: Number of times Counter was called.
+                      kbTransferred:
+                        type: number
+                        format: double
+                        description: Data Transferred in KiloBytes.
+                required:
+                - counterKey
+                - periodKey
+                - periodStartTime
+                - periodEndTime
+                description: Quota counter details.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    patch:
+      tags:
+      - QuotaByPeriodKeys
+      operationId: QuotaByPeriodKeys_Update
+      description: Updates an existing quota counter value in the specified service
+        instance.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: quotaCounterKey
+        in: path
+        required: true
+        description: "Quota counter key identifier.This is the result of expression\
+          \ defined in counter-key attribute of the quota-by-key policy.For Example,\
+          \ if you specify counter-key=\"boo\" in the policy, then it\u2019s accessible\
+          \ by \"boo\" counter key. But if it\u2019s defined as counter-key=\"@(\"\
+          b\"+\"a\")\" then it will be accessible by \"ba\" key"
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: quotaPeriodKey
+        in: path
+        required: true
+        description: Quota period key identifier.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                properties:
+                  x-ms-client-flatten: true
+                  description: Quota counter value details.
+                  type: object
+                  properties:
+                    callsCount:
+                      type: integer
+                      format: int32
+                      description: Number of times Counter was called.
+                    kbTransferred:
+                      type: number
+                      format: double
+                      description: Data Transferred in KiloBytes.
+              description: Quota counter value details.
+        description: The value of the Quota counter to be applied on the specified
+          period.
+        required: true
+      responses:
+        '200':
+          description: The response body contains the Quota counter details for the
+            specified period.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  counterKey:
+                    type: string
+                    description: The Key value of the Counter. Must not be empty.
+                    minLength: 1
+                  periodKey:
+                    type: string
+                    description: Identifier of the Period for which the counter was
+                      collected. Must not be empty.
+                    minLength: 1
+                  periodStartTime:
+                    type: string
+                    format: date-time
+                    description: 'The date of the start of Counter Period. The date
+                      conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ` as
+                      specified by the ISO 8601 standard.
+
+                      '
+                  periodEndTime:
+                    type: string
+                    format: date-time
+                    description: 'The date of the end of Counter Period. The date
+                      conforms to the following format: `yyyy-MM-ddTHH:mm:ssZ` as
+                      specified by the ISO 8601 standard.
+
+                      '
+                  value:
+                    description: Quota Value Properties
+                    type: object
+                    properties:
+                      callsCount:
+                        type: integer
+                        format: int32
+                        description: Number of times Counter was called.
+                      kbTransferred:
+                        type: number
+                        format: double
+                        description: Data Transferred in KiloBytes.
+                required:
+                - counterKey
+                - periodKey
+                - periodStartTime
+                - periodEndTime
+                description: Quota counter details.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+components:
+  parameters:
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      description: The name of the resource group. The name is case insensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    ServiceNameParameter:
+      name: serviceName
+      in: path
+      required: true
+      description: The name of the API Management service.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 50
+        pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+    QuotaCounterKeyParameter:
+      name: quotaCounterKey
+      in: path
+      required: true
+      description: "Quota counter key identifier.This is the result of expression\
+        \ defined in counter-key attribute of the quota-by-key policy.For Example,\
+        \ if you specify counter-key=\"boo\" in the policy, then it\u2019s accessible\
+        \ by \"boo\" counter key. But if it\u2019s defined as counter-key=\"@(\"b\"\
+        +\"a\")\" then it will be accessible by \"ba\" key"
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription. The value must be an UUID.
+      required: true
+      schema:
+        type: string
+        format: uuid
+    QuotaPeriodKeyParameter:
+      name: quotaPeriodKey
+      in: path
+      required: true
+      description: Quota period key identifier.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+    QuotaCounterValueContractProperties:
+      type: object
+      properties:
+        callsCount:
+          type: integer
+          format: int32
+          description: Number of times Counter was called.
+        kbTransferred:
+          type: number
+          format: double
+          description: Data Transferred in KiloBytes.
+      description: Quota counter value details.
+    QuotaCounterContract:
+      type: object
+      properties:
+        counterKey:
+          type: string
+          description: The Key value of the Counter. Must not be empty.
+          minLength: 1
+        periodKey:
+          type: string
+          description: Identifier of the Period for which the counter was collected.
+            Must not be empty.
+          minLength: 1
+        periodStartTime:
+          type: string
+          format: date-time
+          description: 'The date of the start of Counter Period. The date conforms
+            to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO
+            8601 standard.
+
+            '
+        periodEndTime:
+          type: string
+          format: date-time
+          description: 'The date of the end of Counter Period. The date conforms to
+            the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601
+            standard.
+
+            '
+        value:
+          description: Quota Value Properties
+          type: object
+          properties:
+            callsCount:
+              type: integer
+              format: int32
+              description: Number of times Counter was called.
+            kbTransferred:
+              type: number
+              format: double
+              description: Data Transferred in KiloBytes.
+      required:
+      - counterKey
+      - periodKey
+      - periodStartTime
+      - periodEndTime
+      description: Quota counter details.
+    QuotaCounterCollection:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              counterKey:
+                type: string
+                description: The Key value of the Counter. Must not be empty.
+                minLength: 1
+              periodKey:
+                type: string
+                description: Identifier of the Period for which the counter was collected.
+                  Must not be empty.
+                minLength: 1
+              periodStartTime:
+                type: string
+                format: date-time
+                description: 'The date of the start of Counter Period. The date conforms
+                  to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified by
+                  the ISO 8601 standard.
+
+                  '
+              periodEndTime:
+                type: string
+                format: date-time
+                description: 'The date of the end of Counter Period. The date conforms
+                  to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified by
+                  the ISO 8601 standard.
+
+                  '
+              value:
+                description: Quota Value Properties
+                type: object
+                properties:
+                  callsCount:
+                    type: integer
+                    format: int32
+                    description: Number of times Counter was called.
+                  kbTransferred:
+                    type: number
+                    format: double
+                    description: Data Transferred in KiloBytes.
+            required:
+            - counterKey
+            - periodKey
+            - periodStartTime
+            - periodEndTime
+            description: Quota counter details.
+          x-ms-identifiers:
+          - counterKey
+          - periodKey
+          description: Quota counter values.
+        count:
+          type: integer
+          format: int64
+          description: Total record count number across all pages.
+        nextLink:
+          type: string
+          description: Next page link if any.
+      description: Paged Quota Counter list representation.
+    QuotaCounterValueUpdateContract:
+      type: object
+      properties:
+        properties:
+          x-ms-client-flatten: true
+          description: Quota counter value details.
+          type: object
+          properties:
+            callsCount:
+              type: integer
+              format: int32
+              description: Number of times Counter was called.
+            kbTransferred:
+              type: number
+              format: double
+              description: Data Transferred in KiloBytes.
+      description: Quota counter value details.

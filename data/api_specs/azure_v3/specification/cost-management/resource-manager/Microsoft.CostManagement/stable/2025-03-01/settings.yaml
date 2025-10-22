@@ -1,0 +1,736 @@
+openapi: 3.0.0
+info:
+  title: CostManagementClient
+  version: 2025-03-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  /{scope}/providers/Microsoft.CostManagement/settings:
+    get:
+      tags:
+      - Settings
+      operationId: Settings_List
+      description: List all cost management settings in the requested scope.
+      externalDocs:
+        url: https://docs.microsoft.com/rest/api/cost-management/
+      parameters:
+      - name: scope
+        in: path
+        required: true
+        description: The scope associated with this setting. This includes 'subscriptions/{subscriptionId}'
+          for subscription scope, 'providers/Microsoft.Billing/billingAccounts/{billingAccountId}'
+          for Billing Account scope, 'providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}'
+          for billing profile scope.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: OK. The request has succeeded.
+          content:
+            application/json:
+              schema:
+                description: Setting list result. It contains a list of settings.
+                type: object
+                properties:
+                  value:
+                    description: The list of settings.
+                    type: array
+                    readOnly: true
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                        name:
+                          readOnly: true
+                          type: string
+                          description: The name of the resource
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                        kind:
+                          type: string
+                          description: Specifies the kind of settings.
+                          enum:
+                          - taginheritance
+                          x-ms-enum:
+                            name: SettingsKind
+                            modelAsString: true
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                      required:
+                      - kind
+                      discriminator:
+                        propertyName: kind
+                    x-ms-identifiers:
+                    - id
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: "Error response indicates that the service is not able\
+                  \ to process the incoming request. The reason is provided in the\
+                  \ error message. \n\nSome Error responses: \n\n * 429 TooManyRequests\
+                  \ - Request is throttled. Retry after waiting for the time specified\
+                  \ in the \"x-ms-ratelimit-microsoft.consumption-retry-after\" header.\
+                  \ \n\n * 503 ServiceUnavailable - Service is temporarily unavailable.\
+                  \ Retry after waiting for the time specified in the \"Retry-After\"\
+                  \ header."
+                type: object
+                properties:
+                  error:
+                    description: The details of the error.
+                    type: object
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                        readOnly: true
+  /{scope}/providers/Microsoft.CostManagement/settings/{type}:
+    put:
+      tags:
+      - Settings
+      operationId: Settings_CreateOrUpdateByScope
+      description: Create or update a setting within the given scope.
+      parameters:
+      - name: scope
+        in: path
+        required: true
+        description: The scope associated with this setting. This includes 'subscriptions/{subscriptionId}'
+          for subscription scope, 'providers/Microsoft.Billing/billingAccounts/{billingAccountId}'
+          for Billing Account scope, 'providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}'
+          for billing profile scope.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: type
+        in: path
+        description: Setting type.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-enum:
+          name: SettingType
+          modelAsString: true
+          values:
+          - value: taginheritance
+            description: This setting applies billing profile, invoice section, subscription
+              and resource group tags to current month's usage data of child resources.
+            name: taginheritance
+        schema:
+          type: string
+          enum:
+          - taginheritance
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  readOnly: true
+                  type: string
+                  description: Fully qualified resource ID for the resource. Ex -
+                    /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                name:
+                  readOnly: true
+                  type: string
+                  description: The name of the resource
+                type:
+                  readOnly: true
+                  type: string
+                  description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                    or "Microsoft.Storage/storageAccounts"
+                kind:
+                  type: string
+                  description: Specifies the kind of settings.
+                  enum:
+                  - taginheritance
+                  x-ms-enum:
+                    name: SettingsKind
+                    modelAsString: true
+              title: Resource
+              description: Common fields that are returned in the response for all
+                Azure Resource Manager resources
+              x-ms-azure-resource: true
+              required:
+              - kind
+              discriminator:
+                propertyName: kind
+        description: Setting to be created or updated.
+        required: true
+      responses:
+        '200':
+          description: Setting Updated.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  kind:
+                    type: string
+                    description: Specifies the kind of settings.
+                    enum:
+                    - taginheritance
+                    x-ms-enum:
+                      name: SettingsKind
+                      modelAsString: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - kind
+                discriminator:
+                  propertyName: kind
+        '201':
+          description: Setting Created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  kind:
+                    type: string
+                    description: Specifies the kind of settings.
+                    enum:
+                    - taginheritance
+                    x-ms-enum:
+                      name: SettingsKind
+                      modelAsString: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - kind
+                discriminator:
+                  propertyName: kind
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: "Error response indicates that the service is not able\
+                  \ to process the incoming request. The reason is provided in the\
+                  \ error message. \n\nSome Error responses: \n\n * 429 TooManyRequests\
+                  \ - Request is throttled. Retry after waiting for the time specified\
+                  \ in the \"x-ms-ratelimit-microsoft.consumption-retry-after\" header.\
+                  \ \n\n * 503 ServiceUnavailable - Service is temporarily unavailable.\
+                  \ Retry after waiting for the time specified in the \"Retry-After\"\
+                  \ header."
+                type: object
+                properties:
+                  error:
+                    description: The details of the error.
+                    type: object
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                        readOnly: true
+    get:
+      tags:
+      - Settings
+      operationId: Settings_GetByScope
+      description: Get the setting from the given scope by name.
+      externalDocs:
+        url: https://docs.microsoft.com/rest/api/cost-management/
+      parameters:
+      - name: scope
+        in: path
+        required: true
+        description: The scope associated with this setting. This includes 'subscriptions/{subscriptionId}'
+          for subscription scope, 'providers/Microsoft.Billing/billingAccounts/{billingAccountId}'
+          for Billing Account scope, 'providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}'
+          for billing profile scope.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: type
+        in: path
+        description: Setting type.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-enum:
+          name: SettingType
+          modelAsString: true
+          values:
+          - value: taginheritance
+            description: This setting applies billing profile, invoice section, subscription
+              and resource group tags to current month's usage data of child resources.
+            name: taginheritance
+        schema:
+          type: string
+          enum:
+          - taginheritance
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  kind:
+                    type: string
+                    description: Specifies the kind of settings.
+                    enum:
+                    - taginheritance
+                    x-ms-enum:
+                      name: SettingsKind
+                      modelAsString: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - kind
+                discriminator:
+                  propertyName: kind
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: "Error response indicates that the service is not able\
+                  \ to process the incoming request. The reason is provided in the\
+                  \ error message. \n\nSome Error responses: \n\n * 429 TooManyRequests\
+                  \ - Request is throttled. Retry after waiting for the time specified\
+                  \ in the \"x-ms-ratelimit-microsoft.consumption-retry-after\" header.\
+                  \ \n\n * 503 ServiceUnavailable - Service is temporarily unavailable.\
+                  \ Retry after waiting for the time specified in the \"Retry-After\"\
+                  \ header."
+                type: object
+                properties:
+                  error:
+                    description: The details of the error.
+                    type: object
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                        readOnly: true
+    delete:
+      tags:
+      - Settings
+      operationId: Settings_DeleteByScope
+      description: Delete a setting within the given scope.
+      externalDocs:
+        url: https://docs.microsoft.com/rest/api/cost-management/
+      parameters:
+      - name: scope
+        in: path
+        required: true
+        description: The scope associated with this setting. This includes 'subscriptions/{subscriptionId}'
+          for subscription scope, 'providers/Microsoft.Billing/billingAccounts/{billingAccountId}'
+          for Billing Account scope, 'providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}'
+          for billing profile scope.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: type
+        in: path
+        description: Setting type.
+        required: true
+        x-ms-parameter-location: method
+        x-ms-enum:
+          name: SettingType
+          modelAsString: true
+          values:
+          - value: taginheritance
+            description: This setting applies billing profile, invoice section, subscription
+              and resource group tags to current month's usage data of child resources.
+            name: taginheritance
+        schema:
+          type: string
+          enum:
+          - taginheritance
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Setting deleted successfully.
+        '204':
+          description: Setting is already deleted or not found.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                description: "Error response indicates that the service is not able\
+                  \ to process the incoming request. The reason is provided in the\
+                  \ error message. \n\nSome Error responses: \n\n * 429 TooManyRequests\
+                  \ - Request is throttled. Retry after waiting for the time specified\
+                  \ in the \"x-ms-ratelimit-microsoft.consumption-retry-after\" header.\
+                  \ \n\n * 503 ServiceUnavailable - Service is temporarily unavailable.\
+                  \ Retry after waiting for the time specified in the \"Retry-After\"\
+                  \ header."
+                type: object
+                properties:
+                  error:
+                    description: The details of the error.
+                    type: object
+                    properties:
+                      code:
+                        description: Error code.
+                        type: string
+                        readOnly: true
+                      message:
+                        description: Error message indicating why the operation failed.
+                        type: string
+                        readOnly: true
+components:
+  parameters:
+    scopeSettingParameter:
+      name: scope
+      in: path
+      required: true
+      description: The scope associated with this setting. This includes 'subscriptions/{subscriptionId}'
+        for subscription scope, 'providers/Microsoft.Billing/billingAccounts/{billingAccountId}'
+        for Billing Account scope, 'providers/Microsoft.Billing/billingAccounts/{billingAccountId}/billingProfiles/{billingProfileId}'
+        for billing profile scope.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    settingTypeParameter:
+      name: type
+      in: path
+      description: Setting type.
+      required: true
+      x-ms-parameter-location: method
+      x-ms-enum:
+        name: SettingType
+        modelAsString: true
+        values:
+        - value: taginheritance
+          description: This setting applies billing profile, invoice section, subscription
+            and resource group tags to current month's usage data of child resources.
+          name: taginheritance
+      schema:
+        type: string
+        enum:
+        - taginheritance
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    Setting:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        kind:
+          type: string
+          description: Specifies the kind of settings.
+          enum:
+          - taginheritance
+          x-ms-enum:
+            name: SettingsKind
+            modelAsString: true
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+      required:
+      - kind
+      discriminator:
+        propertyName: kind
+    TagInheritanceSetting:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        kind:
+          type: string
+          description: Specifies the kind of settings.
+          enum:
+          - taginheritance
+          x-ms-enum:
+            name: SettingsKind
+            modelAsString: true
+        properties:
+          type: object
+          description: The properties of the tag inheritance setting.
+          required:
+          - preferContainerTags
+          properties:
+            preferContainerTags:
+              description: This property defines the behavior when an inherited tag
+                being applied matches a lower scope tag (Eg. Subscription tag matches
+                the resource tag). If set to true - when tags match, the highest scope
+                tags will be applied. Billing profile is the highest scope,  followed
+                by invoice sections, subscriptions and resource groups (allows overriding
+                of lower scope tag values). If set to false - when tags match, the
+                lowest scope tags will be applied. So, if a resource has the same
+                tag as a subscription tag, the resource tag will be applied (does
+                not allow overriding of lower scope tag values).
+              type: boolean
+      required:
+      - kind
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      discriminator:
+        propertyName: kind
+      x-ms-azure-resource: true
+      x-ms-discriminator-value: taginheritance
+    SettingsListResult:
+      description: Setting list result. It contains a list of settings.
+      type: object
+      properties:
+        value:
+          description: The list of settings.
+          type: array
+          readOnly: true
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+              name:
+                readOnly: true
+                type: string
+                description: The name of the resource
+              type:
+                readOnly: true
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+              kind:
+                type: string
+                description: Specifies the kind of settings.
+                enum:
+                - taginheritance
+                x-ms-enum:
+                  name: SettingsKind
+                  modelAsString: true
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+            required:
+            - kind
+            discriminator:
+              propertyName: kind
+          x-ms-identifiers:
+          - id
+    TagInheritanceProperties:
+      type: object
+      description: The properties of the tag inheritance setting.
+      required:
+      - preferContainerTags
+      properties:
+        preferContainerTags:
+          description: This property defines the behavior when an inherited tag being
+            applied matches a lower scope tag (Eg. Subscription tag matches the resource
+            tag). If set to true - when tags match, the highest scope tags will be
+            applied. Billing profile is the highest scope,  followed by invoice sections,
+            subscriptions and resource groups (allows overriding of lower scope tag
+            values). If set to false - when tags match, the lowest scope tags will
+            be applied. So, if a resource has the same tag as a subscription tag,
+            the resource tag will be applied (does not allow overriding of lower scope
+            tag values).
+          type: boolean
+    ErrorDetails:
+      description: The details of the error.
+      type: object
+      properties:
+        code:
+          description: Error code.
+          type: string
+          readOnly: true
+        message:
+          description: Error message indicating why the operation failed.
+          type: string
+          readOnly: true
+    ErrorResponse:
+      description: "Error response indicates that the service is not able to process\
+        \ the incoming request. The reason is provided in the error message. \n\n\
+        Some Error responses: \n\n * 429 TooManyRequests - Request is throttled. Retry\
+        \ after waiting for the time specified in the \"x-ms-ratelimit-microsoft.consumption-retry-after\"\
+        \ header. \n\n * 503 ServiceUnavailable - Service is temporarily unavailable.\
+        \ Retry after waiting for the time specified in the \"Retry-After\" header."
+      type: object
+      properties:
+        error:
+          description: The details of the error.
+          type: object
+          properties:
+            code:
+              description: Error code.
+              type: string
+              readOnly: true
+            message:
+              description: Error message indicating why the operation failed.
+              type: string
+              readOnly: true
+    Resource:
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true

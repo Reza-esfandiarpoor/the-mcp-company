@@ -1,0 +1,1 @@
+Your job is to create a static website about Capybaras in Azure Storage, in a given storage account. The home page should read "Capybaras are great", and there should be a 404 error response that says, "Sorry, no Capybaras found here."

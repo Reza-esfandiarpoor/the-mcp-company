@@ -1,0 +1,3234 @@
+openapi: 3.0.0
+info:
+  title: ApiManagementClient
+  description: Use these REST APIs for performing operations on Identity Provider
+    entity associated with your Azure API Management deployment. Setting up an external
+    Identity Provider for authentication can help you manage the developer portal
+    logins using the OAuth2 flow.
+  version: 2024-05-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/identityProviders
+  : get:
+      tags:
+      - IdentityProvider
+      operationId: IdentityProvider_ListByService
+      description: Lists a collection of Identity Provider configured in the specified
+        service instance.
+      externalDocs:
+        url: https://docs.microsoft.com/en-us/azure/api-management/api-management-howto-aad#how-to-authorize-developer-accounts-using-azure-active-directory
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Lists a collection of Identity Providers.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                        name:
+                          readOnly: true
+                          type: string
+                          description: The name of the resource
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                        properties:
+                          type: object
+                          properties:
+                            type:
+                              type: string
+                              enum:
+                              - facebook
+                              - google
+                              - microsoft
+                              - twitter
+                              - aad
+                              - aadB2C
+                              x-ms-enum:
+                                name: IdentityProviderType
+                                modelAsString: true
+                                values:
+                                - value: facebook
+                                  description: Facebook as Identity provider.
+                                - value: google
+                                  description: Google as Identity provider.
+                                - value: microsoft
+                                  description: Microsoft Live as Identity provider.
+                                - value: twitter
+                                  description: Twitter as Identity provider.
+                                - value: aad
+                                  description: Azure Active Directory as Identity
+                                    provider.
+                                - value: aadB2C
+                                  description: Azure Active Directory B2C as Identity
+                                    provider.
+                              description: Identity Provider Type identifier.
+                            signinTenant:
+                              type: string
+                              description: The TenantId to use instead of Common when
+                                logging into Active Directory
+                            allowedTenants:
+                              type: array
+                              items:
+                                type: string
+                              maxItems: 32
+                              description: List of Allowed Tenants when configuring
+                                Azure Active Directory login.
+                            authority:
+                              type: string
+                              description: OpenID Connect discovery endpoint hostname
+                                for AAD or AAD B2C.
+                            signupPolicyName:
+                              type: string
+                              description: Signup Policy Name. Only applies to AAD
+                                B2C Identity Provider.
+                              minLength: 1
+                            signinPolicyName:
+                              type: string
+                              description: Signin Policy Name. Only applies to AAD
+                                B2C Identity Provider.
+                              minLength: 1
+                            profileEditingPolicyName:
+                              type: string
+                              description: Profile Editing Policy Name. Only applies
+                                to AAD B2C Identity Provider.
+                              minLength: 1
+                            passwordResetPolicyName:
+                              type: string
+                              description: Password Reset Policy Name. Only applies
+                                to AAD B2C Identity Provider.
+                              minLength: 1
+                            clientLibrary:
+                              type: string
+                              description: The client library to be used in the developer
+                                portal. Only applies to AAD and AAD B2C Identity Provider.
+                              minLength: 0
+                              maxLength: 16
+                            clientId:
+                              type: string
+                              description: Client Id of the Application in the external
+                                Identity Provider. It is App ID for Facebook login,
+                                Client ID for Google login, App ID for Microsoft.
+                              minLength: 1
+                            clientSecret:
+                              x-ms-secret: true
+                              type: string
+                              description: Client secret of the Application in external
+                                Identity Provider, used to authenticate login request.
+                                For example, it is App Secret for Facebook login,
+                                API Key for Google login, Public Key for Microsoft.
+                                This property will not be filled on 'GET' operations!
+                                Use '/listSecrets' POST request to get the value.
+                              minLength: 1
+                          description: Identity Provider Base Parameter Properties.
+                          required:
+                          - clientId
+                          x-ms-client-flatten: true
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                    description: Identity Provider configuration values.
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                  nextLink:
+                    type: string
+                    description: Next page link if any.
+                description: List of all the Identity Providers configured on the
+                  service instance.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/identityProviders/{identityProviderName}
+  : head:
+      tags:
+      - IdentityProvider
+      operationId: IdentityProvider_GetEntityTag
+      description: Gets the entity state (Etag) version of the identityProvider specified
+        by its identifier.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: identityProviderName
+        in: path
+        required: true
+        x-ms-enum:
+          name: IdentityProviderType
+          modelAsString: true
+          values:
+          - value: facebook
+            description: Facebook as Identity provider.
+          - value: google
+            description: Google as Identity provider.
+          - value: microsoft
+            description: Microsoft Live as Identity provider.
+          - value: twitter
+            description: Twitter as Identity provider.
+          - value: aad
+            description: Azure Active Directory as Identity provider.
+          - value: aadB2C
+            description: Azure Active Directory B2C as Identity provider.
+        description: Identity Provider Type identifier.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - facebook
+          - google
+          - microsoft
+          - twitter
+          - aad
+          - aadB2C
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Specified identity provider entity exists and current entity
+            state version is present in the ETag header.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    get:
+      tags:
+      - IdentityProvider
+      operationId: IdentityProvider_Get
+      description: Gets the configuration details of the identity Provider configured
+        in specified service instance.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: identityProviderName
+        in: path
+        required: true
+        x-ms-enum:
+          name: IdentityProviderType
+          modelAsString: true
+          values:
+          - value: facebook
+            description: Facebook as Identity provider.
+          - value: google
+            description: Google as Identity provider.
+          - value: microsoft
+            description: Microsoft Live as Identity provider.
+          - value: twitter
+            description: Twitter as Identity provider.
+          - value: aad
+            description: Azure Active Directory as Identity provider.
+          - value: aadB2C
+            description: Azure Active Directory B2C as Identity provider.
+        description: Identity Provider Type identifier.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - facebook
+          - google
+          - microsoft
+          - twitter
+          - aad
+          - aadB2C
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The response body contains the specified IdentityProvider entity
+            configuration details.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                        - facebook
+                        - google
+                        - microsoft
+                        - twitter
+                        - aad
+                        - aadB2C
+                        x-ms-enum:
+                          name: IdentityProviderType
+                          modelAsString: true
+                          values:
+                          - value: facebook
+                            description: Facebook as Identity provider.
+                          - value: google
+                            description: Google as Identity provider.
+                          - value: microsoft
+                            description: Microsoft Live as Identity provider.
+                          - value: twitter
+                            description: Twitter as Identity provider.
+                          - value: aad
+                            description: Azure Active Directory as Identity provider.
+                          - value: aadB2C
+                            description: Azure Active Directory B2C as Identity provider.
+                        description: Identity Provider Type identifier.
+                      signinTenant:
+                        type: string
+                        description: The TenantId to use instead of Common when logging
+                          into Active Directory
+                      allowedTenants:
+                        type: array
+                        items:
+                          type: string
+                        maxItems: 32
+                        description: List of Allowed Tenants when configuring Azure
+                          Active Directory login.
+                      authority:
+                        type: string
+                        description: OpenID Connect discovery endpoint hostname for
+                          AAD or AAD B2C.
+                      signupPolicyName:
+                        type: string
+                        description: Signup Policy Name. Only applies to AAD B2C Identity
+                          Provider.
+                        minLength: 1
+                      signinPolicyName:
+                        type: string
+                        description: Signin Policy Name. Only applies to AAD B2C Identity
+                          Provider.
+                        minLength: 1
+                      profileEditingPolicyName:
+                        type: string
+                        description: Profile Editing Policy Name. Only applies to
+                          AAD B2C Identity Provider.
+                        minLength: 1
+                      passwordResetPolicyName:
+                        type: string
+                        description: Password Reset Policy Name. Only applies to AAD
+                          B2C Identity Provider.
+                        minLength: 1
+                      clientLibrary:
+                        type: string
+                        description: The client library to be used in the developer
+                          portal. Only applies to AAD and AAD B2C Identity Provider.
+                        minLength: 0
+                        maxLength: 16
+                      clientId:
+                        type: string
+                        description: Client Id of the Application in the external
+                          Identity Provider. It is App ID for Facebook login, Client
+                          ID for Google login, App ID for Microsoft.
+                        minLength: 1
+                      clientSecret:
+                        x-ms-secret: true
+                        type: string
+                        description: Client secret of the Application in external
+                          Identity Provider, used to authenticate login request. For
+                          example, it is App Secret for Facebook login, API Key for
+                          Google login, Public Key for Microsoft. This property will
+                          not be filled on 'GET' operations! Use '/listSecrets' POST
+                          request to get the value.
+                        minLength: 1
+                    description: Identity Provider Base Parameter Properties.
+                    required:
+                    - clientId
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    put:
+      tags:
+      - IdentityProvider
+      operationId: IdentityProvider_CreateOrUpdate
+      description: Creates or Updates the IdentityProvider configuration.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: identityProviderName
+        in: path
+        required: true
+        x-ms-enum:
+          name: IdentityProviderType
+          modelAsString: true
+          values:
+          - value: facebook
+            description: Facebook as Identity provider.
+          - value: google
+            description: Google as Identity provider.
+          - value: microsoft
+            description: Microsoft Live as Identity provider.
+          - value: twitter
+            description: Twitter as Identity provider.
+          - value: aad
+            description: Azure Active Directory as Identity provider.
+          - value: aadB2C
+            description: Azure Active Directory B2C as Identity provider.
+        description: Identity Provider Type identifier.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - facebook
+          - google
+          - microsoft
+          - twitter
+          - aad
+          - aadB2C
+      - name: If-Match
+        in: header
+        required: false
+        description: ETag of the Entity. Not required when creating an entity, but
+          required when updating an entity.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  readOnly: true
+                  type: string
+                  description: Fully qualified resource ID for the resource. Ex -
+                    /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                name:
+                  readOnly: true
+                  type: string
+                  description: The name of the resource
+                type:
+                  readOnly: true
+                  type: string
+                  description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                    or "Microsoft.Storage/storageAccounts"
+                properties:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                      - facebook
+                      - google
+                      - microsoft
+                      - twitter
+                      - aad
+                      - aadB2C
+                      x-ms-enum:
+                        name: IdentityProviderType
+                        modelAsString: true
+                        values:
+                        - value: facebook
+                          description: Facebook as Identity provider.
+                        - value: google
+                          description: Google as Identity provider.
+                        - value: microsoft
+                          description: Microsoft Live as Identity provider.
+                        - value: twitter
+                          description: Twitter as Identity provider.
+                        - value: aad
+                          description: Azure Active Directory as Identity provider.
+                        - value: aadB2C
+                          description: Azure Active Directory B2C as Identity provider.
+                      description: Identity Provider Type identifier.
+                    signinTenant:
+                      type: string
+                      description: The TenantId to use instead of Common when logging
+                        into Active Directory
+                    allowedTenants:
+                      type: array
+                      items:
+                        type: string
+                      maxItems: 32
+                      description: List of Allowed Tenants when configuring Azure
+                        Active Directory login.
+                    authority:
+                      type: string
+                      description: OpenID Connect discovery endpoint hostname for
+                        AAD or AAD B2C.
+                    signupPolicyName:
+                      type: string
+                      description: Signup Policy Name. Only applies to AAD B2C Identity
+                        Provider.
+                      minLength: 1
+                    signinPolicyName:
+                      type: string
+                      description: Signin Policy Name. Only applies to AAD B2C Identity
+                        Provider.
+                      minLength: 1
+                    profileEditingPolicyName:
+                      type: string
+                      description: Profile Editing Policy Name. Only applies to AAD
+                        B2C Identity Provider.
+                      minLength: 1
+                    passwordResetPolicyName:
+                      type: string
+                      description: Password Reset Policy Name. Only applies to AAD
+                        B2C Identity Provider.
+                      minLength: 1
+                    clientLibrary:
+                      type: string
+                      description: The client library to be used in the developer
+                        portal. Only applies to AAD and AAD B2C Identity Provider.
+                      minLength: 0
+                      maxLength: 16
+                    clientId:
+                      type: string
+                      description: Client Id of the Application in the external Identity
+                        Provider. It is App ID for Facebook login, Client ID for Google
+                        login, App ID for Microsoft.
+                      minLength: 1
+                    clientSecret:
+                      x-ms-secret: true
+                      type: string
+                      description: Client secret of the Application in external Identity
+                        Provider, used to authenticate login request. For example,
+                        it is App Secret for Facebook login, API Key for Google login,
+                        Public Key for Microsoft. This property will not be filled
+                        on 'GET' operations! Use '/listSecrets' POST request to get
+                        the value.
+                      minLength: 1
+                  description: Identity Provider Base Parameter Properties.
+                  required:
+                  - clientId
+                  - clientSecret
+                  x-ms-client-flatten: true
+              title: Resource
+              description: Common fields that are returned in the response for all
+                Azure Resource Manager resources
+              x-ms-azure-resource: true
+        description: Create parameters.
+        required: true
+      responses:
+        '200':
+          description: The existing Identity Provider was successfully updated.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                        - facebook
+                        - google
+                        - microsoft
+                        - twitter
+                        - aad
+                        - aadB2C
+                        x-ms-enum:
+                          name: IdentityProviderType
+                          modelAsString: true
+                          values:
+                          - value: facebook
+                            description: Facebook as Identity provider.
+                          - value: google
+                            description: Google as Identity provider.
+                          - value: microsoft
+                            description: Microsoft Live as Identity provider.
+                          - value: twitter
+                            description: Twitter as Identity provider.
+                          - value: aad
+                            description: Azure Active Directory as Identity provider.
+                          - value: aadB2C
+                            description: Azure Active Directory B2C as Identity provider.
+                        description: Identity Provider Type identifier.
+                      signinTenant:
+                        type: string
+                        description: The TenantId to use instead of Common when logging
+                          into Active Directory
+                      allowedTenants:
+                        type: array
+                        items:
+                          type: string
+                        maxItems: 32
+                        description: List of Allowed Tenants when configuring Azure
+                          Active Directory login.
+                      authority:
+                        type: string
+                        description: OpenID Connect discovery endpoint hostname for
+                          AAD or AAD B2C.
+                      signupPolicyName:
+                        type: string
+                        description: Signup Policy Name. Only applies to AAD B2C Identity
+                          Provider.
+                        minLength: 1
+                      signinPolicyName:
+                        type: string
+                        description: Signin Policy Name. Only applies to AAD B2C Identity
+                          Provider.
+                        minLength: 1
+                      profileEditingPolicyName:
+                        type: string
+                        description: Profile Editing Policy Name. Only applies to
+                          AAD B2C Identity Provider.
+                        minLength: 1
+                      passwordResetPolicyName:
+                        type: string
+                        description: Password Reset Policy Name. Only applies to AAD
+                          B2C Identity Provider.
+                        minLength: 1
+                      clientLibrary:
+                        type: string
+                        description: The client library to be used in the developer
+                          portal. Only applies to AAD and AAD B2C Identity Provider.
+                        minLength: 0
+                        maxLength: 16
+                      clientId:
+                        type: string
+                        description: Client Id of the Application in the external
+                          Identity Provider. It is App ID for Facebook login, Client
+                          ID for Google login, App ID for Microsoft.
+                        minLength: 1
+                      clientSecret:
+                        x-ms-secret: true
+                        type: string
+                        description: Client secret of the Application in external
+                          Identity Provider, used to authenticate login request. For
+                          example, it is App Secret for Facebook login, API Key for
+                          Google login, Public Key for Microsoft. This property will
+                          not be filled on 'GET' operations! Use '/listSecrets' POST
+                          request to get the value.
+                        minLength: 1
+                    description: Identity Provider Base Parameter Properties.
+                    required:
+                    - clientId
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        '201':
+          description: IdentityProvider configuration were successfully created.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                        - facebook
+                        - google
+                        - microsoft
+                        - twitter
+                        - aad
+                        - aadB2C
+                        x-ms-enum:
+                          name: IdentityProviderType
+                          modelAsString: true
+                          values:
+                          - value: facebook
+                            description: Facebook as Identity provider.
+                          - value: google
+                            description: Google as Identity provider.
+                          - value: microsoft
+                            description: Microsoft Live as Identity provider.
+                          - value: twitter
+                            description: Twitter as Identity provider.
+                          - value: aad
+                            description: Azure Active Directory as Identity provider.
+                          - value: aadB2C
+                            description: Azure Active Directory B2C as Identity provider.
+                        description: Identity Provider Type identifier.
+                      signinTenant:
+                        type: string
+                        description: The TenantId to use instead of Common when logging
+                          into Active Directory
+                      allowedTenants:
+                        type: array
+                        items:
+                          type: string
+                        maxItems: 32
+                        description: List of Allowed Tenants when configuring Azure
+                          Active Directory login.
+                      authority:
+                        type: string
+                        description: OpenID Connect discovery endpoint hostname for
+                          AAD or AAD B2C.
+                      signupPolicyName:
+                        type: string
+                        description: Signup Policy Name. Only applies to AAD B2C Identity
+                          Provider.
+                        minLength: 1
+                      signinPolicyName:
+                        type: string
+                        description: Signin Policy Name. Only applies to AAD B2C Identity
+                          Provider.
+                        minLength: 1
+                      profileEditingPolicyName:
+                        type: string
+                        description: Profile Editing Policy Name. Only applies to
+                          AAD B2C Identity Provider.
+                        minLength: 1
+                      passwordResetPolicyName:
+                        type: string
+                        description: Password Reset Policy Name. Only applies to AAD
+                          B2C Identity Provider.
+                        minLength: 1
+                      clientLibrary:
+                        type: string
+                        description: The client library to be used in the developer
+                          portal. Only applies to AAD and AAD B2C Identity Provider.
+                        minLength: 0
+                        maxLength: 16
+                      clientId:
+                        type: string
+                        description: Client Id of the Application in the external
+                          Identity Provider. It is App ID for Facebook login, Client
+                          ID for Google login, App ID for Microsoft.
+                        minLength: 1
+                      clientSecret:
+                        x-ms-secret: true
+                        type: string
+                        description: Client secret of the Application in external
+                          Identity Provider, used to authenticate login request. For
+                          example, it is App Secret for Facebook login, API Key for
+                          Google login, Public Key for Microsoft. This property will
+                          not be filled on 'GET' operations! Use '/listSecrets' POST
+                          request to get the value.
+                        minLength: 1
+                    description: Identity Provider Base Parameter Properties.
+                    required:
+                    - clientId
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    patch:
+      tags:
+      - IdentityProvider
+      operationId: IdentityProvider_Update
+      description: Updates an existing IdentityProvider configuration.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: identityProviderName
+        in: path
+        required: true
+        x-ms-enum:
+          name: IdentityProviderType
+          modelAsString: true
+          values:
+          - value: facebook
+            description: Facebook as Identity provider.
+          - value: google
+            description: Google as Identity provider.
+          - value: microsoft
+            description: Microsoft Live as Identity provider.
+          - value: twitter
+            description: Twitter as Identity provider.
+          - value: aad
+            description: Azure Active Directory as Identity provider.
+          - value: aadB2C
+            description: Azure Active Directory B2C as Identity provider.
+        description: Identity Provider Type identifier.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - facebook
+          - google
+          - microsoft
+          - twitter
+          - aad
+          - aadB2C
+      - name: If-Match
+        in: header
+        required: true
+        description: ETag of the Entity. ETag should match the current entity state
+          from the header response of the GET request or it should be * for unconditional
+          update.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                properties:
+                  type: object
+                  properties:
+                    type:
+                      type: string
+                      enum:
+                      - facebook
+                      - google
+                      - microsoft
+                      - twitter
+                      - aad
+                      - aadB2C
+                      x-ms-enum:
+                        name: IdentityProviderType
+                        modelAsString: true
+                        values:
+                        - value: facebook
+                          description: Facebook as Identity provider.
+                        - value: google
+                          description: Google as Identity provider.
+                        - value: microsoft
+                          description: Microsoft Live as Identity provider.
+                        - value: twitter
+                          description: Twitter as Identity provider.
+                        - value: aad
+                          description: Azure Active Directory as Identity provider.
+                        - value: aadB2C
+                          description: Azure Active Directory B2C as Identity provider.
+                      description: Identity Provider Type identifier.
+                    signinTenant:
+                      type: string
+                      description: The TenantId to use instead of Common when logging
+                        into Active Directory
+                    allowedTenants:
+                      type: array
+                      items:
+                        type: string
+                      maxItems: 32
+                      description: List of Allowed Tenants when configuring Azure
+                        Active Directory login.
+                    authority:
+                      type: string
+                      description: OpenID Connect discovery endpoint hostname for
+                        AAD or AAD B2C.
+                    signupPolicyName:
+                      type: string
+                      description: Signup Policy Name. Only applies to AAD B2C Identity
+                        Provider.
+                      minLength: 1
+                    signinPolicyName:
+                      type: string
+                      description: Signin Policy Name. Only applies to AAD B2C Identity
+                        Provider.
+                      minLength: 1
+                    profileEditingPolicyName:
+                      type: string
+                      description: Profile Editing Policy Name. Only applies to AAD
+                        B2C Identity Provider.
+                      minLength: 1
+                    passwordResetPolicyName:
+                      type: string
+                      description: Password Reset Policy Name. Only applies to AAD
+                        B2C Identity Provider.
+                      minLength: 1
+                    clientLibrary:
+                      type: string
+                      description: The client library to be used in the developer
+                        portal. Only applies to AAD and AAD B2C Identity Provider.
+                      minLength: 0
+                      maxLength: 16
+                    clientId:
+                      type: string
+                      description: Client Id of the Application in the external Identity
+                        Provider. It is App ID for Facebook login, Client ID for Google
+                        login, App ID for Microsoft.
+                      minLength: 1
+                    clientSecret:
+                      x-ms-secret: true
+                      type: string
+                      description: Client secret of the Application in external Identity
+                        Provider, used to authenticate login request. For example,
+                        it is App Secret for Facebook login, API Key for Google login,
+                        Public Key for Microsoft.
+                      minLength: 1
+                  description: Identity Provider Base Parameter Properties.
+                  x-ms-client-flatten: true
+              description: Parameters supplied to update Identity Provider
+        description: Update parameters.
+        required: true
+      responses:
+        '200':
+          description: The existing Identity Provider was successfully updated.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    type: object
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                        - facebook
+                        - google
+                        - microsoft
+                        - twitter
+                        - aad
+                        - aadB2C
+                        x-ms-enum:
+                          name: IdentityProviderType
+                          modelAsString: true
+                          values:
+                          - value: facebook
+                            description: Facebook as Identity provider.
+                          - value: google
+                            description: Google as Identity provider.
+                          - value: microsoft
+                            description: Microsoft Live as Identity provider.
+                          - value: twitter
+                            description: Twitter as Identity provider.
+                          - value: aad
+                            description: Azure Active Directory as Identity provider.
+                          - value: aadB2C
+                            description: Azure Active Directory B2C as Identity provider.
+                        description: Identity Provider Type identifier.
+                      signinTenant:
+                        type: string
+                        description: The TenantId to use instead of Common when logging
+                          into Active Directory
+                      allowedTenants:
+                        type: array
+                        items:
+                          type: string
+                        maxItems: 32
+                        description: List of Allowed Tenants when configuring Azure
+                          Active Directory login.
+                      authority:
+                        type: string
+                        description: OpenID Connect discovery endpoint hostname for
+                          AAD or AAD B2C.
+                      signupPolicyName:
+                        type: string
+                        description: Signup Policy Name. Only applies to AAD B2C Identity
+                          Provider.
+                        minLength: 1
+                      signinPolicyName:
+                        type: string
+                        description: Signin Policy Name. Only applies to AAD B2C Identity
+                          Provider.
+                        minLength: 1
+                      profileEditingPolicyName:
+                        type: string
+                        description: Profile Editing Policy Name. Only applies to
+                          AAD B2C Identity Provider.
+                        minLength: 1
+                      passwordResetPolicyName:
+                        type: string
+                        description: Password Reset Policy Name. Only applies to AAD
+                          B2C Identity Provider.
+                        minLength: 1
+                      clientLibrary:
+                        type: string
+                        description: The client library to be used in the developer
+                          portal. Only applies to AAD and AAD B2C Identity Provider.
+                        minLength: 0
+                        maxLength: 16
+                      clientId:
+                        type: string
+                        description: Client Id of the Application in the external
+                          Identity Provider. It is App ID for Facebook login, Client
+                          ID for Google login, App ID for Microsoft.
+                        minLength: 1
+                      clientSecret:
+                        x-ms-secret: true
+                        type: string
+                        description: Client secret of the Application in external
+                          Identity Provider, used to authenticate login request. For
+                          example, it is App Secret for Facebook login, API Key for
+                          Google login, Public Key for Microsoft. This property will
+                          not be filled on 'GET' operations! Use '/listSecrets' POST
+                          request to get the value.
+                        minLength: 1
+                    description: Identity Provider Base Parameter Properties.
+                    required:
+                    - clientId
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    delete:
+      tags:
+      - IdentityProvider
+      operationId: IdentityProvider_Delete
+      description: Deletes the specified identity provider configuration.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: identityProviderName
+        in: path
+        required: true
+        x-ms-enum:
+          name: IdentityProviderType
+          modelAsString: true
+          values:
+          - value: facebook
+            description: Facebook as Identity provider.
+          - value: google
+            description: Google as Identity provider.
+          - value: microsoft
+            description: Microsoft Live as Identity provider.
+          - value: twitter
+            description: Twitter as Identity provider.
+          - value: aad
+            description: Azure Active Directory as Identity provider.
+          - value: aadB2C
+            description: Azure Active Directory B2C as Identity provider.
+        description: Identity Provider Type identifier.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - facebook
+          - google
+          - microsoft
+          - twitter
+          - aad
+          - aadB2C
+      - name: If-Match
+        in: header
+        required: true
+        description: ETag of the Entity. ETag should match the current entity state
+          from the header response of the GET request or it should be * for unconditional
+          update.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The identity provider configuration was successfully deleted.
+        '204':
+          description: The identity provider configuration was successfully deleted.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/identityProviders/{identityProviderName}/listSecrets
+  : post:
+      tags:
+      - IdentityProvider
+      operationId: IdentityProvider_ListSecrets
+      description: Gets the client secret details of the Identity Provider.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: identityProviderName
+        in: path
+        required: true
+        x-ms-enum:
+          name: IdentityProviderType
+          modelAsString: true
+          values:
+          - value: facebook
+            description: Facebook as Identity provider.
+          - value: google
+            description: Google as Identity provider.
+          - value: microsoft
+            description: Microsoft Live as Identity provider.
+          - value: twitter
+            description: Twitter as Identity provider.
+          - value: aad
+            description: Azure Active Directory as Identity provider.
+          - value: aadB2C
+            description: Azure Active Directory B2C as Identity provider.
+        description: Identity Provider Type identifier.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - facebook
+          - google
+          - microsoft
+          - twitter
+          - aad
+          - aadB2C
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The response body contains the client secret.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clientSecret:
+                    type: string
+                    x-ms-secret: true
+                    description: Client or app secret used in IdentityProviders, Aad,
+                      OpenID or OAuth.
+                description: Client or app secret used in IdentityProviders, Aad,
+                  OpenID or OAuth.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+components:
+  parameters:
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      description: The name of the resource group. The name is case insensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    ServiceNameParameter:
+      name: serviceName
+      in: path
+      required: true
+      description: The name of the API Management service.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 50
+        pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription. The value must be an UUID.
+      required: true
+      schema:
+        type: string
+        format: uuid
+    IdentityProviderNameParameter:
+      name: identityProviderName
+      in: path
+      required: true
+      x-ms-enum:
+        name: IdentityProviderType
+        modelAsString: true
+        values:
+        - value: facebook
+          description: Facebook as Identity provider.
+        - value: google
+          description: Google as Identity provider.
+        - value: microsoft
+          description: Microsoft Live as Identity provider.
+        - value: twitter
+          description: Twitter as Identity provider.
+        - value: aad
+          description: Azure Active Directory as Identity provider.
+        - value: aadB2C
+          description: Azure Active Directory B2C as Identity provider.
+      description: Identity Provider Type identifier.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        enum:
+        - facebook
+        - google
+        - microsoft
+        - twitter
+        - aad
+        - aadB2C
+    IfMatchOptionalParameter:
+      name: If-Match
+      in: header
+      required: false
+      description: ETag of the Entity. Not required when creating an entity, but required
+        when updating an entity.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    IfMatchRequiredParameter:
+      name: If-Match
+      in: header
+      required: true
+      description: ETag of the Entity. ETag should match the current entity state
+        from the header response of the GET request or it should be * for unconditional
+        update.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+    Resource:
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    IdentityProviderBaseParameters:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - facebook
+          - google
+          - microsoft
+          - twitter
+          - aad
+          - aadB2C
+          x-ms-enum:
+            name: IdentityProviderType
+            modelAsString: true
+            values:
+            - value: facebook
+              description: Facebook as Identity provider.
+            - value: google
+              description: Google as Identity provider.
+            - value: microsoft
+              description: Microsoft Live as Identity provider.
+            - value: twitter
+              description: Twitter as Identity provider.
+            - value: aad
+              description: Azure Active Directory as Identity provider.
+            - value: aadB2C
+              description: Azure Active Directory B2C as Identity provider.
+          description: Identity Provider Type identifier.
+        signinTenant:
+          type: string
+          description: The TenantId to use instead of Common when logging into Active
+            Directory
+        allowedTenants:
+          type: array
+          items:
+            type: string
+          maxItems: 32
+          description: List of Allowed Tenants when configuring Azure Active Directory
+            login.
+        authority:
+          type: string
+          description: OpenID Connect discovery endpoint hostname for AAD or AAD B2C.
+        signupPolicyName:
+          type: string
+          description: Signup Policy Name. Only applies to AAD B2C Identity Provider.
+          minLength: 1
+        signinPolicyName:
+          type: string
+          description: Signin Policy Name. Only applies to AAD B2C Identity Provider.
+          minLength: 1
+        profileEditingPolicyName:
+          type: string
+          description: Profile Editing Policy Name. Only applies to AAD B2C Identity
+            Provider.
+          minLength: 1
+        passwordResetPolicyName:
+          type: string
+          description: Password Reset Policy Name. Only applies to AAD B2C Identity
+            Provider.
+          minLength: 1
+        clientLibrary:
+          type: string
+          description: The client library to be used in the developer portal. Only
+            applies to AAD and AAD B2C Identity Provider.
+          minLength: 0
+          maxLength: 16
+      description: Identity Provider Base Parameter Properties.
+    IdentityProviderContractProperties:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - facebook
+          - google
+          - microsoft
+          - twitter
+          - aad
+          - aadB2C
+          x-ms-enum:
+            name: IdentityProviderType
+            modelAsString: true
+            values:
+            - value: facebook
+              description: Facebook as Identity provider.
+            - value: google
+              description: Google as Identity provider.
+            - value: microsoft
+              description: Microsoft Live as Identity provider.
+            - value: twitter
+              description: Twitter as Identity provider.
+            - value: aad
+              description: Azure Active Directory as Identity provider.
+            - value: aadB2C
+              description: Azure Active Directory B2C as Identity provider.
+          description: Identity Provider Type identifier.
+        signinTenant:
+          type: string
+          description: The TenantId to use instead of Common when logging into Active
+            Directory
+        allowedTenants:
+          type: array
+          items:
+            type: string
+          maxItems: 32
+          description: List of Allowed Tenants when configuring Azure Active Directory
+            login.
+        authority:
+          type: string
+          description: OpenID Connect discovery endpoint hostname for AAD or AAD B2C.
+        signupPolicyName:
+          type: string
+          description: Signup Policy Name. Only applies to AAD B2C Identity Provider.
+          minLength: 1
+        signinPolicyName:
+          type: string
+          description: Signin Policy Name. Only applies to AAD B2C Identity Provider.
+          minLength: 1
+        profileEditingPolicyName:
+          type: string
+          description: Profile Editing Policy Name. Only applies to AAD B2C Identity
+            Provider.
+          minLength: 1
+        passwordResetPolicyName:
+          type: string
+          description: Password Reset Policy Name. Only applies to AAD B2C Identity
+            Provider.
+          minLength: 1
+        clientLibrary:
+          type: string
+          description: The client library to be used in the developer portal. Only
+            applies to AAD and AAD B2C Identity Provider.
+          minLength: 0
+          maxLength: 16
+        clientId:
+          type: string
+          description: Client Id of the Application in the external Identity Provider.
+            It is App ID for Facebook login, Client ID for Google login, App ID for
+            Microsoft.
+          minLength: 1
+        clientSecret:
+          x-ms-secret: true
+          type: string
+          description: Client secret of the Application in external Identity Provider,
+            used to authenticate login request. For example, it is App Secret for
+            Facebook login, API Key for Google login, Public Key for Microsoft. This
+            property will not be filled on 'GET' operations! Use '/listSecrets' POST
+            request to get the value.
+          minLength: 1
+      description: Identity Provider Base Parameter Properties.
+      required:
+      - clientId
+    IdentityProviderContract:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        properties:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - facebook
+              - google
+              - microsoft
+              - twitter
+              - aad
+              - aadB2C
+              x-ms-enum:
+                name: IdentityProviderType
+                modelAsString: true
+                values:
+                - value: facebook
+                  description: Facebook as Identity provider.
+                - value: google
+                  description: Google as Identity provider.
+                - value: microsoft
+                  description: Microsoft Live as Identity provider.
+                - value: twitter
+                  description: Twitter as Identity provider.
+                - value: aad
+                  description: Azure Active Directory as Identity provider.
+                - value: aadB2C
+                  description: Azure Active Directory B2C as Identity provider.
+              description: Identity Provider Type identifier.
+            signinTenant:
+              type: string
+              description: The TenantId to use instead of Common when logging into
+                Active Directory
+            allowedTenants:
+              type: array
+              items:
+                type: string
+              maxItems: 32
+              description: List of Allowed Tenants when configuring Azure Active Directory
+                login.
+            authority:
+              type: string
+              description: OpenID Connect discovery endpoint hostname for AAD or AAD
+                B2C.
+            signupPolicyName:
+              type: string
+              description: Signup Policy Name. Only applies to AAD B2C Identity Provider.
+              minLength: 1
+            signinPolicyName:
+              type: string
+              description: Signin Policy Name. Only applies to AAD B2C Identity Provider.
+              minLength: 1
+            profileEditingPolicyName:
+              type: string
+              description: Profile Editing Policy Name. Only applies to AAD B2C Identity
+                Provider.
+              minLength: 1
+            passwordResetPolicyName:
+              type: string
+              description: Password Reset Policy Name. Only applies to AAD B2C Identity
+                Provider.
+              minLength: 1
+            clientLibrary:
+              type: string
+              description: The client library to be used in the developer portal.
+                Only applies to AAD and AAD B2C Identity Provider.
+              minLength: 0
+              maxLength: 16
+            clientId:
+              type: string
+              description: Client Id of the Application in the external Identity Provider.
+                It is App ID for Facebook login, Client ID for Google login, App ID
+                for Microsoft.
+              minLength: 1
+            clientSecret:
+              x-ms-secret: true
+              type: string
+              description: Client secret of the Application in external Identity Provider,
+                used to authenticate login request. For example, it is App Secret
+                for Facebook login, API Key for Google login, Public Key for Microsoft.
+                This property will not be filled on 'GET' operations! Use '/listSecrets'
+                POST request to get the value.
+              minLength: 1
+          description: Identity Provider Base Parameter Properties.
+          required:
+          - clientId
+          x-ms-client-flatten: true
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    IdentityProviderList:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+              name:
+                readOnly: true
+                type: string
+                description: The name of the resource
+              type:
+                readOnly: true
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+              properties:
+                type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                    - facebook
+                    - google
+                    - microsoft
+                    - twitter
+                    - aad
+                    - aadB2C
+                    x-ms-enum:
+                      name: IdentityProviderType
+                      modelAsString: true
+                      values:
+                      - value: facebook
+                        description: Facebook as Identity provider.
+                      - value: google
+                        description: Google as Identity provider.
+                      - value: microsoft
+                        description: Microsoft Live as Identity provider.
+                      - value: twitter
+                        description: Twitter as Identity provider.
+                      - value: aad
+                        description: Azure Active Directory as Identity provider.
+                      - value: aadB2C
+                        description: Azure Active Directory B2C as Identity provider.
+                    description: Identity Provider Type identifier.
+                  signinTenant:
+                    type: string
+                    description: The TenantId to use instead of Common when logging
+                      into Active Directory
+                  allowedTenants:
+                    type: array
+                    items:
+                      type: string
+                    maxItems: 32
+                    description: List of Allowed Tenants when configuring Azure Active
+                      Directory login.
+                  authority:
+                    type: string
+                    description: OpenID Connect discovery endpoint hostname for AAD
+                      or AAD B2C.
+                  signupPolicyName:
+                    type: string
+                    description: Signup Policy Name. Only applies to AAD B2C Identity
+                      Provider.
+                    minLength: 1
+                  signinPolicyName:
+                    type: string
+                    description: Signin Policy Name. Only applies to AAD B2C Identity
+                      Provider.
+                    minLength: 1
+                  profileEditingPolicyName:
+                    type: string
+                    description: Profile Editing Policy Name. Only applies to AAD
+                      B2C Identity Provider.
+                    minLength: 1
+                  passwordResetPolicyName:
+                    type: string
+                    description: Password Reset Policy Name. Only applies to AAD B2C
+                      Identity Provider.
+                    minLength: 1
+                  clientLibrary:
+                    type: string
+                    description: The client library to be used in the developer portal.
+                      Only applies to AAD and AAD B2C Identity Provider.
+                    minLength: 0
+                    maxLength: 16
+                  clientId:
+                    type: string
+                    description: Client Id of the Application in the external Identity
+                      Provider. It is App ID for Facebook login, Client ID for Google
+                      login, App ID for Microsoft.
+                    minLength: 1
+                  clientSecret:
+                    x-ms-secret: true
+                    type: string
+                    description: Client secret of the Application in external Identity
+                      Provider, used to authenticate login request. For example, it
+                      is App Secret for Facebook login, API Key for Google login,
+                      Public Key for Microsoft. This property will not be filled on
+                      'GET' operations! Use '/listSecrets' POST request to get the
+                      value.
+                    minLength: 1
+                description: Identity Provider Base Parameter Properties.
+                required:
+                - clientId
+                x-ms-client-flatten: true
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+          description: Identity Provider configuration values.
+        count:
+          type: integer
+          format: int64
+          description: Total record count number across all pages.
+        nextLink:
+          type: string
+          description: Next page link if any.
+      description: List of all the Identity Providers configured on the service instance.
+    IdentityProviderCreateContractProperties:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - facebook
+          - google
+          - microsoft
+          - twitter
+          - aad
+          - aadB2C
+          x-ms-enum:
+            name: IdentityProviderType
+            modelAsString: true
+            values:
+            - value: facebook
+              description: Facebook as Identity provider.
+            - value: google
+              description: Google as Identity provider.
+            - value: microsoft
+              description: Microsoft Live as Identity provider.
+            - value: twitter
+              description: Twitter as Identity provider.
+            - value: aad
+              description: Azure Active Directory as Identity provider.
+            - value: aadB2C
+              description: Azure Active Directory B2C as Identity provider.
+          description: Identity Provider Type identifier.
+        signinTenant:
+          type: string
+          description: The TenantId to use instead of Common when logging into Active
+            Directory
+        allowedTenants:
+          type: array
+          items:
+            type: string
+          maxItems: 32
+          description: List of Allowed Tenants when configuring Azure Active Directory
+            login.
+        authority:
+          type: string
+          description: OpenID Connect discovery endpoint hostname for AAD or AAD B2C.
+        signupPolicyName:
+          type: string
+          description: Signup Policy Name. Only applies to AAD B2C Identity Provider.
+          minLength: 1
+        signinPolicyName:
+          type: string
+          description: Signin Policy Name. Only applies to AAD B2C Identity Provider.
+          minLength: 1
+        profileEditingPolicyName:
+          type: string
+          description: Profile Editing Policy Name. Only applies to AAD B2C Identity
+            Provider.
+          minLength: 1
+        passwordResetPolicyName:
+          type: string
+          description: Password Reset Policy Name. Only applies to AAD B2C Identity
+            Provider.
+          minLength: 1
+        clientLibrary:
+          type: string
+          description: The client library to be used in the developer portal. Only
+            applies to AAD and AAD B2C Identity Provider.
+          minLength: 0
+          maxLength: 16
+        clientId:
+          type: string
+          description: Client Id of the Application in the external Identity Provider.
+            It is App ID for Facebook login, Client ID for Google login, App ID for
+            Microsoft.
+          minLength: 1
+        clientSecret:
+          x-ms-secret: true
+          type: string
+          description: Client secret of the Application in external Identity Provider,
+            used to authenticate login request. For example, it is App Secret for
+            Facebook login, API Key for Google login, Public Key for Microsoft. This
+            property will not be filled on 'GET' operations! Use '/listSecrets' POST
+            request to get the value.
+          minLength: 1
+      description: Identity Provider Base Parameter Properties.
+      required:
+      - clientId
+      - clientSecret
+    IdentityProviderCreateContract:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        properties:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - facebook
+              - google
+              - microsoft
+              - twitter
+              - aad
+              - aadB2C
+              x-ms-enum:
+                name: IdentityProviderType
+                modelAsString: true
+                values:
+                - value: facebook
+                  description: Facebook as Identity provider.
+                - value: google
+                  description: Google as Identity provider.
+                - value: microsoft
+                  description: Microsoft Live as Identity provider.
+                - value: twitter
+                  description: Twitter as Identity provider.
+                - value: aad
+                  description: Azure Active Directory as Identity provider.
+                - value: aadB2C
+                  description: Azure Active Directory B2C as Identity provider.
+              description: Identity Provider Type identifier.
+            signinTenant:
+              type: string
+              description: The TenantId to use instead of Common when logging into
+                Active Directory
+            allowedTenants:
+              type: array
+              items:
+                type: string
+              maxItems: 32
+              description: List of Allowed Tenants when configuring Azure Active Directory
+                login.
+            authority:
+              type: string
+              description: OpenID Connect discovery endpoint hostname for AAD or AAD
+                B2C.
+            signupPolicyName:
+              type: string
+              description: Signup Policy Name. Only applies to AAD B2C Identity Provider.
+              minLength: 1
+            signinPolicyName:
+              type: string
+              description: Signin Policy Name. Only applies to AAD B2C Identity Provider.
+              minLength: 1
+            profileEditingPolicyName:
+              type: string
+              description: Profile Editing Policy Name. Only applies to AAD B2C Identity
+                Provider.
+              minLength: 1
+            passwordResetPolicyName:
+              type: string
+              description: Password Reset Policy Name. Only applies to AAD B2C Identity
+                Provider.
+              minLength: 1
+            clientLibrary:
+              type: string
+              description: The client library to be used in the developer portal.
+                Only applies to AAD and AAD B2C Identity Provider.
+              minLength: 0
+              maxLength: 16
+            clientId:
+              type: string
+              description: Client Id of the Application in the external Identity Provider.
+                It is App ID for Facebook login, Client ID for Google login, App ID
+                for Microsoft.
+              minLength: 1
+            clientSecret:
+              x-ms-secret: true
+              type: string
+              description: Client secret of the Application in external Identity Provider,
+                used to authenticate login request. For example, it is App Secret
+                for Facebook login, API Key for Google login, Public Key for Microsoft.
+                This property will not be filled on 'GET' operations! Use '/listSecrets'
+                POST request to get the value.
+              minLength: 1
+          description: Identity Provider Base Parameter Properties.
+          required:
+          - clientId
+          - clientSecret
+          x-ms-client-flatten: true
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    IdentityProviderUpdateProperties:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - facebook
+          - google
+          - microsoft
+          - twitter
+          - aad
+          - aadB2C
+          x-ms-enum:
+            name: IdentityProviderType
+            modelAsString: true
+            values:
+            - value: facebook
+              description: Facebook as Identity provider.
+            - value: google
+              description: Google as Identity provider.
+            - value: microsoft
+              description: Microsoft Live as Identity provider.
+            - value: twitter
+              description: Twitter as Identity provider.
+            - value: aad
+              description: Azure Active Directory as Identity provider.
+            - value: aadB2C
+              description: Azure Active Directory B2C as Identity provider.
+          description: Identity Provider Type identifier.
+        signinTenant:
+          type: string
+          description: The TenantId to use instead of Common when logging into Active
+            Directory
+        allowedTenants:
+          type: array
+          items:
+            type: string
+          maxItems: 32
+          description: List of Allowed Tenants when configuring Azure Active Directory
+            login.
+        authority:
+          type: string
+          description: OpenID Connect discovery endpoint hostname for AAD or AAD B2C.
+        signupPolicyName:
+          type: string
+          description: Signup Policy Name. Only applies to AAD B2C Identity Provider.
+          minLength: 1
+        signinPolicyName:
+          type: string
+          description: Signin Policy Name. Only applies to AAD B2C Identity Provider.
+          minLength: 1
+        profileEditingPolicyName:
+          type: string
+          description: Profile Editing Policy Name. Only applies to AAD B2C Identity
+            Provider.
+          minLength: 1
+        passwordResetPolicyName:
+          type: string
+          description: Password Reset Policy Name. Only applies to AAD B2C Identity
+            Provider.
+          minLength: 1
+        clientLibrary:
+          type: string
+          description: The client library to be used in the developer portal. Only
+            applies to AAD and AAD B2C Identity Provider.
+          minLength: 0
+          maxLength: 16
+        clientId:
+          type: string
+          description: Client Id of the Application in the external Identity Provider.
+            It is App ID for Facebook login, Client ID for Google login, App ID for
+            Microsoft.
+          minLength: 1
+        clientSecret:
+          x-ms-secret: true
+          type: string
+          description: Client secret of the Application in external Identity Provider,
+            used to authenticate login request. For example, it is App Secret for
+            Facebook login, API Key for Google login, Public Key for Microsoft.
+          minLength: 1
+      description: Identity Provider Base Parameter Properties.
+    IdentityProviderUpdateParameters:
+      type: object
+      properties:
+        properties:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - facebook
+              - google
+              - microsoft
+              - twitter
+              - aad
+              - aadB2C
+              x-ms-enum:
+                name: IdentityProviderType
+                modelAsString: true
+                values:
+                - value: facebook
+                  description: Facebook as Identity provider.
+                - value: google
+                  description: Google as Identity provider.
+                - value: microsoft
+                  description: Microsoft Live as Identity provider.
+                - value: twitter
+                  description: Twitter as Identity provider.
+                - value: aad
+                  description: Azure Active Directory as Identity provider.
+                - value: aadB2C
+                  description: Azure Active Directory B2C as Identity provider.
+              description: Identity Provider Type identifier.
+            signinTenant:
+              type: string
+              description: The TenantId to use instead of Common when logging into
+                Active Directory
+            allowedTenants:
+              type: array
+              items:
+                type: string
+              maxItems: 32
+              description: List of Allowed Tenants when configuring Azure Active Directory
+                login.
+            authority:
+              type: string
+              description: OpenID Connect discovery endpoint hostname for AAD or AAD
+                B2C.
+            signupPolicyName:
+              type: string
+              description: Signup Policy Name. Only applies to AAD B2C Identity Provider.
+              minLength: 1
+            signinPolicyName:
+              type: string
+              description: Signin Policy Name. Only applies to AAD B2C Identity Provider.
+              minLength: 1
+            profileEditingPolicyName:
+              type: string
+              description: Profile Editing Policy Name. Only applies to AAD B2C Identity
+                Provider.
+              minLength: 1
+            passwordResetPolicyName:
+              type: string
+              description: Password Reset Policy Name. Only applies to AAD B2C Identity
+                Provider.
+              minLength: 1
+            clientLibrary:
+              type: string
+              description: The client library to be used in the developer portal.
+                Only applies to AAD and AAD B2C Identity Provider.
+              minLength: 0
+              maxLength: 16
+            clientId:
+              type: string
+              description: Client Id of the Application in the external Identity Provider.
+                It is App ID for Facebook login, Client ID for Google login, App ID
+                for Microsoft.
+              minLength: 1
+            clientSecret:
+              x-ms-secret: true
+              type: string
+              description: Client secret of the Application in external Identity Provider,
+                used to authenticate login request. For example, it is App Secret
+                for Facebook login, API Key for Google login, Public Key for Microsoft.
+              minLength: 1
+          description: Identity Provider Base Parameter Properties.
+          x-ms-client-flatten: true
+      description: Parameters supplied to update Identity Provider
+    ClientSecretContract:
+      type: object
+      properties:
+        clientSecret:
+          type: string
+          x-ms-secret: true
+          description: Client or app secret used in IdentityProviders, Aad, OpenID
+            or OAuth.
+      description: Client or app secret used in IdentityProviders, Aad, OpenID or
+        OAuth.

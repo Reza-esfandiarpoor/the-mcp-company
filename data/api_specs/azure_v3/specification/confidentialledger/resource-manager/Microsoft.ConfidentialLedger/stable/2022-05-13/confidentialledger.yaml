@@ -1,0 +1,3526 @@
+openapi: 3.0.0
+info:
+  version: 2022-05-13
+  title: ConfidentialLedger
+  description: Microsoft Azure Confidential Compute Ledger Control Plane REST API
+    version 2020-12-01-preview.
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  /providers/Microsoft.ConfidentialLedger/operations:
+    get:
+      tags:
+      - Operations
+      operationId: Operations_List
+      description: Retrieves a list of available API operations
+      summary: Retrieves a list of available API operations under this Resource Provider.
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The request was successful; response contains the list of operations
+            under Microsoft.ConfidentialLedger resource provider.
+          content:
+            application/json:
+              schema:
+                description: List containing this Resource Provider's available operations.
+                type: object
+                properties:
+                  value:
+                    description: Resource provider operations list.
+                    type: array
+                    items:
+                      description: Describes the Resource Provider Operation.
+                      type: object
+                      properties:
+                        name:
+                          description: Resource provider operation name.
+                          type: string
+                        isDataAction:
+                          description: Indicates whether the operation is data action
+                            or not.
+                          type: boolean
+                        display:
+                          description: Details about the operations
+                          type: object
+                          properties:
+                            provider:
+                              description: Name of the resource provider.
+                              type: string
+                            resource:
+                              description: Name of the resource type.
+                              type: string
+                            operation:
+                              description: Name of the resource provider operation.
+                              type: string
+                            description:
+                              description: Description of the resource provider operation.
+                              type: string
+                    x-ms-identifiers:
+                    - name
+                    readOnly: true
+                  nextLink:
+                    description: The URI that can be used to request the next page
+                      for list of Azure operations.
+                    type: string
+                    readOnly: true
+        default:
+          description: Error response describing the reason for operation failure.
+            404 - NotFound (Confidential Ledger does not exist.)
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /subscriptions/{subscriptionId}/providers/Microsoft.ConfidentialLedger/checkNameAvailability:
+    post:
+      tags:
+      - NameAvailability
+      description: To check whether a resource name is available.
+      operationId: CheckNameAvailability
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID. This is a GUID-formatted string (e.g.
+          00000000-0000-0000-0000-000000000000)
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: The check availability request body.
+              type: object
+              properties:
+                name:
+                  description: The name of the resource for which availability needs
+                    to be checked.
+                  type: string
+                type:
+                  description: The resource type.
+                  type: string
+        description: Name availability request payload.
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                description: The check availability result.
+                type: object
+                properties:
+                  nameAvailable:
+                    description: Indicates if the resource name is available.
+                    type: boolean
+                  reason:
+                    description: The reason why the given name is not available.
+                    type: string
+                    enum:
+                    - Invalid
+                    - AlreadyExists
+                    x-ms-enum:
+                      name: CheckNameAvailabilityReason
+                      modelAsString: true
+                  message:
+                    description: Detailed reason why the given name is available.
+                    type: string
+        default:
+          description: Error response describing the reason for operation failure.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConfidentialLedger/ledgers/{ledgerName}
+  : get:
+      tags:
+      - Confidential Ledger
+      summary: Retrieves information about a Confidential Ledger resource.
+      description: Retrieves the properties of a Confidential Ledger.
+      operationId: Ledger_Get
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID. This is a GUID-formatted string (e.g.
+          00000000-0000-0000-0000-000000000000)
+        schema:
+          type: string
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 90
+      - name: ledgerName
+        in: path
+        required: true
+        description: Name of the Confidential Ledger
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9]
+      responses:
+        '200':
+          description: The request was successful; response contains the Confidential
+            Ledger
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    description: Name of the Resource.
+                    type: string
+                    readOnly: true
+                  id:
+                    description: Fully qualified resource Id for the resource.
+                    type: string
+                    readOnly: true
+                  type:
+                    description: The type of the resource.
+                    type: string
+                    readOnly: true
+                  systemData:
+                    description: Metadata pertaining to creation and last modification
+                      of the resource
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  location:
+                    description: The Azure location where the Confidential Ledger
+                      is running.
+                    type: string
+                    x-ms-mutability:
+                    - create
+                    - read
+                  tags:
+                    type: object
+                    description: Additional tags for Confidential Ledger
+                    additionalProperties:
+                      type: string
+                    x-ms-mutability:
+                    - read
+                    - create
+                    - update
+                  properties:
+                    description: Properties of Confidential Ledger Resource.
+                    type: object
+                    title: LedgerProperties
+                    properties:
+                      ledgerName:
+                        readOnly: true
+                        type: string
+                        description: Unique name for the Confidential Ledger.
+                      ledgerUri:
+                        type: string
+                        readOnly: true
+                        description: Endpoint for calling Ledger Service.
+                      identityServiceUri:
+                        type: string
+                        readOnly: true
+                        description: Endpoint for accessing network identity.
+                      ledgerInternalNamespace:
+                        type: string
+                        readOnly: true
+                        description: Internal namespace for the Ledger
+                      ledgerType:
+                        description: Type of Confidential Ledger
+                        type: string
+                        enum:
+                        - Unknown
+                        - Public
+                        - Private
+                        x-ms-enum:
+                          name: LedgerType
+                          modelAsString: true
+                      provisioningState:
+                        description: Provisioning state of Ledger Resource
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Unknown
+                        - Succeeded
+                        - Failed
+                        - Canceled
+                        - Creating
+                        - Deleting
+                        - Updating
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: true
+                      aadBasedSecurityPrincipals:
+                        description: Array of all AAD based Security Principals.
+                        type: array
+                        items:
+                          type: object
+                          description: AAD based security principal with associated
+                            Ledger RoleName
+                          properties:
+                            principalId:
+                              description: UUID/GUID based Principal Id of the Security
+                                Principal
+                              type: string
+                            tenantId:
+                              description: UUID/GUID based Tenant Id of the Security
+                                Principal
+                              type: string
+                            ledgerRoleName:
+                              description: LedgerRole associated with the Security
+                                Principal of Ledger
+                              type: string
+                              enum:
+                              - Reader
+                              - Contributor
+                              - Administrator
+                              x-ms-enum:
+                                name: LedgerRoleName
+                                modelAsString: true
+                        x-ms-identifiers:
+                        - principalId
+                      certBasedSecurityPrincipals:
+                        description: Array of all cert based Security Principals.
+                        type: array
+                        items:
+                          type: object
+                          description: Cert based security principal with Ledger RoleName
+                          properties:
+                            cert:
+                              description: Public key of the user cert (.pem or .cer)
+                              type: string
+                            ledgerRoleName:
+                              description: LedgerRole associated with the Security
+                                Principal of Ledger
+                              type: string
+                              enum:
+                              - Reader
+                              - Contributor
+                              - Administrator
+                              x-ms-enum:
+                                name: LedgerRoleName
+                                modelAsString: true
+                        x-ms-identifiers: []
+                description: An Azure resource.
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing the reason for operation failure.
+            404 - NotFound (Confidential Ledger does not exist.)
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+    delete:
+      tags:
+      - Confidential Ledger
+      summary: Deletes a Confidential Ledger resource.
+      description: Deletes an existing Confidential Ledger.
+      operationId: Ledger_Delete
+      x-ms-long-running-operation: true
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID. This is a GUID-formatted string (e.g.
+          00000000-0000-0000-0000-000000000000)
+        schema:
+          type: string
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 90
+      - name: ledgerName
+        in: path
+        required: true
+        description: Name of the Confidential Ledger
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9]
+      responses:
+        '200':
+          description: The request was successful; the Confidential Ledger is deleted.
+        '202':
+          description: The Confidential Ledger resource will be deleted asynchronously
+        '204':
+          description: The request was successful; Confidential Ledger does not exist.
+        default:
+          description: Error response describing the reason for operation failure.
+            409 - Conflict(Confidential Ledger is in a non-terminal state due to an
+            ongoing operation.)
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+    put:
+      tags:
+      - Confidential Ledger
+      summary: Creates a  Confidential Ledger.
+      description: Creates a  Confidential Ledger with the specified ledger parameters.
+      operationId: Ledger_Create
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: azure-async-operation
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID. This is a GUID-formatted string (e.g.
+          00000000-0000-0000-0000-000000000000)
+        schema:
+          type: string
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 90
+      - name: ledgerName
+        in: path
+        required: true
+        description: Name of the Confidential Ledger
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  description: Name of the Resource.
+                  type: string
+                  readOnly: true
+                id:
+                  description: Fully qualified resource Id for the resource.
+                  type: string
+                  readOnly: true
+                type:
+                  description: The type of the resource.
+                  type: string
+                  readOnly: true
+                systemData:
+                  description: Metadata pertaining to creation and last modification
+                    of the resource
+                  readOnly: true
+                  type: object
+                  properties:
+                    createdBy:
+                      type: string
+                      description: The identity that created the resource.
+                    createdByType:
+                      type: string
+                      description: The type of identity that created the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource creation (UTC).
+                    lastModifiedBy:
+                      type: string
+                      description: The identity that last modified the resource.
+                    lastModifiedByType:
+                      type: string
+                      description: The type of identity that last modified the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    lastModifiedAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource last modification (UTC)
+                location:
+                  description: The Azure location where the Confidential Ledger is
+                    running.
+                  type: string
+                  x-ms-mutability:
+                  - create
+                  - read
+                tags:
+                  type: object
+                  description: Additional tags for Confidential Ledger
+                  additionalProperties:
+                    type: string
+                  x-ms-mutability:
+                  - read
+                  - create
+                  - update
+                properties:
+                  description: Properties of Confidential Ledger Resource.
+                  type: object
+                  title: LedgerProperties
+                  properties:
+                    ledgerName:
+                      readOnly: true
+                      type: string
+                      description: Unique name for the Confidential Ledger.
+                    ledgerUri:
+                      type: string
+                      readOnly: true
+                      description: Endpoint for calling Ledger Service.
+                    identityServiceUri:
+                      type: string
+                      readOnly: true
+                      description: Endpoint for accessing network identity.
+                    ledgerInternalNamespace:
+                      type: string
+                      readOnly: true
+                      description: Internal namespace for the Ledger
+                    ledgerType:
+                      description: Type of Confidential Ledger
+                      type: string
+                      enum:
+                      - Unknown
+                      - Public
+                      - Private
+                      x-ms-enum:
+                        name: LedgerType
+                        modelAsString: true
+                    provisioningState:
+                      description: Provisioning state of Ledger Resource
+                      readOnly: true
+                      type: string
+                      enum:
+                      - Unknown
+                      - Succeeded
+                      - Failed
+                      - Canceled
+                      - Creating
+                      - Deleting
+                      - Updating
+                      x-ms-enum:
+                        name: ProvisioningState
+                        modelAsString: true
+                    aadBasedSecurityPrincipals:
+                      description: Array of all AAD based Security Principals.
+                      type: array
+                      items:
+                        type: object
+                        description: AAD based security principal with associated
+                          Ledger RoleName
+                        properties:
+                          principalId:
+                            description: UUID/GUID based Principal Id of the Security
+                              Principal
+                            type: string
+                          tenantId:
+                            description: UUID/GUID based Tenant Id of the Security
+                              Principal
+                            type: string
+                          ledgerRoleName:
+                            description: LedgerRole associated with the Security Principal
+                              of Ledger
+                            type: string
+                            enum:
+                            - Reader
+                            - Contributor
+                            - Administrator
+                            x-ms-enum:
+                              name: LedgerRoleName
+                              modelAsString: true
+                      x-ms-identifiers:
+                      - principalId
+                    certBasedSecurityPrincipals:
+                      description: Array of all cert based Security Principals.
+                      type: array
+                      items:
+                        type: object
+                        description: Cert based security principal with Ledger RoleName
+                        properties:
+                          cert:
+                            description: Public key of the user cert (.pem or .cer)
+                            type: string
+                          ledgerRoleName:
+                            description: LedgerRole associated with the Security Principal
+                              of Ledger
+                            type: string
+                            enum:
+                            - Reader
+                            - Contributor
+                            - Administrator
+                            x-ms-enum:
+                              name: LedgerRoleName
+                              modelAsString: true
+                      x-ms-identifiers: []
+              description: An Azure resource.
+              x-ms-azure-resource: true
+        description: Confidential Ledger Create Request Body
+        required: true
+      responses:
+        '200':
+          description: The request was successful and ledger was created; response
+            contains the Confidential Ledger
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    description: Name of the Resource.
+                    type: string
+                    readOnly: true
+                  id:
+                    description: Fully qualified resource Id for the resource.
+                    type: string
+                    readOnly: true
+                  type:
+                    description: The type of the resource.
+                    type: string
+                    readOnly: true
+                  systemData:
+                    description: Metadata pertaining to creation and last modification
+                      of the resource
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  location:
+                    description: The Azure location where the Confidential Ledger
+                      is running.
+                    type: string
+                    x-ms-mutability:
+                    - create
+                    - read
+                  tags:
+                    type: object
+                    description: Additional tags for Confidential Ledger
+                    additionalProperties:
+                      type: string
+                    x-ms-mutability:
+                    - read
+                    - create
+                    - update
+                  properties:
+                    description: Properties of Confidential Ledger Resource.
+                    type: object
+                    title: LedgerProperties
+                    properties:
+                      ledgerName:
+                        readOnly: true
+                        type: string
+                        description: Unique name for the Confidential Ledger.
+                      ledgerUri:
+                        type: string
+                        readOnly: true
+                        description: Endpoint for calling Ledger Service.
+                      identityServiceUri:
+                        type: string
+                        readOnly: true
+                        description: Endpoint for accessing network identity.
+                      ledgerInternalNamespace:
+                        type: string
+                        readOnly: true
+                        description: Internal namespace for the Ledger
+                      ledgerType:
+                        description: Type of Confidential Ledger
+                        type: string
+                        enum:
+                        - Unknown
+                        - Public
+                        - Private
+                        x-ms-enum:
+                          name: LedgerType
+                          modelAsString: true
+                      provisioningState:
+                        description: Provisioning state of Ledger Resource
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Unknown
+                        - Succeeded
+                        - Failed
+                        - Canceled
+                        - Creating
+                        - Deleting
+                        - Updating
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: true
+                      aadBasedSecurityPrincipals:
+                        description: Array of all AAD based Security Principals.
+                        type: array
+                        items:
+                          type: object
+                          description: AAD based security principal with associated
+                            Ledger RoleName
+                          properties:
+                            principalId:
+                              description: UUID/GUID based Principal Id of the Security
+                                Principal
+                              type: string
+                            tenantId:
+                              description: UUID/GUID based Tenant Id of the Security
+                                Principal
+                              type: string
+                            ledgerRoleName:
+                              description: LedgerRole associated with the Security
+                                Principal of Ledger
+                              type: string
+                              enum:
+                              - Reader
+                              - Contributor
+                              - Administrator
+                              x-ms-enum:
+                                name: LedgerRoleName
+                                modelAsString: true
+                        x-ms-identifiers:
+                        - principalId
+                      certBasedSecurityPrincipals:
+                        description: Array of all cert based Security Principals.
+                        type: array
+                        items:
+                          type: object
+                          description: Cert based security principal with Ledger RoleName
+                          properties:
+                            cert:
+                              description: Public key of the user cert (.pem or .cer)
+                              type: string
+                            ledgerRoleName:
+                              description: LedgerRole associated with the Security
+                                Principal of Ledger
+                              type: string
+                              enum:
+                              - Reader
+                              - Contributor
+                              - Administrator
+                              x-ms-enum:
+                                name: LedgerRoleName
+                                modelAsString: true
+                        x-ms-identifiers: []
+                description: An Azure resource.
+                x-ms-azure-resource: true
+        '201':
+          description: The Confidential Ledger resource will be created asynchronously
+        default:
+          description: Error response describing the reason for operation failure.
+            404 - NotFound (Confidential Ledger could not be created/updated)
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+    patch:
+      tags:
+      - Confidential Ledger
+      summary: Update Confidential Ledger properties
+      description: Updates properties of Confidential Ledger
+      operationId: Ledger_Update
+      x-ms-long-running-operation: true
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID. This is a GUID-formatted string (e.g.
+          00000000-0000-0000-0000-000000000000)
+        schema:
+          type: string
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 90
+      - name: ledgerName
+        in: path
+        required: true
+        description: Name of the Confidential Ledger
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          pattern: ^[a-zA-Z0-9]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  description: Name of the Resource.
+                  type: string
+                  readOnly: true
+                id:
+                  description: Fully qualified resource Id for the resource.
+                  type: string
+                  readOnly: true
+                type:
+                  description: The type of the resource.
+                  type: string
+                  readOnly: true
+                systemData:
+                  description: Metadata pertaining to creation and last modification
+                    of the resource
+                  readOnly: true
+                  type: object
+                  properties:
+                    createdBy:
+                      type: string
+                      description: The identity that created the resource.
+                    createdByType:
+                      type: string
+                      description: The type of identity that created the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource creation (UTC).
+                    lastModifiedBy:
+                      type: string
+                      description: The identity that last modified the resource.
+                    lastModifiedByType:
+                      type: string
+                      description: The type of identity that last modified the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    lastModifiedAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource last modification (UTC)
+                location:
+                  description: The Azure location where the Confidential Ledger is
+                    running.
+                  type: string
+                  x-ms-mutability:
+                  - create
+                  - read
+                tags:
+                  type: object
+                  description: Additional tags for Confidential Ledger
+                  additionalProperties:
+                    type: string
+                  x-ms-mutability:
+                  - read
+                  - create
+                  - update
+                properties:
+                  description: Properties of Confidential Ledger Resource.
+                  type: object
+                  title: LedgerProperties
+                  properties:
+                    ledgerName:
+                      readOnly: true
+                      type: string
+                      description: Unique name for the Confidential Ledger.
+                    ledgerUri:
+                      type: string
+                      readOnly: true
+                      description: Endpoint for calling Ledger Service.
+                    identityServiceUri:
+                      type: string
+                      readOnly: true
+                      description: Endpoint for accessing network identity.
+                    ledgerInternalNamespace:
+                      type: string
+                      readOnly: true
+                      description: Internal namespace for the Ledger
+                    ledgerType:
+                      description: Type of Confidential Ledger
+                      type: string
+                      enum:
+                      - Unknown
+                      - Public
+                      - Private
+                      x-ms-enum:
+                        name: LedgerType
+                        modelAsString: true
+                    provisioningState:
+                      description: Provisioning state of Ledger Resource
+                      readOnly: true
+                      type: string
+                      enum:
+                      - Unknown
+                      - Succeeded
+                      - Failed
+                      - Canceled
+                      - Creating
+                      - Deleting
+                      - Updating
+                      x-ms-enum:
+                        name: ProvisioningState
+                        modelAsString: true
+                    aadBasedSecurityPrincipals:
+                      description: Array of all AAD based Security Principals.
+                      type: array
+                      items:
+                        type: object
+                        description: AAD based security principal with associated
+                          Ledger RoleName
+                        properties:
+                          principalId:
+                            description: UUID/GUID based Principal Id of the Security
+                              Principal
+                            type: string
+                          tenantId:
+                            description: UUID/GUID based Tenant Id of the Security
+                              Principal
+                            type: string
+                          ledgerRoleName:
+                            description: LedgerRole associated with the Security Principal
+                              of Ledger
+                            type: string
+                            enum:
+                            - Reader
+                            - Contributor
+                            - Administrator
+                            x-ms-enum:
+                              name: LedgerRoleName
+                              modelAsString: true
+                      x-ms-identifiers:
+                      - principalId
+                    certBasedSecurityPrincipals:
+                      description: Array of all cert based Security Principals.
+                      type: array
+                      items:
+                        type: object
+                        description: Cert based security principal with Ledger RoleName
+                        properties:
+                          cert:
+                            description: Public key of the user cert (.pem or .cer)
+                            type: string
+                          ledgerRoleName:
+                            description: LedgerRole associated with the Security Principal
+                              of Ledger
+                            type: string
+                            enum:
+                            - Reader
+                            - Contributor
+                            - Administrator
+                            x-ms-enum:
+                              name: LedgerRoleName
+                              modelAsString: true
+                      x-ms-identifiers: []
+              description: An Azure resource.
+              x-ms-azure-resource: true
+        description: Confidential Ledger request body for Updating Ledger
+        required: true
+      responses:
+        '200':
+          description: The request was successful and ledger was recovered; response
+            contains the Confidential Ledger
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    description: Name of the Resource.
+                    type: string
+                    readOnly: true
+                  id:
+                    description: Fully qualified resource Id for the resource.
+                    type: string
+                    readOnly: true
+                  type:
+                    description: The type of the resource.
+                    type: string
+                    readOnly: true
+                  systemData:
+                    description: Metadata pertaining to creation and last modification
+                      of the resource
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  location:
+                    description: The Azure location where the Confidential Ledger
+                      is running.
+                    type: string
+                    x-ms-mutability:
+                    - create
+                    - read
+                  tags:
+                    type: object
+                    description: Additional tags for Confidential Ledger
+                    additionalProperties:
+                      type: string
+                    x-ms-mutability:
+                    - read
+                    - create
+                    - update
+                  properties:
+                    description: Properties of Confidential Ledger Resource.
+                    type: object
+                    title: LedgerProperties
+                    properties:
+                      ledgerName:
+                        readOnly: true
+                        type: string
+                        description: Unique name for the Confidential Ledger.
+                      ledgerUri:
+                        type: string
+                        readOnly: true
+                        description: Endpoint for calling Ledger Service.
+                      identityServiceUri:
+                        type: string
+                        readOnly: true
+                        description: Endpoint for accessing network identity.
+                      ledgerInternalNamespace:
+                        type: string
+                        readOnly: true
+                        description: Internal namespace for the Ledger
+                      ledgerType:
+                        description: Type of Confidential Ledger
+                        type: string
+                        enum:
+                        - Unknown
+                        - Public
+                        - Private
+                        x-ms-enum:
+                          name: LedgerType
+                          modelAsString: true
+                      provisioningState:
+                        description: Provisioning state of Ledger Resource
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Unknown
+                        - Succeeded
+                        - Failed
+                        - Canceled
+                        - Creating
+                        - Deleting
+                        - Updating
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: true
+                      aadBasedSecurityPrincipals:
+                        description: Array of all AAD based Security Principals.
+                        type: array
+                        items:
+                          type: object
+                          description: AAD based security principal with associated
+                            Ledger RoleName
+                          properties:
+                            principalId:
+                              description: UUID/GUID based Principal Id of the Security
+                                Principal
+                              type: string
+                            tenantId:
+                              description: UUID/GUID based Tenant Id of the Security
+                                Principal
+                              type: string
+                            ledgerRoleName:
+                              description: LedgerRole associated with the Security
+                                Principal of Ledger
+                              type: string
+                              enum:
+                              - Reader
+                              - Contributor
+                              - Administrator
+                              x-ms-enum:
+                                name: LedgerRoleName
+                                modelAsString: true
+                        x-ms-identifiers:
+                        - principalId
+                      certBasedSecurityPrincipals:
+                        description: Array of all cert based Security Principals.
+                        type: array
+                        items:
+                          type: object
+                          description: Cert based security principal with Ledger RoleName
+                          properties:
+                            cert:
+                              description: Public key of the user cert (.pem or .cer)
+                              type: string
+                            ledgerRoleName:
+                              description: LedgerRole associated with the Security
+                                Principal of Ledger
+                              type: string
+                              enum:
+                              - Reader
+                              - Contributor
+                              - Administrator
+                              x-ms-enum:
+                                name: LedgerRoleName
+                                modelAsString: true
+                        x-ms-identifiers: []
+                description: An Azure resource.
+                x-ms-azure-resource: true
+        '201':
+          description: The Confidential Ledger resource will be updated asynchronously
+        default:
+          description: Error response describing the reason for operation failure.
+            404 - NotFound (Confidential Ledger could not be created/updated)
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ConfidentialLedger/ledgers:
+    get:
+      tags:
+      - Confidential Ledger
+      summary: Retrieves information about all Confidential Ledger resources under
+        the given subscription and resource group
+      description: Retrieves the properties of all Confidential Ledgers.
+      operationId: Ledger_ListByResourceGroup
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID. This is a GUID-formatted string (e.g.
+          00000000-0000-0000-0000-000000000000)
+        schema:
+          type: string
+      - name: resourceGroupName
+        in: path
+        required: true
+        description: The name of the resource group.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 90
+      - description: The filter to apply on the list operation. eg. $filter=ledgerType
+          eq 'Public'
+        name: $filter
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The request was successful; response contains the Confidential
+            Ledger
+          content:
+            application/json:
+              schema:
+                description: Object that includes an array of Confidential Ledgers
+                  and a possible link for next set.
+                type: object
+                properties:
+                  value:
+                    description: List of Confidential Ledgers
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          description: Name of the Resource.
+                          type: string
+                          readOnly: true
+                        id:
+                          description: Fully qualified resource Id for the resource.
+                          type: string
+                          readOnly: true
+                        type:
+                          description: The type of the resource.
+                          type: string
+                          readOnly: true
+                        systemData:
+                          description: Metadata pertaining to creation and last modification
+                            of the resource
+                          readOnly: true
+                          type: object
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource last modification
+                                (UTC)
+                        location:
+                          description: The Azure location where the Confidential Ledger
+                            is running.
+                          type: string
+                          x-ms-mutability:
+                          - create
+                          - read
+                        tags:
+                          type: object
+                          description: Additional tags for Confidential Ledger
+                          additionalProperties:
+                            type: string
+                          x-ms-mutability:
+                          - read
+                          - create
+                          - update
+                        properties:
+                          description: Properties of Confidential Ledger Resource.
+                          type: object
+                          title: LedgerProperties
+                          properties:
+                            ledgerName:
+                              readOnly: true
+                              type: string
+                              description: Unique name for the Confidential Ledger.
+                            ledgerUri:
+                              type: string
+                              readOnly: true
+                              description: Endpoint for calling Ledger Service.
+                            identityServiceUri:
+                              type: string
+                              readOnly: true
+                              description: Endpoint for accessing network identity.
+                            ledgerInternalNamespace:
+                              type: string
+                              readOnly: true
+                              description: Internal namespace for the Ledger
+                            ledgerType:
+                              description: Type of Confidential Ledger
+                              type: string
+                              enum:
+                              - Unknown
+                              - Public
+                              - Private
+                              x-ms-enum:
+                                name: LedgerType
+                                modelAsString: true
+                            provisioningState:
+                              description: Provisioning state of Ledger Resource
+                              readOnly: true
+                              type: string
+                              enum:
+                              - Unknown
+                              - Succeeded
+                              - Failed
+                              - Canceled
+                              - Creating
+                              - Deleting
+                              - Updating
+                              x-ms-enum:
+                                name: ProvisioningState
+                                modelAsString: true
+                            aadBasedSecurityPrincipals:
+                              description: Array of all AAD based Security Principals.
+                              type: array
+                              items:
+                                type: object
+                                description: AAD based security principal with associated
+                                  Ledger RoleName
+                                properties:
+                                  principalId:
+                                    description: UUID/GUID based Principal Id of the
+                                      Security Principal
+                                    type: string
+                                  tenantId:
+                                    description: UUID/GUID based Tenant Id of the
+                                      Security Principal
+                                    type: string
+                                  ledgerRoleName:
+                                    description: LedgerRole associated with the Security
+                                      Principal of Ledger
+                                    type: string
+                                    enum:
+                                    - Reader
+                                    - Contributor
+                                    - Administrator
+                                    x-ms-enum:
+                                      name: LedgerRoleName
+                                      modelAsString: true
+                              x-ms-identifiers:
+                              - principalId
+                            certBasedSecurityPrincipals:
+                              description: Array of all cert based Security Principals.
+                              type: array
+                              items:
+                                type: object
+                                description: Cert based security principal with Ledger
+                                  RoleName
+                                properties:
+                                  cert:
+                                    description: Public key of the user cert (.pem
+                                      or .cer)
+                                    type: string
+                                  ledgerRoleName:
+                                    description: LedgerRole associated with the Security
+                                      Principal of Ledger
+                                    type: string
+                                    enum:
+                                    - Reader
+                                    - Contributor
+                                    - Administrator
+                                    x-ms-enum:
+                                      name: LedgerRoleName
+                                      modelAsString: true
+                              x-ms-identifiers: []
+                      description: An Azure resource.
+                      x-ms-azure-resource: true
+                  nextLink:
+                    description: The URL the client should use to fetch the next page
+                      (per server side paging).
+                    type: string
+        default:
+          description: Error response describing the reason for operation failure.
+            404 - NotFound (Confidential Ledger does not exist.)
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /subscriptions/{subscriptionId}/providers/Microsoft.ConfidentialLedger/ledgers/:
+    get:
+      tags:
+      - Confidential Ledger
+      summary: Retrieves information about all Confidential Ledger resources under
+        the given subscription
+      description: Retrieves the properties of all Confidential Ledgers.
+      operationId: Ledger_ListBySubscription
+      parameters:
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to be used with the HTTP request.
+        schema:
+          type: string
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The Azure subscription ID. This is a GUID-formatted string (e.g.
+          00000000-0000-0000-0000-000000000000)
+        schema:
+          type: string
+      - description: The filter to apply on the list operation. eg. $filter=ledgerType
+          eq 'Public'
+        name: $filter
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: The request was successful; response contains the list of Confidential
+            Ledgers
+          content:
+            application/json:
+              schema:
+                description: Object that includes an array of Confidential Ledgers
+                  and a possible link for next set.
+                type: object
+                properties:
+                  value:
+                    description: List of Confidential Ledgers
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          description: Name of the Resource.
+                          type: string
+                          readOnly: true
+                        id:
+                          description: Fully qualified resource Id for the resource.
+                          type: string
+                          readOnly: true
+                        type:
+                          description: The type of the resource.
+                          type: string
+                          readOnly: true
+                        systemData:
+                          description: Metadata pertaining to creation and last modification
+                            of the resource
+                          readOnly: true
+                          type: object
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource last modification
+                                (UTC)
+                        location:
+                          description: The Azure location where the Confidential Ledger
+                            is running.
+                          type: string
+                          x-ms-mutability:
+                          - create
+                          - read
+                        tags:
+                          type: object
+                          description: Additional tags for Confidential Ledger
+                          additionalProperties:
+                            type: string
+                          x-ms-mutability:
+                          - read
+                          - create
+                          - update
+                        properties:
+                          description: Properties of Confidential Ledger Resource.
+                          type: object
+                          title: LedgerProperties
+                          properties:
+                            ledgerName:
+                              readOnly: true
+                              type: string
+                              description: Unique name for the Confidential Ledger.
+                            ledgerUri:
+                              type: string
+                              readOnly: true
+                              description: Endpoint for calling Ledger Service.
+                            identityServiceUri:
+                              type: string
+                              readOnly: true
+                              description: Endpoint for accessing network identity.
+                            ledgerInternalNamespace:
+                              type: string
+                              readOnly: true
+                              description: Internal namespace for the Ledger
+                            ledgerType:
+                              description: Type of Confidential Ledger
+                              type: string
+                              enum:
+                              - Unknown
+                              - Public
+                              - Private
+                              x-ms-enum:
+                                name: LedgerType
+                                modelAsString: true
+                            provisioningState:
+                              description: Provisioning state of Ledger Resource
+                              readOnly: true
+                              type: string
+                              enum:
+                              - Unknown
+                              - Succeeded
+                              - Failed
+                              - Canceled
+                              - Creating
+                              - Deleting
+                              - Updating
+                              x-ms-enum:
+                                name: ProvisioningState
+                                modelAsString: true
+                            aadBasedSecurityPrincipals:
+                              description: Array of all AAD based Security Principals.
+                              type: array
+                              items:
+                                type: object
+                                description: AAD based security principal with associated
+                                  Ledger RoleName
+                                properties:
+                                  principalId:
+                                    description: UUID/GUID based Principal Id of the
+                                      Security Principal
+                                    type: string
+                                  tenantId:
+                                    description: UUID/GUID based Tenant Id of the
+                                      Security Principal
+                                    type: string
+                                  ledgerRoleName:
+                                    description: LedgerRole associated with the Security
+                                      Principal of Ledger
+                                    type: string
+                                    enum:
+                                    - Reader
+                                    - Contributor
+                                    - Administrator
+                                    x-ms-enum:
+                                      name: LedgerRoleName
+                                      modelAsString: true
+                              x-ms-identifiers:
+                              - principalId
+                            certBasedSecurityPrincipals:
+                              description: Array of all cert based Security Principals.
+                              type: array
+                              items:
+                                type: object
+                                description: Cert based security principal with Ledger
+                                  RoleName
+                                properties:
+                                  cert:
+                                    description: Public key of the user cert (.pem
+                                      or .cer)
+                                    type: string
+                                  ledgerRoleName:
+                                    description: LedgerRole associated with the Security
+                                      Principal of Ledger
+                                    type: string
+                                    enum:
+                                    - Reader
+                                    - Contributor
+                                    - Administrator
+                                    x-ms-enum:
+                                      name: LedgerRoleName
+                                      modelAsString: true
+                              x-ms-identifiers: []
+                      description: An Azure resource.
+                      x-ms-azure-resource: true
+                  nextLink:
+                    description: The URL the client should use to fetch the next page
+                      (per server side paging).
+                    type: string
+        default:
+          description: Error response describing the reason for operation failure.
+            404 - NotFound (Confidential Ledger does not exist.)
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-pageable:
+        nextLinkName: nextLink
+components:
+  parameters:
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      required: true
+      description: The Azure subscription ID. This is a GUID-formatted string (e.g.
+        00000000-0000-0000-0000-000000000000)
+      schema:
+        type: string
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 3
+        maxLength: 90
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to be used with the HTTP request.
+      schema:
+        type: string
+    LedgerNameParameter:
+      name: ledgerName
+      in: path
+      required: true
+      description: Name of the Confidential Ledger
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        pattern: ^[a-zA-Z0-9]
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    ResourceLocation:
+      description: Location of the ARM Resource
+      type: object
+      properties:
+        location:
+          description: The Azure location where the Confidential Ledger is running.
+          type: string
+          x-ms-mutability:
+          - create
+          - read
+    Tags:
+      description: Tags for Confidential Ledger Resource
+      type: object
+      properties:
+        tags:
+          type: object
+          description: Additional tags for Confidential Ledger
+          additionalProperties:
+            type: string
+          x-ms-mutability:
+          - read
+          - create
+          - update
+    Resource:
+      description: An Azure resource.
+      x-ms-azure-resource: true
+      type: object
+      properties:
+        name:
+          description: Name of the Resource.
+          type: string
+          readOnly: true
+        id:
+          description: Fully qualified resource Id for the resource.
+          type: string
+          readOnly: true
+        type:
+          description: The type of the resource.
+          type: string
+          readOnly: true
+        systemData:
+          description: Metadata pertaining to creation and last modification of the
+            resource
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+    ResourceProviderOperationList:
+      description: List containing this Resource Provider's available operations.
+      type: object
+      properties:
+        value:
+          description: Resource provider operations list.
+          type: array
+          items:
+            description: Describes the Resource Provider Operation.
+            type: object
+            properties:
+              name:
+                description: Resource provider operation name.
+                type: string
+              isDataAction:
+                description: Indicates whether the operation is data action or not.
+                type: boolean
+              display:
+                description: Details about the operations
+                type: object
+                properties:
+                  provider:
+                    description: Name of the resource provider.
+                    type: string
+                  resource:
+                    description: Name of the resource type.
+                    type: string
+                  operation:
+                    description: Name of the resource provider operation.
+                    type: string
+                  description:
+                    description: Description of the resource provider operation.
+                    type: string
+          x-ms-identifiers:
+          - name
+          readOnly: true
+        nextLink:
+          description: The URI that can be used to request the next page for list
+            of Azure operations.
+          type: string
+          readOnly: true
+    ResourceProviderOperationDefinition:
+      description: Describes the Resource Provider Operation.
+      type: object
+      properties:
+        name:
+          description: Resource provider operation name.
+          type: string
+        isDataAction:
+          description: Indicates whether the operation is data action or not.
+          type: boolean
+        display:
+          description: Details about the operations
+          type: object
+          properties:
+            provider:
+              description: Name of the resource provider.
+              type: string
+            resource:
+              description: Name of the resource type.
+              type: string
+            operation:
+              description: Name of the resource provider operation.
+              type: string
+            description:
+              description: Description of the resource provider operation.
+              type: string
+    ResourceProviderOperationDisplay:
+      description: Describes the properties of the Operation.
+      type: object
+      properties:
+        provider:
+          description: Name of the resource provider.
+          type: string
+        resource:
+          description: Name of the resource type.
+          type: string
+        operation:
+          description: Name of the resource provider operation.
+          type: string
+        description:
+          description: Description of the resource provider operation.
+          type: string
+    ConfidentialLedgerType:
+      type: string
+      description: Type of the ledger. Private means transaction data is encrypted.
+      enum:
+      - Unknown
+      - Public
+      - Private
+      x-ms-enum:
+        name: LedgerType
+        modelAsString: true
+    ProvisioningState:
+      type: string
+      description: Object representing ProvisioningState for Confidential Ledger.
+      enum:
+      - Unknown
+      - Succeeded
+      - Failed
+      - Canceled
+      - Creating
+      - Deleting
+      - Updating
+      x-ms-enum:
+        name: ProvisioningState
+        modelAsString: true
+    LedgerRoleName:
+      description: LedgerRole associated with the Security Principal of Ledger
+      type: string
+      enum:
+      - Reader
+      - Contributor
+      - Administrator
+      x-ms-enum:
+        name: LedgerRoleName
+        modelAsString: true
+    CertBasedSecurityPrincipal:
+      type: object
+      description: Cert based security principal with Ledger RoleName
+      properties:
+        cert:
+          description: Public key of the user cert (.pem or .cer)
+          type: string
+        ledgerRoleName:
+          description: LedgerRole associated with the Security Principal of Ledger
+          type: string
+          enum:
+          - Reader
+          - Contributor
+          - Administrator
+          x-ms-enum:
+            name: LedgerRoleName
+            modelAsString: true
+    AADBasedSecurityPrincipal:
+      type: object
+      description: AAD based security principal with associated Ledger RoleName
+      properties:
+        principalId:
+          description: UUID/GUID based Principal Id of the Security Principal
+          type: string
+        tenantId:
+          description: UUID/GUID based Tenant Id of the Security Principal
+          type: string
+        ledgerRoleName:
+          description: LedgerRole associated with the Security Principal of Ledger
+          type: string
+          enum:
+          - Reader
+          - Contributor
+          - Administrator
+          x-ms-enum:
+            name: LedgerRoleName
+            modelAsString: true
+    LedgerProperties:
+      type: object
+      description: Additional Confidential Ledger properties.
+      title: LedgerProperties
+      properties:
+        ledgerName:
+          readOnly: true
+          type: string
+          description: Unique name for the Confidential Ledger.
+        ledgerUri:
+          type: string
+          readOnly: true
+          description: Endpoint for calling Ledger Service.
+        identityServiceUri:
+          type: string
+          readOnly: true
+          description: Endpoint for accessing network identity.
+        ledgerInternalNamespace:
+          type: string
+          readOnly: true
+          description: Internal namespace for the Ledger
+        ledgerType:
+          description: Type of Confidential Ledger
+          type: string
+          enum:
+          - Unknown
+          - Public
+          - Private
+          x-ms-enum:
+            name: LedgerType
+            modelAsString: true
+        provisioningState:
+          description: Provisioning state of Ledger Resource
+          readOnly: true
+          type: string
+          enum:
+          - Unknown
+          - Succeeded
+          - Failed
+          - Canceled
+          - Creating
+          - Deleting
+          - Updating
+          x-ms-enum:
+            name: ProvisioningState
+            modelAsString: true
+        aadBasedSecurityPrincipals:
+          description: Array of all AAD based Security Principals.
+          type: array
+          items:
+            type: object
+            description: AAD based security principal with associated Ledger RoleName
+            properties:
+              principalId:
+                description: UUID/GUID based Principal Id of the Security Principal
+                type: string
+              tenantId:
+                description: UUID/GUID based Tenant Id of the Security Principal
+                type: string
+              ledgerRoleName:
+                description: LedgerRole associated with the Security Principal of
+                  Ledger
+                type: string
+                enum:
+                - Reader
+                - Contributor
+                - Administrator
+                x-ms-enum:
+                  name: LedgerRoleName
+                  modelAsString: true
+          x-ms-identifiers:
+          - principalId
+        certBasedSecurityPrincipals:
+          description: Array of all cert based Security Principals.
+          type: array
+          items:
+            type: object
+            description: Cert based security principal with Ledger RoleName
+            properties:
+              cert:
+                description: Public key of the user cert (.pem or .cer)
+                type: string
+              ledgerRoleName:
+                description: LedgerRole associated with the Security Principal of
+                  Ledger
+                type: string
+                enum:
+                - Reader
+                - Contributor
+                - Administrator
+                x-ms-enum:
+                  name: LedgerRoleName
+                  modelAsString: true
+          x-ms-identifiers: []
+    ConfidentialLedger:
+      type: object
+      properties:
+        name:
+          description: Name of the Resource.
+          type: string
+          readOnly: true
+        id:
+          description: Fully qualified resource Id for the resource.
+          type: string
+          readOnly: true
+        type:
+          description: The type of the resource.
+          type: string
+          readOnly: true
+        systemData:
+          description: Metadata pertaining to creation and last modification of the
+            resource
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+        location:
+          description: The Azure location where the Confidential Ledger is running.
+          type: string
+          x-ms-mutability:
+          - create
+          - read
+        tags:
+          type: object
+          description: Additional tags for Confidential Ledger
+          additionalProperties:
+            type: string
+          x-ms-mutability:
+          - read
+          - create
+          - update
+        properties:
+          description: Properties of Confidential Ledger Resource.
+          type: object
+          title: LedgerProperties
+          properties:
+            ledgerName:
+              readOnly: true
+              type: string
+              description: Unique name for the Confidential Ledger.
+            ledgerUri:
+              type: string
+              readOnly: true
+              description: Endpoint for calling Ledger Service.
+            identityServiceUri:
+              type: string
+              readOnly: true
+              description: Endpoint for accessing network identity.
+            ledgerInternalNamespace:
+              type: string
+              readOnly: true
+              description: Internal namespace for the Ledger
+            ledgerType:
+              description: Type of Confidential Ledger
+              type: string
+              enum:
+              - Unknown
+              - Public
+              - Private
+              x-ms-enum:
+                name: LedgerType
+                modelAsString: true
+            provisioningState:
+              description: Provisioning state of Ledger Resource
+              readOnly: true
+              type: string
+              enum:
+              - Unknown
+              - Succeeded
+              - Failed
+              - Canceled
+              - Creating
+              - Deleting
+              - Updating
+              x-ms-enum:
+                name: ProvisioningState
+                modelAsString: true
+            aadBasedSecurityPrincipals:
+              description: Array of all AAD based Security Principals.
+              type: array
+              items:
+                type: object
+                description: AAD based security principal with associated Ledger RoleName
+                properties:
+                  principalId:
+                    description: UUID/GUID based Principal Id of the Security Principal
+                    type: string
+                  tenantId:
+                    description: UUID/GUID based Tenant Id of the Security Principal
+                    type: string
+                  ledgerRoleName:
+                    description: LedgerRole associated with the Security Principal
+                      of Ledger
+                    type: string
+                    enum:
+                    - Reader
+                    - Contributor
+                    - Administrator
+                    x-ms-enum:
+                      name: LedgerRoleName
+                      modelAsString: true
+              x-ms-identifiers:
+              - principalId
+            certBasedSecurityPrincipals:
+              description: Array of all cert based Security Principals.
+              type: array
+              items:
+                type: object
+                description: Cert based security principal with Ledger RoleName
+                properties:
+                  cert:
+                    description: Public key of the user cert (.pem or .cer)
+                    type: string
+                  ledgerRoleName:
+                    description: LedgerRole associated with the Security Principal
+                      of Ledger
+                    type: string
+                    enum:
+                    - Reader
+                    - Contributor
+                    - Administrator
+                    x-ms-enum:
+                      name: LedgerRoleName
+                      modelAsString: true
+              x-ms-identifiers: []
+      description: An Azure resource.
+      x-ms-azure-resource: true
+    ConfidentialLedgerList:
+      description: Object that includes an array of Confidential Ledgers and a possible
+        link for next set.
+      type: object
+      properties:
+        value:
+          description: List of Confidential Ledgers
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                description: Name of the Resource.
+                type: string
+                readOnly: true
+              id:
+                description: Fully qualified resource Id for the resource.
+                type: string
+                readOnly: true
+              type:
+                description: The type of the resource.
+                type: string
+                readOnly: true
+              systemData:
+                description: Metadata pertaining to creation and last modification
+                  of the resource
+                readOnly: true
+                type: object
+                properties:
+                  createdBy:
+                    type: string
+                    description: The identity that created the resource.
+                  createdByType:
+                    type: string
+                    description: The type of identity that created the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource creation (UTC).
+                  lastModifiedBy:
+                    type: string
+                    description: The identity that last modified the resource.
+                  lastModifiedByType:
+                    type: string
+                    description: The type of identity that last modified the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  lastModifiedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource last modification (UTC)
+              location:
+                description: The Azure location where the Confidential Ledger is running.
+                type: string
+                x-ms-mutability:
+                - create
+                - read
+              tags:
+                type: object
+                description: Additional tags for Confidential Ledger
+                additionalProperties:
+                  type: string
+                x-ms-mutability:
+                - read
+                - create
+                - update
+              properties:
+                description: Properties of Confidential Ledger Resource.
+                type: object
+                title: LedgerProperties
+                properties:
+                  ledgerName:
+                    readOnly: true
+                    type: string
+                    description: Unique name for the Confidential Ledger.
+                  ledgerUri:
+                    type: string
+                    readOnly: true
+                    description: Endpoint for calling Ledger Service.
+                  identityServiceUri:
+                    type: string
+                    readOnly: true
+                    description: Endpoint for accessing network identity.
+                  ledgerInternalNamespace:
+                    type: string
+                    readOnly: true
+                    description: Internal namespace for the Ledger
+                  ledgerType:
+                    description: Type of Confidential Ledger
+                    type: string
+                    enum:
+                    - Unknown
+                    - Public
+                    - Private
+                    x-ms-enum:
+                      name: LedgerType
+                      modelAsString: true
+                  provisioningState:
+                    description: Provisioning state of Ledger Resource
+                    readOnly: true
+                    type: string
+                    enum:
+                    - Unknown
+                    - Succeeded
+                    - Failed
+                    - Canceled
+                    - Creating
+                    - Deleting
+                    - Updating
+                    x-ms-enum:
+                      name: ProvisioningState
+                      modelAsString: true
+                  aadBasedSecurityPrincipals:
+                    description: Array of all AAD based Security Principals.
+                    type: array
+                    items:
+                      type: object
+                      description: AAD based security principal with associated Ledger
+                        RoleName
+                      properties:
+                        principalId:
+                          description: UUID/GUID based Principal Id of the Security
+                            Principal
+                          type: string
+                        tenantId:
+                          description: UUID/GUID based Tenant Id of the Security Principal
+                          type: string
+                        ledgerRoleName:
+                          description: LedgerRole associated with the Security Principal
+                            of Ledger
+                          type: string
+                          enum:
+                          - Reader
+                          - Contributor
+                          - Administrator
+                          x-ms-enum:
+                            name: LedgerRoleName
+                            modelAsString: true
+                    x-ms-identifiers:
+                    - principalId
+                  certBasedSecurityPrincipals:
+                    description: Array of all cert based Security Principals.
+                    type: array
+                    items:
+                      type: object
+                      description: Cert based security principal with Ledger RoleName
+                      properties:
+                        cert:
+                          description: Public key of the user cert (.pem or .cer)
+                          type: string
+                        ledgerRoleName:
+                          description: LedgerRole associated with the Security Principal
+                            of Ledger
+                          type: string
+                          enum:
+                          - Reader
+                          - Contributor
+                          - Administrator
+                          x-ms-enum:
+                            name: LedgerRoleName
+                            modelAsString: true
+                    x-ms-identifiers: []
+            description: An Azure resource.
+            x-ms-azure-resource: true
+        nextLink:
+          description: The URL the client should use to fetch the next page (per server
+            side paging).
+          type: string
+    ErrorDetail:
+      description: The error detail.
+      type: object
+      properties:
+        code:
+          readOnly: true
+          type: string
+          description: The error code.
+        message:
+          readOnly: true
+          type: string
+          description: The error message.
+        target:
+          readOnly: true
+          type: string
+          description: The error target.
+        details:
+          readOnly: true
+          type: array
+          items:
+            description: The error detail.
+            type: object
+            properties:
+              code:
+                readOnly: true
+                type: string
+                description: The error code.
+              message:
+                readOnly: true
+                type: string
+                description: The error message.
+              target:
+                readOnly: true
+                type: string
+                description: The error target.
+              details:
+                readOnly: true
+                type: array
+                items:
+                  description: The error detail.
+                  type: object
+                  properties:
+                    code:
+                      readOnly: true
+                      type: string
+                      description: The error code.
+                    message:
+                      readOnly: true
+                      type: string
+                      description: The error message.
+                    target:
+                      readOnly: true
+                      type: string
+                      description: The error target.
+                x-ms-identifiers:
+                - message
+                - target
+                description: The error details.
+              additionalInfo:
+                readOnly: true
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      readOnly: true
+                      type: string
+                      description: The additional info type.
+                    info:
+                      readOnly: true
+                      type: object
+                      description: The additional info.
+                  description: The resource management error additional info.
+                x-ms-identifiers: []
+                description: The error additional info.
+          x-ms-identifiers:
+          - message
+          - target
+          description: The error details.
+        additionalInfo:
+          readOnly: true
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                readOnly: true
+                type: string
+                description: The additional info type.
+              info:
+                readOnly: true
+                type: object
+                description: The additional info.
+            description: The resource management error additional info.
+          x-ms-identifiers: []
+          description: The error additional info.
+    ErrorAdditionalInfo:
+      type: object
+      properties:
+        type:
+          readOnly: true
+          type: string
+          description: The additional info type.
+        info:
+          readOnly: true
+          type: object
+          description: The additional info.
+      description: The resource management error additional info.
+    ErrorResponse:
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      type: object
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              readOnly: true
+              type: string
+              description: The error code.
+            message:
+              readOnly: true
+              type: string
+              description: The error message.
+            target:
+              readOnly: true
+              type: string
+              description: The error target.
+            details:
+              readOnly: true
+              type: array
+              items:
+                description: The error detail.
+                type: object
+                properties:
+                  code:
+                    readOnly: true
+                    type: string
+                    description: The error code.
+                  message:
+                    readOnly: true
+                    type: string
+                    description: The error message.
+                  target:
+                    readOnly: true
+                    type: string
+                    description: The error target.
+                  details:
+                    readOnly: true
+                    type: array
+                    items:
+                      description: The error detail.
+                      type: object
+                      properties:
+                        code:
+                          readOnly: true
+                          type: string
+                          description: The error code.
+                        message:
+                          readOnly: true
+                          type: string
+                          description: The error message.
+                        target:
+                          readOnly: true
+                          type: string
+                          description: The error target.
+                    x-ms-identifiers:
+                    - message
+                    - target
+                    description: The error details.
+                  additionalInfo:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The additional info type.
+                        info:
+                          readOnly: true
+                          type: object
+                          description: The additional info.
+                      description: The resource management error additional info.
+                    x-ms-identifiers: []
+                    description: The error additional info.
+              x-ms-identifiers:
+              - message
+              - target
+              description: The error details.
+            additionalInfo:
+              readOnly: true
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The additional info type.
+                  info:
+                    readOnly: true
+                    type: object
+                    description: The additional info.
+                description: The resource management error additional info.
+              x-ms-identifiers: []
+              description: The error additional info.
+    CheckNameAvailabilityRequest:
+      description: The check availability request body.
+      type: object
+      properties:
+        name:
+          description: The name of the resource for which availability needs to be
+            checked.
+          type: string
+        type:
+          description: The resource type.
+          type: string
+    CheckNameAvailabilityResponse:
+      description: The check availability result.
+      type: object
+      properties:
+        nameAvailable:
+          description: Indicates if the resource name is available.
+          type: boolean
+        reason:
+          description: The reason why the given name is not available.
+          type: string
+          enum:
+          - Invalid
+          - AlreadyExists
+          x-ms-enum:
+            name: CheckNameAvailabilityReason
+            modelAsString: true
+        message:
+          description: Detailed reason why the given name is available.
+          type: string
+    systemData:
+      description: Metadata pertaining to creation and last modification of the resource.
+      type: object
+      readOnly: true
+      properties:
+        createdBy:
+          type: string
+          description: The identity that created the resource.
+        createdByType:
+          type: string
+          description: The type of identity that created the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource creation (UTC).
+        lastModifiedBy:
+          type: string
+          description: The identity that last modified the resource.
+        lastModifiedByType:
+          type: string
+          description: The type of identity that last modified the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource last modification (UTC)

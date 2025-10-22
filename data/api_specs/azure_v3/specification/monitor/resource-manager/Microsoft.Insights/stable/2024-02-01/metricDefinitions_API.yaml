@@ -1,0 +1,1757 @@
+openapi: 3.0.0
+info:
+  title: Azure Monitor Metrics Definitions API
+  description: Provides APIs for getting the metric metadata for Azure resources.
+  version: 2024-02-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  /subscriptions/{subscriptionId}/providers/Microsoft.Insights/metricDefinitions:
+    get:
+      tags:
+      - MetricDefinitions
+      operationId: MetricDefinitions_ListAtSubscriptionScope
+      description: Lists the metric definitions for the subscription.
+      parameters:
+      - name: subscriptionId
+        in: path
+        required: true
+        description: The ID of the target subscription.
+        schema:
+          type: string
+          minLength: 1
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: region
+        in: query
+        required: true
+        description: The region where the metrics you want reside.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: metricnamespace
+        in: query
+        required: false
+        description: Metric namespace where the metrics you want reside.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful request to get the list of metric definitions
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Represents collection of metric definitions.
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      description: Metric definition class specifies the metadata
+                        for a metric.
+                      properties:
+                        isDimensionRequired:
+                          type: boolean
+                          description: Flag to indicate whether the dimension is required.
+                        resourceId:
+                          type: string
+                          description: The resource identifier of the resource that
+                            emitted the metric.
+                        namespace:
+                          type: string
+                          description: The namespace the metric belongs to.
+                        name:
+                          description: The name and the display name of the metric,
+                            i.e. it is a localizable string.
+                          type: object
+                          required:
+                          - value
+                          properties:
+                            value:
+                              type: string
+                              description: The invariant value.
+                            localizedValue:
+                              type: string
+                              description: The display name.
+                        displayDescription:
+                          type: string
+                          description: Detailed description of this metric.
+                        category:
+                          type: string
+                          description: Custom category name for this metric.
+                        metricClass:
+                          description: The class of the metric.
+                          type: string
+                          enum:
+                          - Availability
+                          - Transactions
+                          - Errors
+                          - Latency
+                          - Saturation
+                          x-ms-enum:
+                            name: MetricClass
+                            modelAsString: true
+                        unit:
+                          description: The unit of the metric.
+                          type: string
+                          enum:
+                          - Count
+                          - Bytes
+                          - Seconds
+                          - CountPerSecond
+                          - BytesPerSecond
+                          - Percent
+                          - MilliSeconds
+                          - ByteSeconds
+                          - Unspecified
+                          - Cores
+                          - MilliCores
+                          - NanoCores
+                          - BitsPerSecond
+                          x-ms-enum:
+                            name: MetricUnit
+                            modelAsString: true
+                            values:
+                            - value: Count
+                              description: Unit of raw quantity.
+                            - value: Bytes
+                              description: Unit of memory in bytes.
+                            - value: Seconds
+                              description: Unit of time in seconds.
+                            - value: CountPerSecond
+                              description: Rate unit of raw quantity per second.
+                            - value: BytesPerSecond
+                              description: Rate unit of memory in bytes per second.
+                            - value: Percent
+                              description: Percentage unit.
+                            - value: MilliSeconds
+                              description: Unit of time in 1/1000th of a second.
+                            - value: ByteSeconds
+                              description: Unit of data transfer or storage. It is
+                                the size of the data in bytes multiplied by the time
+                                it takes to transfer or store the data in seconds.
+                            - value: Unspecified
+                              description: No specified unit.
+                            - value: Cores
+                              description: Unit of processing power.
+                            - value: MilliCores
+                              description: Unit of processing power in 1/1000th of
+                                a CPU core.
+                            - value: NanoCores
+                              description: Unit of processing power in one billionth
+                                of a CPU core.
+                            - value: BitsPerSecond
+                              description: Rate unit of binary digits per second.
+                        primaryAggregationType:
+                          description: The primary aggregation type value defining
+                            how to use the values for display.
+                          type: string
+                          enum:
+                          - None
+                          - Average
+                          - Count
+                          - Minimum
+                          - Maximum
+                          - Total
+                          x-ms-enum:
+                            name: MetricAggregationType
+                            modelAsString: true
+                        supportedAggregationTypes:
+                          type: array
+                          items:
+                            type: string
+                            description: The aggregation type of the metric.
+                            enum:
+                            - None
+                            - Average
+                            - Count
+                            - Minimum
+                            - Maximum
+                            - Total
+                            x-ms-enum:
+                              name: MetricAggregationType
+                              modelAsString: true
+                          description: The collection of what aggregation types are
+                            supported.
+                        metricAvailabilities:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              timeGrain:
+                                type: string
+                                format: duration
+                                description: The time grain specifies a supported
+                                  aggregation interval for the metric. Expressed as
+                                  a duration 'PT1M', 'P1D', etc.
+                              retention:
+                                type: string
+                                format: duration
+                                description: The retention period for the metric at
+                                  the specified timegrain.  Expressed as a duration
+                                  'PT1M', 'P1D', etc.
+                            description: Metric availability specifies the time grain
+                              (aggregation interval or frequency) and the retention
+                              period for that time grain.
+                          x-ms-identifiers:
+                          - timeGrain
+                          description: The collection of what aggregation intervals
+                            are available to be queried.
+                        id:
+                          type: string
+                          description: The resource identifier of the metric definition.
+                        dimensions:
+                          type: array
+                          items:
+                            type: object
+                            required:
+                            - value
+                            properties:
+                              value:
+                                type: string
+                                description: The invariant value.
+                              localizedValue:
+                                type: string
+                                description: The display name.
+                            description: The localizable string class.
+                          x-ms-identifiers:
+                          - value
+                          description: The name and the display name of the dimension,
+                            i.e. it is a localizable string.
+                    description: The values for the metric definitions.
+                required:
+                - value
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                title: Error Response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.)
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    title: Error Response
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          title: Error Response
+                          description: Common error response for all Azure Resource
+                            Manager APIs to return error details for failed operations.
+                            (This also follows the OData error response format.)
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                title: Error Response
+                                description: Common error response for all Azure Resource
+                                  Manager APIs to return error details for failed
+                                  operations. (This also follows the OData error response
+                                  format.)
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-pageable: {}
+  /{resourceUri}/providers/Microsoft.Insights/metricDefinitions:
+    get:
+      tags:
+      - MetricDefinitions
+      operationId: MetricDefinitions_List
+      description: Lists the metric definitions for the resource.
+      parameters:
+      - name: resourceUri
+        in: path
+        required: true
+        description: The identifier of the resource.
+        x-ms-parameter-location: method
+        x-ms-skip-url-encoding: true
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        required: true
+        description: The API version to use for this operation.
+        schema:
+          type: string
+          minLength: 1
+      - name: metricnamespace
+        in: query
+        required: false
+        description: Metric namespace where the metrics you want reside.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful request to get the list of metric definitions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        isDimensionRequired:
+                          type: boolean
+                          description: Flag to indicate whether the dimension is required.
+                        resourceId:
+                          type: string
+                          description: The resource identifier of the resource that
+                            emitted the metric.
+                        namespace:
+                          type: string
+                          description: The namespace the metric belongs to.
+                        name:
+                          description: The name and the display name of the metric,
+                            i.e. it is a localizable string.
+                          type: object
+                          required:
+                          - value
+                          properties:
+                            value:
+                              type: string
+                              description: The invariant value.
+                            localizedValue:
+                              type: string
+                              description: The display name.
+                        displayDescription:
+                          type: string
+                          description: Detailed description of this metric.
+                        category:
+                          type: string
+                          description: Custom category name for this metric.
+                        metricClass:
+                          description: The class of the metric.
+                          type: string
+                          enum:
+                          - Availability
+                          - Transactions
+                          - Errors
+                          - Latency
+                          - Saturation
+                          x-ms-enum:
+                            name: MetricClass
+                            modelAsString: true
+                        unit:
+                          description: The unit of the metric.
+                          type: string
+                          enum:
+                          - Count
+                          - Bytes
+                          - Seconds
+                          - CountPerSecond
+                          - BytesPerSecond
+                          - Percent
+                          - MilliSeconds
+                          - ByteSeconds
+                          - Unspecified
+                          - Cores
+                          - MilliCores
+                          - NanoCores
+                          - BitsPerSecond
+                          x-ms-enum:
+                            name: MetricUnit
+                            modelAsString: true
+                            values:
+                            - value: Count
+                              description: Unit of raw quantity.
+                            - value: Bytes
+                              description: Unit of memory in bytes.
+                            - value: Seconds
+                              description: Unit of time in seconds.
+                            - value: CountPerSecond
+                              description: Rate unit of raw quantity per second.
+                            - value: BytesPerSecond
+                              description: Rate unit of memory in bytes per second.
+                            - value: Percent
+                              description: Percentage unit.
+                            - value: MilliSeconds
+                              description: Unit of time in 1/1000th of a second.
+                            - value: ByteSeconds
+                              description: Unit of data transfer or storage. It is
+                                the size of the data in bytes multiplied by the time
+                                it takes to transfer or store the data in seconds.
+                            - value: Unspecified
+                              description: No specified unit.
+                            - value: Cores
+                              description: Unit of processing power.
+                            - value: MilliCores
+                              description: Unit of processing power in 1/1000th of
+                                a CPU core.
+                            - value: NanoCores
+                              description: Unit of processing power in one billionth
+                                of a CPU core.
+                            - value: BitsPerSecond
+                              description: Rate unit of binary digits per second.
+                        primaryAggregationType:
+                          description: The primary aggregation type value defining
+                            how to use the values for display.
+                          type: string
+                          enum:
+                          - None
+                          - Average
+                          - Count
+                          - Minimum
+                          - Maximum
+                          - Total
+                          x-ms-enum:
+                            name: AggregationType
+                            modelAsString: false
+                        supportedAggregationTypes:
+                          type: array
+                          items:
+                            type: string
+                            description: The aggregation type of the metric.
+                            enum:
+                            - None
+                            - Average
+                            - Count
+                            - Minimum
+                            - Maximum
+                            - Total
+                            x-ms-enum:
+                              name: AggregationType
+                              modelAsString: false
+                          description: The collection of what aggregation types are
+                            supported.
+                        metricAvailabilities:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              timeGrain:
+                                type: string
+                                format: duration
+                                description: The time grain specifies a supported
+                                  aggregation interval for the metric. Expressed as
+                                  a duration 'PT1M', 'P1D', etc.
+                              retention:
+                                type: string
+                                format: duration
+                                description: The retention period for the metric at
+                                  the specified timegrain.  Expressed as a duration
+                                  'PT1M', 'P1D', etc.
+                            description: Metric availability specifies the time grain
+                              (aggregation interval or frequency) and the retention
+                              period for that time grain.
+                          x-ms-identifiers:
+                          - timeGrain
+                          description: The collection of what aggregation intervals
+                            are available to be queried.
+                        id:
+                          type: string
+                          description: The resource identifier of the metric definition.
+                        dimensions:
+                          type: array
+                          items:
+                            type: object
+                            required:
+                            - value
+                            properties:
+                              value:
+                                type: string
+                                description: The invariant value.
+                              localizedValue:
+                                type: string
+                                description: The display name.
+                            description: The localizable string class.
+                          x-ms-identifiers:
+                          - value
+                          description: The name and the display name of the dimension,
+                            i.e. it is a localizable string.
+                      description: Metric definition class specifies the metadata
+                        for a metric.
+                    description: The values for the metric definitions.
+                required:
+                - value
+                description: Represents collection of metric definitions.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                title: Error Response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.)
+                type: object
+                properties:
+                  code:
+                    readOnly: true
+                    type: string
+                    description: The error code.
+                  message:
+                    readOnly: true
+                    type: string
+                    description: The error message.
+                  target:
+                    readOnly: true
+                    type: string
+                    description: The error target.
+                  details:
+                    readOnly: true
+                    type: array
+                    items:
+                      title: Error Response
+                      description: Common error response for all Azure Resource Manager
+                        APIs to return error details for failed operations. (This
+                        also follows the OData error response format.)
+                      type: object
+                      properties:
+                        code:
+                          readOnly: true
+                          type: string
+                          description: The error code.
+                        message:
+                          readOnly: true
+                          type: string
+                          description: The error message.
+                        target:
+                          readOnly: true
+                          type: string
+                          description: The error target.
+                        details:
+                          readOnly: true
+                          type: array
+                          items:
+                            title: Error Response
+                            description: Common error response for all Azure Resource
+                              Manager APIs to return error details for failed operations.
+                              (This also follows the OData error response format.)
+                            type: object
+                            properties:
+                              code:
+                                readOnly: true
+                                type: string
+                                description: The error code.
+                              message:
+                                readOnly: true
+                                type: string
+                                description: The error message.
+                              target:
+                                readOnly: true
+                                type: string
+                                description: The error target.
+                          x-ms-identifiers:
+                          - message
+                          - target
+                          description: The error details.
+                        additionalInfo:
+                          readOnly: true
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              type:
+                                readOnly: true
+                                type: string
+                                description: The additional info type.
+                              info:
+                                readOnly: true
+                                type: object
+                                description: The additional info.
+                            description: The resource management error additional
+                              info.
+                          x-ms-identifiers: []
+                          description: The error additional info.
+                    x-ms-identifiers:
+                    - message
+                    - target
+                    description: The error details.
+                  additionalInfo:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The additional info type.
+                        info:
+                          readOnly: true
+                          type: object
+                          description: The additional info.
+                      description: The resource management error additional info.
+                    x-ms-identifiers: []
+                    description: The error additional info.
+      x-ms-pageable: {}
+components:
+  parameters:
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    RegionParameter:
+      name: region
+      in: query
+      required: true
+      description: The region where the metrics you want reside.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    MetricNamespaceParameter:
+      name: metricnamespace
+      in: query
+      required: false
+      description: Metric namespace where the metrics you want reside.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    ResourceUriParameter:
+      name: resourceUri
+      in: path
+      required: true
+      description: The identifier of the resource.
+      x-ms-parameter-location: method
+      x-ms-skip-url-encoding: true
+      schema:
+        type: string
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    MetricAvailability:
+      type: object
+      properties:
+        timeGrain:
+          type: string
+          format: duration
+          description: The time grain specifies a supported aggregation interval for
+            the metric. Expressed as a duration 'PT1M', 'P1D', etc.
+        retention:
+          type: string
+          format: duration
+          description: The retention period for the metric at the specified timegrain.  Expressed
+            as a duration 'PT1M', 'P1D', etc.
+      description: Metric availability specifies the time grain (aggregation interval
+        or frequency) and the retention period for that time grain.
+    AggregationType:
+      type: string
+      description: The aggregation type of the metric.
+      enum:
+      - None
+      - Average
+      - Count
+      - Minimum
+      - Maximum
+      - Total
+      x-ms-enum:
+        name: AggregationType
+        modelAsString: false
+    MetricAggregationType:
+      type: string
+      description: The aggregation type of the metric.
+      enum:
+      - None
+      - Average
+      - Count
+      - Minimum
+      - Maximum
+      - Total
+      x-ms-enum:
+        name: MetricAggregationType
+        modelAsString: true
+    MetricClass:
+      type: string
+      description: The class of the metric.
+      enum:
+      - Availability
+      - Transactions
+      - Errors
+      - Latency
+      - Saturation
+      x-ms-enum:
+        name: MetricClass
+        modelAsString: true
+    MetricDefinition:
+      type: object
+      properties:
+        isDimensionRequired:
+          type: boolean
+          description: Flag to indicate whether the dimension is required.
+        resourceId:
+          type: string
+          description: The resource identifier of the resource that emitted the metric.
+        namespace:
+          type: string
+          description: The namespace the metric belongs to.
+        name:
+          description: The name and the display name of the metric, i.e. it is a localizable
+            string.
+          type: object
+          required:
+          - value
+          properties:
+            value:
+              type: string
+              description: The invariant value.
+            localizedValue:
+              type: string
+              description: The display name.
+        displayDescription:
+          type: string
+          description: Detailed description of this metric.
+        category:
+          type: string
+          description: Custom category name for this metric.
+        metricClass:
+          description: The class of the metric.
+          type: string
+          enum:
+          - Availability
+          - Transactions
+          - Errors
+          - Latency
+          - Saturation
+          x-ms-enum:
+            name: MetricClass
+            modelAsString: true
+        unit:
+          description: The unit of the metric.
+          type: string
+          enum:
+          - Count
+          - Bytes
+          - Seconds
+          - CountPerSecond
+          - BytesPerSecond
+          - Percent
+          - MilliSeconds
+          - ByteSeconds
+          - Unspecified
+          - Cores
+          - MilliCores
+          - NanoCores
+          - BitsPerSecond
+          x-ms-enum:
+            name: MetricUnit
+            modelAsString: true
+            values:
+            - value: Count
+              description: Unit of raw quantity.
+            - value: Bytes
+              description: Unit of memory in bytes.
+            - value: Seconds
+              description: Unit of time in seconds.
+            - value: CountPerSecond
+              description: Rate unit of raw quantity per second.
+            - value: BytesPerSecond
+              description: Rate unit of memory in bytes per second.
+            - value: Percent
+              description: Percentage unit.
+            - value: MilliSeconds
+              description: Unit of time in 1/1000th of a second.
+            - value: ByteSeconds
+              description: Unit of data transfer or storage. It is the size of the
+                data in bytes multiplied by the time it takes to transfer or store
+                the data in seconds.
+            - value: Unspecified
+              description: No specified unit.
+            - value: Cores
+              description: Unit of processing power.
+            - value: MilliCores
+              description: Unit of processing power in 1/1000th of a CPU core.
+            - value: NanoCores
+              description: Unit of processing power in one billionth of a CPU core.
+            - value: BitsPerSecond
+              description: Rate unit of binary digits per second.
+        primaryAggregationType:
+          description: The primary aggregation type value defining how to use the
+            values for display.
+          type: string
+          enum:
+          - None
+          - Average
+          - Count
+          - Minimum
+          - Maximum
+          - Total
+          x-ms-enum:
+            name: AggregationType
+            modelAsString: false
+        supportedAggregationTypes:
+          type: array
+          items:
+            type: string
+            description: The aggregation type of the metric.
+            enum:
+            - None
+            - Average
+            - Count
+            - Minimum
+            - Maximum
+            - Total
+            x-ms-enum:
+              name: AggregationType
+              modelAsString: false
+          description: The collection of what aggregation types are supported.
+        metricAvailabilities:
+          type: array
+          items:
+            type: object
+            properties:
+              timeGrain:
+                type: string
+                format: duration
+                description: The time grain specifies a supported aggregation interval
+                  for the metric. Expressed as a duration 'PT1M', 'P1D', etc.
+              retention:
+                type: string
+                format: duration
+                description: The retention period for the metric at the specified
+                  timegrain.  Expressed as a duration 'PT1M', 'P1D', etc.
+            description: Metric availability specifies the time grain (aggregation
+              interval or frequency) and the retention period for that time grain.
+          x-ms-identifiers:
+          - timeGrain
+          description: The collection of what aggregation intervals are available
+            to be queried.
+        id:
+          type: string
+          description: The resource identifier of the metric definition.
+        dimensions:
+          type: array
+          items:
+            type: object
+            required:
+            - value
+            properties:
+              value:
+                type: string
+                description: The invariant value.
+              localizedValue:
+                type: string
+                description: The display name.
+            description: The localizable string class.
+          x-ms-identifiers:
+          - value
+          description: The name and the display name of the dimension, i.e. it is
+            a localizable string.
+      description: Metric definition class specifies the metadata for a metric.
+    MetricDefinitionCollection:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              isDimensionRequired:
+                type: boolean
+                description: Flag to indicate whether the dimension is required.
+              resourceId:
+                type: string
+                description: The resource identifier of the resource that emitted
+                  the metric.
+              namespace:
+                type: string
+                description: The namespace the metric belongs to.
+              name:
+                description: The name and the display name of the metric, i.e. it
+                  is a localizable string.
+                type: object
+                required:
+                - value
+                properties:
+                  value:
+                    type: string
+                    description: The invariant value.
+                  localizedValue:
+                    type: string
+                    description: The display name.
+              displayDescription:
+                type: string
+                description: Detailed description of this metric.
+              category:
+                type: string
+                description: Custom category name for this metric.
+              metricClass:
+                description: The class of the metric.
+                type: string
+                enum:
+                - Availability
+                - Transactions
+                - Errors
+                - Latency
+                - Saturation
+                x-ms-enum:
+                  name: MetricClass
+                  modelAsString: true
+              unit:
+                description: The unit of the metric.
+                type: string
+                enum:
+                - Count
+                - Bytes
+                - Seconds
+                - CountPerSecond
+                - BytesPerSecond
+                - Percent
+                - MilliSeconds
+                - ByteSeconds
+                - Unspecified
+                - Cores
+                - MilliCores
+                - NanoCores
+                - BitsPerSecond
+                x-ms-enum:
+                  name: MetricUnit
+                  modelAsString: true
+                  values:
+                  - value: Count
+                    description: Unit of raw quantity.
+                  - value: Bytes
+                    description: Unit of memory in bytes.
+                  - value: Seconds
+                    description: Unit of time in seconds.
+                  - value: CountPerSecond
+                    description: Rate unit of raw quantity per second.
+                  - value: BytesPerSecond
+                    description: Rate unit of memory in bytes per second.
+                  - value: Percent
+                    description: Percentage unit.
+                  - value: MilliSeconds
+                    description: Unit of time in 1/1000th of a second.
+                  - value: ByteSeconds
+                    description: Unit of data transfer or storage. It is the size
+                      of the data in bytes multiplied by the time it takes to transfer
+                      or store the data in seconds.
+                  - value: Unspecified
+                    description: No specified unit.
+                  - value: Cores
+                    description: Unit of processing power.
+                  - value: MilliCores
+                    description: Unit of processing power in 1/1000th of a CPU core.
+                  - value: NanoCores
+                    description: Unit of processing power in one billionth of a CPU
+                      core.
+                  - value: BitsPerSecond
+                    description: Rate unit of binary digits per second.
+              primaryAggregationType:
+                description: The primary aggregation type value defining how to use
+                  the values for display.
+                type: string
+                enum:
+                - None
+                - Average
+                - Count
+                - Minimum
+                - Maximum
+                - Total
+                x-ms-enum:
+                  name: AggregationType
+                  modelAsString: false
+              supportedAggregationTypes:
+                type: array
+                items:
+                  type: string
+                  description: The aggregation type of the metric.
+                  enum:
+                  - None
+                  - Average
+                  - Count
+                  - Minimum
+                  - Maximum
+                  - Total
+                  x-ms-enum:
+                    name: AggregationType
+                    modelAsString: false
+                description: The collection of what aggregation types are supported.
+              metricAvailabilities:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    timeGrain:
+                      type: string
+                      format: duration
+                      description: The time grain specifies a supported aggregation
+                        interval for the metric. Expressed as a duration 'PT1M', 'P1D',
+                        etc.
+                    retention:
+                      type: string
+                      format: duration
+                      description: The retention period for the metric at the specified
+                        timegrain.  Expressed as a duration 'PT1M', 'P1D', etc.
+                  description: Metric availability specifies the time grain (aggregation
+                    interval or frequency) and the retention period for that time
+                    grain.
+                x-ms-identifiers:
+                - timeGrain
+                description: The collection of what aggregation intervals are available
+                  to be queried.
+              id:
+                type: string
+                description: The resource identifier of the metric definition.
+              dimensions:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - value
+                  properties:
+                    value:
+                      type: string
+                      description: The invariant value.
+                    localizedValue:
+                      type: string
+                      description: The display name.
+                  description: The localizable string class.
+                x-ms-identifiers:
+                - value
+                description: The name and the display name of the dimension, i.e.
+                  it is a localizable string.
+            description: Metric definition class specifies the metadata for a metric.
+          description: The values for the metric definitions.
+      required:
+      - value
+      description: Represents collection of metric definitions.
+    SubscriptionScopeMetricDefinition:
+      type: object
+      description: Metric definition class specifies the metadata for a metric.
+      properties:
+        isDimensionRequired:
+          type: boolean
+          description: Flag to indicate whether the dimension is required.
+        resourceId:
+          type: string
+          description: The resource identifier of the resource that emitted the metric.
+        namespace:
+          type: string
+          description: The namespace the metric belongs to.
+        name:
+          description: The name and the display name of the metric, i.e. it is a localizable
+            string.
+          type: object
+          required:
+          - value
+          properties:
+            value:
+              type: string
+              description: The invariant value.
+            localizedValue:
+              type: string
+              description: The display name.
+        displayDescription:
+          type: string
+          description: Detailed description of this metric.
+        category:
+          type: string
+          description: Custom category name for this metric.
+        metricClass:
+          description: The class of the metric.
+          type: string
+          enum:
+          - Availability
+          - Transactions
+          - Errors
+          - Latency
+          - Saturation
+          x-ms-enum:
+            name: MetricClass
+            modelAsString: true
+        unit:
+          description: The unit of the metric.
+          type: string
+          enum:
+          - Count
+          - Bytes
+          - Seconds
+          - CountPerSecond
+          - BytesPerSecond
+          - Percent
+          - MilliSeconds
+          - ByteSeconds
+          - Unspecified
+          - Cores
+          - MilliCores
+          - NanoCores
+          - BitsPerSecond
+          x-ms-enum:
+            name: MetricUnit
+            modelAsString: true
+            values:
+            - value: Count
+              description: Unit of raw quantity.
+            - value: Bytes
+              description: Unit of memory in bytes.
+            - value: Seconds
+              description: Unit of time in seconds.
+            - value: CountPerSecond
+              description: Rate unit of raw quantity per second.
+            - value: BytesPerSecond
+              description: Rate unit of memory in bytes per second.
+            - value: Percent
+              description: Percentage unit.
+            - value: MilliSeconds
+              description: Unit of time in 1/1000th of a second.
+            - value: ByteSeconds
+              description: Unit of data transfer or storage. It is the size of the
+                data in bytes multiplied by the time it takes to transfer or store
+                the data in seconds.
+            - value: Unspecified
+              description: No specified unit.
+            - value: Cores
+              description: Unit of processing power.
+            - value: MilliCores
+              description: Unit of processing power in 1/1000th of a CPU core.
+            - value: NanoCores
+              description: Unit of processing power in one billionth of a CPU core.
+            - value: BitsPerSecond
+              description: Rate unit of binary digits per second.
+        primaryAggregationType:
+          description: The primary aggregation type value defining how to use the
+            values for display.
+          type: string
+          enum:
+          - None
+          - Average
+          - Count
+          - Minimum
+          - Maximum
+          - Total
+          x-ms-enum:
+            name: MetricAggregationType
+            modelAsString: true
+        supportedAggregationTypes:
+          type: array
+          items:
+            type: string
+            description: The aggregation type of the metric.
+            enum:
+            - None
+            - Average
+            - Count
+            - Minimum
+            - Maximum
+            - Total
+            x-ms-enum:
+              name: MetricAggregationType
+              modelAsString: true
+          description: The collection of what aggregation types are supported.
+        metricAvailabilities:
+          type: array
+          items:
+            type: object
+            properties:
+              timeGrain:
+                type: string
+                format: duration
+                description: The time grain specifies a supported aggregation interval
+                  for the metric. Expressed as a duration 'PT1M', 'P1D', etc.
+              retention:
+                type: string
+                format: duration
+                description: The retention period for the metric at the specified
+                  timegrain.  Expressed as a duration 'PT1M', 'P1D', etc.
+            description: Metric availability specifies the time grain (aggregation
+              interval or frequency) and the retention period for that time grain.
+          x-ms-identifiers:
+          - timeGrain
+          description: The collection of what aggregation intervals are available
+            to be queried.
+        id:
+          type: string
+          description: The resource identifier of the metric definition.
+        dimensions:
+          type: array
+          items:
+            type: object
+            required:
+            - value
+            properties:
+              value:
+                type: string
+                description: The invariant value.
+              localizedValue:
+                type: string
+                description: The display name.
+            description: The localizable string class.
+          x-ms-identifiers:
+          - value
+          description: The name and the display name of the dimension, i.e. it is
+            a localizable string.
+    SubscriptionScopeMetricDefinitionCollection:
+      type: object
+      description: Represents collection of metric definitions.
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            description: Metric definition class specifies the metadata for a metric.
+            properties:
+              isDimensionRequired:
+                type: boolean
+                description: Flag to indicate whether the dimension is required.
+              resourceId:
+                type: string
+                description: The resource identifier of the resource that emitted
+                  the metric.
+              namespace:
+                type: string
+                description: The namespace the metric belongs to.
+              name:
+                description: The name and the display name of the metric, i.e. it
+                  is a localizable string.
+                type: object
+                required:
+                - value
+                properties:
+                  value:
+                    type: string
+                    description: The invariant value.
+                  localizedValue:
+                    type: string
+                    description: The display name.
+              displayDescription:
+                type: string
+                description: Detailed description of this metric.
+              category:
+                type: string
+                description: Custom category name for this metric.
+              metricClass:
+                description: The class of the metric.
+                type: string
+                enum:
+                - Availability
+                - Transactions
+                - Errors
+                - Latency
+                - Saturation
+                x-ms-enum:
+                  name: MetricClass
+                  modelAsString: true
+              unit:
+                description: The unit of the metric.
+                type: string
+                enum:
+                - Count
+                - Bytes
+                - Seconds
+                - CountPerSecond
+                - BytesPerSecond
+                - Percent
+                - MilliSeconds
+                - ByteSeconds
+                - Unspecified
+                - Cores
+                - MilliCores
+                - NanoCores
+                - BitsPerSecond
+                x-ms-enum:
+                  name: MetricUnit
+                  modelAsString: true
+                  values:
+                  - value: Count
+                    description: Unit of raw quantity.
+                  - value: Bytes
+                    description: Unit of memory in bytes.
+                  - value: Seconds
+                    description: Unit of time in seconds.
+                  - value: CountPerSecond
+                    description: Rate unit of raw quantity per second.
+                  - value: BytesPerSecond
+                    description: Rate unit of memory in bytes per second.
+                  - value: Percent
+                    description: Percentage unit.
+                  - value: MilliSeconds
+                    description: Unit of time in 1/1000th of a second.
+                  - value: ByteSeconds
+                    description: Unit of data transfer or storage. It is the size
+                      of the data in bytes multiplied by the time it takes to transfer
+                      or store the data in seconds.
+                  - value: Unspecified
+                    description: No specified unit.
+                  - value: Cores
+                    description: Unit of processing power.
+                  - value: MilliCores
+                    description: Unit of processing power in 1/1000th of a CPU core.
+                  - value: NanoCores
+                    description: Unit of processing power in one billionth of a CPU
+                      core.
+                  - value: BitsPerSecond
+                    description: Rate unit of binary digits per second.
+              primaryAggregationType:
+                description: The primary aggregation type value defining how to use
+                  the values for display.
+                type: string
+                enum:
+                - None
+                - Average
+                - Count
+                - Minimum
+                - Maximum
+                - Total
+                x-ms-enum:
+                  name: MetricAggregationType
+                  modelAsString: true
+              supportedAggregationTypes:
+                type: array
+                items:
+                  type: string
+                  description: The aggregation type of the metric.
+                  enum:
+                  - None
+                  - Average
+                  - Count
+                  - Minimum
+                  - Maximum
+                  - Total
+                  x-ms-enum:
+                    name: MetricAggregationType
+                    modelAsString: true
+                description: The collection of what aggregation types are supported.
+              metricAvailabilities:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    timeGrain:
+                      type: string
+                      format: duration
+                      description: The time grain specifies a supported aggregation
+                        interval for the metric. Expressed as a duration 'PT1M', 'P1D',
+                        etc.
+                    retention:
+                      type: string
+                      format: duration
+                      description: The retention period for the metric at the specified
+                        timegrain.  Expressed as a duration 'PT1M', 'P1D', etc.
+                  description: Metric availability specifies the time grain (aggregation
+                    interval or frequency) and the retention period for that time
+                    grain.
+                x-ms-identifiers:
+                - timeGrain
+                description: The collection of what aggregation intervals are available
+                  to be queried.
+              id:
+                type: string
+                description: The resource identifier of the metric definition.
+              dimensions:
+                type: array
+                items:
+                  type: object
+                  required:
+                  - value
+                  properties:
+                    value:
+                      type: string
+                      description: The invariant value.
+                    localizedValue:
+                      type: string
+                      description: The display name.
+                  description: The localizable string class.
+                x-ms-identifiers:
+                - value
+                description: The name and the display name of the dimension, i.e.
+                  it is a localizable string.
+          description: The values for the metric definitions.
+      required:
+      - value
+    ErrorResponse:
+      title: Error Response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.)
+      type: object
+      properties:
+        code:
+          readOnly: true
+          type: string
+          description: The error code.
+        message:
+          readOnly: true
+          type: string
+          description: The error message.
+        target:
+          readOnly: true
+          type: string
+          description: The error target.
+        details:
+          readOnly: true
+          type: array
+          items:
+            title: Error Response
+            description: Common error response for all Azure Resource Manager APIs
+              to return error details for failed operations. (This also follows the
+              OData error response format.)
+            type: object
+            properties:
+              code:
+                readOnly: true
+                type: string
+                description: The error code.
+              message:
+                readOnly: true
+                type: string
+                description: The error message.
+              target:
+                readOnly: true
+                type: string
+                description: The error target.
+              details:
+                readOnly: true
+                type: array
+                items:
+                  title: Error Response
+                  description: Common error response for all Azure Resource Manager
+                    APIs to return error details for failed operations. (This also
+                    follows the OData error response format.)
+                  type: object
+                  properties:
+                    code:
+                      readOnly: true
+                      type: string
+                      description: The error code.
+                    message:
+                      readOnly: true
+                      type: string
+                      description: The error message.
+                    target:
+                      readOnly: true
+                      type: string
+                      description: The error target.
+                x-ms-identifiers:
+                - message
+                - target
+                description: The error details.
+              additionalInfo:
+                readOnly: true
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      readOnly: true
+                      type: string
+                      description: The additional info type.
+                    info:
+                      readOnly: true
+                      type: object
+                      description: The additional info.
+                  description: The resource management error additional info.
+                x-ms-identifiers: []
+                description: The error additional info.
+          x-ms-identifiers:
+          - message
+          - target
+          description: The error details.
+        additionalInfo:
+          readOnly: true
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                readOnly: true
+                type: string
+                description: The additional info type.
+              info:
+                readOnly: true
+                type: object
+                description: The additional info.
+            description: The resource management error additional info.
+          x-ms-identifiers: []
+          description: The error additional info.
+    ErrorAdditionalInfo:
+      type: object
+      properties:
+        type:
+          readOnly: true
+          type: string
+          description: The additional info type.
+        info:
+          readOnly: true
+          type: object
+          description: The additional info.
+      description: The resource management error additional info.
+    ErrorContract:
+      title: Error Response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.)
+      type: object
+      properties:
+        error:
+          description: The error object.
+          title: Error Response
+          type: object
+          properties:
+            code:
+              readOnly: true
+              type: string
+              description: The error code.
+            message:
+              readOnly: true
+              type: string
+              description: The error message.
+            target:
+              readOnly: true
+              type: string
+              description: The error target.
+            details:
+              readOnly: true
+              type: array
+              items:
+                title: Error Response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.)
+                type: object
+                properties:
+                  code:
+                    readOnly: true
+                    type: string
+                    description: The error code.
+                  message:
+                    readOnly: true
+                    type: string
+                    description: The error message.
+                  target:
+                    readOnly: true
+                    type: string
+                    description: The error target.
+                  details:
+                    readOnly: true
+                    type: array
+                    items:
+                      title: Error Response
+                      description: Common error response for all Azure Resource Manager
+                        APIs to return error details for failed operations. (This
+                        also follows the OData error response format.)
+                      type: object
+                      properties:
+                        code:
+                          readOnly: true
+                          type: string
+                          description: The error code.
+                        message:
+                          readOnly: true
+                          type: string
+                          description: The error message.
+                        target:
+                          readOnly: true
+                          type: string
+                          description: The error target.
+                    x-ms-identifiers:
+                    - message
+                    - target
+                    description: The error details.
+                  additionalInfo:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The additional info type.
+                        info:
+                          readOnly: true
+                          type: object
+                          description: The additional info.
+                      description: The resource management error additional info.
+                    x-ms-identifiers: []
+                    description: The error additional info.
+              x-ms-identifiers:
+              - message
+              - target
+              description: The error details.
+            additionalInfo:
+              readOnly: true
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The additional info type.
+                  info:
+                    readOnly: true
+                    type: object
+                    description: The additional info.
+                description: The resource management error additional info.
+              x-ms-identifiers: []
+              description: The error additional info.
+    LocalizableString:
+      type: object
+      required:
+      - value
+      properties:
+        value:
+          type: string
+          description: The invariant value.
+        localizedValue:
+          type: string
+          description: The display name.
+      description: The localizable string class.
+    Unit:
+      type: string
+      description: The unit of the metric.
+      enum:
+      - Count
+      - Bytes
+      - Seconds
+      - CountPerSecond
+      - BytesPerSecond
+      - Percent
+      - MilliSeconds
+      - ByteSeconds
+      - Unspecified
+      - Cores
+      - MilliCores
+      - NanoCores
+      - BitsPerSecond
+      x-ms-enum:
+        name: MetricUnit
+        modelAsString: true
+        values:
+        - value: Count
+          description: Unit of raw quantity.
+        - value: Bytes
+          description: Unit of memory in bytes.
+        - value: Seconds
+          description: Unit of time in seconds.
+        - value: CountPerSecond
+          description: Rate unit of raw quantity per second.
+        - value: BytesPerSecond
+          description: Rate unit of memory in bytes per second.
+        - value: Percent
+          description: Percentage unit.
+        - value: MilliSeconds
+          description: Unit of time in 1/1000th of a second.
+        - value: ByteSeconds
+          description: Unit of data transfer or storage. It is the size of the data
+            in bytes multiplied by the time it takes to transfer or store the data
+            in seconds.
+        - value: Unspecified
+          description: No specified unit.
+        - value: Cores
+          description: Unit of processing power.
+        - value: MilliCores
+          description: Unit of processing power in 1/1000th of a CPU core.
+        - value: NanoCores
+          description: Unit of processing power in one billionth of a CPU core.
+        - value: BitsPerSecond
+          description: Rate unit of binary digits per second.

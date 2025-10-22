@@ -1,0 +1,3299 @@
+openapi: 3.0.0
+info:
+  title: ApiManagementClient
+  description: Use these REST APIs to get the analytics reports associated with your
+    Azure API Management deployment.
+  version: 2024-05-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byApi
+  : get:
+      tags:
+      - Reports
+      operationId: Reports_ListByApi
+      description: Lists report records by API.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: $filter
+        in: query
+        required: true
+        description: The filter to apply on the operation.
+        schema:
+          type: string
+      - name: $top
+        in: query
+        required: false
+        description: Number of records to return.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - name: $skip
+        in: query
+        required: false
+        description: Number of records to skip.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+      - name: $orderby
+        in: query
+        required: false
+        description: OData order by query option.
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Lists a collection of Report record.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Name depending on report endpoint specifies
+                            product, API, operation or developer name.
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: 'Start of aggregation period. The date conforms
+                            to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                            by the ISO 8601 standard.
+
+                            '
+                        interval:
+                          type: string
+                          description: Length of aggregation period.  Interval must
+                            be multiple of 15 minutes and may not be zero. The value
+                            should be in ISO 8601 format (http://en.wikipedia.org/wiki/ISO_8601#Durations).
+                        country:
+                          type: string
+                          description: Country to which this record data is related.
+                        region:
+                          type: string
+                          description: Country region to which this record data is
+                            related.
+                        zip:
+                          type: string
+                          description: Zip code to which this record data is related.
+                        userId:
+                          readOnly: true
+                          type: string
+                          description: User identifier path. /users/{userId}
+                        productId:
+                          readOnly: true
+                          type: string
+                          description: Product identifier path. /products/{productId}
+                        apiId:
+                          type: string
+                          description: API identifier path. /apis/{apiId}
+                        operationId:
+                          type: string
+                          description: Operation identifier path. /apis/{apiId}/operations/{operationId}
+                        apiRegion:
+                          type: string
+                          description: API region identifier.
+                        subscriptionId:
+                          type: string
+                          description: Subscription identifier path. /subscriptions/{subscriptionId}
+                        callCountSuccess:
+                          type: integer
+                          format: int32
+                          description: Number of successful calls. This includes calls
+                            returning HttpStatusCode <= 301 and HttpStatusCode.NotModified
+                            and HttpStatusCode.TemporaryRedirect
+                        callCountBlocked:
+                          type: integer
+                          format: int32
+                          description: Number of calls blocked due to invalid credentials.
+                            This includes calls returning HttpStatusCode.Unauthorized
+                            and HttpStatusCode.Forbidden and HttpStatusCode.TooManyRequests
+                        callCountFailed:
+                          type: integer
+                          format: int32
+                          description: Number of calls failed due to gateway or backend
+                            errors. This includes calls returning HttpStatusCode.BadRequest(400)
+                            and any Code between HttpStatusCode.InternalServerError
+                            (500) and 600
+                        callCountOther:
+                          type: integer
+                          format: int32
+                          description: Number of other calls.
+                        callCountTotal:
+                          type: integer
+                          format: int32
+                          description: Total number of calls.
+                        bandwidth:
+                          type: integer
+                          format: int64
+                          description: Bandwidth consumed.
+                        cacheHitCount:
+                          type: integer
+                          format: int32
+                          description: Number of times when content was served from
+                            cache policy.
+                        cacheMissCount:
+                          type: integer
+                          format: int32
+                          description: Number of times content was fetched from backend.
+                        apiTimeAvg:
+                          type: number
+                          format: double
+                          description: Average time it took to process request.
+                        apiTimeMin:
+                          type: number
+                          format: double
+                          description: Minimum time it took to process request.
+                        apiTimeMax:
+                          type: number
+                          format: double
+                          description: Maximum time it took to process request.
+                        serviceTimeAvg:
+                          type: number
+                          format: double
+                          description: Average time it took to process request on
+                            backend.
+                        serviceTimeMin:
+                          type: number
+                          format: double
+                          description: Minimum time it took to process request on
+                            backend.
+                        serviceTimeMax:
+                          type: number
+                          format: double
+                          description: Maximum time it took to process request on
+                            backend.
+                      description: Report data.
+                    x-ms-identifiers:
+                    - name
+                    - userId
+                    description: Page values.
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                  nextLink:
+                    type: string
+                    description: Next page link if any.
+                description: Paged Report records list representation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+      x-ms-odata: ./definitions.json#/definitions/ReportRecordContract
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byUser
+  : get:
+      tags:
+      - Reports
+      operationId: Reports_ListByUser
+      description: Lists report records by User.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: $filter
+        in: query
+        required: true
+        description: '|   Field     |     Usage     |     Supported operators     |     Supported
+          functions     |</br>|-------------|-------------|-------------|-------------|</br>|
+          timestamp | filter | ge, le |     | </br>| displayName | select, orderBy
+          |     |     | </br>| userId | select, filter | eq |     | </br>| apiRegion
+          | filter | eq |     | </br>| productId | filter | eq |     | </br>| subscriptionId
+          | filter | eq |     | </br>| apiId | filter | eq |     | </br>| operationId
+          | filter | eq |     | </br>| callCountSuccess | select, orderBy |     |     |
+          </br>| callCountBlocked | select, orderBy |     |     | </br>| callCountFailed
+          | select, orderBy |     |     | </br>| callCountOther | select, orderBy
+          |     |     | </br>| callCountTotal | select, orderBy |     |     | </br>|
+          bandwidth | select, orderBy |     |     | </br>| cacheHitsCount | select
+          |     |     | </br>| cacheMissCount | select |     |     | </br>| apiTimeAvg
+          | select, orderBy |     |     | </br>| apiTimeMin | select |     |     |
+          </br>| apiTimeMax | select |     |     | </br>| serviceTimeAvg | select
+          |     |     | </br>| serviceTimeMin | select |     |     | </br>| serviceTimeMax
+          | select |     |     | </br>'
+        schema:
+          type: string
+      - name: $top
+        in: query
+        required: false
+        description: Number of records to return.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - name: $skip
+        in: query
+        required: false
+        description: Number of records to skip.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+      - name: $orderby
+        in: query
+        required: false
+        description: OData order by query option.
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Lists a collection of Report record.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Name depending on report endpoint specifies
+                            product, API, operation or developer name.
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: 'Start of aggregation period. The date conforms
+                            to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                            by the ISO 8601 standard.
+
+                            '
+                        interval:
+                          type: string
+                          description: Length of aggregation period.  Interval must
+                            be multiple of 15 minutes and may not be zero. The value
+                            should be in ISO 8601 format (http://en.wikipedia.org/wiki/ISO_8601#Durations).
+                        country:
+                          type: string
+                          description: Country to which this record data is related.
+                        region:
+                          type: string
+                          description: Country region to which this record data is
+                            related.
+                        zip:
+                          type: string
+                          description: Zip code to which this record data is related.
+                        userId:
+                          readOnly: true
+                          type: string
+                          description: User identifier path. /users/{userId}
+                        productId:
+                          readOnly: true
+                          type: string
+                          description: Product identifier path. /products/{productId}
+                        apiId:
+                          type: string
+                          description: API identifier path. /apis/{apiId}
+                        operationId:
+                          type: string
+                          description: Operation identifier path. /apis/{apiId}/operations/{operationId}
+                        apiRegion:
+                          type: string
+                          description: API region identifier.
+                        subscriptionId:
+                          type: string
+                          description: Subscription identifier path. /subscriptions/{subscriptionId}
+                        callCountSuccess:
+                          type: integer
+                          format: int32
+                          description: Number of successful calls. This includes calls
+                            returning HttpStatusCode <= 301 and HttpStatusCode.NotModified
+                            and HttpStatusCode.TemporaryRedirect
+                        callCountBlocked:
+                          type: integer
+                          format: int32
+                          description: Number of calls blocked due to invalid credentials.
+                            This includes calls returning HttpStatusCode.Unauthorized
+                            and HttpStatusCode.Forbidden and HttpStatusCode.TooManyRequests
+                        callCountFailed:
+                          type: integer
+                          format: int32
+                          description: Number of calls failed due to gateway or backend
+                            errors. This includes calls returning HttpStatusCode.BadRequest(400)
+                            and any Code between HttpStatusCode.InternalServerError
+                            (500) and 600
+                        callCountOther:
+                          type: integer
+                          format: int32
+                          description: Number of other calls.
+                        callCountTotal:
+                          type: integer
+                          format: int32
+                          description: Total number of calls.
+                        bandwidth:
+                          type: integer
+                          format: int64
+                          description: Bandwidth consumed.
+                        cacheHitCount:
+                          type: integer
+                          format: int32
+                          description: Number of times when content was served from
+                            cache policy.
+                        cacheMissCount:
+                          type: integer
+                          format: int32
+                          description: Number of times content was fetched from backend.
+                        apiTimeAvg:
+                          type: number
+                          format: double
+                          description: Average time it took to process request.
+                        apiTimeMin:
+                          type: number
+                          format: double
+                          description: Minimum time it took to process request.
+                        apiTimeMax:
+                          type: number
+                          format: double
+                          description: Maximum time it took to process request.
+                        serviceTimeAvg:
+                          type: number
+                          format: double
+                          description: Average time it took to process request on
+                            backend.
+                        serviceTimeMin:
+                          type: number
+                          format: double
+                          description: Minimum time it took to process request on
+                            backend.
+                        serviceTimeMax:
+                          type: number
+                          format: double
+                          description: Maximum time it took to process request on
+                            backend.
+                      description: Report data.
+                    x-ms-identifiers:
+                    - name
+                    - userId
+                    description: Page values.
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                  nextLink:
+                    type: string
+                    description: Next page link if any.
+                description: Paged Report records list representation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+      x-ms-odata: ./definitions.json#/definitions/ReportRecordContract
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byOperation
+  : get:
+      tags:
+      - Reports
+      operationId: Reports_ListByOperation
+      description: Lists report records by API Operations.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: $filter
+        in: query
+        required: true
+        description: '|   Field     |     Usage     |     Supported operators     |     Supported
+          functions     |</br>|-------------|-------------|-------------|-------------|</br>|
+          timestamp | filter | ge, le |     | </br>| displayName | select, orderBy
+          |     |     | </br>| apiRegion | filter | eq |     | </br>| userId | filter
+          | eq |     | </br>| productId | filter | eq |     | </br>| subscriptionId
+          | filter | eq |     | </br>| apiId | filter | eq |     | </br>| operationId
+          | select, filter | eq |     | </br>| callCountSuccess | select, orderBy
+          |     |     | </br>| callCountBlocked | select, orderBy |     |     | </br>|
+          callCountFailed | select, orderBy |     |     | </br>| callCountOther |
+          select, orderBy |     |     | </br>| callCountTotal | select, orderBy |     |     |
+          </br>| bandwidth | select, orderBy |     |     | </br>| cacheHitsCount |
+          select |     |     | </br>| cacheMissCount | select |     |     | </br>|
+          apiTimeAvg | select, orderBy |     |     | </br>| apiTimeMin | select |     |     |
+          </br>| apiTimeMax | select |     |     | </br>| serviceTimeAvg | select
+          |     |     | </br>| serviceTimeMin | select |     |     | </br>| serviceTimeMax
+          | select |     |     | </br>'
+        schema:
+          type: string
+      - name: $top
+        in: query
+        required: false
+        description: Number of records to return.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - name: $skip
+        in: query
+        required: false
+        description: Number of records to skip.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+      - name: $orderby
+        in: query
+        required: false
+        description: OData order by query option.
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Lists a collection of Report record.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Name depending on report endpoint specifies
+                            product, API, operation or developer name.
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: 'Start of aggregation period. The date conforms
+                            to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                            by the ISO 8601 standard.
+
+                            '
+                        interval:
+                          type: string
+                          description: Length of aggregation period.  Interval must
+                            be multiple of 15 minutes and may not be zero. The value
+                            should be in ISO 8601 format (http://en.wikipedia.org/wiki/ISO_8601#Durations).
+                        country:
+                          type: string
+                          description: Country to which this record data is related.
+                        region:
+                          type: string
+                          description: Country region to which this record data is
+                            related.
+                        zip:
+                          type: string
+                          description: Zip code to which this record data is related.
+                        userId:
+                          readOnly: true
+                          type: string
+                          description: User identifier path. /users/{userId}
+                        productId:
+                          readOnly: true
+                          type: string
+                          description: Product identifier path. /products/{productId}
+                        apiId:
+                          type: string
+                          description: API identifier path. /apis/{apiId}
+                        operationId:
+                          type: string
+                          description: Operation identifier path. /apis/{apiId}/operations/{operationId}
+                        apiRegion:
+                          type: string
+                          description: API region identifier.
+                        subscriptionId:
+                          type: string
+                          description: Subscription identifier path. /subscriptions/{subscriptionId}
+                        callCountSuccess:
+                          type: integer
+                          format: int32
+                          description: Number of successful calls. This includes calls
+                            returning HttpStatusCode <= 301 and HttpStatusCode.NotModified
+                            and HttpStatusCode.TemporaryRedirect
+                        callCountBlocked:
+                          type: integer
+                          format: int32
+                          description: Number of calls blocked due to invalid credentials.
+                            This includes calls returning HttpStatusCode.Unauthorized
+                            and HttpStatusCode.Forbidden and HttpStatusCode.TooManyRequests
+                        callCountFailed:
+                          type: integer
+                          format: int32
+                          description: Number of calls failed due to gateway or backend
+                            errors. This includes calls returning HttpStatusCode.BadRequest(400)
+                            and any Code between HttpStatusCode.InternalServerError
+                            (500) and 600
+                        callCountOther:
+                          type: integer
+                          format: int32
+                          description: Number of other calls.
+                        callCountTotal:
+                          type: integer
+                          format: int32
+                          description: Total number of calls.
+                        bandwidth:
+                          type: integer
+                          format: int64
+                          description: Bandwidth consumed.
+                        cacheHitCount:
+                          type: integer
+                          format: int32
+                          description: Number of times when content was served from
+                            cache policy.
+                        cacheMissCount:
+                          type: integer
+                          format: int32
+                          description: Number of times content was fetched from backend.
+                        apiTimeAvg:
+                          type: number
+                          format: double
+                          description: Average time it took to process request.
+                        apiTimeMin:
+                          type: number
+                          format: double
+                          description: Minimum time it took to process request.
+                        apiTimeMax:
+                          type: number
+                          format: double
+                          description: Maximum time it took to process request.
+                        serviceTimeAvg:
+                          type: number
+                          format: double
+                          description: Average time it took to process request on
+                            backend.
+                        serviceTimeMin:
+                          type: number
+                          format: double
+                          description: Minimum time it took to process request on
+                            backend.
+                        serviceTimeMax:
+                          type: number
+                          format: double
+                          description: Maximum time it took to process request on
+                            backend.
+                      description: Report data.
+                    x-ms-identifiers:
+                    - name
+                    - userId
+                    description: Page values.
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                  nextLink:
+                    type: string
+                    description: Next page link if any.
+                description: Paged Report records list representation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+      x-ms-odata: ./definitions.json#/definitions/ReportRecordContract
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byProduct
+  : get:
+      tags:
+      - Reports
+      operationId: Reports_ListByProduct
+      description: Lists report records by Product.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: $filter
+        in: query
+        required: true
+        description: '|   Field     |     Usage     |     Supported operators     |     Supported
+          functions     |</br>|-------------|-------------|-------------|-------------|</br>|
+          timestamp | filter | ge, le |     | </br>| displayName | select, orderBy
+          |     |     | </br>| apiRegion | filter | eq |     | </br>| userId | filter
+          | eq |     | </br>| productId | select, filter | eq |     | </br>| subscriptionId
+          | filter | eq |     | </br>| callCountSuccess | select, orderBy |     |     |
+          </br>| callCountBlocked | select, orderBy |     |     | </br>| callCountFailed
+          | select, orderBy |     |     | </br>| callCountOther | select, orderBy
+          |     |     | </br>| callCountTotal | select, orderBy |     |     | </br>|
+          bandwidth | select, orderBy |     |     | </br>| cacheHitsCount | select
+          |     |     | </br>| cacheMissCount | select |     |     | </br>| apiTimeAvg
+          | select, orderBy |     |     | </br>| apiTimeMin | select |     |     |
+          </br>| apiTimeMax | select |     |     | </br>| serviceTimeAvg | select
+          |     |     | </br>| serviceTimeMin | select |     |     | </br>| serviceTimeMax
+          | select |     |     | </br>'
+        schema:
+          type: string
+      - name: $top
+        in: query
+        required: false
+        description: Number of records to return.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - name: $skip
+        in: query
+        required: false
+        description: Number of records to skip.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+      - name: $orderby
+        in: query
+        required: false
+        description: OData order by query option.
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Lists a collection of Report record.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Name depending on report endpoint specifies
+                            product, API, operation or developer name.
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: 'Start of aggregation period. The date conforms
+                            to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                            by the ISO 8601 standard.
+
+                            '
+                        interval:
+                          type: string
+                          description: Length of aggregation period.  Interval must
+                            be multiple of 15 minutes and may not be zero. The value
+                            should be in ISO 8601 format (http://en.wikipedia.org/wiki/ISO_8601#Durations).
+                        country:
+                          type: string
+                          description: Country to which this record data is related.
+                        region:
+                          type: string
+                          description: Country region to which this record data is
+                            related.
+                        zip:
+                          type: string
+                          description: Zip code to which this record data is related.
+                        userId:
+                          readOnly: true
+                          type: string
+                          description: User identifier path. /users/{userId}
+                        productId:
+                          readOnly: true
+                          type: string
+                          description: Product identifier path. /products/{productId}
+                        apiId:
+                          type: string
+                          description: API identifier path. /apis/{apiId}
+                        operationId:
+                          type: string
+                          description: Operation identifier path. /apis/{apiId}/operations/{operationId}
+                        apiRegion:
+                          type: string
+                          description: API region identifier.
+                        subscriptionId:
+                          type: string
+                          description: Subscription identifier path. /subscriptions/{subscriptionId}
+                        callCountSuccess:
+                          type: integer
+                          format: int32
+                          description: Number of successful calls. This includes calls
+                            returning HttpStatusCode <= 301 and HttpStatusCode.NotModified
+                            and HttpStatusCode.TemporaryRedirect
+                        callCountBlocked:
+                          type: integer
+                          format: int32
+                          description: Number of calls blocked due to invalid credentials.
+                            This includes calls returning HttpStatusCode.Unauthorized
+                            and HttpStatusCode.Forbidden and HttpStatusCode.TooManyRequests
+                        callCountFailed:
+                          type: integer
+                          format: int32
+                          description: Number of calls failed due to gateway or backend
+                            errors. This includes calls returning HttpStatusCode.BadRequest(400)
+                            and any Code between HttpStatusCode.InternalServerError
+                            (500) and 600
+                        callCountOther:
+                          type: integer
+                          format: int32
+                          description: Number of other calls.
+                        callCountTotal:
+                          type: integer
+                          format: int32
+                          description: Total number of calls.
+                        bandwidth:
+                          type: integer
+                          format: int64
+                          description: Bandwidth consumed.
+                        cacheHitCount:
+                          type: integer
+                          format: int32
+                          description: Number of times when content was served from
+                            cache policy.
+                        cacheMissCount:
+                          type: integer
+                          format: int32
+                          description: Number of times content was fetched from backend.
+                        apiTimeAvg:
+                          type: number
+                          format: double
+                          description: Average time it took to process request.
+                        apiTimeMin:
+                          type: number
+                          format: double
+                          description: Minimum time it took to process request.
+                        apiTimeMax:
+                          type: number
+                          format: double
+                          description: Maximum time it took to process request.
+                        serviceTimeAvg:
+                          type: number
+                          format: double
+                          description: Average time it took to process request on
+                            backend.
+                        serviceTimeMin:
+                          type: number
+                          format: double
+                          description: Minimum time it took to process request on
+                            backend.
+                        serviceTimeMax:
+                          type: number
+                          format: double
+                          description: Maximum time it took to process request on
+                            backend.
+                      description: Report data.
+                    x-ms-identifiers:
+                    - name
+                    - userId
+                    description: Page values.
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                  nextLink:
+                    type: string
+                    description: Next page link if any.
+                description: Paged Report records list representation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+      x-ms-odata: ./definitions.json#/definitions/ReportRecordContract
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byGeo
+  : get:
+      tags:
+      - Reports
+      operationId: Reports_ListByGeo
+      description: Lists report records by geography.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: $filter
+        in: query
+        required: true
+        description: '|   Field     |     Usage     |     Supported operators     |     Supported
+          functions     |</br>|-------------|-------------|-------------|-------------|</br>|
+          timestamp | filter | ge, le |     | </br>| country | select |     |     |
+          </br>| region | select |     |     | </br>| zip | select |     |     | </br>|
+          apiRegion | filter | eq |     | </br>| userId | filter | eq |     | </br>|
+          productId | filter | eq |     | </br>| subscriptionId | filter | eq |     |
+          </br>| apiId | filter | eq |     | </br>| operationId | filter | eq |     |
+          </br>| callCountSuccess | select |     |     | </br>| callCountBlocked |
+          select |     |     | </br>| callCountFailed | select |     |     | </br>|
+          callCountOther | select |     |     | </br>| bandwidth | select, orderBy
+          |     |     | </br>| cacheHitsCount | select |     |     | </br>| cacheMissCount
+          | select |     |     | </br>| apiTimeAvg | select |     |     | </br>| apiTimeMin
+          | select |     |     | </br>| apiTimeMax | select |     |     | </br>| serviceTimeAvg
+          | select |     |     | </br>| serviceTimeMin | select |     |     | </br>|
+          serviceTimeMax | select |     |     | </br>'
+        schema:
+          type: string
+      - name: $top
+        in: query
+        required: false
+        description: Number of records to return.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - name: $skip
+        in: query
+        required: false
+        description: Number of records to skip.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Lists a collection of Report record.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Name depending on report endpoint specifies
+                            product, API, operation or developer name.
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: 'Start of aggregation period. The date conforms
+                            to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                            by the ISO 8601 standard.
+
+                            '
+                        interval:
+                          type: string
+                          description: Length of aggregation period.  Interval must
+                            be multiple of 15 minutes and may not be zero. The value
+                            should be in ISO 8601 format (http://en.wikipedia.org/wiki/ISO_8601#Durations).
+                        country:
+                          type: string
+                          description: Country to which this record data is related.
+                        region:
+                          type: string
+                          description: Country region to which this record data is
+                            related.
+                        zip:
+                          type: string
+                          description: Zip code to which this record data is related.
+                        userId:
+                          readOnly: true
+                          type: string
+                          description: User identifier path. /users/{userId}
+                        productId:
+                          readOnly: true
+                          type: string
+                          description: Product identifier path. /products/{productId}
+                        apiId:
+                          type: string
+                          description: API identifier path. /apis/{apiId}
+                        operationId:
+                          type: string
+                          description: Operation identifier path. /apis/{apiId}/operations/{operationId}
+                        apiRegion:
+                          type: string
+                          description: API region identifier.
+                        subscriptionId:
+                          type: string
+                          description: Subscription identifier path. /subscriptions/{subscriptionId}
+                        callCountSuccess:
+                          type: integer
+                          format: int32
+                          description: Number of successful calls. This includes calls
+                            returning HttpStatusCode <= 301 and HttpStatusCode.NotModified
+                            and HttpStatusCode.TemporaryRedirect
+                        callCountBlocked:
+                          type: integer
+                          format: int32
+                          description: Number of calls blocked due to invalid credentials.
+                            This includes calls returning HttpStatusCode.Unauthorized
+                            and HttpStatusCode.Forbidden and HttpStatusCode.TooManyRequests
+                        callCountFailed:
+                          type: integer
+                          format: int32
+                          description: Number of calls failed due to gateway or backend
+                            errors. This includes calls returning HttpStatusCode.BadRequest(400)
+                            and any Code between HttpStatusCode.InternalServerError
+                            (500) and 600
+                        callCountOther:
+                          type: integer
+                          format: int32
+                          description: Number of other calls.
+                        callCountTotal:
+                          type: integer
+                          format: int32
+                          description: Total number of calls.
+                        bandwidth:
+                          type: integer
+                          format: int64
+                          description: Bandwidth consumed.
+                        cacheHitCount:
+                          type: integer
+                          format: int32
+                          description: Number of times when content was served from
+                            cache policy.
+                        cacheMissCount:
+                          type: integer
+                          format: int32
+                          description: Number of times content was fetched from backend.
+                        apiTimeAvg:
+                          type: number
+                          format: double
+                          description: Average time it took to process request.
+                        apiTimeMin:
+                          type: number
+                          format: double
+                          description: Minimum time it took to process request.
+                        apiTimeMax:
+                          type: number
+                          format: double
+                          description: Maximum time it took to process request.
+                        serviceTimeAvg:
+                          type: number
+                          format: double
+                          description: Average time it took to process request on
+                            backend.
+                        serviceTimeMin:
+                          type: number
+                          format: double
+                          description: Minimum time it took to process request on
+                            backend.
+                        serviceTimeMax:
+                          type: number
+                          format: double
+                          description: Maximum time it took to process request on
+                            backend.
+                      description: Report data.
+                    x-ms-identifiers:
+                    - name
+                    - userId
+                    description: Page values.
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                  nextLink:
+                    type: string
+                    description: Next page link if any.
+                description: Paged Report records list representation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+      x-ms-odata: ./definitions.json#/definitions/ReportRecordContract
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/bySubscription
+  : get:
+      tags:
+      - Reports
+      operationId: Reports_ListBySubscription
+      description: Lists report records by subscription.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: $filter
+        in: query
+        required: true
+        description: '|   Field     |     Usage     |     Supported operators     |     Supported
+          functions     |</br>|-------------|-------------|-------------|-------------|</br>|
+          timestamp | filter | ge, le |     | </br>| displayName | select, orderBy
+          |     |     | </br>| apiRegion | filter | eq |     | </br>| userId | select,
+          filter | eq |     | </br>| productId | select, filter | eq |     | </br>|
+          subscriptionId | select, filter | eq |     | </br>| callCountSuccess | select,
+          orderBy |     |     | </br>| callCountBlocked | select, orderBy |     |     |
+          </br>| callCountFailed | select, orderBy |     |     | </br>| callCountOther
+          | select, orderBy |     |     | </br>| callCountTotal | select, orderBy
+          |     |     | </br>| bandwidth | select, orderBy |     |     | </br>| cacheHitsCount
+          | select |     |     | </br>| cacheMissCount | select |     |     | </br>|
+          apiTimeAvg | select, orderBy |     |     | </br>| apiTimeMin | select |     |     |
+          </br>| apiTimeMax | select |     |     | </br>| serviceTimeAvg | select
+          |     |     | </br>| serviceTimeMin | select |     |     | </br>| serviceTimeMax
+          | select |     |     | </br>'
+        schema:
+          type: string
+      - name: $top
+        in: query
+        required: false
+        description: Number of records to return.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - name: $skip
+        in: query
+        required: false
+        description: Number of records to skip.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+      - name: $orderby
+        in: query
+        required: false
+        description: OData order by query option.
+        schema:
+          type: string
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Lists a collection of Report record.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Name depending on report endpoint specifies
+                            product, API, operation or developer name.
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: 'Start of aggregation period. The date conforms
+                            to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                            by the ISO 8601 standard.
+
+                            '
+                        interval:
+                          type: string
+                          description: Length of aggregation period.  Interval must
+                            be multiple of 15 minutes and may not be zero. The value
+                            should be in ISO 8601 format (http://en.wikipedia.org/wiki/ISO_8601#Durations).
+                        country:
+                          type: string
+                          description: Country to which this record data is related.
+                        region:
+                          type: string
+                          description: Country region to which this record data is
+                            related.
+                        zip:
+                          type: string
+                          description: Zip code to which this record data is related.
+                        userId:
+                          readOnly: true
+                          type: string
+                          description: User identifier path. /users/{userId}
+                        productId:
+                          readOnly: true
+                          type: string
+                          description: Product identifier path. /products/{productId}
+                        apiId:
+                          type: string
+                          description: API identifier path. /apis/{apiId}
+                        operationId:
+                          type: string
+                          description: Operation identifier path. /apis/{apiId}/operations/{operationId}
+                        apiRegion:
+                          type: string
+                          description: API region identifier.
+                        subscriptionId:
+                          type: string
+                          description: Subscription identifier path. /subscriptions/{subscriptionId}
+                        callCountSuccess:
+                          type: integer
+                          format: int32
+                          description: Number of successful calls. This includes calls
+                            returning HttpStatusCode <= 301 and HttpStatusCode.NotModified
+                            and HttpStatusCode.TemporaryRedirect
+                        callCountBlocked:
+                          type: integer
+                          format: int32
+                          description: Number of calls blocked due to invalid credentials.
+                            This includes calls returning HttpStatusCode.Unauthorized
+                            and HttpStatusCode.Forbidden and HttpStatusCode.TooManyRequests
+                        callCountFailed:
+                          type: integer
+                          format: int32
+                          description: Number of calls failed due to gateway or backend
+                            errors. This includes calls returning HttpStatusCode.BadRequest(400)
+                            and any Code between HttpStatusCode.InternalServerError
+                            (500) and 600
+                        callCountOther:
+                          type: integer
+                          format: int32
+                          description: Number of other calls.
+                        callCountTotal:
+                          type: integer
+                          format: int32
+                          description: Total number of calls.
+                        bandwidth:
+                          type: integer
+                          format: int64
+                          description: Bandwidth consumed.
+                        cacheHitCount:
+                          type: integer
+                          format: int32
+                          description: Number of times when content was served from
+                            cache policy.
+                        cacheMissCount:
+                          type: integer
+                          format: int32
+                          description: Number of times content was fetched from backend.
+                        apiTimeAvg:
+                          type: number
+                          format: double
+                          description: Average time it took to process request.
+                        apiTimeMin:
+                          type: number
+                          format: double
+                          description: Minimum time it took to process request.
+                        apiTimeMax:
+                          type: number
+                          format: double
+                          description: Maximum time it took to process request.
+                        serviceTimeAvg:
+                          type: number
+                          format: double
+                          description: Average time it took to process request on
+                            backend.
+                        serviceTimeMin:
+                          type: number
+                          format: double
+                          description: Minimum time it took to process request on
+                            backend.
+                        serviceTimeMax:
+                          type: number
+                          format: double
+                          description: Maximum time it took to process request on
+                            backend.
+                      description: Report data.
+                    x-ms-identifiers:
+                    - name
+                    - userId
+                    description: Page values.
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                  nextLink:
+                    type: string
+                    description: Next page link if any.
+                description: Paged Report records list representation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+      x-ms-odata: ./definitions.json#/definitions/ReportRecordContract
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byTime
+  : get:
+      tags:
+      - Reports
+      operationId: Reports_ListByTime
+      description: Lists report records by Time.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: $filter
+        in: query
+        required: true
+        description: '|   Field     |     Usage     |     Supported operators     |     Supported
+          functions     |</br>|-------------|-------------|-------------|-------------|</br>|
+          timestamp | filter, select | ge, le |     | </br>| interval | select |     |     |
+          </br>| apiRegion | filter | eq |     | </br>| userId | filter | eq |     |
+          </br>| productId | filter | eq |     | </br>| subscriptionId | filter |
+          eq |     | </br>| apiId | filter | eq |     | </br>| operationId | filter
+          | eq |     | </br>| callCountSuccess | select |     |     | </br>| callCountBlocked
+          | select |     |     | </br>| callCountFailed | select |     |     | </br>|
+          callCountOther | select |     |     | </br>| bandwidth | select, orderBy
+          |     |     | </br>| cacheHitsCount | select |     |     | </br>| cacheMissCount
+          | select |     |     | </br>| apiTimeAvg | select |     |     | </br>| apiTimeMin
+          | select |     |     | </br>| apiTimeMax | select |     |     | </br>| serviceTimeAvg
+          | select |     |     | </br>| serviceTimeMin | select |     |     | </br>|
+          serviceTimeMax | select |     |     | </br>'
+        schema:
+          type: string
+      - name: $top
+        in: query
+        required: false
+        description: Number of records to return.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - name: $skip
+        in: query
+        required: false
+        description: Number of records to skip.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+      - name: $orderby
+        in: query
+        required: false
+        description: OData order by query option.
+        schema:
+          type: string
+      - name: interval
+        in: query
+        required: true
+        description: 'By time interval. Interval must be multiple of 15 minutes and
+          may not be zero. The value should be in ISO  8601 format (http://en.wikipedia.org/wiki/ISO_8601#Durations).This
+          code can be used to convert TimeSpan to a valid interval string: XmlConvert.ToString(new
+          TimeSpan(hours, minutes, seconds)).'
+        schema:
+          type: string
+          format: duration
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Lists a collection of Report record.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Name depending on report endpoint specifies
+                            product, API, operation or developer name.
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: 'Start of aggregation period. The date conforms
+                            to the following format: `yyyy-MM-ddTHH:mm:ssZ` as specified
+                            by the ISO 8601 standard.
+
+                            '
+                        interval:
+                          type: string
+                          description: Length of aggregation period.  Interval must
+                            be multiple of 15 minutes and may not be zero. The value
+                            should be in ISO 8601 format (http://en.wikipedia.org/wiki/ISO_8601#Durations).
+                        country:
+                          type: string
+                          description: Country to which this record data is related.
+                        region:
+                          type: string
+                          description: Country region to which this record data is
+                            related.
+                        zip:
+                          type: string
+                          description: Zip code to which this record data is related.
+                        userId:
+                          readOnly: true
+                          type: string
+                          description: User identifier path. /users/{userId}
+                        productId:
+                          readOnly: true
+                          type: string
+                          description: Product identifier path. /products/{productId}
+                        apiId:
+                          type: string
+                          description: API identifier path. /apis/{apiId}
+                        operationId:
+                          type: string
+                          description: Operation identifier path. /apis/{apiId}/operations/{operationId}
+                        apiRegion:
+                          type: string
+                          description: API region identifier.
+                        subscriptionId:
+                          type: string
+                          description: Subscription identifier path. /subscriptions/{subscriptionId}
+                        callCountSuccess:
+                          type: integer
+                          format: int32
+                          description: Number of successful calls. This includes calls
+                            returning HttpStatusCode <= 301 and HttpStatusCode.NotModified
+                            and HttpStatusCode.TemporaryRedirect
+                        callCountBlocked:
+                          type: integer
+                          format: int32
+                          description: Number of calls blocked due to invalid credentials.
+                            This includes calls returning HttpStatusCode.Unauthorized
+                            and HttpStatusCode.Forbidden and HttpStatusCode.TooManyRequests
+                        callCountFailed:
+                          type: integer
+                          format: int32
+                          description: Number of calls failed due to gateway or backend
+                            errors. This includes calls returning HttpStatusCode.BadRequest(400)
+                            and any Code between HttpStatusCode.InternalServerError
+                            (500) and 600
+                        callCountOther:
+                          type: integer
+                          format: int32
+                          description: Number of other calls.
+                        callCountTotal:
+                          type: integer
+                          format: int32
+                          description: Total number of calls.
+                        bandwidth:
+                          type: integer
+                          format: int64
+                          description: Bandwidth consumed.
+                        cacheHitCount:
+                          type: integer
+                          format: int32
+                          description: Number of times when content was served from
+                            cache policy.
+                        cacheMissCount:
+                          type: integer
+                          format: int32
+                          description: Number of times content was fetched from backend.
+                        apiTimeAvg:
+                          type: number
+                          format: double
+                          description: Average time it took to process request.
+                        apiTimeMin:
+                          type: number
+                          format: double
+                          description: Minimum time it took to process request.
+                        apiTimeMax:
+                          type: number
+                          format: double
+                          description: Maximum time it took to process request.
+                        serviceTimeAvg:
+                          type: number
+                          format: double
+                          description: Average time it took to process request on
+                            backend.
+                        serviceTimeMin:
+                          type: number
+                          format: double
+                          description: Minimum time it took to process request on
+                            backend.
+                        serviceTimeMax:
+                          type: number
+                          format: double
+                          description: Maximum time it took to process request on
+                            backend.
+                      description: Report data.
+                    x-ms-identifiers:
+                    - name
+                    - userId
+                    description: Page values.
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                  nextLink:
+                    type: string
+                    description: Next page link if any.
+                description: Paged Report records list representation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+      x-ms-odata: ./definitions.json#/definitions/ReportRecordContract
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/reports/byRequest
+  : get:
+      tags:
+      - Reports
+      operationId: Reports_ListByRequest
+      description: Lists report records by Request.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: $filter
+        in: query
+        required: true
+        description: '|   Field     |     Usage     |     Supported operators     |     Supported
+          functions     |</br>|-------------|-------------|-------------|-------------|</br>|
+          timestamp | filter | ge, le |     | </br>| apiId | filter | eq |     | </br>|
+          operationId | filter | eq |     | </br>| productId | filter | eq |     |
+          </br>| userId | filter | eq |     | </br>| apiRegion | filter | eq |     |
+          </br>| subscriptionId | filter | eq |     | </br>'
+        schema:
+          type: string
+      - name: $top
+        in: query
+        required: false
+        description: Number of records to return.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - name: $skip
+        in: query
+        required: false
+        description: Number of records to skip.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Lists a collection of Report record.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        apiId:
+                          type: string
+                          description: API identifier path. /apis/{apiId}
+                        operationId:
+                          type: string
+                          description: Operation identifier path. /apis/{apiId}/operations/{operationId}
+                        productId:
+                          readOnly: true
+                          type: string
+                          description: Product identifier path. /products/{productId}
+                        userId:
+                          readOnly: true
+                          type: string
+                          description: User identifier path. /users/{userId}
+                        method:
+                          type: string
+                          description: The HTTP method associated with this request..
+                        url:
+                          type: string
+                          description: The full URL associated with this request.
+                        ipAddress:
+                          type: string
+                          description: The client IP address associated with this
+                            request.
+                        backendResponseCode:
+                          type: string
+                          description: The HTTP status code received by the gateway
+                            as a result of forwarding this request to the backend.
+                        responseCode:
+                          type: integer
+                          format: int32
+                          description: The HTTP status code returned by the gateway.
+                        responseSize:
+                          type: integer
+                          format: int32
+                          description: The size of the response returned by the gateway.
+                        timestamp:
+                          type: string
+                          format: date-time
+                          description: The date and time when this request was received
+                            by the gateway in ISO 8601 format.
+                        cache:
+                          type: string
+                          description: Specifies if response cache was involved in
+                            generating the response. If the value is none, the cache
+                            was not used. If the value is hit, cached response was
+                            returned. If the value is miss, the cache was used but
+                            lookup resulted in a miss and request was fulfilled by
+                            the backend.
+                        apiTime:
+                          type: number
+                          format: double
+                          description: The total time it took to process this request.
+                        serviceTime:
+                          type: number
+                          format: double
+                          description: he time it took to forward this request to
+                            the backend and get the response back.
+                        apiRegion:
+                          type: string
+                          description: Azure region where the gateway that processed
+                            this request is located.
+                        subscriptionId:
+                          type: string
+                          description: Subscription identifier path. /subscriptions/{subscriptionId}
+                        requestId:
+                          type: string
+                          description: Request Identifier.
+                        requestSize:
+                          type: integer
+                          format: int32
+                          description: The size of this request..
+                      description: Request Report data.
+                    x-ms-identifiers:
+                    - url
+                    description: Page values.
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                description: Paged Report records list representation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable: {}
+      x-ms-odata: ./definitions.json#/definitions/RequestReportRecordContract
+components:
+  parameters:
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      description: The name of the resource group. The name is case insensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    ServiceNameParameter:
+      name: serviceName
+      in: path
+      required: true
+      description: The name of the API Management service.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 50
+        pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+    TopQueryParameter:
+      name: $top
+      in: query
+      required: false
+      description: Number of records to return.
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+    SkipQueryParameter:
+      name: $skip
+      in: query
+      required: false
+      description: Number of records to skip.
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription. The value must be an UUID.
+      required: true
+      schema:
+        type: string
+        format: uuid
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+    ReportRecordContract:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name depending on report endpoint specifies product, API, operation
+            or developer name.
+        timestamp:
+          type: string
+          format: date-time
+          description: 'Start of aggregation period. The date conforms to the following
+            format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO 8601 standard.
+
+            '
+        interval:
+          type: string
+          description: Length of aggregation period.  Interval must be multiple of
+            15 minutes and may not be zero. The value should be in ISO 8601 format
+            (http://en.wikipedia.org/wiki/ISO_8601#Durations).
+        country:
+          type: string
+          description: Country to which this record data is related.
+        region:
+          type: string
+          description: Country region to which this record data is related.
+        zip:
+          type: string
+          description: Zip code to which this record data is related.
+        userId:
+          readOnly: true
+          type: string
+          description: User identifier path. /users/{userId}
+        productId:
+          readOnly: true
+          type: string
+          description: Product identifier path. /products/{productId}
+        apiId:
+          type: string
+          description: API identifier path. /apis/{apiId}
+        operationId:
+          type: string
+          description: Operation identifier path. /apis/{apiId}/operations/{operationId}
+        apiRegion:
+          type: string
+          description: API region identifier.
+        subscriptionId:
+          type: string
+          description: Subscription identifier path. /subscriptions/{subscriptionId}
+        callCountSuccess:
+          type: integer
+          format: int32
+          description: Number of successful calls. This includes calls returning HttpStatusCode
+            <= 301 and HttpStatusCode.NotModified and HttpStatusCode.TemporaryRedirect
+        callCountBlocked:
+          type: integer
+          format: int32
+          description: Number of calls blocked due to invalid credentials. This includes
+            calls returning HttpStatusCode.Unauthorized and HttpStatusCode.Forbidden
+            and HttpStatusCode.TooManyRequests
+        callCountFailed:
+          type: integer
+          format: int32
+          description: Number of calls failed due to gateway or backend errors. This
+            includes calls returning HttpStatusCode.BadRequest(400) and any Code between
+            HttpStatusCode.InternalServerError (500) and 600
+        callCountOther:
+          type: integer
+          format: int32
+          description: Number of other calls.
+        callCountTotal:
+          type: integer
+          format: int32
+          description: Total number of calls.
+        bandwidth:
+          type: integer
+          format: int64
+          description: Bandwidth consumed.
+        cacheHitCount:
+          type: integer
+          format: int32
+          description: Number of times when content was served from cache policy.
+        cacheMissCount:
+          type: integer
+          format: int32
+          description: Number of times content was fetched from backend.
+        apiTimeAvg:
+          type: number
+          format: double
+          description: Average time it took to process request.
+        apiTimeMin:
+          type: number
+          format: double
+          description: Minimum time it took to process request.
+        apiTimeMax:
+          type: number
+          format: double
+          description: Maximum time it took to process request.
+        serviceTimeAvg:
+          type: number
+          format: double
+          description: Average time it took to process request on backend.
+        serviceTimeMin:
+          type: number
+          format: double
+          description: Minimum time it took to process request on backend.
+        serviceTimeMax:
+          type: number
+          format: double
+          description: Maximum time it took to process request on backend.
+      description: Report data.
+    ReportCollection:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: Name depending on report endpoint specifies product,
+                  API, operation or developer name.
+              timestamp:
+                type: string
+                format: date-time
+                description: 'Start of aggregation period. The date conforms to the
+                  following format: `yyyy-MM-ddTHH:mm:ssZ` as specified by the ISO
+                  8601 standard.
+
+                  '
+              interval:
+                type: string
+                description: Length of aggregation period.  Interval must be multiple
+                  of 15 minutes and may not be zero. The value should be in ISO 8601
+                  format (http://en.wikipedia.org/wiki/ISO_8601#Durations).
+              country:
+                type: string
+                description: Country to which this record data is related.
+              region:
+                type: string
+                description: Country region to which this record data is related.
+              zip:
+                type: string
+                description: Zip code to which this record data is related.
+              userId:
+                readOnly: true
+                type: string
+                description: User identifier path. /users/{userId}
+              productId:
+                readOnly: true
+                type: string
+                description: Product identifier path. /products/{productId}
+              apiId:
+                type: string
+                description: API identifier path. /apis/{apiId}
+              operationId:
+                type: string
+                description: Operation identifier path. /apis/{apiId}/operations/{operationId}
+              apiRegion:
+                type: string
+                description: API region identifier.
+              subscriptionId:
+                type: string
+                description: Subscription identifier path. /subscriptions/{subscriptionId}
+              callCountSuccess:
+                type: integer
+                format: int32
+                description: Number of successful calls. This includes calls returning
+                  HttpStatusCode <= 301 and HttpStatusCode.NotModified and HttpStatusCode.TemporaryRedirect
+              callCountBlocked:
+                type: integer
+                format: int32
+                description: Number of calls blocked due to invalid credentials. This
+                  includes calls returning HttpStatusCode.Unauthorized and HttpStatusCode.Forbidden
+                  and HttpStatusCode.TooManyRequests
+              callCountFailed:
+                type: integer
+                format: int32
+                description: Number of calls failed due to gateway or backend errors.
+                  This includes calls returning HttpStatusCode.BadRequest(400) and
+                  any Code between HttpStatusCode.InternalServerError (500) and 600
+              callCountOther:
+                type: integer
+                format: int32
+                description: Number of other calls.
+              callCountTotal:
+                type: integer
+                format: int32
+                description: Total number of calls.
+              bandwidth:
+                type: integer
+                format: int64
+                description: Bandwidth consumed.
+              cacheHitCount:
+                type: integer
+                format: int32
+                description: Number of times when content was served from cache policy.
+              cacheMissCount:
+                type: integer
+                format: int32
+                description: Number of times content was fetched from backend.
+              apiTimeAvg:
+                type: number
+                format: double
+                description: Average time it took to process request.
+              apiTimeMin:
+                type: number
+                format: double
+                description: Minimum time it took to process request.
+              apiTimeMax:
+                type: number
+                format: double
+                description: Maximum time it took to process request.
+              serviceTimeAvg:
+                type: number
+                format: double
+                description: Average time it took to process request on backend.
+              serviceTimeMin:
+                type: number
+                format: double
+                description: Minimum time it took to process request on backend.
+              serviceTimeMax:
+                type: number
+                format: double
+                description: Maximum time it took to process request on backend.
+            description: Report data.
+          x-ms-identifiers:
+          - name
+          - userId
+          description: Page values.
+        count:
+          type: integer
+          format: int64
+          description: Total record count number across all pages.
+        nextLink:
+          type: string
+          description: Next page link if any.
+      description: Paged Report records list representation.
+    RequestReportRecordContract:
+      type: object
+      properties:
+        apiId:
+          type: string
+          description: API identifier path. /apis/{apiId}
+        operationId:
+          type: string
+          description: Operation identifier path. /apis/{apiId}/operations/{operationId}
+        productId:
+          readOnly: true
+          type: string
+          description: Product identifier path. /products/{productId}
+        userId:
+          readOnly: true
+          type: string
+          description: User identifier path. /users/{userId}
+        method:
+          type: string
+          description: The HTTP method associated with this request..
+        url:
+          type: string
+          description: The full URL associated with this request.
+        ipAddress:
+          type: string
+          description: The client IP address associated with this request.
+        backendResponseCode:
+          type: string
+          description: The HTTP status code received by the gateway as a result of
+            forwarding this request to the backend.
+        responseCode:
+          type: integer
+          format: int32
+          description: The HTTP status code returned by the gateway.
+        responseSize:
+          type: integer
+          format: int32
+          description: The size of the response returned by the gateway.
+        timestamp:
+          type: string
+          format: date-time
+          description: The date and time when this request was received by the gateway
+            in ISO 8601 format.
+        cache:
+          type: string
+          description: Specifies if response cache was involved in generating the
+            response. If the value is none, the cache was not used. If the value is
+            hit, cached response was returned. If the value is miss, the cache was
+            used but lookup resulted in a miss and request was fulfilled by the backend.
+        apiTime:
+          type: number
+          format: double
+          description: The total time it took to process this request.
+        serviceTime:
+          type: number
+          format: double
+          description: he time it took to forward this request to the backend and
+            get the response back.
+        apiRegion:
+          type: string
+          description: Azure region where the gateway that processed this request
+            is located.
+        subscriptionId:
+          type: string
+          description: Subscription identifier path. /subscriptions/{subscriptionId}
+        requestId:
+          type: string
+          description: Request Identifier.
+        requestSize:
+          type: integer
+          format: int32
+          description: The size of this request..
+      description: Request Report data.
+    RequestReportCollection:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              apiId:
+                type: string
+                description: API identifier path. /apis/{apiId}
+              operationId:
+                type: string
+                description: Operation identifier path. /apis/{apiId}/operations/{operationId}
+              productId:
+                readOnly: true
+                type: string
+                description: Product identifier path. /products/{productId}
+              userId:
+                readOnly: true
+                type: string
+                description: User identifier path. /users/{userId}
+              method:
+                type: string
+                description: The HTTP method associated with this request..
+              url:
+                type: string
+                description: The full URL associated with this request.
+              ipAddress:
+                type: string
+                description: The client IP address associated with this request.
+              backendResponseCode:
+                type: string
+                description: The HTTP status code received by the gateway as a result
+                  of forwarding this request to the backend.
+              responseCode:
+                type: integer
+                format: int32
+                description: The HTTP status code returned by the gateway.
+              responseSize:
+                type: integer
+                format: int32
+                description: The size of the response returned by the gateway.
+              timestamp:
+                type: string
+                format: date-time
+                description: The date and time when this request was received by the
+                  gateway in ISO 8601 format.
+              cache:
+                type: string
+                description: Specifies if response cache was involved in generating
+                  the response. If the value is none, the cache was not used. If the
+                  value is hit, cached response was returned. If the value is miss,
+                  the cache was used but lookup resulted in a miss and request was
+                  fulfilled by the backend.
+              apiTime:
+                type: number
+                format: double
+                description: The total time it took to process this request.
+              serviceTime:
+                type: number
+                format: double
+                description: he time it took to forward this request to the backend
+                  and get the response back.
+              apiRegion:
+                type: string
+                description: Azure region where the gateway that processed this request
+                  is located.
+              subscriptionId:
+                type: string
+                description: Subscription identifier path. /subscriptions/{subscriptionId}
+              requestId:
+                type: string
+                description: Request Identifier.
+              requestSize:
+                type: integer
+                format: int32
+                description: The size of this request..
+            description: Request Report data.
+          x-ms-identifiers:
+          - url
+          description: Page values.
+        count:
+          type: integer
+          format: int64
+          description: Total record count number across all pages.
+      description: Paged Report records list representation.

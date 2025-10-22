@@ -1,0 +1,2557 @@
+openapi: 3.0.0
+info:
+  title: NetworkManagerEffectiveConfiguration
+  description: The Microsoft Azure Network Manager effective configuration API provides
+    a RESTful set of web services that interact with Microsoft Azure Networks service
+    to manage your network resources. The API has entities that capture the relationship
+    between an end user and the Microsoft Azure Networks service.
+  version: 2024-07-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/listNetworkManagerEffectiveConnectivityConfigurations
+  : parameters:
+    - name: subscriptionId
+      in: path
+      required: true
+      description: The subscription credentials which uniquely identify the Microsoft
+        Azure subscription. The subscription ID forms part of the URI for every service
+        call.
+      schema:
+        type: string
+    - name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    - name: virtualNetworkName
+      in: path
+      required: true
+      description: The name of the virtual network.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    - name: api-version
+      in: query
+      required: true
+      description: Client API version.
+      schema:
+        type: string
+    - name: $top
+      description: An optional query parameter which specifies the maximum number
+        of records to be returned by the server.
+      in: query
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 20
+    post:
+      tags:
+      - NetworkManagerEffectiveConnectivityConfiguration
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                skipToken:
+                  description: When present, the value can be passed to a subsequent
+                    query call (together with the same query and scopes used in the
+                    current request) to retrieve the next page of data.
+                  type: string
+              description: Query Request Options
+        description: Parameters supplied to list correct page.
+        required: true
+      operationId: ListNetworkManagerEffectiveConnectivityConfigurations
+      description: List all effective connectivity configurations applied on a virtual
+        network.
+      responses:
+        '200':
+          description: OK - Returns information about the configurations.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Connectivity configuration ID.
+                        properties:
+                          x-ms-client-flatten: true
+                          description: Properties of a network manager connectivity
+                            configuration
+                          type: object
+                          properties:
+                            description:
+                              type: string
+                              description: A description of the connectivity configuration.
+                            connectivityTopology:
+                              type: string
+                              enum:
+                              - HubAndSpoke
+                              - Mesh
+                              x-ms-enum:
+                                name: ConnectivityTopology
+                                modelAsString: true
+                              description: Connectivity topology type.
+                            hubs:
+                              type: array
+                              x-ms-identifiers:
+                              - resourceId
+                              items:
+                                type: object
+                                properties:
+                                  resourceId:
+                                    type: string
+                                    description: Resource Id.
+                                  resourceType:
+                                    type: string
+                                    description: Resource Type.
+                                description: Hub Item.
+                              description: List of hubItems
+                            isGlobal:
+                              type: string
+                              enum:
+                              - 'False'
+                              - 'True'
+                              x-ms-enum:
+                                name: IsGlobal
+                                modelAsString: true
+                              description: Flag if global mesh is supported.
+                            connectivityCapabilities:
+                              type: object
+                              description: Collection of additional settings to enhance
+                                specific topology behaviors of the connectivity configuration
+                                resource.
+                              properties:
+                                connectedGroupPrivateEndpointsScale:
+                                  type: string
+                                  enum:
+                                  - Standard
+                                  - HighScale
+                                  x-ms-enum:
+                                    name: ConnectedGroupPrivateEndpointsScale
+                                    modelAsString: true
+                                    values:
+                                    - value: Standard
+                                      description: Default. Allows for up to 2K private
+                                        endpoints in the connected group.
+                                    - value: HighScale
+                                      description: Allows for up to 20K private endpoints
+                                        in the connected group.
+                                  description: Option indicating the scale of private
+                                    endpoints allowed in the connected group of the
+                                    connectivity configuration.
+                                  default: Standard
+                                connectedGroupAddressOverlap:
+                                  type: string
+                                  enum:
+                                  - Allowed
+                                  - Disallowed
+                                  x-ms-enum:
+                                    name: ConnectedGroupAddressOverlap
+                                    modelAsString: true
+                                    values:
+                                    - value: Allowed
+                                      description: Default. Allows connected group
+                                        members to have overlapping IP address space.
+                                    - value: Disallowed
+                                      description: Strictly disallows connected group
+                                        members from having overlapping IP address
+                                        space. Prevents the addition of a virtual
+                                        network with overlapping address to the connected
+                                        group, blocks peering between a virtual network
+                                        and a connected group member if any connected
+                                        group member has an overlapping range, and
+                                        restricts address space modifications that
+                                        would introduce overlap.
+                                  description: Behavior to handle overlapped IP address
+                                    space among members of the connected group of
+                                    the connectivity configuration.
+                                  default: Allowed
+                                peeringEnforcement:
+                                  type: string
+                                  enum:
+                                  - Unenforced
+                                  - Enforced
+                                  x-ms-enum:
+                                    name: PeeringEnforcement
+                                    modelAsString: true
+                                    values:
+                                    - value: Unenforced
+                                      description: Default. Peerings created by the
+                                        connectivity configuration may be modified
+                                        or deleted outside of the network manager.
+                                    - value: Enforced
+                                      description: Peerings created by the connectivity
+                                        configuration will not be modifiable or deletable
+                                        outside of the network manager.
+                                  description: Option indicating enforcement of peerings
+                                    created by the connectivity configuration.
+                                  default: Unenforced
+                              required:
+                              - connectedGroupPrivateEndpointsScale
+                              - connectedGroupAddressOverlap
+                              - peeringEnforcement
+                            appliesToGroups:
+                              type: array
+                              x-ms-identifiers:
+                              - networkGroupId
+                              items:
+                                type: object
+                                properties:
+                                  networkGroupId:
+                                    type: string
+                                    description: Network group Id.
+                                  useHubGateway:
+                                    type: string
+                                    enum:
+                                    - 'False'
+                                    - 'True'
+                                    x-ms-enum:
+                                      name: UseHubGateway
+                                      modelAsString: true
+                                    description: Flag if need to use hub gateway.
+                                  isGlobal:
+                                    type: string
+                                    enum:
+                                    - 'False'
+                                    - 'True'
+                                    x-ms-enum:
+                                      name: IsGlobal
+                                      modelAsString: true
+                                    description: Flag if global is supported.
+                                  groupConnectivity:
+                                    type: string
+                                    enum:
+                                    - None
+                                    - DirectlyConnected
+                                    x-ms-enum:
+                                      name: GroupConnectivity
+                                      modelAsString: true
+                                    description: Group connectivity type.
+                                description: Connectivity group item.
+                                required:
+                                - networkGroupId
+                                - groupConnectivity
+                              description: Groups for configuration
+                            provisioningState:
+                              readOnly: true
+                              description: The provisioning state of the connectivity
+                                configuration resource.
+                              type: string
+                              enum:
+                              - Succeeded
+                              - Updating
+                              - Deleting
+                              - Failed
+                              x-ms-enum:
+                                name: ProvisioningState
+                                modelAsString: true
+                            deleteExistingPeering:
+                              type: string
+                              enum:
+                              - 'False'
+                              - 'True'
+                              x-ms-enum:
+                                name: DeleteExistingPeering
+                                modelAsString: true
+                              description: Flag if need to remove current existing
+                                peerings.
+                            resourceGuid:
+                              type: string
+                              readOnly: true
+                              description: Unique identifier for this resource.
+                          required:
+                          - connectivityTopology
+                          - appliesToGroups
+                        configurationGroups:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: Network group ID.
+                              properties:
+                                x-ms-client-flatten: true
+                                description: The network configuration group properties
+                                type: object
+                                properties:
+                                  description:
+                                    type: string
+                                    description: A description of the network group.
+                                  memberType:
+                                    description: The type of the group member.
+                                    type: string
+                                    enum:
+                                    - VirtualNetwork
+                                    - Subnet
+                                    x-ms-enum:
+                                      name: GroupMemberType
+                                      modelAsString: true
+                                  provisioningState:
+                                    readOnly: true
+                                    description: The provisioning state of the scope
+                                      assignment resource.
+                                    type: string
+                                    enum:
+                                    - Succeeded
+                                    - Updating
+                                    - Deleting
+                                    - Failed
+                                    x-ms-enum:
+                                      name: ProvisioningState
+                                      modelAsString: true
+                                  resourceGuid:
+                                    type: string
+                                    readOnly: true
+                                    description: Unique identifier for this resource.
+                            description: The network configuration group resource
+                          description: Effective configuration groups.
+                      description: The network manager effective connectivity configuration
+                    description: Gets a page of NetworkManagerEffectiveConnectivityConfiguration
+                  skipToken:
+                    description: When present, the value can be passed to a subsequent
+                      query call (together with the same query and scopes used in
+                      the current request) to retrieve the next page of data.
+                    type: string
+                description: Result of the request to list networkManagerEffectiveConnectivityConfiguration.
+                  It contains a list of groups and a skiptoken to get the next set
+                  of results.
+        default:
+          description: Resource Provider error response describing why the operation
+            failed.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    description: Cloud error body.
+                    x-ms-external: true
+                    properties:
+                      code:
+                        type: string
+                        description: An identifier for the error. Codes are invariant
+                          and are intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: A message describing the error, intended to be
+                          suitable for display in a user interface.
+                      target:
+                        type: string
+                        description: The target of the particular error. For example,
+                          the name of the property in error.
+                      details:
+                        type: array
+                        items:
+                          x-ms-external: true
+                          properties:
+                            code:
+                              type: string
+                              description: An identifier for the error. Codes are
+                                invariant and are intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: A message describing the error, intended
+                                to be suitable for display in a user interface.
+                            target:
+                              type: string
+                              description: The target of the particular error. For
+                                example, the name of the property in error.
+                            details:
+                              type: array
+                              items:
+                                x-ms-external: true
+                                properties:
+                                  code:
+                                    type: string
+                                    description: An identifier for the error. Codes
+                                      are invariant and are intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: A message describing the error, intended
+                                      to be suitable for display in a user interface.
+                                  target:
+                                    type: string
+                                    description: The target of the particular error.
+                                      For example, the name of the property in error.
+                                description: An error response from the service.
+                              description: A list of additional details about the
+                                error.
+                          description: An error response from the service.
+                        description: A list of additional details about the error.
+                description: An error response from the service.
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{virtualNetworkName}/listNetworkManagerEffectiveSecurityAdminRules
+  : parameters:
+    - name: subscriptionId
+      in: path
+      required: true
+      description: The subscription credentials which uniquely identify the Microsoft
+        Azure subscription. The subscription ID forms part of the URI for every service
+        call.
+      schema:
+        type: string
+    - name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    - name: virtualNetworkName
+      in: path
+      required: true
+      description: The name of the virtual network.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    - name: api-version
+      in: query
+      required: true
+      description: Client API version.
+      schema:
+        type: string
+    - name: $top
+      description: An optional query parameter which specifies the maximum number
+        of records to be returned by the server.
+      in: query
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 20
+    post:
+      tags:
+      - NetworkManagerEffectiveSecurityAdminRules
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                skipToken:
+                  description: When present, the value can be passed to a subsequent
+                    query call (together with the same query and scopes used in the
+                    current request) to retrieve the next page of data.
+                  type: string
+              description: Query Request Options
+        description: Parameters supplied to list correct page.
+        required: true
+      operationId: ListNetworkManagerEffectiveSecurityAdminRules
+      description: List all effective security admin rules applied on a virtual network.
+      responses:
+        '200':
+          description: OK - Returns information about the configurations.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Resource ID.
+                        configurationDescription:
+                          type: string
+                          description: A description of the security admin configuration.
+                        ruleCollectionDescription:
+                          type: string
+                          description: A description of the rule collection.
+                        ruleCollectionAppliesToGroups:
+                          type: array
+                          x-ms-identifiers:
+                          - networkGroupId
+                          items:
+                            type: object
+                            properties:
+                              networkGroupId:
+                                type: string
+                                description: Network manager group Id.
+                            required:
+                            - networkGroupId
+                            description: Network manager security group item.
+                          description: Groups for rule collection
+                        ruleGroups:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: Network group ID.
+                              properties:
+                                x-ms-client-flatten: true
+                                description: The network configuration group properties
+                                type: object
+                                properties:
+                                  description:
+                                    type: string
+                                    description: A description of the network group.
+                                  memberType:
+                                    description: The type of the group member.
+                                    type: string
+                                    enum:
+                                    - VirtualNetwork
+                                    - Subnet
+                                    x-ms-enum:
+                                      name: GroupMemberType
+                                      modelAsString: true
+                                  provisioningState:
+                                    readOnly: true
+                                    description: The provisioning state of the scope
+                                      assignment resource.
+                                    type: string
+                                    enum:
+                                    - Succeeded
+                                    - Updating
+                                    - Deleting
+                                    - Failed
+                                    x-ms-enum:
+                                      name: ProvisioningState
+                                      modelAsString: true
+                                  resourceGuid:
+                                    type: string
+                                    readOnly: true
+                                    description: Unique identifier for this resource.
+                            description: The network configuration group resource
+                          description: Effective configuration groups.
+                        kind:
+                          type: string
+                          description: Whether the rule is custom or default.
+                          enum:
+                          - Custom
+                          - Default
+                          x-ms-enum:
+                            name: EffectiveAdminRuleKind
+                            modelAsString: true
+                      required:
+                      - kind
+                      discriminator:
+                        propertyName: kind
+                      description: Network base admin rule.
+                    description: Gets a page of NetworkManagerEffectiveSecurityAdminRules
+                  skipToken:
+                    description: When present, the value can be passed to a subsequent
+                      query call (together with the same query and scopes used in
+                      the current request) to retrieve the next page of data.
+                    type: string
+                description: Result of the request to list networkManagerEffectiveSecurityAdminRules.
+                  It contains a list of groups and a skiptoken to get the next set
+                  of results.
+        default:
+          description: Resource Provider error response describing why the operation
+            failed.
+          content:
+            application/json:
+              schema:
+                x-ms-external: true
+                properties:
+                  error:
+                    description: Cloud error body.
+                    x-ms-external: true
+                    properties:
+                      code:
+                        type: string
+                        description: An identifier for the error. Codes are invariant
+                          and are intended to be consumed programmatically.
+                      message:
+                        type: string
+                        description: A message describing the error, intended to be
+                          suitable for display in a user interface.
+                      target:
+                        type: string
+                        description: The target of the particular error. For example,
+                          the name of the property in error.
+                      details:
+                        type: array
+                        items:
+                          x-ms-external: true
+                          properties:
+                            code:
+                              type: string
+                              description: An identifier for the error. Codes are
+                                invariant and are intended to be consumed programmatically.
+                            message:
+                              type: string
+                              description: A message describing the error, intended
+                                to be suitable for display in a user interface.
+                            target:
+                              type: string
+                              description: The target of the particular error. For
+                                example, the name of the property in error.
+                            details:
+                              type: array
+                              items:
+                                x-ms-external: true
+                                properties:
+                                  code:
+                                    type: string
+                                    description: An identifier for the error. Codes
+                                      are invariant and are intended to be consumed
+                                      programmatically.
+                                  message:
+                                    type: string
+                                    description: A message describing the error, intended
+                                      to be suitable for display in a user interface.
+                                  target:
+                                    type: string
+                                    description: The target of the particular error.
+                                      For example, the name of the property in error.
+                                description: An error response from the service.
+                              description: A list of additional details about the
+                                error.
+                          description: An error response from the service.
+                        description: A list of additional details about the error.
+                description: An error response from the service.
+components:
+  parameters:
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    VirtualNetworkNameParameter:
+      name: virtualNetworkName
+      in: path
+      required: true
+      description: The name of the virtual network.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    ListTopParameter:
+      name: $top
+      description: An optional query parameter which specifies the maximum number
+        of records to be returned by the server.
+      in: query
+      required: false
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 20
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      required: true
+      description: The subscription credentials which uniquely identify the Microsoft
+        Azure subscription. The subscription ID forms part of the URI for every service
+        call.
+      schema:
+        type: string
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: Client API version.
+      schema:
+        type: string
+  requestBodies:
+    ListNetworkManagerEffectiveConnectivityConfigurationsParameters:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              skipToken:
+                description: When present, the value can be passed to a subsequent
+                  query call (together with the same query and scopes used in the
+                  current request) to retrieve the next page of data.
+                type: string
+            description: Query Request Options
+      description: Parameters supplied to list correct page.
+      required: true
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    NetworkManagerEffectiveConnectivityConfigurationListResult:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Connectivity configuration ID.
+              properties:
+                x-ms-client-flatten: true
+                description: Properties of a network manager connectivity configuration
+                type: object
+                properties:
+                  description:
+                    type: string
+                    description: A description of the connectivity configuration.
+                  connectivityTopology:
+                    type: string
+                    enum:
+                    - HubAndSpoke
+                    - Mesh
+                    x-ms-enum:
+                      name: ConnectivityTopology
+                      modelAsString: true
+                    description: Connectivity topology type.
+                  hubs:
+                    type: array
+                    x-ms-identifiers:
+                    - resourceId
+                    items:
+                      type: object
+                      properties:
+                        resourceId:
+                          type: string
+                          description: Resource Id.
+                        resourceType:
+                          type: string
+                          description: Resource Type.
+                      description: Hub Item.
+                    description: List of hubItems
+                  isGlobal:
+                    type: string
+                    enum:
+                    - 'False'
+                    - 'True'
+                    x-ms-enum:
+                      name: IsGlobal
+                      modelAsString: true
+                    description: Flag if global mesh is supported.
+                  connectivityCapabilities:
+                    type: object
+                    description: Collection of additional settings to enhance specific
+                      topology behaviors of the connectivity configuration resource.
+                    properties:
+                      connectedGroupPrivateEndpointsScale:
+                        type: string
+                        enum:
+                        - Standard
+                        - HighScale
+                        x-ms-enum:
+                          name: ConnectedGroupPrivateEndpointsScale
+                          modelAsString: true
+                          values:
+                          - value: Standard
+                            description: Default. Allows for up to 2K private endpoints
+                              in the connected group.
+                          - value: HighScale
+                            description: Allows for up to 20K private endpoints in
+                              the connected group.
+                        description: Option indicating the scale of private endpoints
+                          allowed in the connected group of the connectivity configuration.
+                        default: Standard
+                      connectedGroupAddressOverlap:
+                        type: string
+                        enum:
+                        - Allowed
+                        - Disallowed
+                        x-ms-enum:
+                          name: ConnectedGroupAddressOverlap
+                          modelAsString: true
+                          values:
+                          - value: Allowed
+                            description: Default. Allows connected group members to
+                              have overlapping IP address space.
+                          - value: Disallowed
+                            description: Strictly disallows connected group members
+                              from having overlapping IP address space. Prevents the
+                              addition of a virtual network with overlapping address
+                              to the connected group, blocks peering between a virtual
+                              network and a connected group member if any connected
+                              group member has an overlapping range, and restricts
+                              address space modifications that would introduce overlap.
+                        description: Behavior to handle overlapped IP address space
+                          among members of the connected group of the connectivity
+                          configuration.
+                        default: Allowed
+                      peeringEnforcement:
+                        type: string
+                        enum:
+                        - Unenforced
+                        - Enforced
+                        x-ms-enum:
+                          name: PeeringEnforcement
+                          modelAsString: true
+                          values:
+                          - value: Unenforced
+                            description: Default. Peerings created by the connectivity
+                              configuration may be modified or deleted outside of
+                              the network manager.
+                          - value: Enforced
+                            description: Peerings created by the connectivity configuration
+                              will not be modifiable or deletable outside of the network
+                              manager.
+                        description: Option indicating enforcement of peerings created
+                          by the connectivity configuration.
+                        default: Unenforced
+                    required:
+                    - connectedGroupPrivateEndpointsScale
+                    - connectedGroupAddressOverlap
+                    - peeringEnforcement
+                  appliesToGroups:
+                    type: array
+                    x-ms-identifiers:
+                    - networkGroupId
+                    items:
+                      type: object
+                      properties:
+                        networkGroupId:
+                          type: string
+                          description: Network group Id.
+                        useHubGateway:
+                          type: string
+                          enum:
+                          - 'False'
+                          - 'True'
+                          x-ms-enum:
+                            name: UseHubGateway
+                            modelAsString: true
+                          description: Flag if need to use hub gateway.
+                        isGlobal:
+                          type: string
+                          enum:
+                          - 'False'
+                          - 'True'
+                          x-ms-enum:
+                            name: IsGlobal
+                            modelAsString: true
+                          description: Flag if global is supported.
+                        groupConnectivity:
+                          type: string
+                          enum:
+                          - None
+                          - DirectlyConnected
+                          x-ms-enum:
+                            name: GroupConnectivity
+                            modelAsString: true
+                          description: Group connectivity type.
+                      description: Connectivity group item.
+                      required:
+                      - networkGroupId
+                      - groupConnectivity
+                    description: Groups for configuration
+                  provisioningState:
+                    readOnly: true
+                    description: The provisioning state of the connectivity configuration
+                      resource.
+                    type: string
+                    enum:
+                    - Succeeded
+                    - Updating
+                    - Deleting
+                    - Failed
+                    x-ms-enum:
+                      name: ProvisioningState
+                      modelAsString: true
+                  deleteExistingPeering:
+                    type: string
+                    enum:
+                    - 'False'
+                    - 'True'
+                    x-ms-enum:
+                      name: DeleteExistingPeering
+                      modelAsString: true
+                    description: Flag if need to remove current existing peerings.
+                  resourceGuid:
+                    type: string
+                    readOnly: true
+                    description: Unique identifier for this resource.
+                required:
+                - connectivityTopology
+                - appliesToGroups
+              configurationGroups:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: Network group ID.
+                    properties:
+                      x-ms-client-flatten: true
+                      description: The network configuration group properties
+                      type: object
+                      properties:
+                        description:
+                          type: string
+                          description: A description of the network group.
+                        memberType:
+                          description: The type of the group member.
+                          type: string
+                          enum:
+                          - VirtualNetwork
+                          - Subnet
+                          x-ms-enum:
+                            name: GroupMemberType
+                            modelAsString: true
+                        provisioningState:
+                          readOnly: true
+                          description: The provisioning state of the scope assignment
+                            resource.
+                          type: string
+                          enum:
+                          - Succeeded
+                          - Updating
+                          - Deleting
+                          - Failed
+                          x-ms-enum:
+                            name: ProvisioningState
+                            modelAsString: true
+                        resourceGuid:
+                          type: string
+                          readOnly: true
+                          description: Unique identifier for this resource.
+                  description: The network configuration group resource
+                description: Effective configuration groups.
+            description: The network manager effective connectivity configuration
+          description: Gets a page of NetworkManagerEffectiveConnectivityConfiguration
+        skipToken:
+          description: When present, the value can be passed to a subsequent query
+            call (together with the same query and scopes used in the current request)
+            to retrieve the next page of data.
+          type: string
+      description: Result of the request to list networkManagerEffectiveConnectivityConfiguration.
+        It contains a list of groups and a skiptoken to get the next set of results.
+    NetworkManagerEffectiveSecurityAdminRulesListResult:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Resource ID.
+              configurationDescription:
+                type: string
+                description: A description of the security admin configuration.
+              ruleCollectionDescription:
+                type: string
+                description: A description of the rule collection.
+              ruleCollectionAppliesToGroups:
+                type: array
+                x-ms-identifiers:
+                - networkGroupId
+                items:
+                  type: object
+                  properties:
+                    networkGroupId:
+                      type: string
+                      description: Network manager group Id.
+                  required:
+                  - networkGroupId
+                  description: Network manager security group item.
+                description: Groups for rule collection
+              ruleGroups:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      description: Network group ID.
+                    properties:
+                      x-ms-client-flatten: true
+                      description: The network configuration group properties
+                      type: object
+                      properties:
+                        description:
+                          type: string
+                          description: A description of the network group.
+                        memberType:
+                          description: The type of the group member.
+                          type: string
+                          enum:
+                          - VirtualNetwork
+                          - Subnet
+                          x-ms-enum:
+                            name: GroupMemberType
+                            modelAsString: true
+                        provisioningState:
+                          readOnly: true
+                          description: The provisioning state of the scope assignment
+                            resource.
+                          type: string
+                          enum:
+                          - Succeeded
+                          - Updating
+                          - Deleting
+                          - Failed
+                          x-ms-enum:
+                            name: ProvisioningState
+                            modelAsString: true
+                        resourceGuid:
+                          type: string
+                          readOnly: true
+                          description: Unique identifier for this resource.
+                  description: The network configuration group resource
+                description: Effective configuration groups.
+              kind:
+                type: string
+                description: Whether the rule is custom or default.
+                enum:
+                - Custom
+                - Default
+                x-ms-enum:
+                  name: EffectiveAdminRuleKind
+                  modelAsString: true
+            required:
+            - kind
+            discriminator:
+              propertyName: kind
+            description: Network base admin rule.
+          description: Gets a page of NetworkManagerEffectiveSecurityAdminRules
+        skipToken:
+          description: When present, the value can be passed to a subsequent query
+            call (together with the same query and scopes used in the current request)
+            to retrieve the next page of data.
+          type: string
+      description: Result of the request to list networkManagerEffectiveSecurityAdminRules.
+        It contains a list of groups and a skiptoken to get the next set of results.
+    EffectiveConnectivityConfiguration:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Connectivity configuration ID.
+        properties:
+          x-ms-client-flatten: true
+          description: Properties of a network manager connectivity configuration
+          type: object
+          properties:
+            description:
+              type: string
+              description: A description of the connectivity configuration.
+            connectivityTopology:
+              type: string
+              enum:
+              - HubAndSpoke
+              - Mesh
+              x-ms-enum:
+                name: ConnectivityTopology
+                modelAsString: true
+              description: Connectivity topology type.
+            hubs:
+              type: array
+              x-ms-identifiers:
+              - resourceId
+              items:
+                type: object
+                properties:
+                  resourceId:
+                    type: string
+                    description: Resource Id.
+                  resourceType:
+                    type: string
+                    description: Resource Type.
+                description: Hub Item.
+              description: List of hubItems
+            isGlobal:
+              type: string
+              enum:
+              - 'False'
+              - 'True'
+              x-ms-enum:
+                name: IsGlobal
+                modelAsString: true
+              description: Flag if global mesh is supported.
+            connectivityCapabilities:
+              type: object
+              description: Collection of additional settings to enhance specific topology
+                behaviors of the connectivity configuration resource.
+              properties:
+                connectedGroupPrivateEndpointsScale:
+                  type: string
+                  enum:
+                  - Standard
+                  - HighScale
+                  x-ms-enum:
+                    name: ConnectedGroupPrivateEndpointsScale
+                    modelAsString: true
+                    values:
+                    - value: Standard
+                      description: Default. Allows for up to 2K private endpoints
+                        in the connected group.
+                    - value: HighScale
+                      description: Allows for up to 20K private endpoints in the connected
+                        group.
+                  description: Option indicating the scale of private endpoints allowed
+                    in the connected group of the connectivity configuration.
+                  default: Standard
+                connectedGroupAddressOverlap:
+                  type: string
+                  enum:
+                  - Allowed
+                  - Disallowed
+                  x-ms-enum:
+                    name: ConnectedGroupAddressOverlap
+                    modelAsString: true
+                    values:
+                    - value: Allowed
+                      description: Default. Allows connected group members to have
+                        overlapping IP address space.
+                    - value: Disallowed
+                      description: Strictly disallows connected group members from
+                        having overlapping IP address space. Prevents the addition
+                        of a virtual network with overlapping address to the connected
+                        group, blocks peering between a virtual network and a connected
+                        group member if any connected group member has an overlapping
+                        range, and restricts address space modifications that would
+                        introduce overlap.
+                  description: Behavior to handle overlapped IP address space among
+                    members of the connected group of the connectivity configuration.
+                  default: Allowed
+                peeringEnforcement:
+                  type: string
+                  enum:
+                  - Unenforced
+                  - Enforced
+                  x-ms-enum:
+                    name: PeeringEnforcement
+                    modelAsString: true
+                    values:
+                    - value: Unenforced
+                      description: Default. Peerings created by the connectivity configuration
+                        may be modified or deleted outside of the network manager.
+                    - value: Enforced
+                      description: Peerings created by the connectivity configuration
+                        will not be modifiable or deletable outside of the network
+                        manager.
+                  description: Option indicating enforcement of peerings created by
+                    the connectivity configuration.
+                  default: Unenforced
+              required:
+              - connectedGroupPrivateEndpointsScale
+              - connectedGroupAddressOverlap
+              - peeringEnforcement
+            appliesToGroups:
+              type: array
+              x-ms-identifiers:
+              - networkGroupId
+              items:
+                type: object
+                properties:
+                  networkGroupId:
+                    type: string
+                    description: Network group Id.
+                  useHubGateway:
+                    type: string
+                    enum:
+                    - 'False'
+                    - 'True'
+                    x-ms-enum:
+                      name: UseHubGateway
+                      modelAsString: true
+                    description: Flag if need to use hub gateway.
+                  isGlobal:
+                    type: string
+                    enum:
+                    - 'False'
+                    - 'True'
+                    x-ms-enum:
+                      name: IsGlobal
+                      modelAsString: true
+                    description: Flag if global is supported.
+                  groupConnectivity:
+                    type: string
+                    enum:
+                    - None
+                    - DirectlyConnected
+                    x-ms-enum:
+                      name: GroupConnectivity
+                      modelAsString: true
+                    description: Group connectivity type.
+                description: Connectivity group item.
+                required:
+                - networkGroupId
+                - groupConnectivity
+              description: Groups for configuration
+            provisioningState:
+              readOnly: true
+              description: The provisioning state of the connectivity configuration
+                resource.
+              type: string
+              enum:
+              - Succeeded
+              - Updating
+              - Deleting
+              - Failed
+              x-ms-enum:
+                name: ProvisioningState
+                modelAsString: true
+            deleteExistingPeering:
+              type: string
+              enum:
+              - 'False'
+              - 'True'
+              x-ms-enum:
+                name: DeleteExistingPeering
+                modelAsString: true
+              description: Flag if need to remove current existing peerings.
+            resourceGuid:
+              type: string
+              readOnly: true
+              description: Unique identifier for this resource.
+          required:
+          - connectivityTopology
+          - appliesToGroups
+        configurationGroups:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Network group ID.
+              properties:
+                x-ms-client-flatten: true
+                description: The network configuration group properties
+                type: object
+                properties:
+                  description:
+                    type: string
+                    description: A description of the network group.
+                  memberType:
+                    description: The type of the group member.
+                    type: string
+                    enum:
+                    - VirtualNetwork
+                    - Subnet
+                    x-ms-enum:
+                      name: GroupMemberType
+                      modelAsString: true
+                  provisioningState:
+                    readOnly: true
+                    description: The provisioning state of the scope assignment resource.
+                    type: string
+                    enum:
+                    - Succeeded
+                    - Updating
+                    - Deleting
+                    - Failed
+                    x-ms-enum:
+                      name: ProvisioningState
+                      modelAsString: true
+                  resourceGuid:
+                    type: string
+                    readOnly: true
+                    description: Unique identifier for this resource.
+            description: The network configuration group resource
+          description: Effective configuration groups.
+      description: The network manager effective connectivity configuration
+    EffectiveBaseSecurityAdminRule:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Resource ID.
+        configurationDescription:
+          type: string
+          description: A description of the security admin configuration.
+        ruleCollectionDescription:
+          type: string
+          description: A description of the rule collection.
+        ruleCollectionAppliesToGroups:
+          type: array
+          x-ms-identifiers:
+          - networkGroupId
+          items:
+            type: object
+            properties:
+              networkGroupId:
+                type: string
+                description: Network manager group Id.
+            required:
+            - networkGroupId
+            description: Network manager security group item.
+          description: Groups for rule collection
+        ruleGroups:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Network group ID.
+              properties:
+                x-ms-client-flatten: true
+                description: The network configuration group properties
+                type: object
+                properties:
+                  description:
+                    type: string
+                    description: A description of the network group.
+                  memberType:
+                    description: The type of the group member.
+                    type: string
+                    enum:
+                    - VirtualNetwork
+                    - Subnet
+                    x-ms-enum:
+                      name: GroupMemberType
+                      modelAsString: true
+                  provisioningState:
+                    readOnly: true
+                    description: The provisioning state of the scope assignment resource.
+                    type: string
+                    enum:
+                    - Succeeded
+                    - Updating
+                    - Deleting
+                    - Failed
+                    x-ms-enum:
+                      name: ProvisioningState
+                      modelAsString: true
+                  resourceGuid:
+                    type: string
+                    readOnly: true
+                    description: Unique identifier for this resource.
+            description: The network configuration group resource
+          description: Effective configuration groups.
+        kind:
+          type: string
+          description: Whether the rule is custom or default.
+          enum:
+          - Custom
+          - Default
+          x-ms-enum:
+            name: EffectiveAdminRuleKind
+            modelAsString: true
+      required:
+      - kind
+      discriminator:
+        propertyName: kind
+      description: Network base admin rule.
+    EffectiveSecurityAdminRule:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Resource ID.
+        configurationDescription:
+          type: string
+          description: A description of the security admin configuration.
+        ruleCollectionDescription:
+          type: string
+          description: A description of the rule collection.
+        ruleCollectionAppliesToGroups:
+          type: array
+          x-ms-identifiers:
+          - networkGroupId
+          items:
+            type: object
+            properties:
+              networkGroupId:
+                type: string
+                description: Network manager group Id.
+            required:
+            - networkGroupId
+            description: Network manager security group item.
+          description: Groups for rule collection
+        ruleGroups:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Network group ID.
+              properties:
+                x-ms-client-flatten: true
+                description: The network configuration group properties
+                type: object
+                properties:
+                  description:
+                    type: string
+                    description: A description of the network group.
+                  memberType:
+                    description: The type of the group member.
+                    type: string
+                    enum:
+                    - VirtualNetwork
+                    - Subnet
+                    x-ms-enum:
+                      name: GroupMemberType
+                      modelAsString: true
+                  provisioningState:
+                    readOnly: true
+                    description: The provisioning state of the scope assignment resource.
+                    type: string
+                    enum:
+                    - Succeeded
+                    - Updating
+                    - Deleting
+                    - Failed
+                    x-ms-enum:
+                      name: ProvisioningState
+                      modelAsString: true
+                  resourceGuid:
+                    type: string
+                    readOnly: true
+                    description: Unique identifier for this resource.
+            description: The network configuration group resource
+          description: Effective configuration groups.
+        kind:
+          type: string
+          description: Whether the rule is custom or default.
+          enum:
+          - Custom
+          - Default
+          x-ms-enum:
+            name: EffectiveAdminRuleKind
+            modelAsString: true
+        properties:
+          x-ms-client-flatten: true
+          description: Indicates the properties of the security admin rule
+          type: object
+          properties:
+            description:
+              type: string
+              description: A description for this rule. Restricted to 140 chars.
+            protocol:
+              type: string
+              description: Network protocol this rule applies to.
+              enum:
+              - Tcp
+              - Udp
+              - Icmp
+              - Esp
+              - Any
+              - Ah
+              x-ms-enum:
+                name: SecurityConfigurationRuleProtocol
+                modelAsString: true
+            sources:
+              type: array
+              x-ms-identifiers:
+              - addressPrefix
+              items:
+                type: object
+                properties:
+                  addressPrefix:
+                    type: string
+                    description: Address prefix.
+                  addressPrefixType:
+                    type: string
+                    description: Address prefix type.
+                    enum:
+                    - IPPrefix
+                    - ServiceTag
+                    - NetworkGroup
+                    x-ms-enum:
+                      name: AddressPrefixType
+                      modelAsString: true
+                description: Address prefix item.
+              description: The CIDR or source IP ranges.
+            destinations:
+              type: array
+              x-ms-identifiers:
+              - addressPrefix
+              items:
+                type: object
+                properties:
+                  addressPrefix:
+                    type: string
+                    description: Address prefix.
+                  addressPrefixType:
+                    type: string
+                    description: Address prefix type.
+                    enum:
+                    - IPPrefix
+                    - ServiceTag
+                    - NetworkGroup
+                    x-ms-enum:
+                      name: AddressPrefixType
+                      modelAsString: true
+                description: Address prefix item.
+              description: The destination address prefixes. CIDR or destination IP
+                ranges.
+            sourcePortRanges:
+              type: array
+              items:
+                type: string
+                description: The source port.
+              description: The source port ranges.
+            destinationPortRanges:
+              type: array
+              items:
+                type: string
+                description: The destination port.
+              description: The destination port ranges.
+            access:
+              description: Indicates the access allowed for this particular rule
+              type: string
+              enum:
+              - Allow
+              - Deny
+              - AlwaysAllow
+              x-ms-enum:
+                name: SecurityConfigurationRuleAccess
+                modelAsString: true
+            priority:
+              type: integer
+              format: int32
+              minimum: 1
+              maximum: 4096
+              description: The priority of the rule. The value can be between 1 and
+                4096. The priority number must be unique for each rule in the collection.
+                The lower the priority number, the higher the priority of the rule.
+            direction:
+              description: Indicates if the traffic matched against the rule in inbound
+                or outbound.
+              type: string
+              enum:
+              - Inbound
+              - Outbound
+              x-ms-enum:
+                name: SecurityConfigurationRuleDirection
+                modelAsString: true
+            provisioningState:
+              readOnly: true
+              description: The provisioning state of the resource.
+              enum:
+              - Failed
+              - Succeeded
+              - Canceled
+              - Creating
+              - Updating
+              - Deleting
+              type: string
+              x-ms-enum:
+                modelAsString: true
+                name: ProvisioningState
+            resourceGuid:
+              type: string
+              readOnly: true
+              description: Unique identifier for this resource.
+          required:
+          - protocol
+          - access
+          - direction
+          - priority
+      required:
+      - kind
+      description: Network base admin rule.
+      discriminator:
+        propertyName: kind
+      x-ms-discriminator-value: Custom
+    EffectiveDefaultSecurityAdminRule:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Resource ID.
+        configurationDescription:
+          type: string
+          description: A description of the security admin configuration.
+        ruleCollectionDescription:
+          type: string
+          description: A description of the rule collection.
+        ruleCollectionAppliesToGroups:
+          type: array
+          x-ms-identifiers:
+          - networkGroupId
+          items:
+            type: object
+            properties:
+              networkGroupId:
+                type: string
+                description: Network manager group Id.
+            required:
+            - networkGroupId
+            description: Network manager security group item.
+          description: Groups for rule collection
+        ruleGroups:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Network group ID.
+              properties:
+                x-ms-client-flatten: true
+                description: The network configuration group properties
+                type: object
+                properties:
+                  description:
+                    type: string
+                    description: A description of the network group.
+                  memberType:
+                    description: The type of the group member.
+                    type: string
+                    enum:
+                    - VirtualNetwork
+                    - Subnet
+                    x-ms-enum:
+                      name: GroupMemberType
+                      modelAsString: true
+                  provisioningState:
+                    readOnly: true
+                    description: The provisioning state of the scope assignment resource.
+                    type: string
+                    enum:
+                    - Succeeded
+                    - Updating
+                    - Deleting
+                    - Failed
+                    x-ms-enum:
+                      name: ProvisioningState
+                      modelAsString: true
+                  resourceGuid:
+                    type: string
+                    readOnly: true
+                    description: Unique identifier for this resource.
+            description: The network configuration group resource
+          description: Effective configuration groups.
+        kind:
+          type: string
+          description: Whether the rule is custom or default.
+          enum:
+          - Custom
+          - Default
+          x-ms-enum:
+            name: EffectiveAdminRuleKind
+            modelAsString: true
+        properties:
+          x-ms-client-flatten: true
+          description: Indicates the properties of the default security admin rule
+          type: object
+          properties:
+            description:
+              type: string
+              readOnly: true
+              description: A description for this rule. Restricted to 140 chars.
+            flag:
+              type: string
+              description: Default rule flag.
+            protocol:
+              type: string
+              readOnly: true
+              description: Network protocol this rule applies to.
+              enum:
+              - Tcp
+              - Udp
+              - Icmp
+              - Esp
+              - Any
+              - Ah
+              x-ms-enum:
+                name: SecurityConfigurationRuleProtocol
+                modelAsString: true
+            sources:
+              type: array
+              x-ms-identifiers:
+              - addressPrefix
+              readOnly: true
+              items:
+                type: object
+                properties:
+                  addressPrefix:
+                    type: string
+                    description: Address prefix.
+                  addressPrefixType:
+                    type: string
+                    description: Address prefix type.
+                    enum:
+                    - IPPrefix
+                    - ServiceTag
+                    - NetworkGroup
+                    x-ms-enum:
+                      name: AddressPrefixType
+                      modelAsString: true
+                description: Address prefix item.
+              description: The CIDR or source IP ranges.
+            destinations:
+              type: array
+              x-ms-identifiers:
+              - addressPrefix
+              readOnly: true
+              items:
+                type: object
+                properties:
+                  addressPrefix:
+                    type: string
+                    description: Address prefix.
+                  addressPrefixType:
+                    type: string
+                    description: Address prefix type.
+                    enum:
+                    - IPPrefix
+                    - ServiceTag
+                    - NetworkGroup
+                    x-ms-enum:
+                      name: AddressPrefixType
+                      modelAsString: true
+                description: Address prefix item.
+              description: The destination address prefixes. CIDR or destination IP
+                ranges.
+            sourcePortRanges:
+              type: array
+              readOnly: true
+              items:
+                type: string
+                description: The source port.
+              description: The source port ranges.
+            destinationPortRanges:
+              type: array
+              readOnly: true
+              items:
+                type: string
+                description: The destination port.
+              description: The destination port ranges.
+            access:
+              readOnly: true
+              description: Indicates the access allowed for this particular rule
+              type: string
+              enum:
+              - Allow
+              - Deny
+              - AlwaysAllow
+              x-ms-enum:
+                name: SecurityConfigurationRuleAccess
+                modelAsString: true
+            priority:
+              type: integer
+              format: int32
+              readOnly: true
+              description: The priority of the rule. The value can be between 1 and
+                4096. The priority number must be unique for each rule in the collection.
+                The lower the priority number, the higher the priority of the rule.
+            direction:
+              readOnly: true
+              description: Indicates if the traffic matched against the rule in inbound
+                or outbound.
+              type: string
+              enum:
+              - Inbound
+              - Outbound
+              x-ms-enum:
+                name: SecurityConfigurationRuleDirection
+                modelAsString: true
+            provisioningState:
+              readOnly: true
+              description: The provisioning state of the resource.
+              enum:
+              - Failed
+              - Succeeded
+              - Canceled
+              - Creating
+              - Updating
+              - Deleting
+              type: string
+              x-ms-enum:
+                modelAsString: true
+                name: ProvisioningState
+            resourceGuid:
+              type: string
+              readOnly: true
+              description: Unique identifier for this resource.
+      required:
+      - kind
+      description: Network base admin rule.
+      discriminator:
+        propertyName: kind
+      x-ms-discriminator-value: Default
+    ConfigurationGroup:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Network group ID.
+        properties:
+          x-ms-client-flatten: true
+          description: The network configuration group properties
+          type: object
+          properties:
+            description:
+              type: string
+              description: A description of the network group.
+            memberType:
+              description: The type of the group member.
+              type: string
+              enum:
+              - VirtualNetwork
+              - Subnet
+              x-ms-enum:
+                name: GroupMemberType
+                modelAsString: true
+            provisioningState:
+              readOnly: true
+              description: The provisioning state of the scope assignment resource.
+              type: string
+              enum:
+              - Succeeded
+              - Updating
+              - Deleting
+              - Failed
+              x-ms-enum:
+                name: ProvisioningState
+                modelAsString: true
+            resourceGuid:
+              type: string
+              readOnly: true
+              description: Unique identifier for this resource.
+      description: The network configuration group resource
+    QueryRequestOptions:
+      type: object
+      properties:
+        skipToken:
+          description: When present, the value can be passed to a subsequent query
+            call (together with the same query and scopes used in the current request)
+            to retrieve the next page of data.
+          type: string
+      description: Query Request Options
+    CloudErrorBody:
+      x-ms-external: true
+      properties:
+        code:
+          type: string
+          description: An identifier for the error. Codes are invariant and are intended
+            to be consumed programmatically.
+        message:
+          type: string
+          description: A message describing the error, intended to be suitable for
+            display in a user interface.
+        target:
+          type: string
+          description: The target of the particular error. For example, the name of
+            the property in error.
+        details:
+          type: array
+          items:
+            x-ms-external: true
+            properties:
+              code:
+                type: string
+                description: An identifier for the error. Codes are invariant and
+                  are intended to be consumed programmatically.
+              message:
+                type: string
+                description: A message describing the error, intended to be suitable
+                  for display in a user interface.
+              target:
+                type: string
+                description: The target of the particular error. For example, the
+                  name of the property in error.
+              details:
+                type: array
+                items:
+                  x-ms-external: true
+                  properties:
+                    code:
+                      type: string
+                      description: An identifier for the error. Codes are invariant
+                        and are intended to be consumed programmatically.
+                    message:
+                      type: string
+                      description: A message describing the error, intended to be
+                        suitable for display in a user interface.
+                    target:
+                      type: string
+                      description: The target of the particular error. For example,
+                        the name of the property in error.
+                  description: An error response from the service.
+                description: A list of additional details about the error.
+            description: An error response from the service.
+          description: A list of additional details about the error.
+      description: An error response from the service.
+    CloudError:
+      x-ms-external: true
+      properties:
+        error:
+          description: Cloud error body.
+          x-ms-external: true
+          properties:
+            code:
+              type: string
+              description: An identifier for the error. Codes are invariant and are
+                intended to be consumed programmatically.
+            message:
+              type: string
+              description: A message describing the error, intended to be suitable
+                for display in a user interface.
+            target:
+              type: string
+              description: The target of the particular error. For example, the name
+                of the property in error.
+            details:
+              type: array
+              items:
+                x-ms-external: true
+                properties:
+                  code:
+                    type: string
+                    description: An identifier for the error. Codes are invariant
+                      and are intended to be consumed programmatically.
+                  message:
+                    type: string
+                    description: A message describing the error, intended to be suitable
+                      for display in a user interface.
+                  target:
+                    type: string
+                    description: The target of the particular error. For example,
+                      the name of the property in error.
+                  details:
+                    type: array
+                    items:
+                      x-ms-external: true
+                      properties:
+                        code:
+                          type: string
+                          description: An identifier for the error. Codes are invariant
+                            and are intended to be consumed programmatically.
+                        message:
+                          type: string
+                          description: A message describing the error, intended to
+                            be suitable for display in a user interface.
+                        target:
+                          type: string
+                          description: The target of the particular error. For example,
+                            the name of the property in error.
+                      description: An error response from the service.
+                    description: A list of additional details about the error.
+                description: An error response from the service.
+              description: A list of additional details about the error.
+      description: An error response from the service.
+    Hub:
+      type: object
+      properties:
+        resourceId:
+          type: string
+          description: Resource Id.
+        resourceType:
+          type: string
+          description: Resource Type.
+      description: Hub Item.
+    connectivityGroupItem:
+      type: object
+      properties:
+        networkGroupId:
+          type: string
+          description: Network group Id.
+        useHubGateway:
+          type: string
+          enum:
+          - 'False'
+          - 'True'
+          x-ms-enum:
+            name: UseHubGateway
+            modelAsString: true
+          description: Flag if need to use hub gateway.
+        isGlobal:
+          type: string
+          enum:
+          - 'False'
+          - 'True'
+          x-ms-enum:
+            name: IsGlobal
+            modelAsString: true
+          description: Flag if global is supported.
+        groupConnectivity:
+          type: string
+          enum:
+          - None
+          - DirectlyConnected
+          x-ms-enum:
+            name: GroupConnectivity
+            modelAsString: true
+          description: Group connectivity type.
+      description: Connectivity group item.
+      required:
+      - networkGroupId
+      - groupConnectivity
+    ProvisioningState:
+      type: string
+      readOnly: true
+      description: The current provisioning state.
+      enum:
+      - Succeeded
+      - Updating
+      - Deleting
+      - Failed
+      x-ms-enum:
+        name: ProvisioningState
+        modelAsString: true
+    ConnectivityConfigurationProperties:
+      type: object
+      properties:
+        description:
+          type: string
+          description: A description of the connectivity configuration.
+        connectivityTopology:
+          type: string
+          enum:
+          - HubAndSpoke
+          - Mesh
+          x-ms-enum:
+            name: ConnectivityTopology
+            modelAsString: true
+          description: Connectivity topology type.
+        hubs:
+          type: array
+          x-ms-identifiers:
+          - resourceId
+          items:
+            type: object
+            properties:
+              resourceId:
+                type: string
+                description: Resource Id.
+              resourceType:
+                type: string
+                description: Resource Type.
+            description: Hub Item.
+          description: List of hubItems
+        isGlobal:
+          type: string
+          enum:
+          - 'False'
+          - 'True'
+          x-ms-enum:
+            name: IsGlobal
+            modelAsString: true
+          description: Flag if global mesh is supported.
+        connectivityCapabilities:
+          type: object
+          description: Collection of additional settings to enhance specific topology
+            behaviors of the connectivity configuration resource.
+          properties:
+            connectedGroupPrivateEndpointsScale:
+              type: string
+              enum:
+              - Standard
+              - HighScale
+              x-ms-enum:
+                name: ConnectedGroupPrivateEndpointsScale
+                modelAsString: true
+                values:
+                - value: Standard
+                  description: Default. Allows for up to 2K private endpoints in the
+                    connected group.
+                - value: HighScale
+                  description: Allows for up to 20K private endpoints in the connected
+                    group.
+              description: Option indicating the scale of private endpoints allowed
+                in the connected group of the connectivity configuration.
+              default: Standard
+            connectedGroupAddressOverlap:
+              type: string
+              enum:
+              - Allowed
+              - Disallowed
+              x-ms-enum:
+                name: ConnectedGroupAddressOverlap
+                modelAsString: true
+                values:
+                - value: Allowed
+                  description: Default. Allows connected group members to have overlapping
+                    IP address space.
+                - value: Disallowed
+                  description: Strictly disallows connected group members from having
+                    overlapping IP address space. Prevents the addition of a virtual
+                    network with overlapping address to the connected group, blocks
+                    peering between a virtual network and a connected group member
+                    if any connected group member has an overlapping range, and restricts
+                    address space modifications that would introduce overlap.
+              description: Behavior to handle overlapped IP address space among members
+                of the connected group of the connectivity configuration.
+              default: Allowed
+            peeringEnforcement:
+              type: string
+              enum:
+              - Unenforced
+              - Enforced
+              x-ms-enum:
+                name: PeeringEnforcement
+                modelAsString: true
+                values:
+                - value: Unenforced
+                  description: Default. Peerings created by the connectivity configuration
+                    may be modified or deleted outside of the network manager.
+                - value: Enforced
+                  description: Peerings created by the connectivity configuration
+                    will not be modifiable or deletable outside of the network manager.
+              description: Option indicating enforcement of peerings created by the
+                connectivity configuration.
+              default: Unenforced
+          required:
+          - connectedGroupPrivateEndpointsScale
+          - connectedGroupAddressOverlap
+          - peeringEnforcement
+        appliesToGroups:
+          type: array
+          x-ms-identifiers:
+          - networkGroupId
+          items:
+            type: object
+            properties:
+              networkGroupId:
+                type: string
+                description: Network group Id.
+              useHubGateway:
+                type: string
+                enum:
+                - 'False'
+                - 'True'
+                x-ms-enum:
+                  name: UseHubGateway
+                  modelAsString: true
+                description: Flag if need to use hub gateway.
+              isGlobal:
+                type: string
+                enum:
+                - 'False'
+                - 'True'
+                x-ms-enum:
+                  name: IsGlobal
+                  modelAsString: true
+                description: Flag if global is supported.
+              groupConnectivity:
+                type: string
+                enum:
+                - None
+                - DirectlyConnected
+                x-ms-enum:
+                  name: GroupConnectivity
+                  modelAsString: true
+                description: Group connectivity type.
+            description: Connectivity group item.
+            required:
+            - networkGroupId
+            - groupConnectivity
+          description: Groups for configuration
+        provisioningState:
+          readOnly: true
+          description: The provisioning state of the connectivity configuration resource.
+          type: string
+          enum:
+          - Succeeded
+          - Updating
+          - Deleting
+          - Failed
+          x-ms-enum:
+            name: ProvisioningState
+            modelAsString: true
+        deleteExistingPeering:
+          type: string
+          enum:
+          - 'False'
+          - 'True'
+          x-ms-enum:
+            name: DeleteExistingPeering
+            modelAsString: true
+          description: Flag if need to remove current existing peerings.
+        resourceGuid:
+          type: string
+          readOnly: true
+          description: Unique identifier for this resource.
+      required:
+      - connectivityTopology
+      - appliesToGroups
+      description: Properties of network manager connectivity configuration
+    GroupMemberType:
+      type: string
+      description: Network Group member type
+      enum:
+      - VirtualNetwork
+      - Subnet
+      x-ms-enum:
+        name: GroupMemberType
+        modelAsString: true
+    NetworkGroupProperties:
+      type: object
+      properties:
+        description:
+          type: string
+          description: A description of the network group.
+        memberType:
+          description: The type of the group member.
+          type: string
+          enum:
+          - VirtualNetwork
+          - Subnet
+          x-ms-enum:
+            name: GroupMemberType
+            modelAsString: true
+        provisioningState:
+          readOnly: true
+          description: The provisioning state of the scope assignment resource.
+          type: string
+          enum:
+          - Succeeded
+          - Updating
+          - Deleting
+          - Failed
+          x-ms-enum:
+            name: ProvisioningState
+            modelAsString: true
+        resourceGuid:
+          type: string
+          readOnly: true
+          description: Unique identifier for this resource.
+      description: Properties of network group
+    NetworkManagerSecurityGroupItem:
+      type: object
+      properties:
+        networkGroupId:
+          type: string
+          description: Network manager group Id.
+      required:
+      - networkGroupId
+      description: Network manager security group item.
+    RuleProtocol:
+      type: string
+      description: Network protocol this rule applies to.
+      enum:
+      - Tcp
+      - Udp
+      - Icmp
+      - Esp
+      - Any
+      - Ah
+      x-ms-enum:
+        name: SecurityConfigurationRuleProtocol
+        modelAsString: true
+    AddressPrefixItem:
+      type: object
+      properties:
+        addressPrefix:
+          type: string
+          description: Address prefix.
+        addressPrefixType:
+          type: string
+          description: Address prefix type.
+          enum:
+          - IPPrefix
+          - ServiceTag
+          - NetworkGroup
+          x-ms-enum:
+            name: AddressPrefixType
+            modelAsString: true
+      description: Address prefix item.
+    SecurityConfigurationRuleAccess:
+      type: string
+      description: Whether network traffic is allowed or denied.
+      enum:
+      - Allow
+      - Deny
+      - AlwaysAllow
+      x-ms-enum:
+        name: SecurityConfigurationRuleAccess
+        modelAsString: true
+    SecurityConfigurationRuleDirection:
+      type: string
+      description: The direction of the rule. The direction specifies if the rule
+        will be evaluated on incoming or outgoing traffic.
+      enum:
+      - Inbound
+      - Outbound
+      x-ms-enum:
+        name: SecurityConfigurationRuleDirection
+        modelAsString: true
+    definitions-ProvisioningState:
+      description: Provisioning states of a resource.
+      enum:
+      - Failed
+      - Succeeded
+      - Canceled
+      - Creating
+      - Updating
+      - Deleting
+      type: string
+      readOnly: true
+      x-ms-enum:
+        modelAsString: true
+        name: ProvisioningState
+    AdminPropertiesFormat:
+      type: object
+      properties:
+        description:
+          type: string
+          description: A description for this rule. Restricted to 140 chars.
+        protocol:
+          type: string
+          description: Network protocol this rule applies to.
+          enum:
+          - Tcp
+          - Udp
+          - Icmp
+          - Esp
+          - Any
+          - Ah
+          x-ms-enum:
+            name: SecurityConfigurationRuleProtocol
+            modelAsString: true
+        sources:
+          type: array
+          x-ms-identifiers:
+          - addressPrefix
+          items:
+            type: object
+            properties:
+              addressPrefix:
+                type: string
+                description: Address prefix.
+              addressPrefixType:
+                type: string
+                description: Address prefix type.
+                enum:
+                - IPPrefix
+                - ServiceTag
+                - NetworkGroup
+                x-ms-enum:
+                  name: AddressPrefixType
+                  modelAsString: true
+            description: Address prefix item.
+          description: The CIDR or source IP ranges.
+        destinations:
+          type: array
+          x-ms-identifiers:
+          - addressPrefix
+          items:
+            type: object
+            properties:
+              addressPrefix:
+                type: string
+                description: Address prefix.
+              addressPrefixType:
+                type: string
+                description: Address prefix type.
+                enum:
+                - IPPrefix
+                - ServiceTag
+                - NetworkGroup
+                x-ms-enum:
+                  name: AddressPrefixType
+                  modelAsString: true
+            description: Address prefix item.
+          description: The destination address prefixes. CIDR or destination IP ranges.
+        sourcePortRanges:
+          type: array
+          items:
+            type: string
+            description: The source port.
+          description: The source port ranges.
+        destinationPortRanges:
+          type: array
+          items:
+            type: string
+            description: The destination port.
+          description: The destination port ranges.
+        access:
+          description: Indicates the access allowed for this particular rule
+          type: string
+          enum:
+          - Allow
+          - Deny
+          - AlwaysAllow
+          x-ms-enum:
+            name: SecurityConfigurationRuleAccess
+            modelAsString: true
+        priority:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 4096
+          description: The priority of the rule. The value can be between 1 and 4096.
+            The priority number must be unique for each rule in the collection. The
+            lower the priority number, the higher the priority of the rule.
+        direction:
+          description: Indicates if the traffic matched against the rule in inbound
+            or outbound.
+          type: string
+          enum:
+          - Inbound
+          - Outbound
+          x-ms-enum:
+            name: SecurityConfigurationRuleDirection
+            modelAsString: true
+        provisioningState:
+          readOnly: true
+          description: The provisioning state of the resource.
+          enum:
+          - Failed
+          - Succeeded
+          - Canceled
+          - Creating
+          - Updating
+          - Deleting
+          type: string
+          x-ms-enum:
+            modelAsString: true
+            name: ProvisioningState
+        resourceGuid:
+          type: string
+          readOnly: true
+          description: Unique identifier for this resource.
+      required:
+      - protocol
+      - access
+      - direction
+      - priority
+      description: Security admin rule resource.
+    DefaultAdminPropertiesFormat:
+      type: object
+      properties:
+        description:
+          type: string
+          readOnly: true
+          description: A description for this rule. Restricted to 140 chars.
+        flag:
+          type: string
+          description: Default rule flag.
+        protocol:
+          type: string
+          readOnly: true
+          description: Network protocol this rule applies to.
+          enum:
+          - Tcp
+          - Udp
+          - Icmp
+          - Esp
+          - Any
+          - Ah
+          x-ms-enum:
+            name: SecurityConfigurationRuleProtocol
+            modelAsString: true
+        sources:
+          type: array
+          x-ms-identifiers:
+          - addressPrefix
+          readOnly: true
+          items:
+            type: object
+            properties:
+              addressPrefix:
+                type: string
+                description: Address prefix.
+              addressPrefixType:
+                type: string
+                description: Address prefix type.
+                enum:
+                - IPPrefix
+                - ServiceTag
+                - NetworkGroup
+                x-ms-enum:
+                  name: AddressPrefixType
+                  modelAsString: true
+            description: Address prefix item.
+          description: The CIDR or source IP ranges.
+        destinations:
+          type: array
+          x-ms-identifiers:
+          - addressPrefix
+          readOnly: true
+          items:
+            type: object
+            properties:
+              addressPrefix:
+                type: string
+                description: Address prefix.
+              addressPrefixType:
+                type: string
+                description: Address prefix type.
+                enum:
+                - IPPrefix
+                - ServiceTag
+                - NetworkGroup
+                x-ms-enum:
+                  name: AddressPrefixType
+                  modelAsString: true
+            description: Address prefix item.
+          description: The destination address prefixes. CIDR or destination IP ranges.
+        sourcePortRanges:
+          type: array
+          readOnly: true
+          items:
+            type: string
+            description: The source port.
+          description: The source port ranges.
+        destinationPortRanges:
+          type: array
+          readOnly: true
+          items:
+            type: string
+            description: The destination port.
+          description: The destination port ranges.
+        access:
+          readOnly: true
+          description: Indicates the access allowed for this particular rule
+          type: string
+          enum:
+          - Allow
+          - Deny
+          - AlwaysAllow
+          x-ms-enum:
+            name: SecurityConfigurationRuleAccess
+            modelAsString: true
+        priority:
+          type: integer
+          format: int32
+          readOnly: true
+          description: The priority of the rule. The value can be between 1 and 4096.
+            The priority number must be unique for each rule in the collection. The
+            lower the priority number, the higher the priority of the rule.
+        direction:
+          readOnly: true
+          description: Indicates if the traffic matched against the rule in inbound
+            or outbound.
+          type: string
+          enum:
+          - Inbound
+          - Outbound
+          x-ms-enum:
+            name: SecurityConfigurationRuleDirection
+            modelAsString: true
+        provisioningState:
+          readOnly: true
+          description: The provisioning state of the resource.
+          enum:
+          - Failed
+          - Succeeded
+          - Canceled
+          - Creating
+          - Updating
+          - Deleting
+          type: string
+          x-ms-enum:
+            modelAsString: true
+            name: ProvisioningState
+        resourceGuid:
+          type: string
+          readOnly: true
+          description: Unique identifier for this resource.
+      description: Security default admin rule resource.

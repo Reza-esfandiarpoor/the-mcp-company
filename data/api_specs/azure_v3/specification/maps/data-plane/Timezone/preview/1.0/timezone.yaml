@@ -1,0 +1,2727 @@
+openapi: 3.0.0
+info:
+  title: Azure Maps Time Zone Service
+  version: '1.0'
+  description: Azure Maps Time Zone REST APIs
+servers:
+- url: https://atlas.microsoft.com
+security:
+- AADToken:
+  - https://atlas.microsoft.com/.default
+- SharedKey: []
+- SasToken: []
+paths:
+  /timezone/byId/{format}:
+    get:
+      summary: Use to get the current, historical, and future time zone information
+        for the specified IANA time zone ID.
+      description: '
+
+
+        The `Get Timezone By ID` API is an HTTP `GET` request that returns current,
+        historical, and future time zone information for the specified IANA time zone
+        ID.'
+      operationId: Timezone_GetTimezoneByID
+      parameters:
+      - name: x-ms-client-id
+        x-ms-client-name: clientId
+        description: Indicates the account intended for use with the Microsoft Entra
+          ID security model. This unique ID for the Azure Maps account can be obtained
+          from the [Azure Maps management plane Account API](/rest/api/maps-management/accounts).
+          For more information on using Microsoft Entra ID security in Azure Maps,
+          see [Manage authentication in Azure Maps](/azure/azure-maps/how-to-manage-authentication).
+        in: header
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: api-version
+        description: Version number of Azure Maps API.
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+          default: '1.0'
+      - name: Accept-Language
+        in: header
+        description: Specifies the language code in which the timezone names should
+          be returned. If no language code is provided, the response will be in "EN".
+          Please refer to [Supported Languages](https://docs.microsoft.com/azure/azure-maps/supported-languages)
+          for details.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: options
+        in: query
+        description: Alternatively, use alias "o". Options available for types of
+          information returned in the result.
+        x-ms-enum:
+          name: TimezoneOptions
+          modelAsString: true
+          values:
+          - value: none
+            description: Do not include zoneinfo or transitions in the result.
+          - value: zoneInfo
+            description: Include additional time zone info in the result.
+          - value: transitions
+            description: Include transition information in the result (The number
+              of transitions is currently capped at 250).
+          - value: all
+            description: Include both zoneinfo and transitions in the result.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - none
+          - zoneInfo
+          - transitions
+          - all
+      - name: timeStamp
+        in: query
+        description: Alternatively, use alias "stamp", or "s". Reference time, if
+          omitted, the API will use the machine time serving the request.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          format: date-time
+      - name: transitionsFrom
+        x-ms-client-name: daylightSavingsTimeFrom
+        in: query
+        description: Alternatively, use alias "tf". The start date from which daylight
+          savings time (DST) transitions are requested, only applies when "options"
+          = all or "options" = transitions.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          format: date-time
+      - name: transitionsYears
+        x-ms-client-name: daylightSavingsTimeLastingYears
+        in: query
+        description: Alternatively, use alias "ty". The number of years from "transitionsFrom"
+          for which DST transitions are requested, only applies when "options" = all
+          or "options" = transitions.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+      - name: format
+        description: Desired format of the response. Only `json` format is supported.
+        in: path
+        required: true
+        x-ms-enum:
+          name: JsonFormat
+          modelAsString: true
+          values:
+          - value: json
+            description: '[The JavaScript Object Notation Data Interchange Format](https://tools.ietf.org/html/rfc8259)'
+        x-ms-client-default: json
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - json
+      - name: query
+        x-ms-client-name: timezoneId
+        in: query
+        description: The IANA time zone ID.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: This object is returned from a successful Timezone By
+                  ID call or By Coordinates call
+                type: object
+                properties:
+                  Version:
+                    description: Version property
+                    type: string
+                    readOnly: true
+                  ReferenceUtcTimestamp:
+                    description: Reference Utc Timestamp property
+                    type: string
+                    readOnly: true
+                    format: date-time
+                  TimeZones:
+                    description: TimeZoneId array
+                    type: array
+                    readOnly: true
+                    items:
+                      type: object
+                      properties:
+                        Id:
+                          description: Id property
+                          type: string
+                          readOnly: true
+                        Aliases:
+                          description: 'An array of time zone ID aliases. Only returned
+                            when [options]=*zoneinfo* or *all*.
+
+
+                            Note: may be null.'
+                          type: array
+                          readOnly: true
+                          items:
+                            type: string
+                            readOnly: true
+                        Countries:
+                          description: An array of country/region records. Only returned
+                            when [options]=*zoneinfo* or *all*.
+                          type: array
+                          readOnly: true
+                          items:
+                            type: object
+                            description: A country/region record.
+                            properties:
+                              Name:
+                                description: country/region Name
+                                type: string
+                                readOnly: true
+                              Code:
+                                description: ISO-3166 2-letter country/region code
+                                  for the country/region.
+                                type: string
+                                readOnly: true
+                        Names:
+                          type: object
+                          description: Timezone names object.
+                          properties:
+                            ISO6391LanguageCode:
+                              description: The ISO 639-1 language code of the Names
+                              type: string
+                              readOnly: true
+                            Generic:
+                              description: Generic Name
+                              type: string
+                              readOnly: true
+                            Standard:
+                              description: Standard Name
+                              type: string
+                              readOnly: true
+                            Daylight:
+                              description: Daylight Name
+                              type: string
+                              readOnly: true
+                        ReferenceTime:
+                          description: Details in effect at the local time.
+                          type: object
+                          readOnly: true
+                          properties:
+                            Tag:
+                              description: Time zone name in effect at the reference
+                                timestamp (i.e. PST or PDT depending whether Daylight
+                                Savings Time is in effect).
+                              type: string
+                              readOnly: true
+                            StandardOffset:
+                              description: UTC offset in effect at the `ReferenceUTCTimestamp`.
+                              type: string
+                              readOnly: true
+                            DaylightSavings:
+                              description: Time saving in minutes in effect at the
+                                `ReferenceUTCTimestamp`.
+                              type: string
+                              readOnly: true
+                            WallTime:
+                              description: Current wall time at the given time zone
+                                as shown in the `Tag` property.
+                              type: string
+                              readOnly: true
+                            PosixTzValidYear:
+                              description: 'The year this POSIX string is valid for.
+                                Note: A POSIX string will only be valid in the given
+                                year.'
+                              type: integer
+                              readOnly: true
+                            PosixTz:
+                              description: POSIX string used to set the time zone
+                                environment variable.
+                              type: string
+                              readOnly: true
+                            Sunrise:
+                              description: Sunrise at the given time zone as shown
+                                in the `Tag` property, populated only when the call
+                                is `byCoordinates`. The sunrise is described in the
+                                [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+                                format. Note that the Timezone API does not return
+                                sunrise and sunset times when solar day is observed
+                                in the requested region.
+                              type: string
+                              format: date-time
+                              readOnly: true
+                            Sunset:
+                              description: Sunset at the given time zone as shown
+                                in the `Tag` property, populated only when the call
+                                is `byCoordinates`. The sunset is described in the
+                                [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+                                format. Note that the Timezone API does not return
+                                sunrise and sunset times when solar day is observed
+                                in the requested region.
+                              type: string
+                              format: date-time
+                              readOnly: true
+                        RepresentativePoint:
+                          description: Representative point property
+                          type: object
+                          readOnly: true
+                          properties:
+                            Latitude:
+                              description: Latitude property
+                              type: number
+                              readOnly: true
+                            Longitude:
+                              description: Longitude property
+                              type: number
+                              readOnly: true
+                        TimeTransitions:
+                          description: Time zone DST transitions from [transitionsFrom]
+                            until timestamp + 1 year.
+                          type: array
+                          readOnly: true
+                          items:
+                            type: object
+                            readOnly: true
+                            properties:
+                              Tag:
+                                description: Tag property
+                                type: string
+                                readOnly: true
+                              StandardOffset:
+                                description: StandardOffset property
+                                type: string
+                                readOnly: true
+                              DaylightSavings:
+                                description: DaylightSavings property
+                                type: string
+                                readOnly: true
+                              UtcStart:
+                                description: Start date, start time for this transition
+                                  period
+                                type: string
+                                readOnly: true
+                                format: date-time
+                              UtcEnd:
+                                description: End date, end time for this transition
+                                  period
+                                type: string
+                                readOnly: true
+                                format: date-time
+        default:
+          description: An unexpected error occurred.
+          x-ms-error-response: true
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers: []
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers: []
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+  /timezone/byCoordinates/{format}:
+    get:
+      summary: Use to get the current, historical, and future time zone information
+        for the specified latitude-longitude pair.
+      description: '
+
+
+        The `Get Timezone By Coordinates` API is an HTTP `GET` request that returns
+        current, historical, and future time zone information for a specified latitude-longitude
+        pair. In addition, the API provides sunset and sunrise times for a given location,
+        with the exception of regions that observe solar days.'
+      operationId: Timezone_GetTimezoneByCoordinates
+      parameters:
+      - name: x-ms-client-id
+        x-ms-client-name: clientId
+        description: Indicates the account intended for use with the Microsoft Entra
+          ID security model. This unique ID for the Azure Maps account can be obtained
+          from the [Azure Maps management plane Account API](/rest/api/maps-management/accounts).
+          For more information on using Microsoft Entra ID security in Azure Maps,
+          see [Manage authentication in Azure Maps](/azure/azure-maps/how-to-manage-authentication).
+        in: header
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: api-version
+        description: Version number of Azure Maps API.
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+          default: '1.0'
+      - name: Accept-Language
+        in: header
+        description: Specifies the language code in which the timezone names should
+          be returned. If no language code is provided, the response will be in "EN".
+          Please refer to [Supported Languages](https://docs.microsoft.com/azure/azure-maps/supported-languages)
+          for details.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      - name: options
+        in: query
+        description: Alternatively, use alias "o". Options available for types of
+          information returned in the result.
+        x-ms-enum:
+          name: TimezoneOptions
+          modelAsString: true
+          values:
+          - value: none
+            description: Do not include zoneinfo or transitions in the result.
+          - value: zoneInfo
+            description: Include additional time zone info in the result.
+          - value: transitions
+            description: Include transition information in the result (The number
+              of transitions is currently capped at 250).
+          - value: all
+            description: Include both zoneinfo and transitions in the result.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - none
+          - zoneInfo
+          - transitions
+          - all
+      - name: timeStamp
+        in: query
+        description: Alternatively, use alias "stamp", or "s". Reference time, if
+          omitted, the API will use the machine time serving the request.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          format: date-time
+      - name: transitionsFrom
+        x-ms-client-name: daylightSavingsTimeFrom
+        in: query
+        description: Alternatively, use alias "tf". The start date from which daylight
+          savings time (DST) transitions are requested, only applies when "options"
+          = all or "options" = transitions.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          format: date-time
+      - name: transitionsYears
+        x-ms-client-name: daylightSavingsTimeLastingYears
+        in: query
+        description: Alternatively, use alias "ty". The number of years from "transitionsFrom"
+          for which DST transitions are requested, only applies when "options" = all
+          or "options" = transitions.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+      - name: format
+        description: Desired format of the response. Only `json` format is supported.
+        in: path
+        required: true
+        x-ms-enum:
+          name: JsonFormat
+          modelAsString: true
+          values:
+          - value: json
+            description: '[The JavaScript Object Notation Data Interchange Format](https://tools.ietf.org/html/rfc8259)'
+        x-ms-client-default: json
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - json
+      - name: query
+        in: query
+        description: Coordinates of the point for which time zone information is requested.
+          This parameter is a list of coordinates, containing a pair of coordinate(lat,
+          long). When this endpoint is called directly, coordinates are passed in
+          as a single string containing coordinates, separated by commas.
+        required: true
+        x-ms-client-name: coordinates
+        style: form
+        explode: false
+        schema:
+          type: array
+          items:
+            type: number
+            format: double
+          minItems: 2
+          maxItems: 2
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: This object is returned from a successful Timezone By
+                  ID call or By Coordinates call
+                type: object
+                properties:
+                  Version:
+                    description: Version property
+                    type: string
+                    readOnly: true
+                  ReferenceUtcTimestamp:
+                    description: Reference Utc Timestamp property
+                    type: string
+                    readOnly: true
+                    format: date-time
+                  TimeZones:
+                    description: TimeZoneId array
+                    type: array
+                    readOnly: true
+                    items:
+                      type: object
+                      properties:
+                        Id:
+                          description: Id property
+                          type: string
+                          readOnly: true
+                        Aliases:
+                          description: 'An array of time zone ID aliases. Only returned
+                            when [options]=*zoneinfo* or *all*.
+
+
+                            Note: may be null.'
+                          type: array
+                          readOnly: true
+                          items:
+                            type: string
+                            readOnly: true
+                        Countries:
+                          description: An array of country/region records. Only returned
+                            when [options]=*zoneinfo* or *all*.
+                          type: array
+                          readOnly: true
+                          items:
+                            type: object
+                            description: A country/region record.
+                            properties:
+                              Name:
+                                description: country/region Name
+                                type: string
+                                readOnly: true
+                              Code:
+                                description: ISO-3166 2-letter country/region code
+                                  for the country/region.
+                                type: string
+                                readOnly: true
+                        Names:
+                          type: object
+                          description: Timezone names object.
+                          properties:
+                            ISO6391LanguageCode:
+                              description: The ISO 639-1 language code of the Names
+                              type: string
+                              readOnly: true
+                            Generic:
+                              description: Generic Name
+                              type: string
+                              readOnly: true
+                            Standard:
+                              description: Standard Name
+                              type: string
+                              readOnly: true
+                            Daylight:
+                              description: Daylight Name
+                              type: string
+                              readOnly: true
+                        ReferenceTime:
+                          description: Details in effect at the local time.
+                          type: object
+                          readOnly: true
+                          properties:
+                            Tag:
+                              description: Time zone name in effect at the reference
+                                timestamp (i.e. PST or PDT depending whether Daylight
+                                Savings Time is in effect).
+                              type: string
+                              readOnly: true
+                            StandardOffset:
+                              description: UTC offset in effect at the `ReferenceUTCTimestamp`.
+                              type: string
+                              readOnly: true
+                            DaylightSavings:
+                              description: Time saving in minutes in effect at the
+                                `ReferenceUTCTimestamp`.
+                              type: string
+                              readOnly: true
+                            WallTime:
+                              description: Current wall time at the given time zone
+                                as shown in the `Tag` property.
+                              type: string
+                              readOnly: true
+                            PosixTzValidYear:
+                              description: 'The year this POSIX string is valid for.
+                                Note: A POSIX string will only be valid in the given
+                                year.'
+                              type: integer
+                              readOnly: true
+                            PosixTz:
+                              description: POSIX string used to set the time zone
+                                environment variable.
+                              type: string
+                              readOnly: true
+                            Sunrise:
+                              description: Sunrise at the given time zone as shown
+                                in the `Tag` property, populated only when the call
+                                is `byCoordinates`. The sunrise is described in the
+                                [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+                                format. Note that the Timezone API does not return
+                                sunrise and sunset times when solar day is observed
+                                in the requested region.
+                              type: string
+                              format: date-time
+                              readOnly: true
+                            Sunset:
+                              description: Sunset at the given time zone as shown
+                                in the `Tag` property, populated only when the call
+                                is `byCoordinates`. The sunset is described in the
+                                [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+                                format. Note that the Timezone API does not return
+                                sunrise and sunset times when solar day is observed
+                                in the requested region.
+                              type: string
+                              format: date-time
+                              readOnly: true
+                        RepresentativePoint:
+                          description: Representative point property
+                          type: object
+                          readOnly: true
+                          properties:
+                            Latitude:
+                              description: Latitude property
+                              type: number
+                              readOnly: true
+                            Longitude:
+                              description: Longitude property
+                              type: number
+                              readOnly: true
+                        TimeTransitions:
+                          description: Time zone DST transitions from [transitionsFrom]
+                            until timestamp + 1 year.
+                          type: array
+                          readOnly: true
+                          items:
+                            type: object
+                            readOnly: true
+                            properties:
+                              Tag:
+                                description: Tag property
+                                type: string
+                                readOnly: true
+                              StandardOffset:
+                                description: StandardOffset property
+                                type: string
+                                readOnly: true
+                              DaylightSavings:
+                                description: DaylightSavings property
+                                type: string
+                                readOnly: true
+                              UtcStart:
+                                description: Start date, start time for this transition
+                                  period
+                                type: string
+                                readOnly: true
+                                format: date-time
+                              UtcEnd:
+                                description: End date, end time for this transition
+                                  period
+                                type: string
+                                readOnly: true
+                                format: date-time
+        default:
+          description: An unexpected error occurred.
+          x-ms-error-response: true
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers: []
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers: []
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+  /timezone/enumWindows/{format}:
+    get:
+      summary: Use to get the list of Windows Time Zone IDs.
+      description: '
+
+
+        The `Get Windows Time Zones` API is an HTTP `GET` request that returns a full
+        list of Windows Time Zone IDs.'
+      operationId: Timezone_GetTimezoneEnumWindows
+      x-ms-client-name: GetWindowsTimezoneIds
+      parameters:
+      - name: x-ms-client-id
+        x-ms-client-name: clientId
+        description: Indicates the account intended for use with the Microsoft Entra
+          ID security model. This unique ID for the Azure Maps account can be obtained
+          from the [Azure Maps management plane Account API](/rest/api/maps-management/accounts).
+          For more information on using Microsoft Entra ID security in Azure Maps,
+          see [Manage authentication in Azure Maps](/azure/azure-maps/how-to-manage-authentication).
+        in: header
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: api-version
+        description: Version number of Azure Maps API.
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+          default: '1.0'
+      - name: format
+        description: Desired format of the response. Only `json` format is supported.
+        in: path
+        required: true
+        x-ms-enum:
+          name: JsonFormat
+          modelAsString: true
+          values:
+          - value: json
+            description: '[The JavaScript Object Notation Data Interchange Format](https://tools.ietf.org/html/rfc8259)'
+        x-ms-client-default: json
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - json
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: This object is returned from a successful Timezone Enum
+                  Windows call
+                type: array
+                items:
+                  type: object
+                  properties:
+                    WindowsId:
+                      description: Windows Id property
+                      type: string
+                      readOnly: true
+                    Territory:
+                      description: Territory property
+                      type: string
+                      readOnly: true
+                    IanaIds:
+                      description: IanaIds array
+                      type: array
+                      items:
+                        type: string
+                        readOnly: true
+        default:
+          description: An unexpected error occurred.
+          x-ms-error-response: true
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers: []
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers: []
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+  /timezone/enumIana/{format}:
+    get:
+      summary: Use to get the list of IANA time zone IDs.
+      description: '
+
+
+        The `Get IANA Time Zones` API is an HTTP `GET` request that returns a full
+        list of Internet Assigned Numbers Authority (IANA) time zone IDs. Updates
+        to the IANA service are reflected in the system within one day.'
+      operationId: Timezone_GetTimezoneEnumIANA
+      x-ms-client-name: GetIANATimezoneIds
+      parameters:
+      - name: x-ms-client-id
+        x-ms-client-name: clientId
+        description: Indicates the account intended for use with the Microsoft Entra
+          ID security model. This unique ID for the Azure Maps account can be obtained
+          from the [Azure Maps management plane Account API](/rest/api/maps-management/accounts).
+          For more information on using Microsoft Entra ID security in Azure Maps,
+          see [Manage authentication in Azure Maps](/azure/azure-maps/how-to-manage-authentication).
+        in: header
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: api-version
+        description: Version number of Azure Maps API.
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+          default: '1.0'
+      - name: format
+        description: Desired format of the response. Only `json` format is supported.
+        in: path
+        required: true
+        x-ms-enum:
+          name: JsonFormat
+          modelAsString: true
+          values:
+          - value: json
+            description: '[The JavaScript Object Notation Data Interchange Format](https://tools.ietf.org/html/rfc8259)'
+        x-ms-client-default: json
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - json
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: This object is returned from a successful Timezone Enum
+                  IANA call
+                type: array
+                items:
+                  type: object
+                  properties:
+                    Id:
+                      description: Id property
+                      type: string
+                      readOnly: true
+                    IsAlias:
+                      description: IsAlias property
+                      type: boolean
+                      readOnly: true
+                    AliasOf:
+                      description: AliasOf property
+                      type: string
+                      readOnly: true
+                    HasZone1970Location:
+                      description: This attribute returns `True` if the IanaId has
+                        any country/zone associated with it.
+                      type: boolean
+                      readOnly: true
+        default:
+          description: An unexpected error occurred.
+          x-ms-error-response: true
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers: []
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers: []
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+  /timezone/ianaVersion/{format}:
+    get:
+      summary: Use to get the current IANA version number.
+      description: '
+
+
+        The `Get Time Zone IANA Version` API is an HTTP `GET` request that returns
+        the current Internet Assigned Numbers Authority (IANA) version number as Metadata.'
+      operationId: Timezone_GetTimezoneIANAVersion
+      x-ms-client-name: GetIANAVersion
+      parameters:
+      - name: x-ms-client-id
+        x-ms-client-name: clientId
+        description: Indicates the account intended for use with the Microsoft Entra
+          ID security model. This unique ID for the Azure Maps account can be obtained
+          from the [Azure Maps management plane Account API](/rest/api/maps-management/accounts).
+          For more information on using Microsoft Entra ID security in Azure Maps,
+          see [Manage authentication in Azure Maps](/azure/azure-maps/how-to-manage-authentication).
+        in: header
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: api-version
+        description: Version number of Azure Maps API.
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+          default: '1.0'
+      - name: format
+        description: Desired format of the response. Only `json` format is supported.
+        in: path
+        required: true
+        x-ms-enum:
+          name: JsonFormat
+          modelAsString: true
+          values:
+          - value: json
+            description: '[The JavaScript Object Notation Data Interchange Format](https://tools.ietf.org/html/rfc8259)'
+        x-ms-client-default: json
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - json
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: This object is returned from a successful Timezone IANA
+                  Version call
+                type: object
+                properties:
+                  Version:
+                    description: Version property
+                    type: string
+                    readOnly: true
+        default:
+          description: An unexpected error occurred.
+          x-ms-error-response: true
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers: []
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers: []
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+  /timezone/windowsToIana/{format}:
+    get:
+      summary: Use to get the IANA ID.
+      description: '
+
+
+        The `Get Windows to IANA Time Zone` API is an HTTP `GET` request that returns
+        a corresponding Internet Assigned Numbers Authority (IANA) ID, given a valid
+        Windows Time Zone ID. Multiple IANA IDs may be returned for a single Windows
+        ID. It is possible to narrow these results by adding an optional territory
+        parameter.'
+      operationId: Timezone_GetTimezoneWindowsToIANA
+      x-ms-client-name: ConvertWindowsTimezoneToIANA
+      parameters:
+      - name: x-ms-client-id
+        x-ms-client-name: clientId
+        description: Indicates the account intended for use with the Microsoft Entra
+          ID security model. This unique ID for the Azure Maps account can be obtained
+          from the [Azure Maps management plane Account API](/rest/api/maps-management/accounts).
+          For more information on using Microsoft Entra ID security in Azure Maps,
+          see [Manage authentication in Azure Maps](/azure/azure-maps/how-to-manage-authentication).
+        in: header
+        x-ms-parameter-location: client
+        schema:
+          type: string
+      - name: api-version
+        description: Version number of Azure Maps API.
+        in: query
+        required: true
+        x-ms-parameter-location: client
+        schema:
+          type: string
+          default: '1.0'
+      - name: format
+        description: Desired format of the response. Only `json` format is supported.
+        in: path
+        required: true
+        x-ms-enum:
+          name: JsonFormat
+          modelAsString: true
+          values:
+          - value: json
+            description: '[The JavaScript Object Notation Data Interchange Format](https://tools.ietf.org/html/rfc8259)'
+        x-ms-client-default: json
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          enum:
+          - json
+      - name: query
+        in: query
+        x-ms-client-name: windowsTimezoneId
+        description: The Windows time zone ID.
+        required: true
+        schema:
+          type: string
+      - name: territory
+        in: query
+        x-ms-client-name: windowsTerritoryCode
+        description: Windows Time Zone territory code.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: This object is returned from a successful Timezone Windows
+                  To IANA call
+                type: array
+                items:
+                  type: object
+                  properties:
+                    Id:
+                      description: Id property
+                      type: string
+                      readOnly: true
+                    IsAlias:
+                      description: IsAlias property
+                      type: boolean
+                      readOnly: true
+                    AliasOf:
+                      description: AliasOf property
+                      type: string
+                      readOnly: true
+                    HasZone1970Location:
+                      description: This attribute returns `True` if the IanaId has
+                        any country/zone associated with it.
+                      type: boolean
+                      readOnly: true
+        default:
+          description: An unexpected error occurred.
+          x-ms-error-response: true
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers: []
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers: []
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+components:
+  parameters:
+    ApiVersion:
+      name: api-version
+      description: Version number of Azure Maps API.
+      in: query
+      required: true
+      x-ms-parameter-location: client
+      schema:
+        type: string
+        default: '1.0'
+    TimezoneAcceptLanguage:
+      name: Accept-Language
+      in: header
+      description: Specifies the language code in which the timezone names should
+        be returned. If no language code is provided, the response will be in "EN".
+        Please refer to [Supported Languages](https://docs.microsoft.com/azure/azure-maps/supported-languages)
+        for details.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    TimezoneOptions:
+      name: options
+      in: query
+      description: Alternatively, use alias "o". Options available for types of information
+        returned in the result.
+      x-ms-enum:
+        name: TimezoneOptions
+        modelAsString: true
+        values:
+        - value: none
+          description: Do not include zoneinfo or transitions in the result.
+        - value: zoneInfo
+          description: Include additional time zone info in the result.
+        - value: transitions
+          description: Include transition information in the result (The number of
+            transitions is currently capped at 250).
+        - value: all
+          description: Include both zoneinfo and transitions in the result.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        enum:
+        - none
+        - zoneInfo
+        - transitions
+        - all
+    TimezoneTimeStamp:
+      name: timeStamp
+      in: query
+      description: Alternatively, use alias "stamp", or "s". Reference time, if omitted,
+        the API will use the machine time serving the request.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        format: date-time
+    TimezoneTransitionsFrom:
+      name: transitionsFrom
+      x-ms-client-name: daylightSavingsTimeFrom
+      in: query
+      description: Alternatively, use alias "tf". The start date from which daylight
+        savings time (DST) transitions are requested, only applies when "options"
+        = all or "options" = transitions.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        format: date-time
+    TimezoneTransitionsYears:
+      name: transitionsYears
+      x-ms-client-name: daylightSavingsTimeLastingYears
+      in: query
+      description: Alternatively, use alias "ty". The number of years from "transitionsFrom"
+        for which DST transitions are requested, only applies when "options" = all
+        or "options" = transitions.
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+    ClientId:
+      name: x-ms-client-id
+      x-ms-client-name: clientId
+      description: Indicates the account intended for use with the Microsoft Entra
+        ID security model. This unique ID for the Azure Maps account can be obtained
+        from the [Azure Maps management plane Account API](/rest/api/maps-management/accounts).
+        For more information on using Microsoft Entra ID security in Azure Maps, see
+        [Manage authentication in Azure Maps](/azure/azure-maps/how-to-manage-authentication).
+      in: header
+      x-ms-parameter-location: client
+      schema:
+        type: string
+    JsonFormat:
+      name: format
+      description: Desired format of the response. Only `json` format is supported.
+      in: path
+      required: true
+      x-ms-enum:
+        name: JsonFormat
+        modelAsString: true
+        values:
+        - value: json
+          description: '[The JavaScript Object Notation Data Interchange Format](https://tools.ietf.org/html/rfc8259)'
+      x-ms-client-default: json
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        enum:
+        - json
+  responses:
+    default:
+      description: An unexpected error occurred.
+      x-ms-error-response: true
+      content:
+        application/json:
+          schema:
+            type: object
+            title: Error response
+            description: Common error response for all Azure Resource Manager APIs
+              to return error details for failed operations. (This also follows the
+              OData error response format.).
+            properties:
+              error:
+                description: The error object.
+                type: object
+                properties:
+                  code:
+                    readOnly: true
+                    type: string
+                    description: The error code.
+                  message:
+                    readOnly: true
+                    type: string
+                    description: The error message.
+                  target:
+                    readOnly: true
+                    type: string
+                    description: The error target.
+                  details:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          readOnly: true
+                          type: string
+                          description: The error code.
+                        message:
+                          readOnly: true
+                          type: string
+                          description: The error message.
+                        target:
+                          readOnly: true
+                          type: string
+                          description: The error target.
+                        details:
+                          readOnly: true
+                          type: array
+                          items:
+                            type: object
+                            description: The error detail.
+                            properties:
+                              code:
+                                readOnly: true
+                                type: string
+                                description: The error code.
+                              message:
+                                readOnly: true
+                                type: string
+                                description: The error message.
+                              target:
+                                readOnly: true
+                                type: string
+                                description: The error target.
+                          x-ms-identifiers: []
+                          description: The error details.
+                        additionalInfo:
+                          readOnly: true
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              type:
+                                readOnly: true
+                                type: string
+                                description: The additional info type.
+                              info:
+                                readOnly: true
+                                type: object
+                                description: The additional info.
+                            description: The resource management error additional
+                              info.
+                          x-ms-identifiers: []
+                          description: The error additional info.
+                    x-ms-identifiers: []
+                    description: The error details.
+                  additionalInfo:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The additional info type.
+                        info:
+                          readOnly: true
+                          type: object
+                          description: The additional info.
+                      description: The resource management error additional info.
+                    x-ms-identifiers: []
+                    description: The error additional info.
+  securitySchemes:
+    AADToken:
+      type: oauth2
+      description: "These are the [Microsoft Entra OAuth 2.0](https://docs.microsoft.com/azure/active-directory/develop/v1-overview)\
+        \ Flows. When paired with [Azure role-based access](https://docs.microsoft.com/azure/role-based-access-control/overview)\
+        \ control it can be used to control access to Azure Maps REST APIs. Azure\
+        \ role-based access controls are used to designate access to one or more Azure\
+        \ Maps resource account or sub-resources. Any user, group, or service principal\
+        \ can be granted access via a  built-in role or a custom role composed of\
+        \ one or more permissions to Azure Maps REST APIs.\n\nTo implement scenarios,\
+        \ we recommend viewing [authentication concepts](https://aka.ms/amauth). In\
+        \ summary, this security definition provides a solution for modeling application(s)\
+        \ via objects capable of access control on specific APIs and scopes.\n\n####\
+        \ Notes\n* This security definition **requires** the use of the `x-ms-client-id`\
+        \ header to indicate which Azure Maps resource the application is requesting\
+        \ access to. This can be acquired from the [Maps management API](https://aka.ms/amauthdetails).\n\
+        * \nThe `Authorization URL` is specific to the Azure public cloud instance.\
+        \ Sovereign clouds have unique Authorization URLs and Microsoft Entra ID configurations.\
+        \ \n* \nThe Azure role-based access control is configured from the [Azure\
+        \ management plane](https://aka.ms/amrbac) via Azure portal, PowerShell, CLI,\
+        \ Azure SDKs, or REST APIs.\n* \nUsage of the [Azure Maps Web SDK](https://aka.ms/amaadmc)\
+        \ allows for configuration based setup of an application for multiple use\
+        \ cases.\n* For more information on Microsoft identity platform, see [Microsoft\
+        \ identity platform overview](https://learn.microsoft.com/entra/identity-platform/v2-overview)."
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            https://atlas.microsoft.com/.default: https://atlas.microsoft.com/.default
+    SharedKey:
+      type: apiKey
+      description: "This is a shared key that is provisioned when you [Create an Azure\
+        \ Maps account](https://docs.microsoft.com/azure/azure-maps/quick-demo-map-app#create-an-azure-maps-account)\
+        \ in the Azure portal or using PowerShell, CLI, Azure SDKs, or REST API.\n\
+        \n With this key, any application can access all REST API. In other words,\
+        \ this key can be used as a master key in the account that they are issued\
+        \ in.\n\n For publicly exposed applications, our recommendation is to use\
+        \ the [confidential client applications](https://docs.microsoft.com/azure/azure-maps/authentication-best-practices#confidential-client-applications)\
+        \ approach to access Azure Maps REST APIs so your key can be securely stored."
+      name: subscription-key
+      in: query
+    SasToken:
+      type: apiKey
+      description: "This is a shared access signature token is created from the List\
+        \ SAS operation on the [Azure Maps resource](https://aka.ms/amauth) through\
+        \ the Azure management plane via Azure portal, PowerShell, CLI, Azure SDKs,\
+        \ or REST APIs.\n\n With this token, any application is authorized to access\
+        \ with Azure role-based access controls and fine-grain control to the expiration,\
+        \ rate, and region(s) of use for the particular token. In other words, the\
+        \ SAS Token can be used to allow applications to control access in a more\
+        \ secured way than the shared key.\n\n For publicly exposed applications,\
+        \ our recommendation is to configure a specific list of allowed origins on\
+        \ the [Map account resource](https://aka.ms/amauth) to limit rendering abuse\
+        \ and regularly renew the SAS Token."
+      name: SAS Token
+      in: header
+  schemas:
+    CountryRecord:
+      type: object
+      description: A country/region record.
+      properties:
+        Name:
+          description: country/region Name
+          type: string
+          readOnly: true
+        Code:
+          description: ISO-3166 2-letter country/region code for the country/region.
+          type: string
+          readOnly: true
+    TimeTransition:
+      type: object
+      readOnly: true
+      properties:
+        Tag:
+          description: Tag property
+          type: string
+          readOnly: true
+        StandardOffset:
+          description: StandardOffset property
+          type: string
+          readOnly: true
+        DaylightSavings:
+          description: DaylightSavings property
+          type: string
+          readOnly: true
+        UtcStart:
+          description: Start date, start time for this transition period
+          type: string
+          readOnly: true
+          format: date-time
+        UtcEnd:
+          description: End date, end time for this transition period
+          type: string
+          readOnly: true
+          format: date-time
+    TimezoneResult:
+      description: This object is returned from a successful Timezone By ID call or
+        By Coordinates call
+      type: object
+      properties:
+        Version:
+          description: Version property
+          type: string
+          readOnly: true
+        ReferenceUtcTimestamp:
+          description: Reference Utc Timestamp property
+          type: string
+          readOnly: true
+          format: date-time
+        TimeZones:
+          description: TimeZoneId array
+          type: array
+          readOnly: true
+          items:
+            type: object
+            properties:
+              Id:
+                description: Id property
+                type: string
+                readOnly: true
+              Aliases:
+                description: 'An array of time zone ID aliases. Only returned when
+                  [options]=*zoneinfo* or *all*.
+
+
+                  Note: may be null.'
+                type: array
+                readOnly: true
+                items:
+                  type: string
+                  readOnly: true
+              Countries:
+                description: An array of country/region records. Only returned when
+                  [options]=*zoneinfo* or *all*.
+                type: array
+                readOnly: true
+                items:
+                  type: object
+                  description: A country/region record.
+                  properties:
+                    Name:
+                      description: country/region Name
+                      type: string
+                      readOnly: true
+                    Code:
+                      description: ISO-3166 2-letter country/region code for the country/region.
+                      type: string
+                      readOnly: true
+              Names:
+                type: object
+                description: Timezone names object.
+                properties:
+                  ISO6391LanguageCode:
+                    description: The ISO 639-1 language code of the Names
+                    type: string
+                    readOnly: true
+                  Generic:
+                    description: Generic Name
+                    type: string
+                    readOnly: true
+                  Standard:
+                    description: Standard Name
+                    type: string
+                    readOnly: true
+                  Daylight:
+                    description: Daylight Name
+                    type: string
+                    readOnly: true
+              ReferenceTime:
+                description: Details in effect at the local time.
+                type: object
+                readOnly: true
+                properties:
+                  Tag:
+                    description: Time zone name in effect at the reference timestamp
+                      (i.e. PST or PDT depending whether Daylight Savings Time is
+                      in effect).
+                    type: string
+                    readOnly: true
+                  StandardOffset:
+                    description: UTC offset in effect at the `ReferenceUTCTimestamp`.
+                    type: string
+                    readOnly: true
+                  DaylightSavings:
+                    description: Time saving in minutes in effect at the `ReferenceUTCTimestamp`.
+                    type: string
+                    readOnly: true
+                  WallTime:
+                    description: Current wall time at the given time zone as shown
+                      in the `Tag` property.
+                    type: string
+                    readOnly: true
+                  PosixTzValidYear:
+                    description: 'The year this POSIX string is valid for. Note: A
+                      POSIX string will only be valid in the given year.'
+                    type: integer
+                    readOnly: true
+                  PosixTz:
+                    description: POSIX string used to set the time zone environment
+                      variable.
+                    type: string
+                    readOnly: true
+                  Sunrise:
+                    description: Sunrise at the given time zone as shown in the `Tag`
+                      property, populated only when the call is `byCoordinates`. The
+                      sunrise is described in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+                      format. Note that the Timezone API does not return sunrise and
+                      sunset times when solar day is observed in the requested region.
+                    type: string
+                    format: date-time
+                    readOnly: true
+                  Sunset:
+                    description: Sunset at the given time zone as shown in the `Tag`
+                      property, populated only when the call is `byCoordinates`. The
+                      sunset is described in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+                      format. Note that the Timezone API does not return sunrise and
+                      sunset times when solar day is observed in the requested region.
+                    type: string
+                    format: date-time
+                    readOnly: true
+              RepresentativePoint:
+                description: Representative point property
+                type: object
+                readOnly: true
+                properties:
+                  Latitude:
+                    description: Latitude property
+                    type: number
+                    readOnly: true
+                  Longitude:
+                    description: Longitude property
+                    type: number
+                    readOnly: true
+              TimeTransitions:
+                description: Time zone DST transitions from [transitionsFrom] until
+                  timestamp + 1 year.
+                type: array
+                readOnly: true
+                items:
+                  type: object
+                  readOnly: true
+                  properties:
+                    Tag:
+                      description: Tag property
+                      type: string
+                      readOnly: true
+                    StandardOffset:
+                      description: StandardOffset property
+                      type: string
+                      readOnly: true
+                    DaylightSavings:
+                      description: DaylightSavings property
+                      type: string
+                      readOnly: true
+                    UtcStart:
+                      description: Start date, start time for this transition period
+                      type: string
+                      readOnly: true
+                      format: date-time
+                    UtcEnd:
+                      description: End date, end time for this transition period
+                      type: string
+                      readOnly: true
+                      format: date-time
+    TimezoneEnumWindowsResult:
+      description: This object is returned from a successful Timezone Enum Windows
+        call
+      type: array
+      items:
+        type: object
+        properties:
+          WindowsId:
+            description: Windows Id property
+            type: string
+            readOnly: true
+          Territory:
+            description: Territory property
+            type: string
+            readOnly: true
+          IanaIds:
+            description: IanaIds array
+            type: array
+            items:
+              type: string
+              readOnly: true
+    TimezoneWindows:
+      type: object
+      properties:
+        WindowsId:
+          description: Windows Id property
+          type: string
+          readOnly: true
+        Territory:
+          description: Territory property
+          type: string
+          readOnly: true
+        IanaIds:
+          description: IanaIds array
+          type: array
+          items:
+            type: string
+            readOnly: true
+    TimezoneEnumIanaResult:
+      description: This object is returned from a successful Timezone Enum IANA call
+      type: array
+      items:
+        type: object
+        properties:
+          Id:
+            description: Id property
+            type: string
+            readOnly: true
+          IsAlias:
+            description: IsAlias property
+            type: boolean
+            readOnly: true
+          AliasOf:
+            description: AliasOf property
+            type: string
+            readOnly: true
+          HasZone1970Location:
+            description: This attribute returns `True` if the IanaId has any country/zone
+              associated with it.
+            type: boolean
+            readOnly: true
+    TimezoneIanaVersionResult:
+      description: This object is returned from a successful Timezone IANA Version
+        call
+      type: object
+      properties:
+        Version:
+          description: Version property
+          type: string
+          readOnly: true
+    TimezoneWindowsToIanaResult:
+      description: This object is returned from a successful Timezone Windows To IANA
+        call
+      type: array
+      items:
+        type: object
+        properties:
+          Id:
+            description: Id property
+            type: string
+            readOnly: true
+          IsAlias:
+            description: IsAlias property
+            type: boolean
+            readOnly: true
+          AliasOf:
+            description: AliasOf property
+            type: string
+            readOnly: true
+          HasZone1970Location:
+            description: This attribute returns `True` if the IanaId has any country/zone
+              associated with it.
+            type: boolean
+            readOnly: true
+    IanaId:
+      type: object
+      properties:
+        Id:
+          description: Id property
+          type: string
+          readOnly: true
+        IsAlias:
+          description: IsAlias property
+          type: boolean
+          readOnly: true
+        AliasOf:
+          description: AliasOf property
+          type: string
+          readOnly: true
+        HasZone1970Location:
+          description: This attribute returns `True` if the IanaId has any country/zone
+            associated with it.
+          type: boolean
+          readOnly: true
+    TimezoneIds:
+      description: TimeZoneId array
+      type: array
+      readOnly: true
+      items:
+        type: object
+        properties:
+          Id:
+            description: Id property
+            type: string
+            readOnly: true
+          Aliases:
+            description: 'An array of time zone ID aliases. Only returned when [options]=*zoneinfo*
+              or *all*.
+
+
+              Note: may be null.'
+            type: array
+            readOnly: true
+            items:
+              type: string
+              readOnly: true
+          Countries:
+            description: An array of country/region records. Only returned when [options]=*zoneinfo*
+              or *all*.
+            type: array
+            readOnly: true
+            items:
+              type: object
+              description: A country/region record.
+              properties:
+                Name:
+                  description: country/region Name
+                  type: string
+                  readOnly: true
+                Code:
+                  description: ISO-3166 2-letter country/region code for the country/region.
+                  type: string
+                  readOnly: true
+          Names:
+            type: object
+            description: Timezone names object.
+            properties:
+              ISO6391LanguageCode:
+                description: The ISO 639-1 language code of the Names
+                type: string
+                readOnly: true
+              Generic:
+                description: Generic Name
+                type: string
+                readOnly: true
+              Standard:
+                description: Standard Name
+                type: string
+                readOnly: true
+              Daylight:
+                description: Daylight Name
+                type: string
+                readOnly: true
+          ReferenceTime:
+            description: Details in effect at the local time.
+            type: object
+            readOnly: true
+            properties:
+              Tag:
+                description: Time zone name in effect at the reference timestamp (i.e.
+                  PST or PDT depending whether Daylight Savings Time is in effect).
+                type: string
+                readOnly: true
+              StandardOffset:
+                description: UTC offset in effect at the `ReferenceUTCTimestamp`.
+                type: string
+                readOnly: true
+              DaylightSavings:
+                description: Time saving in minutes in effect at the `ReferenceUTCTimestamp`.
+                type: string
+                readOnly: true
+              WallTime:
+                description: Current wall time at the given time zone as shown in
+                  the `Tag` property.
+                type: string
+                readOnly: true
+              PosixTzValidYear:
+                description: 'The year this POSIX string is valid for. Note: A POSIX
+                  string will only be valid in the given year.'
+                type: integer
+                readOnly: true
+              PosixTz:
+                description: POSIX string used to set the time zone environment variable.
+                type: string
+                readOnly: true
+              Sunrise:
+                description: Sunrise at the given time zone as shown in the `Tag`
+                  property, populated only when the call is `byCoordinates`. The sunrise
+                  is described in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+                  format. Note that the Timezone API does not return sunrise and sunset
+                  times when solar day is observed in the requested region.
+                type: string
+                format: date-time
+                readOnly: true
+              Sunset:
+                description: Sunset at the given time zone as shown in the `Tag` property,
+                  populated only when the call is `byCoordinates`. The sunset is described
+                  in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+                  format. Note that the Timezone API does not return sunrise and sunset
+                  times when solar day is observed in the requested region.
+                type: string
+                format: date-time
+                readOnly: true
+          RepresentativePoint:
+            description: Representative point property
+            type: object
+            readOnly: true
+            properties:
+              Latitude:
+                description: Latitude property
+                type: number
+                readOnly: true
+              Longitude:
+                description: Longitude property
+                type: number
+                readOnly: true
+          TimeTransitions:
+            description: Time zone DST transitions from [transitionsFrom] until timestamp
+              + 1 year.
+            type: array
+            readOnly: true
+            items:
+              type: object
+              readOnly: true
+              properties:
+                Tag:
+                  description: Tag property
+                  type: string
+                  readOnly: true
+                StandardOffset:
+                  description: StandardOffset property
+                  type: string
+                  readOnly: true
+                DaylightSavings:
+                  description: DaylightSavings property
+                  type: string
+                  readOnly: true
+                UtcStart:
+                  description: Start date, start time for this transition period
+                  type: string
+                  readOnly: true
+                  format: date-time
+                UtcEnd:
+                  description: End date, end time for this transition period
+                  type: string
+                  readOnly: true
+                  format: date-time
+    TimezoneId:
+      type: object
+      properties:
+        Id:
+          description: Id property
+          type: string
+          readOnly: true
+        Aliases:
+          description: 'An array of time zone ID aliases. Only returned when [options]=*zoneinfo*
+            or *all*.
+
+
+            Note: may be null.'
+          type: array
+          readOnly: true
+          items:
+            type: string
+            readOnly: true
+        Countries:
+          description: An array of country/region records. Only returned when [options]=*zoneinfo*
+            or *all*.
+          type: array
+          readOnly: true
+          items:
+            type: object
+            description: A country/region record.
+            properties:
+              Name:
+                description: country/region Name
+                type: string
+                readOnly: true
+              Code:
+                description: ISO-3166 2-letter country/region code for the country/region.
+                type: string
+                readOnly: true
+        Names:
+          type: object
+          description: Timezone names object.
+          properties:
+            ISO6391LanguageCode:
+              description: The ISO 639-1 language code of the Names
+              type: string
+              readOnly: true
+            Generic:
+              description: Generic Name
+              type: string
+              readOnly: true
+            Standard:
+              description: Standard Name
+              type: string
+              readOnly: true
+            Daylight:
+              description: Daylight Name
+              type: string
+              readOnly: true
+        ReferenceTime:
+          description: Details in effect at the local time.
+          type: object
+          readOnly: true
+          properties:
+            Tag:
+              description: Time zone name in effect at the reference timestamp (i.e.
+                PST or PDT depending whether Daylight Savings Time is in effect).
+              type: string
+              readOnly: true
+            StandardOffset:
+              description: UTC offset in effect at the `ReferenceUTCTimestamp`.
+              type: string
+              readOnly: true
+            DaylightSavings:
+              description: Time saving in minutes in effect at the `ReferenceUTCTimestamp`.
+              type: string
+              readOnly: true
+            WallTime:
+              description: Current wall time at the given time zone as shown in the
+                `Tag` property.
+              type: string
+              readOnly: true
+            PosixTzValidYear:
+              description: 'The year this POSIX string is valid for. Note: A POSIX
+                string will only be valid in the given year.'
+              type: integer
+              readOnly: true
+            PosixTz:
+              description: POSIX string used to set the time zone environment variable.
+              type: string
+              readOnly: true
+            Sunrise:
+              description: Sunrise at the given time zone as shown in the `Tag` property,
+                populated only when the call is `byCoordinates`. The sunrise is described
+                in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+                format. Note that the Timezone API does not return sunrise and sunset
+                times when solar day is observed in the requested region.
+              type: string
+              format: date-time
+              readOnly: true
+            Sunset:
+              description: Sunset at the given time zone as shown in the `Tag` property,
+                populated only when the call is `byCoordinates`. The sunset is described
+                in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+                format. Note that the Timezone API does not return sunrise and sunset
+                times when solar day is observed in the requested region.
+              type: string
+              format: date-time
+              readOnly: true
+        RepresentativePoint:
+          description: Representative point property
+          type: object
+          readOnly: true
+          properties:
+            Latitude:
+              description: Latitude property
+              type: number
+              readOnly: true
+            Longitude:
+              description: Longitude property
+              type: number
+              readOnly: true
+        TimeTransitions:
+          description: Time zone DST transitions from [transitionsFrom] until timestamp
+            + 1 year.
+          type: array
+          readOnly: true
+          items:
+            type: object
+            readOnly: true
+            properties:
+              Tag:
+                description: Tag property
+                type: string
+                readOnly: true
+              StandardOffset:
+                description: StandardOffset property
+                type: string
+                readOnly: true
+              DaylightSavings:
+                description: DaylightSavings property
+                type: string
+                readOnly: true
+              UtcStart:
+                description: Start date, start time for this transition period
+                type: string
+                readOnly: true
+                format: date-time
+              UtcEnd:
+                description: End date, end time for this transition period
+                type: string
+                readOnly: true
+                format: date-time
+    TimezoneNames:
+      type: object
+      description: Timezone names object.
+      properties:
+        ISO6391LanguageCode:
+          description: The ISO 639-1 language code of the Names
+          type: string
+          readOnly: true
+        Generic:
+          description: Generic Name
+          type: string
+          readOnly: true
+        Standard:
+          description: Standard Name
+          type: string
+          readOnly: true
+        Daylight:
+          description: Daylight Name
+          type: string
+          readOnly: true
+    ReferenceTime:
+      description: Details in effect at the local time.
+      type: object
+      readOnly: true
+      properties:
+        Tag:
+          description: Time zone name in effect at the reference timestamp (i.e. PST
+            or PDT depending whether Daylight Savings Time is in effect).
+          type: string
+          readOnly: true
+        StandardOffset:
+          description: UTC offset in effect at the `ReferenceUTCTimestamp`.
+          type: string
+          readOnly: true
+        DaylightSavings:
+          description: Time saving in minutes in effect at the `ReferenceUTCTimestamp`.
+          type: string
+          readOnly: true
+        WallTime:
+          description: Current wall time at the given time zone as shown in the `Tag`
+            property.
+          type: string
+          readOnly: true
+        PosixTzValidYear:
+          description: 'The year this POSIX string is valid for. Note: A POSIX string
+            will only be valid in the given year.'
+          type: integer
+          readOnly: true
+        PosixTz:
+          description: POSIX string used to set the time zone environment variable.
+          type: string
+          readOnly: true
+        Sunrise:
+          description: Sunrise at the given time zone as shown in the `Tag` property,
+            populated only when the call is `byCoordinates`. The sunrise is described
+            in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+            format. Note that the Timezone API does not return sunrise and sunset
+            times when solar day is observed in the requested region.
+          type: string
+          format: date-time
+          readOnly: true
+        Sunset:
+          description: Sunset at the given time zone as shown in the `Tag` property,
+            populated only when the call is `byCoordinates`. The sunset is described
+            in the [ISO 8601](https://www.iso.org/iso-8601-date-and-time-format.html)
+            format. Note that the Timezone API does not return sunrise and sunset
+            times when solar day is observed in the requested region.
+          type: string
+          format: date-time
+          readOnly: true
+    RepresentativePoint:
+      description: Representative point property
+      type: object
+      readOnly: true
+      properties:
+        Latitude:
+          description: Latitude property
+          type: number
+          readOnly: true
+        Longitude:
+          description: Longitude property
+          type: number
+          readOnly: true
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          readOnly: true
+          type: string
+          description: The error code.
+        message:
+          readOnly: true
+          type: string
+          description: The error message.
+        target:
+          readOnly: true
+          type: string
+          description: The error target.
+        details:
+          readOnly: true
+          type: array
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                readOnly: true
+                type: string
+                description: The error code.
+              message:
+                readOnly: true
+                type: string
+                description: The error message.
+              target:
+                readOnly: true
+                type: string
+                description: The error target.
+              details:
+                readOnly: true
+                type: array
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      readOnly: true
+                      type: string
+                      description: The error code.
+                    message:
+                      readOnly: true
+                      type: string
+                      description: The error message.
+                    target:
+                      readOnly: true
+                      type: string
+                      description: The error target.
+                x-ms-identifiers: []
+                description: The error details.
+              additionalInfo:
+                readOnly: true
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      readOnly: true
+                      type: string
+                      description: The additional info type.
+                    info:
+                      readOnly: true
+                      type: object
+                      description: The additional info.
+                  description: The resource management error additional info.
+                x-ms-identifiers: []
+                description: The error additional info.
+          x-ms-identifiers: []
+          description: The error details.
+        additionalInfo:
+          readOnly: true
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                readOnly: true
+                type: string
+                description: The additional info type.
+              info:
+                readOnly: true
+                type: object
+                description: The additional info.
+            description: The resource management error additional info.
+          x-ms-identifiers: []
+          description: The error additional info.
+    ErrorAdditionalInfo:
+      type: object
+      properties:
+        type:
+          readOnly: true
+          type: string
+          description: The additional info type.
+        info:
+          readOnly: true
+          type: object
+          description: The additional info.
+      description: The resource management error additional info.
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              readOnly: true
+              type: string
+              description: The error code.
+            message:
+              readOnly: true
+              type: string
+              description: The error message.
+            target:
+              readOnly: true
+              type: string
+              description: The error target.
+            details:
+              readOnly: true
+              type: array
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    readOnly: true
+                    type: string
+                    description: The error code.
+                  message:
+                    readOnly: true
+                    type: string
+                    description: The error message.
+                  target:
+                    readOnly: true
+                    type: string
+                    description: The error target.
+                  details:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          readOnly: true
+                          type: string
+                          description: The error code.
+                        message:
+                          readOnly: true
+                          type: string
+                          description: The error message.
+                        target:
+                          readOnly: true
+                          type: string
+                          description: The error target.
+                    x-ms-identifiers: []
+                    description: The error details.
+                  additionalInfo:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The additional info type.
+                        info:
+                          readOnly: true
+                          type: object
+                          description: The additional info.
+                      description: The resource management error additional info.
+                    x-ms-identifiers: []
+                    description: The error additional info.
+              x-ms-identifiers: []
+              description: The error details.
+            additionalInfo:
+              readOnly: true
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The additional info type.
+                  info:
+                    readOnly: true
+                    type: object
+                    description: The additional info.
+                description: The resource management error additional info.
+              x-ms-identifiers: []
+              description: The error additional info.

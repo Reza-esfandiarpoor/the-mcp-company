@@ -1,0 +1,562 @@
+openapi: 3.0.0
+info:
+  version: 2023-06-07
+  title: LabServicesClient
+  description: REST API for managing Azure Lab Services core usages.
+servers:
+- url: https://management.azure.com
+paths:
+  /subscriptions/{subscriptionId}/providers/Microsoft.LabServices/locations/{location}/usages:
+    parameters:
+    - name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    - name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    - name: location
+      in: path
+      required: true
+      description: The location name.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+        pattern: ^[-\w\._]+$
+    - in: query
+      name: $filter
+      description: The filter to apply to the operation.
+      schema:
+        type: string
+    get:
+      tags:
+      - Usages
+      summary: Gets the list of usages.
+      description: Returns list of usage per SKU family for the specified subscription
+        in the specified region.
+      operationId: Usages_ListByLocation
+      responses:
+        '200':
+          description: The request was successful; a list of usages is returned
+          content:
+            application/json:
+              schema:
+                description: List of Core Usages.
+                type: object
+                properties:
+                  value:
+                    description: The array page of Usages.
+                    type: array
+                    items:
+                      description: The core usage details.
+                      type: object
+                      properties:
+                        currentValue:
+                          description: The current usage.
+                          type: integer
+                          format: int64
+                        limit:
+                          description: The limit integer.
+                          type: integer
+                          format: int64
+                        unit:
+                          description: The unit details.
+                          type: string
+                          enum:
+                          - Count
+                          x-ms-enum:
+                            name: UsageUnit
+                            modelAsString: true
+                        name:
+                          description: The name.
+                          type: object
+                          properties:
+                            localizedValue:
+                              description: The localized name of the resource.
+                              type: string
+                            skuInstances:
+                              description: The instances of the resource.
+                              type: array
+                              items:
+                                type: string
+                            value:
+                              description: The name of the resource.
+                              type: string
+                        id:
+                          description: The fully qualified arm resource id.
+                          type: string
+                  nextLink:
+                    description: The link to get the next page of Usage result.
+                    type: string
+                    readOnly: true
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-pageable:
+        nextLinkName: nextLink
+components:
+  parameters:
+    LocationRouteParameter:
+      name: location
+      in: path
+      required: true
+      description: The location name.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+        pattern: ^[-\w\._]+$
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    ListUsagesResult:
+      description: List of Core Usages.
+      type: object
+      properties:
+        value:
+          description: The array page of Usages.
+          type: array
+          items:
+            description: The core usage details.
+            type: object
+            properties:
+              currentValue:
+                description: The current usage.
+                type: integer
+                format: int64
+              limit:
+                description: The limit integer.
+                type: integer
+                format: int64
+              unit:
+                description: The unit details.
+                type: string
+                enum:
+                - Count
+                x-ms-enum:
+                  name: UsageUnit
+                  modelAsString: true
+              name:
+                description: The name.
+                type: object
+                properties:
+                  localizedValue:
+                    description: The localized name of the resource.
+                    type: string
+                  skuInstances:
+                    description: The instances of the resource.
+                    type: array
+                    items:
+                      type: string
+                  value:
+                    description: The name of the resource.
+                    type: string
+              id:
+                description: The fully qualified arm resource id.
+                type: string
+        nextLink:
+          description: The link to get the next page of Usage result.
+          type: string
+          readOnly: true
+    Usage:
+      description: The core usage details.
+      type: object
+      properties:
+        currentValue:
+          description: The current usage.
+          type: integer
+          format: int64
+        limit:
+          description: The limit integer.
+          type: integer
+          format: int64
+        unit:
+          description: The unit details.
+          type: string
+          enum:
+          - Count
+          x-ms-enum:
+            name: UsageUnit
+            modelAsString: true
+        name:
+          description: The name.
+          type: object
+          properties:
+            localizedValue:
+              description: The localized name of the resource.
+              type: string
+            skuInstances:
+              description: The instances of the resource.
+              type: array
+              items:
+                type: string
+            value:
+              description: The name of the resource.
+              type: string
+        id:
+          description: The fully qualified arm resource id.
+          type: string
+    UsageName:
+      description: The Usage Names.
+      type: object
+      properties:
+        localizedValue:
+          description: The localized name of the resource.
+          type: string
+        skuInstances:
+          description: The instances of the resource.
+          type: array
+          items:
+            type: string
+        value:
+          description: The name of the resource.
+          type: string
+    ErrorDetail:
+      description: The error detail.
+      type: object
+      properties:
+        code:
+          readOnly: true
+          type: string
+          description: The error code.
+        message:
+          readOnly: true
+          type: string
+          description: The error message.
+        target:
+          readOnly: true
+          type: string
+          description: The error target.
+        details:
+          readOnly: true
+          type: array
+          items:
+            description: The error detail.
+            type: object
+            properties:
+              code:
+                readOnly: true
+                type: string
+                description: The error code.
+              message:
+                readOnly: true
+                type: string
+                description: The error message.
+              target:
+                readOnly: true
+                type: string
+                description: The error target.
+              details:
+                readOnly: true
+                type: array
+                items:
+                  description: The error detail.
+                  type: object
+                  properties:
+                    code:
+                      readOnly: true
+                      type: string
+                      description: The error code.
+                    message:
+                      readOnly: true
+                      type: string
+                      description: The error message.
+                    target:
+                      readOnly: true
+                      type: string
+                      description: The error target.
+                x-ms-identifiers:
+                - message
+                - target
+                description: The error details.
+              additionalInfo:
+                readOnly: true
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      readOnly: true
+                      type: string
+                      description: The additional info type.
+                    info:
+                      readOnly: true
+                      type: object
+                      description: The additional info.
+                  description: The resource management error additional info.
+                x-ms-identifiers: []
+                description: The error additional info.
+          x-ms-identifiers:
+          - message
+          - target
+          description: The error details.
+        additionalInfo:
+          readOnly: true
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                readOnly: true
+                type: string
+                description: The additional info type.
+              info:
+                readOnly: true
+                type: object
+                description: The additional info.
+            description: The resource management error additional info.
+          x-ms-identifiers: []
+          description: The error additional info.
+    ErrorAdditionalInfo:
+      type: object
+      properties:
+        type:
+          readOnly: true
+          type: string
+          description: The additional info type.
+        info:
+          readOnly: true
+          type: object
+          description: The additional info.
+      description: The resource management error additional info.
+    ErrorResponse:
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      type: object
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              readOnly: true
+              type: string
+              description: The error code.
+            message:
+              readOnly: true
+              type: string
+              description: The error message.
+            target:
+              readOnly: true
+              type: string
+              description: The error target.
+            details:
+              readOnly: true
+              type: array
+              items:
+                description: The error detail.
+                type: object
+                properties:
+                  code:
+                    readOnly: true
+                    type: string
+                    description: The error code.
+                  message:
+                    readOnly: true
+                    type: string
+                    description: The error message.
+                  target:
+                    readOnly: true
+                    type: string
+                    description: The error target.
+                  details:
+                    readOnly: true
+                    type: array
+                    items:
+                      description: The error detail.
+                      type: object
+                      properties:
+                        code:
+                          readOnly: true
+                          type: string
+                          description: The error code.
+                        message:
+                          readOnly: true
+                          type: string
+                          description: The error message.
+                        target:
+                          readOnly: true
+                          type: string
+                          description: The error target.
+                    x-ms-identifiers:
+                    - message
+                    - target
+                    description: The error details.
+                  additionalInfo:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The additional info type.
+                        info:
+                          readOnly: true
+                          type: object
+                          description: The additional info.
+                      description: The resource management error additional info.
+                    x-ms-identifiers: []
+                    description: The error additional info.
+              x-ms-identifiers:
+              - message
+              - target
+              description: The error details.
+            additionalInfo:
+              readOnly: true
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The additional info type.
+                  info:
+                    readOnly: true
+                    type: object
+                    description: The additional info.
+                description: The resource management error additional info.
+              x-ms-identifiers: []
+              description: The error additional info.

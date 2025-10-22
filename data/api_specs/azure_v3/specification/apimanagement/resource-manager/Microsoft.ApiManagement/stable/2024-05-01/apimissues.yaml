@@ -1,0 +1,1095 @@
+openapi: 3.0.0
+info:
+  title: ApiManagementClient
+  description: Use this REST API to get all the issues across an Azure Api Management
+    service.
+  version: 2024-05-01
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/issues
+  : get:
+      tags:
+      - Issue
+      operationId: Issue_ListByService
+      description: Lists a collection of issues in the specified service instance.
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: $filter
+        in: query
+        required: false
+        description: '|     Field     |     Usage     |     Supported operators     |     Supported
+          functions     |</br>|-------------|-------------|-------------|-------------|</br>|
+          name | filter | ge, le, eq, ne, gt, lt | substringof, contains, startswith,
+          endswith |</br>| apiId | filter | ge, le, eq, ne, gt, lt | substringof,
+          contains, startswith, endswith |</br>| title | filter | ge, le, eq, ne,
+          gt, lt | substringof, contains, startswith, endswith |</br>| description
+          | filter | ge, le, eq, ne, gt, lt | substringof, contains, startswith, endswith
+          |</br>| authorName | filter | ge, le, eq, ne, gt, lt | substringof, contains,
+          startswith, endswith |</br>| state | filter | eq |     |</br>'
+        schema:
+          type: string
+      - name: $top
+        in: query
+        required: false
+        description: Number of records to return.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+      - name: $skip
+        in: query
+        required: false
+        description: Number of records to skip.
+        x-ms-parameter-location: method
+        schema:
+          type: integer
+          format: int32
+          minimum: 0
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Lists a collection of Issue entities.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                        name:
+                          readOnly: true
+                          type: string
+                          description: The name of the resource
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                        properties:
+                          type: object
+                          properties:
+                            createdDate:
+                              type: string
+                              format: date-time
+                              description: Date and time when the issue was created.
+                            state:
+                              type: string
+                              description: Status of the issue.
+                              enum:
+                              - proposed
+                              - open
+                              - removed
+                              - resolved
+                              - closed
+                              x-ms-enum:
+                                name: State
+                                modelAsString: true
+                                values:
+                                - value: proposed
+                                  description: The issue is proposed.
+                                - value: open
+                                  description: The issue is opened.
+                                - value: removed
+                                  description: The issue was removed.
+                                - value: resolved
+                                  description: The issue is now resolved.
+                                - value: closed
+                                  description: The issue was closed.
+                            apiId:
+                              type: string
+                              description: A resource identifier for the API the issue
+                                was created for.
+                            title:
+                              type: string
+                              description: The issue title.
+                            description:
+                              type: string
+                              description: Text describing the issue.
+                            userId:
+                              type: string
+                              description: A resource identifier for the user created
+                                the issue.
+                          description: Issue contract Base Properties.
+                          required:
+                          - title
+                          - description
+                          - userId
+                          x-ms-client-flatten: true
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                    description: Issue values.
+                    readOnly: true
+                  count:
+                    type: integer
+                    format: int64
+                    description: Total record count number across all pages.
+                  nextLink:
+                    type: string
+                    description: Next page link if any.
+                    readOnly: true
+                description: Paged Issue list representation.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+      x-ms-odata: ./definitions.json#/definitions/IssueContract
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ApiManagement/service/{serviceName}/issues/{issueId}
+  : get:
+      tags:
+      - Issue
+      operationId: Issue_Get
+      description: Gets API Management issue details
+      parameters:
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: serviceName
+        in: path
+        required: true
+        description: The name of the API Management service.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 50
+          pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+      - name: issueId
+        in: path
+        required: true
+        description: Issue identifier. Must be unique in the current API Management
+          service instance.
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 256
+          pattern: ^[^*#&+:<>?]+$
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Get the details of the issue.
+          headers:
+            ETag:
+              description: Current entity state version. Should be treated as opaque
+                and used to make conditional HTTP requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  properties:
+                    type: object
+                    properties:
+                      createdDate:
+                        type: string
+                        format: date-time
+                        description: Date and time when the issue was created.
+                      state:
+                        type: string
+                        description: Status of the issue.
+                        enum:
+                        - proposed
+                        - open
+                        - removed
+                        - resolved
+                        - closed
+                        x-ms-enum:
+                          name: State
+                          modelAsString: true
+                          values:
+                          - value: proposed
+                            description: The issue is proposed.
+                          - value: open
+                            description: The issue is opened.
+                          - value: removed
+                            description: The issue was removed.
+                          - value: resolved
+                            description: The issue is now resolved.
+                          - value: closed
+                            description: The issue was closed.
+                      apiId:
+                        type: string
+                        description: A resource identifier for the API the issue was
+                          created for.
+                      title:
+                        type: string
+                        description: The issue title.
+                      description:
+                        type: string
+                        description: Text describing the issue.
+                      userId:
+                        type: string
+                        description: A resource identifier for the user created the
+                          issue.
+                    description: Issue contract Base Properties.
+                    required:
+                    - title
+                    - description
+                    - userId
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+components:
+  parameters:
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      description: The name of the resource group. The name is case insensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    ServiceNameParameter:
+      name: serviceName
+      in: path
+      required: true
+      description: The name of the API Management service.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 50
+        pattern: ^[a-zA-Z](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?$
+    TopQueryParameter:
+      name: $top
+      in: query
+      required: false
+      description: Number of records to return.
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+    SkipQueryParameter:
+      name: $skip
+      in: query
+      required: false
+      description: Number of records to skip.
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+        minimum: 0
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription. The value must be an UUID.
+      required: true
+      schema:
+        type: string
+        format: uuid
+    IssueIdParameter:
+      name: issueId
+      in: path
+      required: true
+      description: Issue identifier. Must be unique in the current API Management
+        service instance.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 256
+        pattern: ^[^*#&+:<>?]+$
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+    Resource:
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    IssueContractBaseProperties:
+      type: object
+      properties:
+        createdDate:
+          type: string
+          format: date-time
+          description: Date and time when the issue was created.
+        state:
+          type: string
+          description: Status of the issue.
+          enum:
+          - proposed
+          - open
+          - removed
+          - resolved
+          - closed
+          x-ms-enum:
+            name: State
+            modelAsString: true
+            values:
+            - value: proposed
+              description: The issue is proposed.
+            - value: open
+              description: The issue is opened.
+            - value: removed
+              description: The issue was removed.
+            - value: resolved
+              description: The issue is now resolved.
+            - value: closed
+              description: The issue was closed.
+        apiId:
+          type: string
+          description: A resource identifier for the API the issue was created for.
+      description: Issue contract Base Properties.
+    IssueContractProperties:
+      type: object
+      properties:
+        createdDate:
+          type: string
+          format: date-time
+          description: Date and time when the issue was created.
+        state:
+          type: string
+          description: Status of the issue.
+          enum:
+          - proposed
+          - open
+          - removed
+          - resolved
+          - closed
+          x-ms-enum:
+            name: State
+            modelAsString: true
+            values:
+            - value: proposed
+              description: The issue is proposed.
+            - value: open
+              description: The issue is opened.
+            - value: removed
+              description: The issue was removed.
+            - value: resolved
+              description: The issue is now resolved.
+            - value: closed
+              description: The issue was closed.
+        apiId:
+          type: string
+          description: A resource identifier for the API the issue was created for.
+        title:
+          type: string
+          description: The issue title.
+        description:
+          type: string
+          description: Text describing the issue.
+        userId:
+          type: string
+          description: A resource identifier for the user created the issue.
+      description: Issue contract Base Properties.
+      required:
+      - title
+      - description
+      - userId
+    IssueContract:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        properties:
+          type: object
+          properties:
+            createdDate:
+              type: string
+              format: date-time
+              description: Date and time when the issue was created.
+            state:
+              type: string
+              description: Status of the issue.
+              enum:
+              - proposed
+              - open
+              - removed
+              - resolved
+              - closed
+              x-ms-enum:
+                name: State
+                modelAsString: true
+                values:
+                - value: proposed
+                  description: The issue is proposed.
+                - value: open
+                  description: The issue is opened.
+                - value: removed
+                  description: The issue was removed.
+                - value: resolved
+                  description: The issue is now resolved.
+                - value: closed
+                  description: The issue was closed.
+            apiId:
+              type: string
+              description: A resource identifier for the API the issue was created
+                for.
+            title:
+              type: string
+              description: The issue title.
+            description:
+              type: string
+              description: Text describing the issue.
+            userId:
+              type: string
+              description: A resource identifier for the user created the issue.
+          description: Issue contract Base Properties.
+          required:
+          - title
+          - description
+          - userId
+          x-ms-client-flatten: true
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    IssueCollection:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+              name:
+                readOnly: true
+                type: string
+                description: The name of the resource
+              type:
+                readOnly: true
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+              properties:
+                type: object
+                properties:
+                  createdDate:
+                    type: string
+                    format: date-time
+                    description: Date and time when the issue was created.
+                  state:
+                    type: string
+                    description: Status of the issue.
+                    enum:
+                    - proposed
+                    - open
+                    - removed
+                    - resolved
+                    - closed
+                    x-ms-enum:
+                      name: State
+                      modelAsString: true
+                      values:
+                      - value: proposed
+                        description: The issue is proposed.
+                      - value: open
+                        description: The issue is opened.
+                      - value: removed
+                        description: The issue was removed.
+                      - value: resolved
+                        description: The issue is now resolved.
+                      - value: closed
+                        description: The issue was closed.
+                  apiId:
+                    type: string
+                    description: A resource identifier for the API the issue was created
+                      for.
+                  title:
+                    type: string
+                    description: The issue title.
+                  description:
+                    type: string
+                    description: Text describing the issue.
+                  userId:
+                    type: string
+                    description: A resource identifier for the user created the issue.
+                description: Issue contract Base Properties.
+                required:
+                - title
+                - description
+                - userId
+                x-ms-client-flatten: true
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+          description: Issue values.
+          readOnly: true
+        count:
+          type: integer
+          format: int64
+          description: Total record count number across all pages.
+        nextLink:
+          type: string
+          description: Next page link if any.
+          readOnly: true
+      description: Paged Issue list representation.

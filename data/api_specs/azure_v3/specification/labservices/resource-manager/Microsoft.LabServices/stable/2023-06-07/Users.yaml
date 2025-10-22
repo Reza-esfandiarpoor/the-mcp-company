@@ -1,0 +1,3442 @@
+openapi: 3.0.0
+info:
+  version: 2023-06-07
+  title: LabServicesClient
+  description: REST API for managing Azure Lab Services users.
+servers:
+- url: https://management.azure.com
+paths:
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labs/{labName}/users:
+    parameters:
+    - name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    - name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    - name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    - name: labName
+      in: path
+      required: true
+      description: The name of the lab that uniquely identifies it within containing
+        lab plan. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+    - in: query
+      name: $filter
+      description: The filter to apply to the operation.
+      schema:
+        type: string
+    get:
+      tags:
+      - User
+      summary: Get all users for a lab.
+      description: Returns a list of all users for a lab.
+      operationId: Users_ListByLab
+      responses:
+        '200':
+          description: The request was successful; response contains all users for
+            the given lab.
+          content:
+            application/json:
+              schema:
+                description: Paged list of users.
+                type: object
+                properties:
+                  value:
+                    description: The array page of user results.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                        name:
+                          readOnly: true
+                          type: string
+                          description: The name of the resource
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                        systemData:
+                          description: Metadata pertaining to creation and last modification
+                            of the user resource.
+                          readOnly: true
+                          type: object
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource last modification
+                                (UTC)
+                        properties:
+                          type: object
+                          properties:
+                            additionalUsageQuota:
+                              description: The amount of usage quota time the user
+                                gets in addition to the lab usage quota.
+                              type: string
+                              format: duration
+                            provisioningState:
+                              description: Current provisioning state of the user
+                                resource.
+                              readOnly: true
+                              type: string
+                              enum:
+                              - Creating
+                              - Updating
+                              - Deleting
+                              - Succeeded
+                              - Failed
+                              - Locked
+                              x-ms-enum:
+                                name: ProvisioningState
+                                modelAsString: false
+                                values:
+                                - value: Creating
+                                  description: Resource is in the process of being
+                                    created.
+                                - value: Updating
+                                  description: New property values are being applied
+                                    to the resource.
+                                - value: Deleting
+                                  description: Resource is in the process of being
+                                    deleted.
+                                - value: Succeeded
+                                  description: Resource is in healthy state after
+                                    creation or update operation.
+                                - value: Failed
+                                  description: Previous operation on the resource
+                                    has failed leaving resource in unhealthy state.
+                                - value: Locked
+                                  description: The resource is locked and changes
+                                    are currently blocked. This could be due to maintenance
+                                    or a scheduled operation. The state will go back
+                                    to succeeded once the locking operation has finished.
+                            resourceOperationError:
+                              description: Error details of last operation done on
+                                lab plan.
+                              readOnly: true
+                              type: object
+                              properties:
+                                timestamp:
+                                  description: The datetime of when the error occured
+                                  type: string
+                                  format: date-time
+                                code:
+                                  description: The code that corresponds to the type
+                                    of operation failure
+                                  type: string
+                                message:
+                                  description: The operation failure message
+                                  type: string
+                                action:
+                                  description: The operation action that failed
+                                  type: string
+                            displayName:
+                              description: Display name of the user, for example user's
+                                full name.
+                              type: string
+                              readOnly: true
+                            email:
+                              description: Email address of the user.
+                              x-ms-mutability:
+                              - read
+                              - create
+                              type: string
+                              minLength: 6
+                              maxLength: 254
+                            registrationState:
+                              description: State of the user's registration within
+                                the lab.
+                              readOnly: true
+                              type: string
+                              enum:
+                              - NotRegistered
+                              - Registered
+                              x-ms-enum:
+                                name: RegistrationState
+                                modelAsString: false
+                                values:
+                                - value: Registered
+                                  description: User has not yet registered with the
+                                    lab.
+                                - value: NotRegistered
+                                  description: User has registered with the lab.
+                            invitationState:
+                              description: State of the invitation message for the
+                                user.
+                              readOnly: true
+                              type: string
+                              enum:
+                              - NotSent
+                              - Sending
+                              - Sent
+                              - Failed
+                              x-ms-enum:
+                                name: InvitationState
+                                modelAsString: false
+                                values:
+                                - value: NotSent
+                                  description: The invitation has not been sent.
+                                - value: Sending
+                                  description: Currently sending the invitation.
+                                - value: Sent
+                                  description: The invitation has been successfully
+                                    sent.
+                                - value: Failed
+                                  description: There was an error while sending the
+                                    invitation.
+                            invitationSent:
+                              description: Date and time when the invitation message
+                                was sent to the user.
+                              type: string
+                              format: date-time
+                              readOnly: true
+                            totalUsage:
+                              description: How long the user has used their virtual
+                                machines in this lab.
+                              type: string
+                              format: duration
+                              readOnly: true
+                          description: User resource properties used for updates.
+                          required:
+                          - email
+                          x-ms-client-flatten: true
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                      required:
+                      - properties
+                    readOnly: true
+                  nextLink:
+                    description: The link to get the next page of image results.
+                    type: string
+                    readOnly: true
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-pageable:
+        nextLinkName: nextLink
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labs/{labName}/users/{userName}
+  : parameters:
+    - name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    - name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    - name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    - name: labName
+      in: path
+      required: true
+      description: The name of the lab that uniquely identifies it within containing
+        lab plan. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+    - name: userName
+      in: path
+      required: true
+      description: The name of the user that uniquely identifies it within containing
+        lab. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+        pattern: ^[-\w\\._\\(\\)]+$
+    get:
+      tags:
+      - User
+      summary: Get a lab user.
+      description: Returns the properties of a lab user.
+      operationId: Users_Get
+      responses:
+        '200':
+          description: The request was successful; response contains the lab user.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  systemData:
+                    description: Metadata pertaining to creation and last modification
+                      of the user resource.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    type: object
+                    properties:
+                      additionalUsageQuota:
+                        description: The amount of usage quota time the user gets
+                          in addition to the lab usage quota.
+                        type: string
+                        format: duration
+                      provisioningState:
+                        description: Current provisioning state of the user resource.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Creating
+                        - Updating
+                        - Deleting
+                        - Succeeded
+                        - Failed
+                        - Locked
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: false
+                          values:
+                          - value: Creating
+                            description: Resource is in the process of being created.
+                          - value: Updating
+                            description: New property values are being applied to
+                              the resource.
+                          - value: Deleting
+                            description: Resource is in the process of being deleted.
+                          - value: Succeeded
+                            description: Resource is in healthy state after creation
+                              or update operation.
+                          - value: Failed
+                            description: Previous operation on the resource has failed
+                              leaving resource in unhealthy state.
+                          - value: Locked
+                            description: The resource is locked and changes are currently
+                              blocked. This could be due to maintenance or a scheduled
+                              operation. The state will go back to succeeded once
+                              the locking operation has finished.
+                      resourceOperationError:
+                        description: Error details of last operation done on lab plan.
+                        readOnly: true
+                        type: object
+                        properties:
+                          timestamp:
+                            description: The datetime of when the error occured
+                            type: string
+                            format: date-time
+                          code:
+                            description: The code that corresponds to the type of
+                              operation failure
+                            type: string
+                          message:
+                            description: The operation failure message
+                            type: string
+                          action:
+                            description: The operation action that failed
+                            type: string
+                      displayName:
+                        description: Display name of the user, for example user's
+                          full name.
+                        type: string
+                        readOnly: true
+                      email:
+                        description: Email address of the user.
+                        x-ms-mutability:
+                        - read
+                        - create
+                        type: string
+                        minLength: 6
+                        maxLength: 254
+                      registrationState:
+                        description: State of the user's registration within the lab.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - NotRegistered
+                        - Registered
+                        x-ms-enum:
+                          name: RegistrationState
+                          modelAsString: false
+                          values:
+                          - value: Registered
+                            description: User has not yet registered with the lab.
+                          - value: NotRegistered
+                            description: User has registered with the lab.
+                      invitationState:
+                        description: State of the invitation message for the user.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - NotSent
+                        - Sending
+                        - Sent
+                        - Failed
+                        x-ms-enum:
+                          name: InvitationState
+                          modelAsString: false
+                          values:
+                          - value: NotSent
+                            description: The invitation has not been sent.
+                          - value: Sending
+                            description: Currently sending the invitation.
+                          - value: Sent
+                            description: The invitation has been successfully sent.
+                          - value: Failed
+                            description: There was an error while sending the invitation.
+                      invitationSent:
+                        description: Date and time when the invitation message was
+                          sent to the user.
+                        type: string
+                        format: date-time
+                        readOnly: true
+                      totalUsage:
+                        description: How long the user has used their virtual machines
+                          in this lab.
+                        type: string
+                        format: duration
+                        readOnly: true
+                    description: User resource properties used for updates.
+                    required:
+                    - email
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - properties
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+    put:
+      tags:
+      - User
+      summary: Create or update a lab user.
+      description: Operation to create or update a lab user.
+      operationId: Users_CreateOrUpdate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  readOnly: true
+                  type: string
+                  description: Fully qualified resource ID for the resource. Ex -
+                    /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                name:
+                  readOnly: true
+                  type: string
+                  description: The name of the resource
+                type:
+                  readOnly: true
+                  type: string
+                  description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                    or "Microsoft.Storage/storageAccounts"
+                systemData:
+                  description: Metadata pertaining to creation and last modification
+                    of the user resource.
+                  readOnly: true
+                  type: object
+                  properties:
+                    createdBy:
+                      type: string
+                      description: The identity that created the resource.
+                    createdByType:
+                      type: string
+                      description: The type of identity that created the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource creation (UTC).
+                    lastModifiedBy:
+                      type: string
+                      description: The identity that last modified the resource.
+                    lastModifiedByType:
+                      type: string
+                      description: The type of identity that last modified the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    lastModifiedAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource last modification (UTC)
+                properties:
+                  type: object
+                  properties:
+                    additionalUsageQuota:
+                      description: The amount of usage quota time the user gets in
+                        addition to the lab usage quota.
+                      type: string
+                      format: duration
+                    provisioningState:
+                      description: Current provisioning state of the user resource.
+                      readOnly: true
+                      type: string
+                      enum:
+                      - Creating
+                      - Updating
+                      - Deleting
+                      - Succeeded
+                      - Failed
+                      - Locked
+                      x-ms-enum:
+                        name: ProvisioningState
+                        modelAsString: false
+                        values:
+                        - value: Creating
+                          description: Resource is in the process of being created.
+                        - value: Updating
+                          description: New property values are being applied to the
+                            resource.
+                        - value: Deleting
+                          description: Resource is in the process of being deleted.
+                        - value: Succeeded
+                          description: Resource is in healthy state after creation
+                            or update operation.
+                        - value: Failed
+                          description: Previous operation on the resource has failed
+                            leaving resource in unhealthy state.
+                        - value: Locked
+                          description: The resource is locked and changes are currently
+                            blocked. This could be due to maintenance or a scheduled
+                            operation. The state will go back to succeeded once the
+                            locking operation has finished.
+                    resourceOperationError:
+                      description: Error details of last operation done on lab plan.
+                      readOnly: true
+                      type: object
+                      properties:
+                        timestamp:
+                          description: The datetime of when the error occured
+                          type: string
+                          format: date-time
+                        code:
+                          description: The code that corresponds to the type of operation
+                            failure
+                          type: string
+                        message:
+                          description: The operation failure message
+                          type: string
+                        action:
+                          description: The operation action that failed
+                          type: string
+                    displayName:
+                      description: Display name of the user, for example user's full
+                        name.
+                      type: string
+                      readOnly: true
+                    email:
+                      description: Email address of the user.
+                      x-ms-mutability:
+                      - read
+                      - create
+                      type: string
+                      minLength: 6
+                      maxLength: 254
+                    registrationState:
+                      description: State of the user's registration within the lab.
+                      readOnly: true
+                      type: string
+                      enum:
+                      - NotRegistered
+                      - Registered
+                      x-ms-enum:
+                        name: RegistrationState
+                        modelAsString: false
+                        values:
+                        - value: Registered
+                          description: User has not yet registered with the lab.
+                        - value: NotRegistered
+                          description: User has registered with the lab.
+                    invitationState:
+                      description: State of the invitation message for the user.
+                      readOnly: true
+                      type: string
+                      enum:
+                      - NotSent
+                      - Sending
+                      - Sent
+                      - Failed
+                      x-ms-enum:
+                        name: InvitationState
+                        modelAsString: false
+                        values:
+                        - value: NotSent
+                          description: The invitation has not been sent.
+                        - value: Sending
+                          description: Currently sending the invitation.
+                        - value: Sent
+                          description: The invitation has been successfully sent.
+                        - value: Failed
+                          description: There was an error while sending the invitation.
+                    invitationSent:
+                      description: Date and time when the invitation message was sent
+                        to the user.
+                      type: string
+                      format: date-time
+                      readOnly: true
+                    totalUsage:
+                      description: How long the user has used their virtual machines
+                        in this lab.
+                      type: string
+                      format: duration
+                      readOnly: true
+                  description: User resource properties used for updates.
+                  required:
+                  - email
+                  x-ms-client-flatten: true
+              title: Resource
+              description: Common fields that are returned in the response for all
+                Azure Resource Manager resources
+              x-ms-azure-resource: true
+              required:
+              - properties
+        description: The request body.
+        required: true
+      responses:
+        '200':
+          description: The user was updated successfully; response contains the lab
+            user.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  systemData:
+                    description: Metadata pertaining to creation and last modification
+                      of the user resource.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    type: object
+                    properties:
+                      additionalUsageQuota:
+                        description: The amount of usage quota time the user gets
+                          in addition to the lab usage quota.
+                        type: string
+                        format: duration
+                      provisioningState:
+                        description: Current provisioning state of the user resource.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Creating
+                        - Updating
+                        - Deleting
+                        - Succeeded
+                        - Failed
+                        - Locked
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: false
+                          values:
+                          - value: Creating
+                            description: Resource is in the process of being created.
+                          - value: Updating
+                            description: New property values are being applied to
+                              the resource.
+                          - value: Deleting
+                            description: Resource is in the process of being deleted.
+                          - value: Succeeded
+                            description: Resource is in healthy state after creation
+                              or update operation.
+                          - value: Failed
+                            description: Previous operation on the resource has failed
+                              leaving resource in unhealthy state.
+                          - value: Locked
+                            description: The resource is locked and changes are currently
+                              blocked. This could be due to maintenance or a scheduled
+                              operation. The state will go back to succeeded once
+                              the locking operation has finished.
+                      resourceOperationError:
+                        description: Error details of last operation done on lab plan.
+                        readOnly: true
+                        type: object
+                        properties:
+                          timestamp:
+                            description: The datetime of when the error occured
+                            type: string
+                            format: date-time
+                          code:
+                            description: The code that corresponds to the type of
+                              operation failure
+                            type: string
+                          message:
+                            description: The operation failure message
+                            type: string
+                          action:
+                            description: The operation action that failed
+                            type: string
+                      displayName:
+                        description: Display name of the user, for example user's
+                          full name.
+                        type: string
+                        readOnly: true
+                      email:
+                        description: Email address of the user.
+                        x-ms-mutability:
+                        - read
+                        - create
+                        type: string
+                        minLength: 6
+                        maxLength: 254
+                      registrationState:
+                        description: State of the user's registration within the lab.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - NotRegistered
+                        - Registered
+                        x-ms-enum:
+                          name: RegistrationState
+                          modelAsString: false
+                          values:
+                          - value: Registered
+                            description: User has not yet registered with the lab.
+                          - value: NotRegistered
+                            description: User has registered with the lab.
+                      invitationState:
+                        description: State of the invitation message for the user.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - NotSent
+                        - Sending
+                        - Sent
+                        - Failed
+                        x-ms-enum:
+                          name: InvitationState
+                          modelAsString: false
+                          values:
+                          - value: NotSent
+                            description: The invitation has not been sent.
+                          - value: Sending
+                            description: Currently sending the invitation.
+                          - value: Sent
+                            description: The invitation has been successfully sent.
+                          - value: Failed
+                            description: There was an error while sending the invitation.
+                      invitationSent:
+                        description: Date and time when the invitation message was
+                          sent to the user.
+                        type: string
+                        format: date-time
+                        readOnly: true
+                      totalUsage:
+                        description: How long the user has used their virtual machines
+                          in this lab.
+                        type: string
+                        format: duration
+                        readOnly: true
+                    description: User resource properties used for updates.
+                    required:
+                    - email
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - properties
+        '201':
+          description: The user was created successfully; response contains the lab
+            user.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  systemData:
+                    description: Metadata pertaining to creation and last modification
+                      of the user resource.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    type: object
+                    properties:
+                      additionalUsageQuota:
+                        description: The amount of usage quota time the user gets
+                          in addition to the lab usage quota.
+                        type: string
+                        format: duration
+                      provisioningState:
+                        description: Current provisioning state of the user resource.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Creating
+                        - Updating
+                        - Deleting
+                        - Succeeded
+                        - Failed
+                        - Locked
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: false
+                          values:
+                          - value: Creating
+                            description: Resource is in the process of being created.
+                          - value: Updating
+                            description: New property values are being applied to
+                              the resource.
+                          - value: Deleting
+                            description: Resource is in the process of being deleted.
+                          - value: Succeeded
+                            description: Resource is in healthy state after creation
+                              or update operation.
+                          - value: Failed
+                            description: Previous operation on the resource has failed
+                              leaving resource in unhealthy state.
+                          - value: Locked
+                            description: The resource is locked and changes are currently
+                              blocked. This could be due to maintenance or a scheduled
+                              operation. The state will go back to succeeded once
+                              the locking operation has finished.
+                      resourceOperationError:
+                        description: Error details of last operation done on lab plan.
+                        readOnly: true
+                        type: object
+                        properties:
+                          timestamp:
+                            description: The datetime of when the error occured
+                            type: string
+                            format: date-time
+                          code:
+                            description: The code that corresponds to the type of
+                              operation failure
+                            type: string
+                          message:
+                            description: The operation failure message
+                            type: string
+                          action:
+                            description: The operation action that failed
+                            type: string
+                      displayName:
+                        description: Display name of the user, for example user's
+                          full name.
+                        type: string
+                        readOnly: true
+                      email:
+                        description: Email address of the user.
+                        x-ms-mutability:
+                        - read
+                        - create
+                        type: string
+                        minLength: 6
+                        maxLength: 254
+                      registrationState:
+                        description: State of the user's registration within the lab.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - NotRegistered
+                        - Registered
+                        x-ms-enum:
+                          name: RegistrationState
+                          modelAsString: false
+                          values:
+                          - value: Registered
+                            description: User has not yet registered with the lab.
+                          - value: NotRegistered
+                            description: User has registered with the lab.
+                      invitationState:
+                        description: State of the invitation message for the user.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - NotSent
+                        - Sending
+                        - Sent
+                        - Failed
+                        x-ms-enum:
+                          name: InvitationState
+                          modelAsString: false
+                          values:
+                          - value: NotSent
+                            description: The invitation has not been sent.
+                          - value: Sending
+                            description: Currently sending the invitation.
+                          - value: Sent
+                            description: The invitation has been successfully sent.
+                          - value: Failed
+                            description: There was an error while sending the invitation.
+                      invitationSent:
+                        description: Date and time when the invitation message was
+                          sent to the user.
+                        type: string
+                        format: date-time
+                        readOnly: true
+                      totalUsage:
+                        description: How long the user has used their virtual machines
+                          in this lab.
+                        type: string
+                        format: duration
+                        readOnly: true
+                    description: User resource properties used for updates.
+                    required:
+                    - email
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - properties
+        '202':
+          description: The user was updated successfully and has a long running operation;
+            response contains the lab user.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  systemData:
+                    description: Metadata pertaining to creation and last modification
+                      of the user resource.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    type: object
+                    properties:
+                      additionalUsageQuota:
+                        description: The amount of usage quota time the user gets
+                          in addition to the lab usage quota.
+                        type: string
+                        format: duration
+                      provisioningState:
+                        description: Current provisioning state of the user resource.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Creating
+                        - Updating
+                        - Deleting
+                        - Succeeded
+                        - Failed
+                        - Locked
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: false
+                          values:
+                          - value: Creating
+                            description: Resource is in the process of being created.
+                          - value: Updating
+                            description: New property values are being applied to
+                              the resource.
+                          - value: Deleting
+                            description: Resource is in the process of being deleted.
+                          - value: Succeeded
+                            description: Resource is in healthy state after creation
+                              or update operation.
+                          - value: Failed
+                            description: Previous operation on the resource has failed
+                              leaving resource in unhealthy state.
+                          - value: Locked
+                            description: The resource is locked and changes are currently
+                              blocked. This could be due to maintenance or a scheduled
+                              operation. The state will go back to succeeded once
+                              the locking operation has finished.
+                      resourceOperationError:
+                        description: Error details of last operation done on lab plan.
+                        readOnly: true
+                        type: object
+                        properties:
+                          timestamp:
+                            description: The datetime of when the error occured
+                            type: string
+                            format: date-time
+                          code:
+                            description: The code that corresponds to the type of
+                              operation failure
+                            type: string
+                          message:
+                            description: The operation failure message
+                            type: string
+                          action:
+                            description: The operation action that failed
+                            type: string
+                      displayName:
+                        description: Display name of the user, for example user's
+                          full name.
+                        type: string
+                        readOnly: true
+                      email:
+                        description: Email address of the user.
+                        x-ms-mutability:
+                        - read
+                        - create
+                        type: string
+                        minLength: 6
+                        maxLength: 254
+                      registrationState:
+                        description: State of the user's registration within the lab.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - NotRegistered
+                        - Registered
+                        x-ms-enum:
+                          name: RegistrationState
+                          modelAsString: false
+                          values:
+                          - value: Registered
+                            description: User has not yet registered with the lab.
+                          - value: NotRegistered
+                            description: User has registered with the lab.
+                      invitationState:
+                        description: State of the invitation message for the user.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - NotSent
+                        - Sending
+                        - Sent
+                        - Failed
+                        x-ms-enum:
+                          name: InvitationState
+                          modelAsString: false
+                          values:
+                          - value: NotSent
+                            description: The invitation has not been sent.
+                          - value: Sending
+                            description: Currently sending the invitation.
+                          - value: Sent
+                            description: The invitation has been successfully sent.
+                          - value: Failed
+                            description: There was an error while sending the invitation.
+                      invitationSent:
+                        description: Date and time when the invitation message was
+                          sent to the user.
+                        type: string
+                        format: date-time
+                        readOnly: true
+                      totalUsage:
+                        description: How long the user has used their virtual machines
+                          in this lab.
+                        type: string
+                        format: duration
+                        readOnly: true
+                    description: User resource properties used for updates.
+                    required:
+                    - email
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - properties
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: original-uri
+    patch:
+      tags:
+      - User
+      summary: Update a lab user.
+      description: Operation to update a lab user.
+      operationId: Users_Update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: User of a lab that can register for and use virtual machines
+                within the lab. Used for updates.
+              type: object
+              properties:
+                properties:
+                  description: User resource properties
+                  x-ms-client-flatten: true
+                  type: object
+                  properties:
+                    additionalUsageQuota:
+                      description: The amount of usage quota time the user gets in
+                        addition to the lab usage quota.
+                      type: string
+                      format: duration
+        description: The request body.
+        required: true
+      responses:
+        '200':
+          description: The user was updated successfully; response contains the lab
+            user.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  systemData:
+                    description: Metadata pertaining to creation and last modification
+                      of the user resource.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    type: object
+                    properties:
+                      additionalUsageQuota:
+                        description: The amount of usage quota time the user gets
+                          in addition to the lab usage quota.
+                        type: string
+                        format: duration
+                      provisioningState:
+                        description: Current provisioning state of the user resource.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Creating
+                        - Updating
+                        - Deleting
+                        - Succeeded
+                        - Failed
+                        - Locked
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: false
+                          values:
+                          - value: Creating
+                            description: Resource is in the process of being created.
+                          - value: Updating
+                            description: New property values are being applied to
+                              the resource.
+                          - value: Deleting
+                            description: Resource is in the process of being deleted.
+                          - value: Succeeded
+                            description: Resource is in healthy state after creation
+                              or update operation.
+                          - value: Failed
+                            description: Previous operation on the resource has failed
+                              leaving resource in unhealthy state.
+                          - value: Locked
+                            description: The resource is locked and changes are currently
+                              blocked. This could be due to maintenance or a scheduled
+                              operation. The state will go back to succeeded once
+                              the locking operation has finished.
+                      resourceOperationError:
+                        description: Error details of last operation done on lab plan.
+                        readOnly: true
+                        type: object
+                        properties:
+                          timestamp:
+                            description: The datetime of when the error occured
+                            type: string
+                            format: date-time
+                          code:
+                            description: The code that corresponds to the type of
+                              operation failure
+                            type: string
+                          message:
+                            description: The operation failure message
+                            type: string
+                          action:
+                            description: The operation action that failed
+                            type: string
+                      displayName:
+                        description: Display name of the user, for example user's
+                          full name.
+                        type: string
+                        readOnly: true
+                      email:
+                        description: Email address of the user.
+                        x-ms-mutability:
+                        - read
+                        - create
+                        type: string
+                        minLength: 6
+                        maxLength: 254
+                      registrationState:
+                        description: State of the user's registration within the lab.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - NotRegistered
+                        - Registered
+                        x-ms-enum:
+                          name: RegistrationState
+                          modelAsString: false
+                          values:
+                          - value: Registered
+                            description: User has not yet registered with the lab.
+                          - value: NotRegistered
+                            description: User has registered with the lab.
+                      invitationState:
+                        description: State of the invitation message for the user.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - NotSent
+                        - Sending
+                        - Sent
+                        - Failed
+                        x-ms-enum:
+                          name: InvitationState
+                          modelAsString: false
+                          values:
+                          - value: NotSent
+                            description: The invitation has not been sent.
+                          - value: Sending
+                            description: Currently sending the invitation.
+                          - value: Sent
+                            description: The invitation has been successfully sent.
+                          - value: Failed
+                            description: There was an error while sending the invitation.
+                      invitationSent:
+                        description: Date and time when the invitation message was
+                          sent to the user.
+                        type: string
+                        format: date-time
+                        readOnly: true
+                      totalUsage:
+                        description: How long the user has used their virtual machines
+                          in this lab.
+                        type: string
+                        format: duration
+                        readOnly: true
+                    description: User resource properties used for updates.
+                    required:
+                    - email
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - properties
+        '202':
+          description: The user was updated successfully and has a long running operation;
+            response contains the lab user.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  systemData:
+                    description: Metadata pertaining to creation and last modification
+                      of the user resource.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    type: object
+                    properties:
+                      additionalUsageQuota:
+                        description: The amount of usage quota time the user gets
+                          in addition to the lab usage quota.
+                        type: string
+                        format: duration
+                      provisioningState:
+                        description: Current provisioning state of the user resource.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Creating
+                        - Updating
+                        - Deleting
+                        - Succeeded
+                        - Failed
+                        - Locked
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: false
+                          values:
+                          - value: Creating
+                            description: Resource is in the process of being created.
+                          - value: Updating
+                            description: New property values are being applied to
+                              the resource.
+                          - value: Deleting
+                            description: Resource is in the process of being deleted.
+                          - value: Succeeded
+                            description: Resource is in healthy state after creation
+                              or update operation.
+                          - value: Failed
+                            description: Previous operation on the resource has failed
+                              leaving resource in unhealthy state.
+                          - value: Locked
+                            description: The resource is locked and changes are currently
+                              blocked. This could be due to maintenance or a scheduled
+                              operation. The state will go back to succeeded once
+                              the locking operation has finished.
+                      resourceOperationError:
+                        description: Error details of last operation done on lab plan.
+                        readOnly: true
+                        type: object
+                        properties:
+                          timestamp:
+                            description: The datetime of when the error occured
+                            type: string
+                            format: date-time
+                          code:
+                            description: The code that corresponds to the type of
+                              operation failure
+                            type: string
+                          message:
+                            description: The operation failure message
+                            type: string
+                          action:
+                            description: The operation action that failed
+                            type: string
+                      displayName:
+                        description: Display name of the user, for example user's
+                          full name.
+                        type: string
+                        readOnly: true
+                      email:
+                        description: Email address of the user.
+                        x-ms-mutability:
+                        - read
+                        - create
+                        type: string
+                        minLength: 6
+                        maxLength: 254
+                      registrationState:
+                        description: State of the user's registration within the lab.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - NotRegistered
+                        - Registered
+                        x-ms-enum:
+                          name: RegistrationState
+                          modelAsString: false
+                          values:
+                          - value: Registered
+                            description: User has not yet registered with the lab.
+                          - value: NotRegistered
+                            description: User has registered with the lab.
+                      invitationState:
+                        description: State of the invitation message for the user.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - NotSent
+                        - Sending
+                        - Sent
+                        - Failed
+                        x-ms-enum:
+                          name: InvitationState
+                          modelAsString: false
+                          values:
+                          - value: NotSent
+                            description: The invitation has not been sent.
+                          - value: Sending
+                            description: Currently sending the invitation.
+                          - value: Sent
+                            description: The invitation has been successfully sent.
+                          - value: Failed
+                            description: There was an error while sending the invitation.
+                      invitationSent:
+                        description: Date and time when the invitation message was
+                          sent to the user.
+                        type: string
+                        format: date-time
+                        readOnly: true
+                      totalUsage:
+                        description: How long the user has used their virtual machines
+                          in this lab.
+                        type: string
+                        format: duration
+                        readOnly: true
+                    description: User resource properties used for updates.
+                    required:
+                    - email
+                    x-ms-client-flatten: true
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - properties
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: location
+    delete:
+      tags:
+      - User
+      summary: Deletes a user resource.
+      description: Operation to delete a user resource.
+      operationId: Users_Delete
+      responses:
+        '200':
+          description: The request was completed.
+        '202':
+          description: The request was accepted.
+        '204':
+          description: The request has been fulfilled.
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: location
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labs/{labName}/users/{userName}/invite
+  : parameters:
+    - name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    - name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    - name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    - name: labName
+      in: path
+      required: true
+      description: The name of the lab that uniquely identifies it within containing
+        lab plan. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+    - name: userName
+      in: path
+      required: true
+      description: The name of the user that uniquely identifies it within containing
+        lab. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+        pattern: ^[-\w\\._\\(\\)]+$
+    post:
+      tags:
+      - User
+      summary: Invite a user to a lab.
+      description: Operation to invite a user to a lab.
+      operationId: Users_Invite
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Body for a user invite request
+              type: object
+              properties:
+                text:
+                  description: Custom text for the invite email.
+                  type: string
+        description: The request body.
+        required: true
+      responses:
+        '200':
+          description: The request was successful.
+        '202':
+          description: The request was accepted.
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: location
+components:
+  parameters:
+    UserNameParameter:
+      name: userName
+      in: path
+      required: true
+      description: The name of the user that uniquely identifies it within containing
+        lab. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+        pattern: ^[-\w\\._\\(\\)]+$
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    LabNameParameter:
+      name: labName
+      in: path
+      required: true
+      description: The name of the lab that uniquely identifies it within containing
+        lab plan. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        systemData:
+          description: Metadata pertaining to creation and last modification of the
+            user resource.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+        properties:
+          type: object
+          properties:
+            additionalUsageQuota:
+              description: The amount of usage quota time the user gets in addition
+                to the lab usage quota.
+              type: string
+              format: duration
+            provisioningState:
+              description: Current provisioning state of the user resource.
+              readOnly: true
+              type: string
+              enum:
+              - Creating
+              - Updating
+              - Deleting
+              - Succeeded
+              - Failed
+              - Locked
+              x-ms-enum:
+                name: ProvisioningState
+                modelAsString: false
+                values:
+                - value: Creating
+                  description: Resource is in the process of being created.
+                - value: Updating
+                  description: New property values are being applied to the resource.
+                - value: Deleting
+                  description: Resource is in the process of being deleted.
+                - value: Succeeded
+                  description: Resource is in healthy state after creation or update
+                    operation.
+                - value: Failed
+                  description: Previous operation on the resource has failed leaving
+                    resource in unhealthy state.
+                - value: Locked
+                  description: The resource is locked and changes are currently blocked.
+                    This could be due to maintenance or a scheduled operation. The
+                    state will go back to succeeded once the locking operation has
+                    finished.
+            resourceOperationError:
+              description: Error details of last operation done on lab plan.
+              readOnly: true
+              type: object
+              properties:
+                timestamp:
+                  description: The datetime of when the error occured
+                  type: string
+                  format: date-time
+                code:
+                  description: The code that corresponds to the type of operation
+                    failure
+                  type: string
+                message:
+                  description: The operation failure message
+                  type: string
+                action:
+                  description: The operation action that failed
+                  type: string
+            displayName:
+              description: Display name of the user, for example user's full name.
+              type: string
+              readOnly: true
+            email:
+              description: Email address of the user.
+              x-ms-mutability:
+              - read
+              - create
+              type: string
+              minLength: 6
+              maxLength: 254
+            registrationState:
+              description: State of the user's registration within the lab.
+              readOnly: true
+              type: string
+              enum:
+              - NotRegistered
+              - Registered
+              x-ms-enum:
+                name: RegistrationState
+                modelAsString: false
+                values:
+                - value: Registered
+                  description: User has not yet registered with the lab.
+                - value: NotRegistered
+                  description: User has registered with the lab.
+            invitationState:
+              description: State of the invitation message for the user.
+              readOnly: true
+              type: string
+              enum:
+              - NotSent
+              - Sending
+              - Sent
+              - Failed
+              x-ms-enum:
+                name: InvitationState
+                modelAsString: false
+                values:
+                - value: NotSent
+                  description: The invitation has not been sent.
+                - value: Sending
+                  description: Currently sending the invitation.
+                - value: Sent
+                  description: The invitation has been successfully sent.
+                - value: Failed
+                  description: There was an error while sending the invitation.
+            invitationSent:
+              description: Date and time when the invitation message was sent to the
+                user.
+              type: string
+              format: date-time
+              readOnly: true
+            totalUsage:
+              description: How long the user has used their virtual machines in this
+                lab.
+              type: string
+              format: duration
+              readOnly: true
+          description: User resource properties used for updates.
+          required:
+          - email
+          x-ms-client-flatten: true
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+      required:
+      - properties
+    PagedUsers:
+      description: Paged list of users.
+      type: object
+      properties:
+        value:
+          description: The array page of user results.
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+              name:
+                readOnly: true
+                type: string
+                description: The name of the resource
+              type:
+                readOnly: true
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+              systemData:
+                description: Metadata pertaining to creation and last modification
+                  of the user resource.
+                readOnly: true
+                type: object
+                properties:
+                  createdBy:
+                    type: string
+                    description: The identity that created the resource.
+                  createdByType:
+                    type: string
+                    description: The type of identity that created the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource creation (UTC).
+                  lastModifiedBy:
+                    type: string
+                    description: The identity that last modified the resource.
+                  lastModifiedByType:
+                    type: string
+                    description: The type of identity that last modified the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  lastModifiedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource last modification (UTC)
+              properties:
+                type: object
+                properties:
+                  additionalUsageQuota:
+                    description: The amount of usage quota time the user gets in addition
+                      to the lab usage quota.
+                    type: string
+                    format: duration
+                  provisioningState:
+                    description: Current provisioning state of the user resource.
+                    readOnly: true
+                    type: string
+                    enum:
+                    - Creating
+                    - Updating
+                    - Deleting
+                    - Succeeded
+                    - Failed
+                    - Locked
+                    x-ms-enum:
+                      name: ProvisioningState
+                      modelAsString: false
+                      values:
+                      - value: Creating
+                        description: Resource is in the process of being created.
+                      - value: Updating
+                        description: New property values are being applied to the
+                          resource.
+                      - value: Deleting
+                        description: Resource is in the process of being deleted.
+                      - value: Succeeded
+                        description: Resource is in healthy state after creation or
+                          update operation.
+                      - value: Failed
+                        description: Previous operation on the resource has failed
+                          leaving resource in unhealthy state.
+                      - value: Locked
+                        description: The resource is locked and changes are currently
+                          blocked. This could be due to maintenance or a scheduled
+                          operation. The state will go back to succeeded once the
+                          locking operation has finished.
+                  resourceOperationError:
+                    description: Error details of last operation done on lab plan.
+                    readOnly: true
+                    type: object
+                    properties:
+                      timestamp:
+                        description: The datetime of when the error occured
+                        type: string
+                        format: date-time
+                      code:
+                        description: The code that corresponds to the type of operation
+                          failure
+                        type: string
+                      message:
+                        description: The operation failure message
+                        type: string
+                      action:
+                        description: The operation action that failed
+                        type: string
+                  displayName:
+                    description: Display name of the user, for example user's full
+                      name.
+                    type: string
+                    readOnly: true
+                  email:
+                    description: Email address of the user.
+                    x-ms-mutability:
+                    - read
+                    - create
+                    type: string
+                    minLength: 6
+                    maxLength: 254
+                  registrationState:
+                    description: State of the user's registration within the lab.
+                    readOnly: true
+                    type: string
+                    enum:
+                    - NotRegistered
+                    - Registered
+                    x-ms-enum:
+                      name: RegistrationState
+                      modelAsString: false
+                      values:
+                      - value: Registered
+                        description: User has not yet registered with the lab.
+                      - value: NotRegistered
+                        description: User has registered with the lab.
+                  invitationState:
+                    description: State of the invitation message for the user.
+                    readOnly: true
+                    type: string
+                    enum:
+                    - NotSent
+                    - Sending
+                    - Sent
+                    - Failed
+                    x-ms-enum:
+                      name: InvitationState
+                      modelAsString: false
+                      values:
+                      - value: NotSent
+                        description: The invitation has not been sent.
+                      - value: Sending
+                        description: Currently sending the invitation.
+                      - value: Sent
+                        description: The invitation has been successfully sent.
+                      - value: Failed
+                        description: There was an error while sending the invitation.
+                  invitationSent:
+                    description: Date and time when the invitation message was sent
+                      to the user.
+                    type: string
+                    format: date-time
+                    readOnly: true
+                  totalUsage:
+                    description: How long the user has used their virtual machines
+                      in this lab.
+                    type: string
+                    format: duration
+                    readOnly: true
+                description: User resource properties used for updates.
+                required:
+                - email
+                x-ms-client-flatten: true
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+            required:
+            - properties
+          readOnly: true
+        nextLink:
+          description: The link to get the next page of image results.
+          type: string
+          readOnly: true
+    UserUpdate:
+      description: User of a lab that can register for and use virtual machines within
+        the lab. Used for updates.
+      type: object
+      properties:
+        properties:
+          description: User resource properties
+          x-ms-client-flatten: true
+          type: object
+          properties:
+            additionalUsageQuota:
+              description: The amount of usage quota time the user gets in addition
+                to the lab usage quota.
+              type: string
+              format: duration
+    UserUpdateProperties:
+      description: User resource properties used for updates.
+      type: object
+      properties:
+        additionalUsageQuota:
+          description: The amount of usage quota time the user gets in addition to
+            the lab usage quota.
+          type: string
+          format: duration
+    UserProperties:
+      type: object
+      properties:
+        additionalUsageQuota:
+          description: The amount of usage quota time the user gets in addition to
+            the lab usage quota.
+          type: string
+          format: duration
+        provisioningState:
+          description: Current provisioning state of the user resource.
+          readOnly: true
+          type: string
+          enum:
+          - Creating
+          - Updating
+          - Deleting
+          - Succeeded
+          - Failed
+          - Locked
+          x-ms-enum:
+            name: ProvisioningState
+            modelAsString: false
+            values:
+            - value: Creating
+              description: Resource is in the process of being created.
+            - value: Updating
+              description: New property values are being applied to the resource.
+            - value: Deleting
+              description: Resource is in the process of being deleted.
+            - value: Succeeded
+              description: Resource is in healthy state after creation or update operation.
+            - value: Failed
+              description: Previous operation on the resource has failed leaving resource
+                in unhealthy state.
+            - value: Locked
+              description: The resource is locked and changes are currently blocked.
+                This could be due to maintenance or a scheduled operation. The state
+                will go back to succeeded once the locking operation has finished.
+        resourceOperationError:
+          description: Error details of last operation done on lab plan.
+          readOnly: true
+          type: object
+          properties:
+            timestamp:
+              description: The datetime of when the error occured
+              type: string
+              format: date-time
+            code:
+              description: The code that corresponds to the type of operation failure
+              type: string
+            message:
+              description: The operation failure message
+              type: string
+            action:
+              description: The operation action that failed
+              type: string
+        displayName:
+          description: Display name of the user, for example user's full name.
+          type: string
+          readOnly: true
+        email:
+          description: Email address of the user.
+          x-ms-mutability:
+          - read
+          - create
+          type: string
+          minLength: 6
+          maxLength: 254
+        registrationState:
+          description: State of the user's registration within the lab.
+          readOnly: true
+          type: string
+          enum:
+          - NotRegistered
+          - Registered
+          x-ms-enum:
+            name: RegistrationState
+            modelAsString: false
+            values:
+            - value: Registered
+              description: User has not yet registered with the lab.
+            - value: NotRegistered
+              description: User has registered with the lab.
+        invitationState:
+          description: State of the invitation message for the user.
+          readOnly: true
+          type: string
+          enum:
+          - NotSent
+          - Sending
+          - Sent
+          - Failed
+          x-ms-enum:
+            name: InvitationState
+            modelAsString: false
+            values:
+            - value: NotSent
+              description: The invitation has not been sent.
+            - value: Sending
+              description: Currently sending the invitation.
+            - value: Sent
+              description: The invitation has been successfully sent.
+            - value: Failed
+              description: There was an error while sending the invitation.
+        invitationSent:
+          description: Date and time when the invitation message was sent to the user.
+          type: string
+          format: date-time
+          readOnly: true
+        totalUsage:
+          description: How long the user has used their virtual machines in this lab.
+          type: string
+          format: duration
+          readOnly: true
+      description: User resource properties used for updates.
+      required:
+      - email
+    RegistrationState:
+      type: string
+      enum:
+      - NotRegistered
+      - Registered
+      description: The user lab registration state.
+      x-ms-enum:
+        name: RegistrationState
+        modelAsString: false
+        values:
+        - value: Registered
+          description: User has not yet registered with the lab.
+        - value: NotRegistered
+          description: User has registered with the lab.
+    InvitationState:
+      type: string
+      enum:
+      - NotSent
+      - Sending
+      - Sent
+      - Failed
+      description: The lab user invitation state.
+      x-ms-enum:
+        name: InvitationState
+        modelAsString: false
+        values:
+        - value: NotSent
+          description: The invitation has not been sent.
+        - value: Sending
+          description: Currently sending the invitation.
+        - value: Sent
+          description: The invitation has been successfully sent.
+        - value: Failed
+          description: There was an error while sending the invitation.
+    InviteBody:
+      description: Body for a user invite request
+      type: object
+      properties:
+        text:
+          description: Custom text for the invite email.
+          type: string
+    ErrorDetail:
+      description: The error detail.
+      type: object
+      properties:
+        code:
+          readOnly: true
+          type: string
+          description: The error code.
+        message:
+          readOnly: true
+          type: string
+          description: The error message.
+        target:
+          readOnly: true
+          type: string
+          description: The error target.
+        details:
+          readOnly: true
+          type: array
+          items:
+            description: The error detail.
+            type: object
+            properties:
+              code:
+                readOnly: true
+                type: string
+                description: The error code.
+              message:
+                readOnly: true
+                type: string
+                description: The error message.
+              target:
+                readOnly: true
+                type: string
+                description: The error target.
+              details:
+                readOnly: true
+                type: array
+                items:
+                  description: The error detail.
+                  type: object
+                  properties:
+                    code:
+                      readOnly: true
+                      type: string
+                      description: The error code.
+                    message:
+                      readOnly: true
+                      type: string
+                      description: The error message.
+                    target:
+                      readOnly: true
+                      type: string
+                      description: The error target.
+                x-ms-identifiers:
+                - message
+                - target
+                description: The error details.
+              additionalInfo:
+                readOnly: true
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      readOnly: true
+                      type: string
+                      description: The additional info type.
+                    info:
+                      readOnly: true
+                      type: object
+                      description: The additional info.
+                  description: The resource management error additional info.
+                x-ms-identifiers: []
+                description: The error additional info.
+          x-ms-identifiers:
+          - message
+          - target
+          description: The error details.
+        additionalInfo:
+          readOnly: true
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                readOnly: true
+                type: string
+                description: The additional info type.
+              info:
+                readOnly: true
+                type: object
+                description: The additional info.
+            description: The resource management error additional info.
+          x-ms-identifiers: []
+          description: The error additional info.
+    ErrorAdditionalInfo:
+      type: object
+      properties:
+        type:
+          readOnly: true
+          type: string
+          description: The additional info type.
+        info:
+          readOnly: true
+          type: object
+          description: The additional info.
+      description: The resource management error additional info.
+    ErrorResponse:
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      type: object
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              readOnly: true
+              type: string
+              description: The error code.
+            message:
+              readOnly: true
+              type: string
+              description: The error message.
+            target:
+              readOnly: true
+              type: string
+              description: The error target.
+            details:
+              readOnly: true
+              type: array
+              items:
+                description: The error detail.
+                type: object
+                properties:
+                  code:
+                    readOnly: true
+                    type: string
+                    description: The error code.
+                  message:
+                    readOnly: true
+                    type: string
+                    description: The error message.
+                  target:
+                    readOnly: true
+                    type: string
+                    description: The error target.
+                  details:
+                    readOnly: true
+                    type: array
+                    items:
+                      description: The error detail.
+                      type: object
+                      properties:
+                        code:
+                          readOnly: true
+                          type: string
+                          description: The error code.
+                        message:
+                          readOnly: true
+                          type: string
+                          description: The error message.
+                        target:
+                          readOnly: true
+                          type: string
+                          description: The error target.
+                    x-ms-identifiers:
+                    - message
+                    - target
+                    description: The error details.
+                  additionalInfo:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The additional info type.
+                        info:
+                          readOnly: true
+                          type: object
+                          description: The additional info.
+                      description: The resource management error additional info.
+                    x-ms-identifiers: []
+                    description: The error additional info.
+              x-ms-identifiers:
+              - message
+              - target
+              description: The error details.
+            additionalInfo:
+              readOnly: true
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The additional info type.
+                  info:
+                    readOnly: true
+                    type: object
+                    description: The additional info.
+                description: The resource management error additional info.
+              x-ms-identifiers: []
+              description: The error additional info.
+    Resource:
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    systemData:
+      description: Metadata pertaining to creation and last modification of the resource.
+      type: object
+      readOnly: true
+      properties:
+        createdBy:
+          type: string
+          description: The identity that created the resource.
+        createdByType:
+          type: string
+          description: The type of identity that created the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource creation (UTC).
+        lastModifiedBy:
+          type: string
+          description: The identity that last modified the resource.
+        lastModifiedByType:
+          type: string
+          description: The type of identity that last modified the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource last modification (UTC)
+    provisioningState:
+      type: string
+      enum:
+      - Creating
+      - Updating
+      - Deleting
+      - Succeeded
+      - Failed
+      - Locked
+      description: Resource provisioning state.
+      x-ms-enum:
+        name: ProvisioningState
+        modelAsString: false
+        values:
+        - value: Creating
+          description: Resource is in the process of being created.
+        - value: Updating
+          description: New property values are being applied to the resource.
+        - value: Deleting
+          description: Resource is in the process of being deleted.
+        - value: Succeeded
+          description: Resource is in healthy state after creation or update operation.
+        - value: Failed
+          description: Previous operation on the resource has failed leaving resource
+            in unhealthy state.
+        - value: Locked
+          description: The resource is locked and changes are currently blocked. This
+            could be due to maintenance or a scheduled operation. The state will go
+            back to succeeded once the locking operation has finished.
+    ResourceOperationError:
+      description: Error details of the latest operation failure on this resource
+      type: object
+      properties:
+        timestamp:
+          description: The datetime of when the error occured
+          type: string
+          format: date-time
+        code:
+          description: The code that corresponds to the type of operation failure
+          type: string
+        message:
+          description: The operation failure message
+          type: string
+        action:
+          description: The operation action that failed
+          type: string
+    emailAddress:
+      type: string
+      minLength: 6
+      maxLength: 254
+      description: An email address.

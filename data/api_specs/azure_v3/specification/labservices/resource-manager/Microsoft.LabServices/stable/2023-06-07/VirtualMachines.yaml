@@ -1,0 +1,2746 @@
+openapi: 3.0.0
+info:
+  version: 2023-06-07
+  title: LabServicesClient
+  description: REST API for managing Azure Lab Services virtual machines.
+servers:
+- url: https://management.azure.com
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labs/{labName}/virtualMachines
+  : parameters:
+    - name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    - name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    - name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    - name: labName
+      in: path
+      required: true
+      description: The name of the lab that uniquely identifies it within containing
+        lab plan. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+    - in: query
+      name: $filter
+      description: The filter to apply to the operation.
+      schema:
+        type: string
+    get:
+      tags:
+      - VirtualMachine
+      summary: Get all virtual machines for a lab.
+      description: Returns a list of all virtual machines for a lab.
+      operationId: VirtualMachines_ListByLab
+      responses:
+        '200':
+          description: The request was successful; response contains all virtual machines
+            for the given lab.
+          content:
+            application/json:
+              schema:
+                description: Paged list of lab services virtual machines.
+                type: object
+                properties:
+                  value:
+                    description: The array page of virtual machine results.
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          readOnly: true
+                          type: string
+                          description: Fully qualified resource ID for the resource.
+                            Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                        name:
+                          readOnly: true
+                          type: string
+                          description: The name of the resource
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                        systemData:
+                          description: System data of the Lab virtual machine.
+                          readOnly: true
+                          type: object
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource last modification
+                                (UTC)
+                        properties:
+                          description: Virtual machine resource properties
+                          x-ms-client-flatten: true
+                          type: object
+                          properties:
+                            provisioningState:
+                              description: Current provisioning state of the virtual
+                                machine.
+                              readOnly: true
+                              type: string
+                              enum:
+                              - Creating
+                              - Updating
+                              - Deleting
+                              - Succeeded
+                              - Failed
+                              - Locked
+                              x-ms-enum:
+                                name: ProvisioningState
+                                modelAsString: false
+                                values:
+                                - value: Creating
+                                  description: Resource is in the process of being
+                                    created.
+                                - value: Updating
+                                  description: New property values are being applied
+                                    to the resource.
+                                - value: Deleting
+                                  description: Resource is in the process of being
+                                    deleted.
+                                - value: Succeeded
+                                  description: Resource is in healthy state after
+                                    creation or update operation.
+                                - value: Failed
+                                  description: Previous operation on the resource
+                                    has failed leaving resource in unhealthy state.
+                                - value: Locked
+                                  description: The resource is locked and changes
+                                    are currently blocked. This could be due to maintenance
+                                    or a scheduled operation. The state will go back
+                                    to succeeded once the locking operation has finished.
+                            state:
+                              description: The current state of the virtual machine
+                              readOnly: true
+                              type: string
+                              enum:
+                              - Stopped
+                              - Starting
+                              - Running
+                              - Stopping
+                              - ResettingPassword
+                              - Reimaging
+                              - Redeploying
+                              x-ms-enum:
+                                name: VirtualMachineState
+                                modelAsString: false
+                                values:
+                                - value: Stopped
+                                  description: The VM is currently stopped.
+                                - value: Starting
+                                  description: The VM is starting.
+                                - value: Running
+                                  description: The VM is running.
+                                - value: Stopping
+                                  description: The VM is stopping.
+                                - value: ResettingPassword
+                                  description: The VM password is being reset.
+                                - value: Reimaging
+                                  description: The VM is being reimaged.
+                                - value: Redeploying
+                                  description: The VM is being redeployed.
+                            resourceOperationError:
+                              description: Error details of last operation done on
+                                lab plan.
+                              readOnly: true
+                              type: object
+                              properties:
+                                timestamp:
+                                  description: The datetime of when the error occured
+                                  type: string
+                                  format: date-time
+                                code:
+                                  description: The code that corresponds to the type
+                                    of operation failure
+                                  type: string
+                                message:
+                                  description: The operation failure message
+                                  type: string
+                                action:
+                                  description: The operation action that failed
+                                  type: string
+                            connectionProfile:
+                              description: Profile for information about connecting
+                                to the virtual machine.
+                              readOnly: true
+                              type: object
+                              properties:
+                                privateIpAddress:
+                                  description: The private IP address of the virtual
+                                    machine.
+                                  type: string
+                                  readOnly: true
+                                sshAuthority:
+                                  description: Port and host name separated by semicolon
+                                    for connecting via SSH protocol to the virtual
+                                    machine.
+                                  type: string
+                                  readOnly: true
+                                sshInBrowserUrl:
+                                  description: URL for connecting via SSH protocol
+                                    to the virtual machine in browser.
+                                  readOnly: true
+                                  type: string
+                                  minLength: 3
+                                  maxLength: 2000
+                                rdpAuthority:
+                                  description: Port and host name separated by semicolon
+                                    for connecting via RDP protocol to the virtual
+                                    machine.
+                                  type: string
+                                  readOnly: true
+                                rdpInBrowserUrl:
+                                  description: URL for connecting via RDP protocol
+                                    to the virtual machine in browser.
+                                  readOnly: true
+                                  type: string
+                                  minLength: 3
+                                  maxLength: 2000
+                                adminUsername:
+                                  description: The username used to log on to the
+                                    virtual machine as admin.
+                                  type: string
+                                  readOnly: true
+                                nonAdminUsername:
+                                  description: The username used to log on to the
+                                    virtual machine as non-admin, if one exists.
+                                  type: string
+                                  readOnly: true
+                            claimedByUserId:
+                              description: The lab user ID (not the PUID!) of who
+                                claimed the virtual machine.
+                              type: string
+                              readOnly: true
+                            vmType:
+                              description: The type of this VM resource
+                              readOnly: true
+                              type: string
+                              enum:
+                              - User
+                              - Template
+                              x-ms-enum:
+                                name: VirtualMachineType
+                                modelAsString: false
+                                values:
+                                - value: User
+                                  description: A user VM
+                                - value: Template
+                                  description: A template VM
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                      required:
+                      - properties
+                    readOnly: true
+                  nextLink:
+                    description: The link to get the next page of virtual machine
+                      results.
+                    type: string
+                    readOnly: true
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-pageable:
+        nextLinkName: nextLink
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labs/{labName}/virtualMachines/{virtualMachineName}
+  : parameters:
+    - name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    - name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    - name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    - name: labName
+      in: path
+      required: true
+      description: The name of the lab that uniquely identifies it within containing
+        lab plan. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+    - name: virtualMachineName
+      in: path
+      required: true
+      description: The ID of the virtual machine that uniquely identifies it within
+        the containing lab. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+        pattern: ^[-\w\\._\\(\\)]+$
+    get:
+      tags:
+      - VirtualMachine
+      summary: Get a lab virtual machine.
+      description: Returns the properties for a lab virtual machine.
+      operationId: VirtualMachines_Get
+      responses:
+        '200':
+          description: The request was successful; response contains the lab virtual
+            machine.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    readOnly: true
+                    type: string
+                    description: Fully qualified resource ID for the resource. Ex
+                      - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                  name:
+                    readOnly: true
+                    type: string
+                    description: The name of the resource
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                  systemData:
+                    description: System data of the Lab virtual machine.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  properties:
+                    description: Virtual machine resource properties
+                    x-ms-client-flatten: true
+                    type: object
+                    properties:
+                      provisioningState:
+                        description: Current provisioning state of the virtual machine.
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Creating
+                        - Updating
+                        - Deleting
+                        - Succeeded
+                        - Failed
+                        - Locked
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: false
+                          values:
+                          - value: Creating
+                            description: Resource is in the process of being created.
+                          - value: Updating
+                            description: New property values are being applied to
+                              the resource.
+                          - value: Deleting
+                            description: Resource is in the process of being deleted.
+                          - value: Succeeded
+                            description: Resource is in healthy state after creation
+                              or update operation.
+                          - value: Failed
+                            description: Previous operation on the resource has failed
+                              leaving resource in unhealthy state.
+                          - value: Locked
+                            description: The resource is locked and changes are currently
+                              blocked. This could be due to maintenance or a scheduled
+                              operation. The state will go back to succeeded once
+                              the locking operation has finished.
+                      state:
+                        description: The current state of the virtual machine
+                        readOnly: true
+                        type: string
+                        enum:
+                        - Stopped
+                        - Starting
+                        - Running
+                        - Stopping
+                        - ResettingPassword
+                        - Reimaging
+                        - Redeploying
+                        x-ms-enum:
+                          name: VirtualMachineState
+                          modelAsString: false
+                          values:
+                          - value: Stopped
+                            description: The VM is currently stopped.
+                          - value: Starting
+                            description: The VM is starting.
+                          - value: Running
+                            description: The VM is running.
+                          - value: Stopping
+                            description: The VM is stopping.
+                          - value: ResettingPassword
+                            description: The VM password is being reset.
+                          - value: Reimaging
+                            description: The VM is being reimaged.
+                          - value: Redeploying
+                            description: The VM is being redeployed.
+                      resourceOperationError:
+                        description: Error details of last operation done on lab plan.
+                        readOnly: true
+                        type: object
+                        properties:
+                          timestamp:
+                            description: The datetime of when the error occured
+                            type: string
+                            format: date-time
+                          code:
+                            description: The code that corresponds to the type of
+                              operation failure
+                            type: string
+                          message:
+                            description: The operation failure message
+                            type: string
+                          action:
+                            description: The operation action that failed
+                            type: string
+                      connectionProfile:
+                        description: Profile for information about connecting to the
+                          virtual machine.
+                        readOnly: true
+                        type: object
+                        properties:
+                          privateIpAddress:
+                            description: The private IP address of the virtual machine.
+                            type: string
+                            readOnly: true
+                          sshAuthority:
+                            description: Port and host name separated by semicolon
+                              for connecting via SSH protocol to the virtual machine.
+                            type: string
+                            readOnly: true
+                          sshInBrowserUrl:
+                            description: URL for connecting via SSH protocol to the
+                              virtual machine in browser.
+                            readOnly: true
+                            type: string
+                            minLength: 3
+                            maxLength: 2000
+                          rdpAuthority:
+                            description: Port and host name separated by semicolon
+                              for connecting via RDP protocol to the virtual machine.
+                            type: string
+                            readOnly: true
+                          rdpInBrowserUrl:
+                            description: URL for connecting via RDP protocol to the
+                              virtual machine in browser.
+                            readOnly: true
+                            type: string
+                            minLength: 3
+                            maxLength: 2000
+                          adminUsername:
+                            description: The username used to log on to the virtual
+                              machine as admin.
+                            type: string
+                            readOnly: true
+                          nonAdminUsername:
+                            description: The username used to log on to the virtual
+                              machine as non-admin, if one exists.
+                            type: string
+                            readOnly: true
+                      claimedByUserId:
+                        description: The lab user ID (not the PUID!) of who claimed
+                          the virtual machine.
+                        type: string
+                        readOnly: true
+                      vmType:
+                        description: The type of this VM resource
+                        readOnly: true
+                        type: string
+                        enum:
+                        - User
+                        - Template
+                        x-ms-enum:
+                          name: VirtualMachineType
+                          modelAsString: false
+                          values:
+                          - value: User
+                            description: A user VM
+                          - value: Template
+                            description: A template VM
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+                required:
+                - properties
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labs/{labName}/virtualMachines/{virtualMachineName}/start
+  : parameters:
+    - name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    - name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    - name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    - name: labName
+      in: path
+      required: true
+      description: The name of the lab that uniquely identifies it within containing
+        lab plan. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+    - name: virtualMachineName
+      in: path
+      required: true
+      description: The ID of the virtual machine that uniquely identifies it within
+        the containing lab. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+        pattern: ^[-\w\\._\\(\\)]+$
+    post:
+      tags:
+      - VirtualMachine
+      summary: Start a lab virtual machine.
+      description: Action to start a lab virtual machine.
+      operationId: VirtualMachines_Start
+      responses:
+        '200':
+          description: The request was completed.
+        '202':
+          description: The request was accepted.
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: location
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labs/{labName}/virtualMachines/{virtualMachineName}/stop
+  : parameters:
+    - name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    - name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    - name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    - name: labName
+      in: path
+      required: true
+      description: The name of the lab that uniquely identifies it within containing
+        lab plan. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+    - name: virtualMachineName
+      in: path
+      required: true
+      description: The ID of the virtual machine that uniquely identifies it within
+        the containing lab. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+        pattern: ^[-\w\\._\\(\\)]+$
+    post:
+      tags:
+      - VirtualMachine
+      summary: Stop a lab virtual machine.
+      description: Action to stop a lab virtual machine.
+      operationId: VirtualMachines_Stop
+      responses:
+        '200':
+          description: The request was completed.
+        '202':
+          description: The request was accepted.
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: location
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labs/{labName}/virtualMachines/{virtualMachineName}/reimage
+  : parameters:
+    - name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    - name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    - name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    - name: labName
+      in: path
+      required: true
+      description: The name of the lab that uniquely identifies it within containing
+        lab plan. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+    - name: virtualMachineName
+      in: path
+      required: true
+      description: The ID of the virtual machine that uniquely identifies it within
+        the containing lab. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+        pattern: ^[-\w\\._\\(\\)]+$
+    post:
+      tags:
+      - VirtualMachine
+      summary: Re-image a lab virtual machine.
+      description: Re-image a lab virtual machine. The virtual machine will be deleted
+        and recreated using the latest published snapshot of the reference environment
+        of the lab.
+      operationId: VirtualMachines_Reimage
+      responses:
+        '200':
+          description: The request was completed.
+        '202':
+          description: The request was accepted.
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: location
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labs/{labName}/virtualMachines/{virtualMachineName}/redeploy
+  : parameters:
+    - name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    - name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    - name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    - name: labName
+      in: path
+      required: true
+      description: The name of the lab that uniquely identifies it within containing
+        lab plan. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+    - name: virtualMachineName
+      in: path
+      required: true
+      description: The ID of the virtual machine that uniquely identifies it within
+        the containing lab. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+        pattern: ^[-\w\\._\\(\\)]+$
+    post:
+      tags:
+      - VirtualMachine
+      summary: Redeploy a lab virtual machine to a different compute node. For troubleshooting
+        connectivity.
+      description: Action to redeploy a lab virtual machine to a different compute
+        node. For troubleshooting connectivity.
+      operationId: VirtualMachines_Redeploy
+      responses:
+        '200':
+          description: The request was completed.
+        '202':
+          description: The request was accepted.
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: location
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.LabServices/labs/{labName}/virtualMachines/{virtualMachineName}/resetPassword
+  : parameters:
+    - name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    - name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    - name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    - name: labName
+      in: path
+      required: true
+      description: The name of the lab that uniquely identifies it within containing
+        lab plan. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+    - name: virtualMachineName
+      in: path
+      required: true
+      description: The ID of the virtual machine that uniquely identifies it within
+        the containing lab. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+        pattern: ^[-\w\\._\\(\\)]+$
+    post:
+      tags:
+      - VirtualMachine
+      summary: Reset a lab virtual machine password.
+      description: Resets a lab virtual machine password.
+      operationId: VirtualMachines_ResetPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: Body of a reset password request.
+              type: object
+              properties:
+                username:
+                  description: The user whose password is being reset
+                  type: string
+                  x-ms-mutability:
+                  - read
+                  - create
+                password:
+                  description: The password
+                  type: string
+                  x-ms-secret: true
+                  x-ms-mutability:
+                  - create
+              required:
+              - username
+              - password
+        description: The request body.
+        required: true
+      responses:
+        '200':
+          description: The request was completed.
+        '202':
+          description: The request was accepted.
+        default:
+          description: The default error response.
+          content:
+            application/json:
+              schema:
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                type: object
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        readOnly: true
+                        type: string
+                        description: The error code.
+                      message:
+                        readOnly: true
+                        type: string
+                        description: The error message.
+                      target:
+                        readOnly: true
+                        type: string
+                        description: The error target.
+                      details:
+                        readOnly: true
+                        type: array
+                        items:
+                          description: The error detail.
+                          type: object
+                          properties:
+                            code:
+                              readOnly: true
+                              type: string
+                              description: The error code.
+                            message:
+                              readOnly: true
+                              type: string
+                              description: The error message.
+                            target:
+                              readOnly: true
+                              type: string
+                              description: The error target.
+                            details:
+                              readOnly: true
+                              type: array
+                              items:
+                                description: The error detail.
+                                type: object
+                                properties:
+                                  code:
+                                    readOnly: true
+                                    type: string
+                                    description: The error code.
+                                  message:
+                                    readOnly: true
+                                    type: string
+                                    description: The error message.
+                                  target:
+                                    readOnly: true
+                                    type: string
+                                    description: The error target.
+                              x-ms-identifiers:
+                              - message
+                              - target
+                              description: The error details.
+                            additionalInfo:
+                              readOnly: true
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  type:
+                                    readOnly: true
+                                    type: string
+                                    description: The additional info type.
+                                  info:
+                                    readOnly: true
+                                    type: object
+                                    description: The additional info.
+                                description: The resource management error additional
+                                  info.
+                              x-ms-identifiers: []
+                              description: The error additional info.
+                        x-ms-identifiers:
+                        - message
+                        - target
+                        description: The error details.
+                      additionalInfo:
+                        readOnly: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            type:
+                              readOnly: true
+                              type: string
+                              description: The additional info type.
+                            info:
+                              readOnly: true
+                              type: object
+                              description: The additional info.
+                          description: The resource management error additional info.
+                        x-ms-identifiers: []
+                        description: The error additional info.
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: location
+components:
+  parameters:
+    VirtualMachineNameParameter:
+      name: virtualMachineName
+      in: path
+      required: true
+      description: The ID of the virtual machine that uniquely identifies it within
+        the containing lab. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+        pattern: ^[-\w\\._\\(\\)]+$
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      required: true
+      description: The API version to use for this operation.
+      schema:
+        type: string
+        minLength: 1
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      required: true
+      description: The ID of the target subscription.
+      schema:
+        type: string
+        minLength: 1
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      required: true
+      description: The name of the resource group. The name is case insensitive.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    LabNameParameter:
+      name: labName
+      in: path
+      required: true
+      description: The name of the lab that uniquely identifies it within containing
+        lab plan. Used in resource URIs.
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 100
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    VirtualMachine:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+        systemData:
+          description: System data of the Lab virtual machine.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+        properties:
+          description: Virtual machine resource properties
+          x-ms-client-flatten: true
+          type: object
+          properties:
+            provisioningState:
+              description: Current provisioning state of the virtual machine.
+              readOnly: true
+              type: string
+              enum:
+              - Creating
+              - Updating
+              - Deleting
+              - Succeeded
+              - Failed
+              - Locked
+              x-ms-enum:
+                name: ProvisioningState
+                modelAsString: false
+                values:
+                - value: Creating
+                  description: Resource is in the process of being created.
+                - value: Updating
+                  description: New property values are being applied to the resource.
+                - value: Deleting
+                  description: Resource is in the process of being deleted.
+                - value: Succeeded
+                  description: Resource is in healthy state after creation or update
+                    operation.
+                - value: Failed
+                  description: Previous operation on the resource has failed leaving
+                    resource in unhealthy state.
+                - value: Locked
+                  description: The resource is locked and changes are currently blocked.
+                    This could be due to maintenance or a scheduled operation. The
+                    state will go back to succeeded once the locking operation has
+                    finished.
+            state:
+              description: The current state of the virtual machine
+              readOnly: true
+              type: string
+              enum:
+              - Stopped
+              - Starting
+              - Running
+              - Stopping
+              - ResettingPassword
+              - Reimaging
+              - Redeploying
+              x-ms-enum:
+                name: VirtualMachineState
+                modelAsString: false
+                values:
+                - value: Stopped
+                  description: The VM is currently stopped.
+                - value: Starting
+                  description: The VM is starting.
+                - value: Running
+                  description: The VM is running.
+                - value: Stopping
+                  description: The VM is stopping.
+                - value: ResettingPassword
+                  description: The VM password is being reset.
+                - value: Reimaging
+                  description: The VM is being reimaged.
+                - value: Redeploying
+                  description: The VM is being redeployed.
+            resourceOperationError:
+              description: Error details of last operation done on lab plan.
+              readOnly: true
+              type: object
+              properties:
+                timestamp:
+                  description: The datetime of when the error occured
+                  type: string
+                  format: date-time
+                code:
+                  description: The code that corresponds to the type of operation
+                    failure
+                  type: string
+                message:
+                  description: The operation failure message
+                  type: string
+                action:
+                  description: The operation action that failed
+                  type: string
+            connectionProfile:
+              description: Profile for information about connecting to the virtual
+                machine.
+              readOnly: true
+              type: object
+              properties:
+                privateIpAddress:
+                  description: The private IP address of the virtual machine.
+                  type: string
+                  readOnly: true
+                sshAuthority:
+                  description: Port and host name separated by semicolon for connecting
+                    via SSH protocol to the virtual machine.
+                  type: string
+                  readOnly: true
+                sshInBrowserUrl:
+                  description: URL for connecting via SSH protocol to the virtual
+                    machine in browser.
+                  readOnly: true
+                  type: string
+                  minLength: 3
+                  maxLength: 2000
+                rdpAuthority:
+                  description: Port and host name separated by semicolon for connecting
+                    via RDP protocol to the virtual machine.
+                  type: string
+                  readOnly: true
+                rdpInBrowserUrl:
+                  description: URL for connecting via RDP protocol to the virtual
+                    machine in browser.
+                  readOnly: true
+                  type: string
+                  minLength: 3
+                  maxLength: 2000
+                adminUsername:
+                  description: The username used to log on to the virtual machine
+                    as admin.
+                  type: string
+                  readOnly: true
+                nonAdminUsername:
+                  description: The username used to log on to the virtual machine
+                    as non-admin, if one exists.
+                  type: string
+                  readOnly: true
+            claimedByUserId:
+              description: The lab user ID (not the PUID!) of who claimed the virtual
+                machine.
+              type: string
+              readOnly: true
+            vmType:
+              description: The type of this VM resource
+              readOnly: true
+              type: string
+              enum:
+              - User
+              - Template
+              x-ms-enum:
+                name: VirtualMachineType
+                modelAsString: false
+                values:
+                - value: User
+                  description: A user VM
+                - value: Template
+                  description: A template VM
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+      required:
+      - properties
+    PagedVirtualMachines:
+      description: Paged list of lab services virtual machines.
+      type: object
+      properties:
+        value:
+          description: The array page of virtual machine results.
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                readOnly: true
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+              name:
+                readOnly: true
+                type: string
+                description: The name of the resource
+              type:
+                readOnly: true
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+              systemData:
+                description: System data of the Lab virtual machine.
+                readOnly: true
+                type: object
+                properties:
+                  createdBy:
+                    type: string
+                    description: The identity that created the resource.
+                  createdByType:
+                    type: string
+                    description: The type of identity that created the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource creation (UTC).
+                  lastModifiedBy:
+                    type: string
+                    description: The identity that last modified the resource.
+                  lastModifiedByType:
+                    type: string
+                    description: The type of identity that last modified the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  lastModifiedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource last modification (UTC)
+              properties:
+                description: Virtual machine resource properties
+                x-ms-client-flatten: true
+                type: object
+                properties:
+                  provisioningState:
+                    description: Current provisioning state of the virtual machine.
+                    readOnly: true
+                    type: string
+                    enum:
+                    - Creating
+                    - Updating
+                    - Deleting
+                    - Succeeded
+                    - Failed
+                    - Locked
+                    x-ms-enum:
+                      name: ProvisioningState
+                      modelAsString: false
+                      values:
+                      - value: Creating
+                        description: Resource is in the process of being created.
+                      - value: Updating
+                        description: New property values are being applied to the
+                          resource.
+                      - value: Deleting
+                        description: Resource is in the process of being deleted.
+                      - value: Succeeded
+                        description: Resource is in healthy state after creation or
+                          update operation.
+                      - value: Failed
+                        description: Previous operation on the resource has failed
+                          leaving resource in unhealthy state.
+                      - value: Locked
+                        description: The resource is locked and changes are currently
+                          blocked. This could be due to maintenance or a scheduled
+                          operation. The state will go back to succeeded once the
+                          locking operation has finished.
+                  state:
+                    description: The current state of the virtual machine
+                    readOnly: true
+                    type: string
+                    enum:
+                    - Stopped
+                    - Starting
+                    - Running
+                    - Stopping
+                    - ResettingPassword
+                    - Reimaging
+                    - Redeploying
+                    x-ms-enum:
+                      name: VirtualMachineState
+                      modelAsString: false
+                      values:
+                      - value: Stopped
+                        description: The VM is currently stopped.
+                      - value: Starting
+                        description: The VM is starting.
+                      - value: Running
+                        description: The VM is running.
+                      - value: Stopping
+                        description: The VM is stopping.
+                      - value: ResettingPassword
+                        description: The VM password is being reset.
+                      - value: Reimaging
+                        description: The VM is being reimaged.
+                      - value: Redeploying
+                        description: The VM is being redeployed.
+                  resourceOperationError:
+                    description: Error details of last operation done on lab plan.
+                    readOnly: true
+                    type: object
+                    properties:
+                      timestamp:
+                        description: The datetime of when the error occured
+                        type: string
+                        format: date-time
+                      code:
+                        description: The code that corresponds to the type of operation
+                          failure
+                        type: string
+                      message:
+                        description: The operation failure message
+                        type: string
+                      action:
+                        description: The operation action that failed
+                        type: string
+                  connectionProfile:
+                    description: Profile for information about connecting to the virtual
+                      machine.
+                    readOnly: true
+                    type: object
+                    properties:
+                      privateIpAddress:
+                        description: The private IP address of the virtual machine.
+                        type: string
+                        readOnly: true
+                      sshAuthority:
+                        description: Port and host name separated by semicolon for
+                          connecting via SSH protocol to the virtual machine.
+                        type: string
+                        readOnly: true
+                      sshInBrowserUrl:
+                        description: URL for connecting via SSH protocol to the virtual
+                          machine in browser.
+                        readOnly: true
+                        type: string
+                        minLength: 3
+                        maxLength: 2000
+                      rdpAuthority:
+                        description: Port and host name separated by semicolon for
+                          connecting via RDP protocol to the virtual machine.
+                        type: string
+                        readOnly: true
+                      rdpInBrowserUrl:
+                        description: URL for connecting via RDP protocol to the virtual
+                          machine in browser.
+                        readOnly: true
+                        type: string
+                        minLength: 3
+                        maxLength: 2000
+                      adminUsername:
+                        description: The username used to log on to the virtual machine
+                          as admin.
+                        type: string
+                        readOnly: true
+                      nonAdminUsername:
+                        description: The username used to log on to the virtual machine
+                          as non-admin, if one exists.
+                        type: string
+                        readOnly: true
+                  claimedByUserId:
+                    description: The lab user ID (not the PUID!) of who claimed the
+                      virtual machine.
+                    type: string
+                    readOnly: true
+                  vmType:
+                    description: The type of this VM resource
+                    readOnly: true
+                    type: string
+                    enum:
+                    - User
+                    - Template
+                    x-ms-enum:
+                      name: VirtualMachineType
+                      modelAsString: false
+                      values:
+                      - value: User
+                        description: A user VM
+                      - value: Template
+                        description: A template VM
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+            required:
+            - properties
+          readOnly: true
+        nextLink:
+          description: The link to get the next page of virtual machine results.
+          type: string
+          readOnly: true
+    VirtualMachineProperties:
+      description: Virtual machine resource properties
+      type: object
+      properties:
+        provisioningState:
+          description: Current provisioning state of the virtual machine.
+          readOnly: true
+          type: string
+          enum:
+          - Creating
+          - Updating
+          - Deleting
+          - Succeeded
+          - Failed
+          - Locked
+          x-ms-enum:
+            name: ProvisioningState
+            modelAsString: false
+            values:
+            - value: Creating
+              description: Resource is in the process of being created.
+            - value: Updating
+              description: New property values are being applied to the resource.
+            - value: Deleting
+              description: Resource is in the process of being deleted.
+            - value: Succeeded
+              description: Resource is in healthy state after creation or update operation.
+            - value: Failed
+              description: Previous operation on the resource has failed leaving resource
+                in unhealthy state.
+            - value: Locked
+              description: The resource is locked and changes are currently blocked.
+                This could be due to maintenance or a scheduled operation. The state
+                will go back to succeeded once the locking operation has finished.
+        state:
+          description: The current state of the virtual machine
+          readOnly: true
+          type: string
+          enum:
+          - Stopped
+          - Starting
+          - Running
+          - Stopping
+          - ResettingPassword
+          - Reimaging
+          - Redeploying
+          x-ms-enum:
+            name: VirtualMachineState
+            modelAsString: false
+            values:
+            - value: Stopped
+              description: The VM is currently stopped.
+            - value: Starting
+              description: The VM is starting.
+            - value: Running
+              description: The VM is running.
+            - value: Stopping
+              description: The VM is stopping.
+            - value: ResettingPassword
+              description: The VM password is being reset.
+            - value: Reimaging
+              description: The VM is being reimaged.
+            - value: Redeploying
+              description: The VM is being redeployed.
+        resourceOperationError:
+          description: Error details of last operation done on lab plan.
+          readOnly: true
+          type: object
+          properties:
+            timestamp:
+              description: The datetime of when the error occured
+              type: string
+              format: date-time
+            code:
+              description: The code that corresponds to the type of operation failure
+              type: string
+            message:
+              description: The operation failure message
+              type: string
+            action:
+              description: The operation action that failed
+              type: string
+        connectionProfile:
+          description: Profile for information about connecting to the virtual machine.
+          readOnly: true
+          type: object
+          properties:
+            privateIpAddress:
+              description: The private IP address of the virtual machine.
+              type: string
+              readOnly: true
+            sshAuthority:
+              description: Port and host name separated by semicolon for connecting
+                via SSH protocol to the virtual machine.
+              type: string
+              readOnly: true
+            sshInBrowserUrl:
+              description: URL for connecting via SSH protocol to the virtual machine
+                in browser.
+              readOnly: true
+              type: string
+              minLength: 3
+              maxLength: 2000
+            rdpAuthority:
+              description: Port and host name separated by semicolon for connecting
+                via RDP protocol to the virtual machine.
+              type: string
+              readOnly: true
+            rdpInBrowserUrl:
+              description: URL for connecting via RDP protocol to the virtual machine
+                in browser.
+              readOnly: true
+              type: string
+              minLength: 3
+              maxLength: 2000
+            adminUsername:
+              description: The username used to log on to the virtual machine as admin.
+              type: string
+              readOnly: true
+            nonAdminUsername:
+              description: The username used to log on to the virtual machine as non-admin,
+                if one exists.
+              type: string
+              readOnly: true
+        claimedByUserId:
+          description: The lab user ID (not the PUID!) of who claimed the virtual
+            machine.
+          type: string
+          readOnly: true
+        vmType:
+          description: The type of this VM resource
+          readOnly: true
+          type: string
+          enum:
+          - User
+          - Template
+          x-ms-enum:
+            name: VirtualMachineType
+            modelAsString: false
+            values:
+            - value: User
+              description: A user VM
+            - value: Template
+              description: A template VM
+    ResetPasswordBody:
+      description: Body of a reset password request.
+      type: object
+      properties:
+        username:
+          description: The user whose password is being reset
+          type: string
+          x-ms-mutability:
+          - read
+          - create
+        password:
+          description: The password
+          type: string
+          x-ms-secret: true
+          x-ms-mutability:
+          - create
+      required:
+      - username
+      - password
+    VirtualMachineState:
+      type: string
+      enum:
+      - Stopped
+      - Starting
+      - Running
+      - Stopping
+      - ResettingPassword
+      - Reimaging
+      - Redeploying
+      description: The state of a virtual machine.
+      x-ms-enum:
+        name: VirtualMachineState
+        modelAsString: false
+        values:
+        - value: Stopped
+          description: The VM is currently stopped.
+        - value: Starting
+          description: The VM is starting.
+        - value: Running
+          description: The VM is running.
+        - value: Stopping
+          description: The VM is stopping.
+        - value: ResettingPassword
+          description: The VM password is being reset.
+        - value: Reimaging
+          description: The VM is being reimaged.
+        - value: Redeploying
+          description: The VM is being redeployed.
+    VirtualMachineConnectionProfile:
+      description: The connection information for the virtual machine
+      type: object
+      properties:
+        privateIpAddress:
+          description: The private IP address of the virtual machine.
+          type: string
+          readOnly: true
+        sshAuthority:
+          description: Port and host name separated by semicolon for connecting via
+            SSH protocol to the virtual machine.
+          type: string
+          readOnly: true
+        sshInBrowserUrl:
+          description: URL for connecting via SSH protocol to the virtual machine
+            in browser.
+          readOnly: true
+          type: string
+          minLength: 3
+          maxLength: 2000
+        rdpAuthority:
+          description: Port and host name separated by semicolon for connecting via
+            RDP protocol to the virtual machine.
+          type: string
+          readOnly: true
+        rdpInBrowserUrl:
+          description: URL for connecting via RDP protocol to the virtual machine
+            in browser.
+          readOnly: true
+          type: string
+          minLength: 3
+          maxLength: 2000
+        adminUsername:
+          description: The username used to log on to the virtual machine as admin.
+          type: string
+          readOnly: true
+        nonAdminUsername:
+          description: The username used to log on to the virtual machine as non-admin,
+            if one exists.
+          type: string
+          readOnly: true
+    VirtualMachineType:
+      type: string
+      enum:
+      - User
+      - Template
+      description: The type of the lab virtual machine.
+      x-ms-enum:
+        name: VirtualMachineType
+        modelAsString: false
+        values:
+        - value: User
+          description: A user VM
+        - value: Template
+          description: A template VM
+    ErrorDetail:
+      description: The error detail.
+      type: object
+      properties:
+        code:
+          readOnly: true
+          type: string
+          description: The error code.
+        message:
+          readOnly: true
+          type: string
+          description: The error message.
+        target:
+          readOnly: true
+          type: string
+          description: The error target.
+        details:
+          readOnly: true
+          type: array
+          items:
+            description: The error detail.
+            type: object
+            properties:
+              code:
+                readOnly: true
+                type: string
+                description: The error code.
+              message:
+                readOnly: true
+                type: string
+                description: The error message.
+              target:
+                readOnly: true
+                type: string
+                description: The error target.
+              details:
+                readOnly: true
+                type: array
+                items:
+                  description: The error detail.
+                  type: object
+                  properties:
+                    code:
+                      readOnly: true
+                      type: string
+                      description: The error code.
+                    message:
+                      readOnly: true
+                      type: string
+                      description: The error message.
+                    target:
+                      readOnly: true
+                      type: string
+                      description: The error target.
+                x-ms-identifiers:
+                - message
+                - target
+                description: The error details.
+              additionalInfo:
+                readOnly: true
+                type: array
+                items:
+                  type: object
+                  properties:
+                    type:
+                      readOnly: true
+                      type: string
+                      description: The additional info type.
+                    info:
+                      readOnly: true
+                      type: object
+                      description: The additional info.
+                  description: The resource management error additional info.
+                x-ms-identifiers: []
+                description: The error additional info.
+          x-ms-identifiers:
+          - message
+          - target
+          description: The error details.
+        additionalInfo:
+          readOnly: true
+          type: array
+          items:
+            type: object
+            properties:
+              type:
+                readOnly: true
+                type: string
+                description: The additional info type.
+              info:
+                readOnly: true
+                type: object
+                description: The additional info.
+            description: The resource management error additional info.
+          x-ms-identifiers: []
+          description: The error additional info.
+    ErrorAdditionalInfo:
+      type: object
+      properties:
+        type:
+          readOnly: true
+          type: string
+          description: The additional info type.
+        info:
+          readOnly: true
+          type: object
+          description: The additional info.
+      description: The resource management error additional info.
+    ErrorResponse:
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      type: object
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              readOnly: true
+              type: string
+              description: The error code.
+            message:
+              readOnly: true
+              type: string
+              description: The error message.
+            target:
+              readOnly: true
+              type: string
+              description: The error target.
+            details:
+              readOnly: true
+              type: array
+              items:
+                description: The error detail.
+                type: object
+                properties:
+                  code:
+                    readOnly: true
+                    type: string
+                    description: The error code.
+                  message:
+                    readOnly: true
+                    type: string
+                    description: The error message.
+                  target:
+                    readOnly: true
+                    type: string
+                    description: The error target.
+                  details:
+                    readOnly: true
+                    type: array
+                    items:
+                      description: The error detail.
+                      type: object
+                      properties:
+                        code:
+                          readOnly: true
+                          type: string
+                          description: The error code.
+                        message:
+                          readOnly: true
+                          type: string
+                          description: The error message.
+                        target:
+                          readOnly: true
+                          type: string
+                          description: The error target.
+                    x-ms-identifiers:
+                    - message
+                    - target
+                    description: The error details.
+                  additionalInfo:
+                    readOnly: true
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        type:
+                          readOnly: true
+                          type: string
+                          description: The additional info type.
+                        info:
+                          readOnly: true
+                          type: object
+                          description: The additional info.
+                      description: The resource management error additional info.
+                    x-ms-identifiers: []
+                    description: The error additional info.
+              x-ms-identifiers:
+              - message
+              - target
+              description: The error details.
+            additionalInfo:
+              readOnly: true
+              type: array
+              items:
+                type: object
+                properties:
+                  type:
+                    readOnly: true
+                    type: string
+                    description: The additional info type.
+                  info:
+                    readOnly: true
+                    type: object
+                    description: The additional info.
+                description: The resource management error additional info.
+              x-ms-identifiers: []
+              description: The error additional info.
+    Resource:
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+        name:
+          readOnly: true
+          type: string
+          description: The name of the resource
+        type:
+          readOnly: true
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    systemData:
+      description: Metadata pertaining to creation and last modification of the resource.
+      type: object
+      readOnly: true
+      properties:
+        createdBy:
+          type: string
+          description: The identity that created the resource.
+        createdByType:
+          type: string
+          description: The type of identity that created the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource creation (UTC).
+        lastModifiedBy:
+          type: string
+          description: The identity that last modified the resource.
+        lastModifiedByType:
+          type: string
+          description: The type of identity that last modified the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource last modification (UTC)
+    provisioningState:
+      type: string
+      enum:
+      - Creating
+      - Updating
+      - Deleting
+      - Succeeded
+      - Failed
+      - Locked
+      description: Resource provisioning state.
+      x-ms-enum:
+        name: ProvisioningState
+        modelAsString: false
+        values:
+        - value: Creating
+          description: Resource is in the process of being created.
+        - value: Updating
+          description: New property values are being applied to the resource.
+        - value: Deleting
+          description: Resource is in the process of being deleted.
+        - value: Succeeded
+          description: Resource is in healthy state after creation or update operation.
+        - value: Failed
+          description: Previous operation on the resource has failed leaving resource
+            in unhealthy state.
+        - value: Locked
+          description: The resource is locked and changes are currently blocked. This
+            could be due to maintenance or a scheduled operation. The state will go
+            back to succeeded once the locking operation has finished.
+    ResourceOperationError:
+      description: Error details of the latest operation failure on this resource
+      type: object
+      properties:
+        timestamp:
+          description: The datetime of when the error occured
+          type: string
+          format: date-time
+        code:
+          description: The code that corresponds to the type of operation failure
+          type: string
+        message:
+          description: The operation failure message
+          type: string
+        action:
+          description: The operation action that failed
+          type: string
+    url:
+      type: string
+      minLength: 3
+      maxLength: 2000
+      description: A URL.

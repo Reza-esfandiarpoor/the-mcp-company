@@ -1,0 +1,912 @@
+openapi: 3.0.0
+info:
+  title: Azure Database Migration Service (classic) Resource Provider
+  version: 2025-06-30
+paths: {}
+components:
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    MigrationValidationOptions:
+      type: object
+      description: Types of validations to run after the migration
+      properties:
+        enableSchemaValidation:
+          type: boolean
+          description: Allows to compare the schema information between source and
+            target.
+        enableDataIntegrityValidation:
+          type: boolean
+          description: Allows to perform a checksum based data integrity validation
+            between source and target for the selected database / tables .
+        enableQueryAnalysisValidation:
+          type: boolean
+          description: Allows to perform a quick and intelligent query analysis by
+            retrieving queries from the source database and executes them in the target.
+            The result will have execution statistics for executions in source and
+            target databases for the extracted queries.
+    MigrationReportResult:
+      type: object
+      description: Migration validation report result, contains the url for downloading
+        the generated report.
+      properties:
+        id:
+          type: string
+          description: Migration validation result identifier
+        reportUrl:
+          type: string
+          description: The url of the report.
+    MigrationValidationResult:
+      type: object
+      description: Migration Validation Result
+      properties:
+        id:
+          type: string
+          description: Migration validation result identifier
+          readOnly: true
+        migrationId:
+          type: string
+          description: Migration Identifier
+          readOnly: true
+        summaryResults:
+          type: object
+          description: Validation summary results for each database
+          additionalProperties:
+            type: object
+            description: Migration Validation Database level summary result
+            properties:
+              id:
+                type: string
+                description: Result identifier
+                readOnly: true
+              migrationId:
+                type: string
+                description: Migration Identifier
+                readOnly: true
+              sourceDatabaseName:
+                type: string
+                description: Name of the source database
+                readOnly: true
+              targetDatabaseName:
+                type: string
+                description: Name of the target database
+                readOnly: true
+              startedOn:
+                type: string
+                format: date-time
+                description: Validation start time
+                readOnly: true
+              endedOn:
+                type: string
+                format: date-time
+                description: Validation end time
+                readOnly: true
+              status:
+                description: Current status of validation at the database level
+                readOnly: true
+                type: string
+                enum:
+                - Default
+                - NotStarted
+                - Initialized
+                - InProgress
+                - Completed
+                - CompletedWithIssues
+                - Stopped
+                - Failed
+                x-ms-enum:
+                  name: ValidationStatus
+                  modelAsString: true
+        status:
+          description: Current status of validation at the migration level. Status
+            from the database validation result status will be aggregated here.
+          readOnly: true
+          type: string
+          enum:
+          - Default
+          - NotStarted
+          - Initialized
+          - InProgress
+          - Completed
+          - CompletedWithIssues
+          - Stopped
+          - Failed
+          x-ms-enum:
+            name: ValidationStatus
+            modelAsString: true
+    MigrationValidationDatabaseSummaryResult:
+      type: object
+      description: Migration Validation Database level summary result
+      properties:
+        id:
+          type: string
+          description: Result identifier
+          readOnly: true
+        migrationId:
+          type: string
+          description: Migration Identifier
+          readOnly: true
+        sourceDatabaseName:
+          type: string
+          description: Name of the source database
+          readOnly: true
+        targetDatabaseName:
+          type: string
+          description: Name of the target database
+          readOnly: true
+        startedOn:
+          type: string
+          format: date-time
+          description: Validation start time
+          readOnly: true
+        endedOn:
+          type: string
+          format: date-time
+          description: Validation end time
+          readOnly: true
+        status:
+          description: Current status of validation at the database level
+          readOnly: true
+          type: string
+          enum:
+          - Default
+          - NotStarted
+          - Initialized
+          - InProgress
+          - Completed
+          - CompletedWithIssues
+          - Stopped
+          - Failed
+          x-ms-enum:
+            name: ValidationStatus
+            modelAsString: true
+    MigrationValidationDatabaseLevelResult:
+      type: object
+      description: Database level validation results
+      properties:
+        id:
+          type: string
+          description: Result identifier
+          readOnly: true
+        migrationId:
+          type: string
+          description: Migration Identifier
+          readOnly: true
+        sourceDatabaseName:
+          type: string
+          description: Name of the source database
+          readOnly: true
+        targetDatabaseName:
+          type: string
+          description: Name of the target database
+          readOnly: true
+        startedOn:
+          type: string
+          format: date-time
+          description: Validation start time
+          readOnly: true
+        endedOn:
+          type: string
+          format: date-time
+          description: Validation end time
+          readOnly: true
+        dataIntegrityValidationResult:
+          description: Provides data integrity validation result between the source
+            and target tables that are migrated.
+          readOnly: true
+          type: object
+          properties:
+            failedObjects:
+              type: object
+              description: List of failed table names of source and target pair
+              additionalProperties:
+                type: string
+            validationErrors:
+              type: array
+              description: List of errors that happened while performing data integrity
+                validation
+              properties:
+                text:
+                  type: string
+                  description: Error Text
+                severity:
+                  type: string
+                  description: Severity of the error
+                  enum:
+                  - Message
+                  - Warning
+                  - Error
+                  x-ms-enum:
+                    name: Severity
+                    modelAsString: true
+              items: {}
+        schemaValidationResult:
+          description: Provides schema comparison result between source and target
+            database
+          readOnly: true
+          type: object
+          properties:
+            schemaDifferences:
+              type: array
+              description: List of schema differences between the source and target
+                databases
+              properties:
+                objectName:
+                  type: string
+                  description: Name of the object that has the difference
+                objectType:
+                  type: object
+                  description: Type of the object that has the difference. e.g (Table/View/StoredProcedure)
+                  enum:
+                  - StoredProcedures
+                  - Table
+                  - User
+                  - View
+                  - Function
+                  x-ms-enum:
+                    name: ObjectType
+                    modelAsString: true
+                updateAction:
+                  type: string
+                  description: Update action type with respect to target
+                  enum:
+                  - DeletedOnTarget
+                  - ChangedOnTarget
+                  - AddedOnTarget
+                  x-ms-enum:
+                    name: UpdateActionType
+                    modelAsString: true
+              items: {}
+            validationErrors:
+              type: array
+              description: List of errors that happened while performing schema compare
+                validation
+              properties:
+                text:
+                  type: string
+                  description: Error Text
+                severity:
+                  type: string
+                  description: Severity of the error
+                  enum:
+                  - Message
+                  - Warning
+                  - Error
+                  x-ms-enum:
+                    name: Severity
+                    modelAsString: true
+              items: {}
+            sourceDatabaseObjectCount:
+              type: object
+              description: Count of source database objects
+              additionalProperties:
+                type: integer
+                format: int64
+            targetDatabaseObjectCount:
+              type: object
+              description: Count of target database objects
+              additionalProperties:
+                type: integer
+                format: int64
+        queryAnalysisValidationResult:
+          description: Results of some of the query execution result between source
+            and target database
+          readOnly: true
+          type: object
+          properties:
+            queryResults:
+              type: array
+              description: List of queries executed and it's execution results in
+                source and target
+              properties:
+                queryText:
+                  type: string
+                  description: Query text retrieved from the source server
+                statementsInBatch:
+                  type: integer
+                  format: int64
+                  description: Total no. of statements in the batch
+                sourceResult:
+                  type: object
+                  description: Query analysis result from the source
+                  properties:
+                    executionCount:
+                      type: integer
+                      format: int64
+                      description: No. of query executions
+                    cpuTimeMs:
+                      type: number
+                      format: float
+                      description: CPU Time in millisecond(s) for the query execution
+                    elapsedTimeMs:
+                      type: number
+                      format: float
+                      description: Time taken in millisecond(s) for executing the
+                        query
+                    waitStats:
+                      type: object
+                      description: Dictionary of sql query execution wait types and
+                        the respective statistics
+                      additionalProperties:
+                        type: object
+                        description: Wait statistics gathered during query batch execution
+                        properties:
+                          waitType:
+                            type: string
+                            description: Type of the Wait
+                          waitTimeMs:
+                            type: number
+                            format: float
+                            default: 0
+                            description: 'Total wait time in millisecond(s) '
+                          waitCount:
+                            type: integer
+                            format: int64
+                            description: Total no. of waits
+                    hasErrors:
+                      type: boolean
+                      description: Indicates whether the query resulted in an error
+                    sqlErrors:
+                      type: array
+                      description: List of sql Errors
+                      items:
+                        type: string
+                targetResult:
+                  type: object
+                  description: Query analysis result from the target
+                  properties:
+                    executionCount:
+                      type: integer
+                      format: int64
+                      description: No. of query executions
+                    cpuTimeMs:
+                      type: number
+                      format: float
+                      description: CPU Time in millisecond(s) for the query execution
+                    elapsedTimeMs:
+                      type: number
+                      format: float
+                      description: Time taken in millisecond(s) for executing the
+                        query
+                    waitStats:
+                      type: object
+                      description: Dictionary of sql query execution wait types and
+                        the respective statistics
+                      additionalProperties:
+                        type: object
+                        description: Wait statistics gathered during query batch execution
+                        properties:
+                          waitType:
+                            type: string
+                            description: Type of the Wait
+                          waitTimeMs:
+                            type: number
+                            format: float
+                            default: 0
+                            description: 'Total wait time in millisecond(s) '
+                          waitCount:
+                            type: integer
+                            format: int64
+                            description: Total no. of waits
+                    hasErrors:
+                      type: boolean
+                      description: Indicates whether the query resulted in an error
+                    sqlErrors:
+                      type: array
+                      description: List of sql Errors
+                      items:
+                        type: string
+              items: {}
+            validationErrors:
+              type: array
+              description: Errors that are part of the execution
+              properties:
+                text:
+                  type: string
+                  description: Error Text
+                severity:
+                  type: string
+                  description: Severity of the error
+                  enum:
+                  - Message
+                  - Warning
+                  - Error
+                  x-ms-enum:
+                    name: Severity
+                    modelAsString: true
+              items: {}
+        status:
+          description: Current status of validation at the database level
+          readOnly: true
+          type: string
+          enum:
+          - Default
+          - NotStarted
+          - Initialized
+          - InProgress
+          - Completed
+          - CompletedWithIssues
+          - Stopped
+          - Failed
+          x-ms-enum:
+            name: ValidationStatus
+            modelAsString: true
+    DataIntegrityValidationResult:
+      type: object
+      description: Results for checksum based Data Integrity validation results
+      properties:
+        failedObjects:
+          type: object
+          description: List of failed table names of source and target pair
+          additionalProperties:
+            type: string
+        validationErrors:
+          type: array
+          description: List of errors that happened while performing data integrity
+            validation
+          properties:
+            text:
+              type: string
+              description: Error Text
+            severity:
+              type: string
+              description: Severity of the error
+              enum:
+              - Message
+              - Warning
+              - Error
+              x-ms-enum:
+                name: Severity
+                modelAsString: true
+          items: {}
+    SchemaComparisonValidationResult:
+      type: object
+      description: Results for schema comparison between the source and target
+      properties:
+        schemaDifferences:
+          type: array
+          description: List of schema differences between the source and target databases
+          properties:
+            objectName:
+              type: string
+              description: Name of the object that has the difference
+            objectType:
+              type: object
+              description: Type of the object that has the difference. e.g (Table/View/StoredProcedure)
+              enum:
+              - StoredProcedures
+              - Table
+              - User
+              - View
+              - Function
+              x-ms-enum:
+                name: ObjectType
+                modelAsString: true
+            updateAction:
+              type: string
+              description: Update action type with respect to target
+              enum:
+              - DeletedOnTarget
+              - ChangedOnTarget
+              - AddedOnTarget
+              x-ms-enum:
+                name: UpdateActionType
+                modelAsString: true
+          items: {}
+        validationErrors:
+          type: array
+          description: List of errors that happened while performing schema compare
+            validation
+          properties:
+            text:
+              type: string
+              description: Error Text
+            severity:
+              type: string
+              description: Severity of the error
+              enum:
+              - Message
+              - Warning
+              - Error
+              x-ms-enum:
+                name: Severity
+                modelAsString: true
+          items: {}
+        sourceDatabaseObjectCount:
+          type: object
+          description: Count of source database objects
+          additionalProperties:
+            type: integer
+            format: int64
+        targetDatabaseObjectCount:
+          type: object
+          description: Count of target database objects
+          additionalProperties:
+            type: integer
+            format: int64
+    SchemaComparisonValidationResultType:
+      type: object
+      description: Description about the errors happen while performing migration
+        validation
+      properties:
+        objectName:
+          type: string
+          description: Name of the object that has the difference
+        objectType:
+          type: object
+          description: Type of the object that has the difference. e.g (Table/View/StoredProcedure)
+          enum:
+          - StoredProcedures
+          - Table
+          - User
+          - View
+          - Function
+          x-ms-enum:
+            name: ObjectType
+            modelAsString: true
+        updateAction:
+          type: string
+          description: Update action type with respect to target
+          enum:
+          - DeletedOnTarget
+          - ChangedOnTarget
+          - AddedOnTarget
+          x-ms-enum:
+            name: UpdateActionType
+            modelAsString: true
+    UpdateActionType:
+      type: string
+      description: Type of the actual difference for the compared object, while performing
+        schema comparison
+      enum:
+      - DeletedOnTarget
+      - ChangedOnTarget
+      - AddedOnTarget
+      x-ms-enum:
+        name: UpdateActionType
+        modelAsString: true
+    QueryAnalysisValidationResult:
+      type: object
+      description: Results for query analysis comparison between the source and target
+      properties:
+        queryResults:
+          type: array
+          description: List of queries executed and it's execution results in source
+            and target
+          properties:
+            queryText:
+              type: string
+              description: Query text retrieved from the source server
+            statementsInBatch:
+              type: integer
+              format: int64
+              description: Total no. of statements in the batch
+            sourceResult:
+              type: object
+              description: Query analysis result from the source
+              properties:
+                executionCount:
+                  type: integer
+                  format: int64
+                  description: No. of query executions
+                cpuTimeMs:
+                  type: number
+                  format: float
+                  description: CPU Time in millisecond(s) for the query execution
+                elapsedTimeMs:
+                  type: number
+                  format: float
+                  description: Time taken in millisecond(s) for executing the query
+                waitStats:
+                  type: object
+                  description: Dictionary of sql query execution wait types and the
+                    respective statistics
+                  additionalProperties:
+                    type: object
+                    description: Wait statistics gathered during query batch execution
+                    properties:
+                      waitType:
+                        type: string
+                        description: Type of the Wait
+                      waitTimeMs:
+                        type: number
+                        format: float
+                        default: 0
+                        description: 'Total wait time in millisecond(s) '
+                      waitCount:
+                        type: integer
+                        format: int64
+                        description: Total no. of waits
+                hasErrors:
+                  type: boolean
+                  description: Indicates whether the query resulted in an error
+                sqlErrors:
+                  type: array
+                  description: List of sql Errors
+                  items:
+                    type: string
+            targetResult:
+              type: object
+              description: Query analysis result from the target
+              properties:
+                executionCount:
+                  type: integer
+                  format: int64
+                  description: No. of query executions
+                cpuTimeMs:
+                  type: number
+                  format: float
+                  description: CPU Time in millisecond(s) for the query execution
+                elapsedTimeMs:
+                  type: number
+                  format: float
+                  description: Time taken in millisecond(s) for executing the query
+                waitStats:
+                  type: object
+                  description: Dictionary of sql query execution wait types and the
+                    respective statistics
+                  additionalProperties:
+                    type: object
+                    description: Wait statistics gathered during query batch execution
+                    properties:
+                      waitType:
+                        type: string
+                        description: Type of the Wait
+                      waitTimeMs:
+                        type: number
+                        format: float
+                        default: 0
+                        description: 'Total wait time in millisecond(s) '
+                      waitCount:
+                        type: integer
+                        format: int64
+                        description: Total no. of waits
+                hasErrors:
+                  type: boolean
+                  description: Indicates whether the query resulted in an error
+                sqlErrors:
+                  type: array
+                  description: List of sql Errors
+                  items:
+                    type: string
+          items: {}
+        validationErrors:
+          type: array
+          description: Errors that are part of the execution
+          properties:
+            text:
+              type: string
+              description: Error Text
+            severity:
+              type: string
+              description: Severity of the error
+              enum:
+              - Message
+              - Warning
+              - Error
+              x-ms-enum:
+                name: Severity
+                modelAsString: true
+          items: {}
+    QueryExecutionResult:
+      type: object
+      description: Describes query analysis results for execution in source and target
+      properties:
+        queryText:
+          type: string
+          description: Query text retrieved from the source server
+        statementsInBatch:
+          type: integer
+          format: int64
+          description: Total no. of statements in the batch
+        sourceResult:
+          type: object
+          description: Query analysis result from the source
+          properties:
+            executionCount:
+              type: integer
+              format: int64
+              description: No. of query executions
+            cpuTimeMs:
+              type: number
+              format: float
+              description: CPU Time in millisecond(s) for the query execution
+            elapsedTimeMs:
+              type: number
+              format: float
+              description: Time taken in millisecond(s) for executing the query
+            waitStats:
+              type: object
+              description: Dictionary of sql query execution wait types and the respective
+                statistics
+              additionalProperties:
+                type: object
+                description: Wait statistics gathered during query batch execution
+                properties:
+                  waitType:
+                    type: string
+                    description: Type of the Wait
+                  waitTimeMs:
+                    type: number
+                    format: float
+                    default: 0
+                    description: 'Total wait time in millisecond(s) '
+                  waitCount:
+                    type: integer
+                    format: int64
+                    description: Total no. of waits
+            hasErrors:
+              type: boolean
+              description: Indicates whether the query resulted in an error
+            sqlErrors:
+              type: array
+              description: List of sql Errors
+              items:
+                type: string
+        targetResult:
+          type: object
+          description: Query analysis result from the target
+          properties:
+            executionCount:
+              type: integer
+              format: int64
+              description: No. of query executions
+            cpuTimeMs:
+              type: number
+              format: float
+              description: CPU Time in millisecond(s) for the query execution
+            elapsedTimeMs:
+              type: number
+              format: float
+              description: Time taken in millisecond(s) for executing the query
+            waitStats:
+              type: object
+              description: Dictionary of sql query execution wait types and the respective
+                statistics
+              additionalProperties:
+                type: object
+                description: Wait statistics gathered during query batch execution
+                properties:
+                  waitType:
+                    type: string
+                    description: Type of the Wait
+                  waitTimeMs:
+                    type: number
+                    format: float
+                    default: 0
+                    description: 'Total wait time in millisecond(s) '
+                  waitCount:
+                    type: integer
+                    format: int64
+                    description: Total no. of waits
+            hasErrors:
+              type: boolean
+              description: Indicates whether the query resulted in an error
+            sqlErrors:
+              type: array
+              description: List of sql Errors
+              items:
+                type: string
+    ExecutionStatistics:
+      type: object
+      description: Description about the errors happen while performing migration
+        validation
+      properties:
+        executionCount:
+          type: integer
+          format: int64
+          description: No. of query executions
+        cpuTimeMs:
+          type: number
+          format: float
+          description: CPU Time in millisecond(s) for the query execution
+        elapsedTimeMs:
+          type: number
+          format: float
+          description: Time taken in millisecond(s) for executing the query
+        waitStats:
+          type: object
+          description: Dictionary of sql query execution wait types and the respective
+            statistics
+          additionalProperties:
+            type: object
+            description: Wait statistics gathered during query batch execution
+            properties:
+              waitType:
+                type: string
+                description: Type of the Wait
+              waitTimeMs:
+                type: number
+                format: float
+                default: 0
+                description: 'Total wait time in millisecond(s) '
+              waitCount:
+                type: integer
+                format: int64
+                description: Total no. of waits
+        hasErrors:
+          type: boolean
+          description: Indicates whether the query resulted in an error
+        sqlErrors:
+          type: array
+          description: List of sql Errors
+          items:
+            type: string
+    WaitStatistics:
+      type: object
+      description: Wait statistics gathered during query batch execution
+      properties:
+        waitType:
+          type: string
+          description: Type of the Wait
+        waitTimeMs:
+          type: number
+          format: float
+          default: 0
+          description: 'Total wait time in millisecond(s) '
+        waitCount:
+          type: integer
+          format: int64
+          description: Total no. of waits
+    Severity:
+      type: string
+      description: Severity of the validation error
+      enum:
+      - Message
+      - Warning
+      - Error
+      x-ms-enum:
+        name: Severity
+        modelAsString: true
+    ValidationError:
+      type: object
+      description: Description about the errors happen while performing migration
+        validation
+      properties:
+        text:
+          type: string
+          description: Error Text
+        severity:
+          type: string
+          description: Severity of the error
+          enum:
+          - Message
+          - Warning
+          - Error
+          x-ms-enum:
+            name: Severity
+            modelAsString: true
+    ValidationStatus:
+      type: string
+      description: Current status of the validation
+      enum:
+      - Default
+      - NotStarted
+      - Initialized
+      - InProgress
+      - Completed
+      - CompletedWithIssues
+      - Stopped
+      - Failed
+      x-ms-enum:
+        name: ValidationStatus
+        modelAsString: true
+    DatabaseObjectType:
+      type: string
+      description: An enumeration of type of objects
+      enum:
+      - StoredProcedures
+      - Table
+      - User
+      - View
+      - Function
+      x-ms-enum:
+        name: ObjectType
+        modelAsString: true

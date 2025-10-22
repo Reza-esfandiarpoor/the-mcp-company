@@ -1,0 +1,1033 @@
+openapi: 3.0.0
+info:
+  version: 2024-01-01
+  title: AzureArcDataManagementClient
+  description: The AzureArcData management API provides a RESTful set of web APIs
+    to manage Azure Data Services on Azure Arc Resources.
+paths: {}
+components:
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    ActiveDirectoryConnectorListResult:
+      description: A list of active directory connectors
+      type: object
+      properties:
+        value:
+          description: Array of results.
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+                readOnly: true
+              name:
+                type: string
+                description: The name of the resource
+                readOnly: true
+              type:
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+                readOnly: true
+              systemData:
+                type: object
+                description: Azure Resource Manager metadata containing createdBy
+                  and modifiedBy information.
+                readOnly: true
+                properties:
+                  createdBy:
+                    type: string
+                    description: The identity that created the resource.
+                  createdByType:
+                    type: string
+                    description: The type of identity that created the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource creation (UTC).
+                  lastModifiedBy:
+                    type: string
+                    description: The identity that last modified the resource.
+                  lastModifiedByType:
+                    type: string
+                    description: The type of identity that last modified the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  lastModifiedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource last modification (UTC)
+              properties:
+                description: 'null'
+                x-ms-client-flatten: false
+                type: object
+                properties:
+                  domainServiceAccountLoginInformation:
+                    description: Username and password for domain service account
+                      authentication.
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                        description: Login username.
+                      password:
+                        type: string
+                        description: Login password.
+                        x-ms-mutability:
+                        - create
+                        - update
+                        x-ms-secret: true
+                  provisioningState:
+                    type: string
+                    description: The provisioning state of the Active Directory connector
+                      resource.
+                    readOnly: true
+                  spec:
+                    description: 'null'
+                    x-ms-client-flatten: false
+                    type: object
+                    properties:
+                      activeDirectory:
+                        description: 'null'
+                        x-ms-client-flatten: false
+                        type: object
+                        properties:
+                          realm:
+                            type: string
+                            description: Name (uppercase) of the Active Directory
+                              domain that this AD connector will be associated with.
+                          netbiosDomainName:
+                            type: string
+                            description: NETBIOS name of the Active Directory domain.
+                          serviceAccountProvisioning:
+                            type: string
+                            enum:
+                            - automatic
+                            - manual
+                            x-ms-enum:
+                              name: accountProvisioningMode
+                              modelAsString: true
+                            default: manual
+                            description: The service account provisioning mode for
+                              this Active Directory connector.
+                          ouDistinguishedName:
+                            type: string
+                            description: The distinguished name of the Active Directory
+                              Organizational Unit.
+                          domainControllers:
+                            description: 'null'
+                            x-ms-client-flatten: false
+                            type: object
+                            properties:
+                              primaryDomainController:
+                                description: Information about the Primary Domain
+                                  Controller (PDC) in the AD domain.
+                                x-ms-client-flatten: false
+                                type: object
+                                properties:
+                                  hostname:
+                                    type: string
+                                    description: Fully-qualified domain name of a
+                                      domain controller in the AD domain.
+                                required:
+                                - hostname
+                              secondaryDomainControllers:
+                                description: 'null'
+                                x-ms-client-flatten: false
+                                type: array
+                                items:
+                                  description: List of the fully-qualified domain
+                                    names of the secondary domain controllers in the
+                                    AD domain.
+                                  x-ms-client-flatten: false
+                                  type: object
+                                  properties:
+                                    hostname:
+                                      type: string
+                                      description: Fully-qualified domain name of
+                                        a domain controller in the AD domain.
+                                  required:
+                                  - hostname
+                                x-ms-identifiers:
+                                - hostname
+                        required:
+                        - realm
+                      dns:
+                        description: 'null'
+                        x-ms-client-flatten: false
+                        type: object
+                        properties:
+                          domainName:
+                            type: string
+                            description: DNS domain name for which DNS lookups should
+                              be forwarded to the Active Directory DNS servers.
+                          nameserverIPAddresses:
+                            type: array
+                            description: List of Active Directory DNS server IP addresses.
+                            items:
+                              type: string
+                              minimum: 1
+                          replicas:
+                            type: integer
+                            description: Replica count for DNS proxy service. Default
+                              value is 1.
+                            default: 1
+                            format: int64
+                          preferK8sDnsForPtrLookups:
+                            type: boolean
+                            description: Flag indicating whether to prefer Kubernetes
+                              DNS server response over AD DNS server response for
+                              IP address lookups.
+                            default: true
+                        required:
+                        - nameserverIPAddresses
+                    required:
+                    - activeDirectory
+                    - dns
+                  status:
+                    description: 'null'
+                    x-ms-client-flatten: false
+                    type: object
+                    properties:
+                      lastUpdateTime:
+                        type: string
+                        description: The time that the custom resource was last updated.
+                      observedGeneration:
+                        type: integer
+                        format: int64
+                        description: The version of the replicaSet associated with
+                          the AD connector custom resource.
+                      state:
+                        type: string
+                        description: The state of the AD connector custom resource.
+                    additionalProperties: {}
+                required:
+                - spec
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+            required:
+            - properties
+          readOnly: true
+        nextLink:
+          description: Link to retrieve next page of results.
+          type: string
+          readOnly: true
+    ActiveDirectoryConnectorResource:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          type: object
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+        properties:
+          description: 'null'
+          x-ms-client-flatten: false
+          type: object
+          properties:
+            domainServiceAccountLoginInformation:
+              description: Username and password for domain service account authentication.
+              type: object
+              properties:
+                username:
+                  type: string
+                  description: Login username.
+                password:
+                  type: string
+                  description: Login password.
+                  x-ms-mutability:
+                  - create
+                  - update
+                  x-ms-secret: true
+            provisioningState:
+              type: string
+              description: The provisioning state of the Active Directory connector
+                resource.
+              readOnly: true
+            spec:
+              description: 'null'
+              x-ms-client-flatten: false
+              type: object
+              properties:
+                activeDirectory:
+                  description: 'null'
+                  x-ms-client-flatten: false
+                  type: object
+                  properties:
+                    realm:
+                      type: string
+                      description: Name (uppercase) of the Active Directory domain
+                        that this AD connector will be associated with.
+                    netbiosDomainName:
+                      type: string
+                      description: NETBIOS name of the Active Directory domain.
+                    serviceAccountProvisioning:
+                      type: string
+                      enum:
+                      - automatic
+                      - manual
+                      x-ms-enum:
+                        name: accountProvisioningMode
+                        modelAsString: true
+                      default: manual
+                      description: The service account provisioning mode for this
+                        Active Directory connector.
+                    ouDistinguishedName:
+                      type: string
+                      description: The distinguished name of the Active Directory
+                        Organizational Unit.
+                    domainControllers:
+                      description: 'null'
+                      x-ms-client-flatten: false
+                      type: object
+                      properties:
+                        primaryDomainController:
+                          description: Information about the Primary Domain Controller
+                            (PDC) in the AD domain.
+                          x-ms-client-flatten: false
+                          type: object
+                          properties:
+                            hostname:
+                              type: string
+                              description: Fully-qualified domain name of a domain
+                                controller in the AD domain.
+                          required:
+                          - hostname
+                        secondaryDomainControllers:
+                          description: 'null'
+                          x-ms-client-flatten: false
+                          type: array
+                          items:
+                            description: List of the fully-qualified domain names
+                              of the secondary domain controllers in the AD domain.
+                            x-ms-client-flatten: false
+                            type: object
+                            properties:
+                              hostname:
+                                type: string
+                                description: Fully-qualified domain name of a domain
+                                  controller in the AD domain.
+                            required:
+                            - hostname
+                          x-ms-identifiers:
+                          - hostname
+                  required:
+                  - realm
+                dns:
+                  description: 'null'
+                  x-ms-client-flatten: false
+                  type: object
+                  properties:
+                    domainName:
+                      type: string
+                      description: DNS domain name for which DNS lookups should be
+                        forwarded to the Active Directory DNS servers.
+                    nameserverIPAddresses:
+                      type: array
+                      description: List of Active Directory DNS server IP addresses.
+                      items:
+                        type: string
+                        minimum: 1
+                    replicas:
+                      type: integer
+                      description: Replica count for DNS proxy service. Default value
+                        is 1.
+                      default: 1
+                      format: int64
+                    preferK8sDnsForPtrLookups:
+                      type: boolean
+                      description: Flag indicating whether to prefer Kubernetes DNS
+                        server response over AD DNS server response for IP address
+                        lookups.
+                      default: true
+                  required:
+                  - nameserverIPAddresses
+              required:
+              - activeDirectory
+              - dns
+            status:
+              description: 'null'
+              x-ms-client-flatten: false
+              type: object
+              properties:
+                lastUpdateTime:
+                  type: string
+                  description: The time that the custom resource was last updated.
+                observedGeneration:
+                  type: integer
+                  format: int64
+                  description: The version of the replicaSet associated with the AD
+                    connector custom resource.
+                state:
+                  type: string
+                  description: The state of the AD connector custom resource.
+              additionalProperties: {}
+          required:
+          - spec
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+      required:
+      - properties
+    ActiveDirectoryConnectorProperties:
+      type: object
+      description: The properties of an Active Directory connector resource
+      properties:
+        domainServiceAccountLoginInformation:
+          description: Username and password for domain service account authentication.
+          type: object
+          properties:
+            username:
+              type: string
+              description: Login username.
+            password:
+              type: string
+              description: Login password.
+              x-ms-mutability:
+              - create
+              - update
+              x-ms-secret: true
+        provisioningState:
+          type: string
+          description: The provisioning state of the Active Directory connector resource.
+          readOnly: true
+        spec:
+          description: 'null'
+          x-ms-client-flatten: false
+          type: object
+          properties:
+            activeDirectory:
+              description: 'null'
+              x-ms-client-flatten: false
+              type: object
+              properties:
+                realm:
+                  type: string
+                  description: Name (uppercase) of the Active Directory domain that
+                    this AD connector will be associated with.
+                netbiosDomainName:
+                  type: string
+                  description: NETBIOS name of the Active Directory domain.
+                serviceAccountProvisioning:
+                  type: string
+                  enum:
+                  - automatic
+                  - manual
+                  x-ms-enum:
+                    name: accountProvisioningMode
+                    modelAsString: true
+                  default: manual
+                  description: The service account provisioning mode for this Active
+                    Directory connector.
+                ouDistinguishedName:
+                  type: string
+                  description: The distinguished name of the Active Directory Organizational
+                    Unit.
+                domainControllers:
+                  description: 'null'
+                  x-ms-client-flatten: false
+                  type: object
+                  properties:
+                    primaryDomainController:
+                      description: Information about the Primary Domain Controller
+                        (PDC) in the AD domain.
+                      x-ms-client-flatten: false
+                      type: object
+                      properties:
+                        hostname:
+                          type: string
+                          description: Fully-qualified domain name of a domain controller
+                            in the AD domain.
+                      required:
+                      - hostname
+                    secondaryDomainControllers:
+                      description: 'null'
+                      x-ms-client-flatten: false
+                      type: array
+                      items:
+                        description: List of the fully-qualified domain names of the
+                          secondary domain controllers in the AD domain.
+                        x-ms-client-flatten: false
+                        type: object
+                        properties:
+                          hostname:
+                            type: string
+                            description: Fully-qualified domain name of a domain controller
+                              in the AD domain.
+                        required:
+                        - hostname
+                      x-ms-identifiers:
+                      - hostname
+              required:
+              - realm
+            dns:
+              description: 'null'
+              x-ms-client-flatten: false
+              type: object
+              properties:
+                domainName:
+                  type: string
+                  description: DNS domain name for which DNS lookups should be forwarded
+                    to the Active Directory DNS servers.
+                nameserverIPAddresses:
+                  type: array
+                  description: List of Active Directory DNS server IP addresses.
+                  items:
+                    type: string
+                    minimum: 1
+                replicas:
+                  type: integer
+                  description: Replica count for DNS proxy service. Default value
+                    is 1.
+                  default: 1
+                  format: int64
+                preferK8sDnsForPtrLookups:
+                  type: boolean
+                  description: Flag indicating whether to prefer Kubernetes DNS server
+                    response over AD DNS server response for IP address lookups.
+                  default: true
+              required:
+              - nameserverIPAddresses
+          required:
+          - activeDirectory
+          - dns
+        status:
+          description: 'null'
+          x-ms-client-flatten: false
+          type: object
+          properties:
+            lastUpdateTime:
+              type: string
+              description: The time that the custom resource was last updated.
+            observedGeneration:
+              type: integer
+              format: int64
+              description: The version of the replicaSet associated with the AD connector
+                custom resource.
+            state:
+              type: string
+              description: The state of the AD connector custom resource.
+          additionalProperties: {}
+      required:
+      - spec
+    ActiveDirectoryConnectorSpec:
+      description: The specifications of the AD Kubernetes resource.
+      type: object
+      properties:
+        activeDirectory:
+          description: 'null'
+          x-ms-client-flatten: false
+          type: object
+          properties:
+            realm:
+              type: string
+              description: Name (uppercase) of the Active Directory domain that this
+                AD connector will be associated with.
+            netbiosDomainName:
+              type: string
+              description: NETBIOS name of the Active Directory domain.
+            serviceAccountProvisioning:
+              type: string
+              enum:
+              - automatic
+              - manual
+              x-ms-enum:
+                name: accountProvisioningMode
+                modelAsString: true
+              default: manual
+              description: The service account provisioning mode for this Active Directory
+                connector.
+            ouDistinguishedName:
+              type: string
+              description: The distinguished name of the Active Directory Organizational
+                Unit.
+            domainControllers:
+              description: 'null'
+              x-ms-client-flatten: false
+              type: object
+              properties:
+                primaryDomainController:
+                  description: Information about the Primary Domain Controller (PDC)
+                    in the AD domain.
+                  x-ms-client-flatten: false
+                  type: object
+                  properties:
+                    hostname:
+                      type: string
+                      description: Fully-qualified domain name of a domain controller
+                        in the AD domain.
+                  required:
+                  - hostname
+                secondaryDomainControllers:
+                  description: 'null'
+                  x-ms-client-flatten: false
+                  type: array
+                  items:
+                    description: List of the fully-qualified domain names of the secondary
+                      domain controllers in the AD domain.
+                    x-ms-client-flatten: false
+                    type: object
+                    properties:
+                      hostname:
+                        type: string
+                        description: Fully-qualified domain name of a domain controller
+                          in the AD domain.
+                    required:
+                    - hostname
+                  x-ms-identifiers:
+                  - hostname
+          required:
+          - realm
+        dns:
+          description: 'null'
+          x-ms-client-flatten: false
+          type: object
+          properties:
+            domainName:
+              type: string
+              description: DNS domain name for which DNS lookups should be forwarded
+                to the Active Directory DNS servers.
+            nameserverIPAddresses:
+              type: array
+              description: List of Active Directory DNS server IP addresses.
+              items:
+                type: string
+                minimum: 1
+            replicas:
+              type: integer
+              description: Replica count for DNS proxy service. Default value is 1.
+              default: 1
+              format: int64
+            preferK8sDnsForPtrLookups:
+              type: boolean
+              description: Flag indicating whether to prefer Kubernetes DNS server
+                response over AD DNS server response for IP address lookups.
+              default: true
+          required:
+          - nameserverIPAddresses
+      required:
+      - activeDirectory
+      - dns
+    ActiveDirectoryConnectorDomainDetails:
+      type: object
+      description: Active Directory domain details
+      properties:
+        realm:
+          type: string
+          description: Name (uppercase) of the Active Directory domain that this AD
+            connector will be associated with.
+        netbiosDomainName:
+          type: string
+          description: NETBIOS name of the Active Directory domain.
+        serviceAccountProvisioning:
+          type: string
+          enum:
+          - automatic
+          - manual
+          x-ms-enum:
+            name: accountProvisioningMode
+            modelAsString: true
+          default: manual
+          description: The service account provisioning mode for this Active Directory
+            connector.
+        ouDistinguishedName:
+          type: string
+          description: The distinguished name of the Active Directory Organizational
+            Unit.
+        domainControllers:
+          description: 'null'
+          x-ms-client-flatten: false
+          type: object
+          properties:
+            primaryDomainController:
+              description: Information about the Primary Domain Controller (PDC) in
+                the AD domain.
+              x-ms-client-flatten: false
+              type: object
+              properties:
+                hostname:
+                  type: string
+                  description: Fully-qualified domain name of a domain controller
+                    in the AD domain.
+              required:
+              - hostname
+            secondaryDomainControllers:
+              description: 'null'
+              x-ms-client-flatten: false
+              type: array
+              items:
+                description: List of the fully-qualified domain names of the secondary
+                  domain controllers in the AD domain.
+                x-ms-client-flatten: false
+                type: object
+                properties:
+                  hostname:
+                    type: string
+                    description: Fully-qualified domain name of a domain controller
+                      in the AD domain.
+                required:
+                - hostname
+              x-ms-identifiers:
+              - hostname
+      required:
+      - realm
+    ActiveDirectoryConnectorDNSDetails:
+      type: object
+      description: DNS server details
+      properties:
+        domainName:
+          type: string
+          description: DNS domain name for which DNS lookups should be forwarded to
+            the Active Directory DNS servers.
+        nameserverIPAddresses:
+          type: array
+          description: List of Active Directory DNS server IP addresses.
+          items:
+            type: string
+            minimum: 1
+        replicas:
+          type: integer
+          description: Replica count for DNS proxy service. Default value is 1.
+          default: 1
+          format: int64
+        preferK8sDnsForPtrLookups:
+          type: boolean
+          description: Flag indicating whether to prefer Kubernetes DNS server response
+            over AD DNS server response for IP address lookups.
+          default: true
+      required:
+      - nameserverIPAddresses
+    ActiveDirectoryDomainControllers:
+      type: object
+      description: Details about the Active Directory domain controllers associated
+        with this AD connector instance
+      properties:
+        primaryDomainController:
+          description: Information about the Primary Domain Controller (PDC) in the
+            AD domain.
+          x-ms-client-flatten: false
+          type: object
+          properties:
+            hostname:
+              type: string
+              description: Fully-qualified domain name of a domain controller in the
+                AD domain.
+          required:
+          - hostname
+        secondaryDomainControllers:
+          description: 'null'
+          x-ms-client-flatten: false
+          type: array
+          items:
+            description: List of the fully-qualified domain names of the secondary
+              domain controllers in the AD domain.
+            x-ms-client-flatten: false
+            type: object
+            properties:
+              hostname:
+                type: string
+                description: Fully-qualified domain name of a domain controller in
+                  the AD domain.
+            required:
+            - hostname
+          x-ms-identifiers:
+          - hostname
+    ActiveDirectoryDomainController:
+      type: object
+      description: Information about a domain controller in the AD domain.
+      properties:
+        hostname:
+          type: string
+          description: Fully-qualified domain name of a domain controller in the AD
+            domain.
+      required:
+      - hostname
+    ActiveDirectorySecondaryDomainControllers:
+      type: array
+      description: Information about the secondary domain controllers in the AD domain.
+      items:
+        description: List of the fully-qualified domain names of the secondary domain
+          controllers in the AD domain.
+        x-ms-client-flatten: false
+        type: object
+        properties:
+          hostname:
+            type: string
+            description: Fully-qualified domain name of a domain controller in the
+              AD domain.
+        required:
+        - hostname
+      x-ms-identifiers:
+      - hostname
+    ActiveDirectoryConnectorStatus:
+      type: object
+      description: The status of the Kubernetes custom resource.
+      properties:
+        lastUpdateTime:
+          type: string
+          description: The time that the custom resource was last updated.
+        observedGeneration:
+          type: integer
+          format: int64
+          description: The version of the replicaSet associated with the AD connector
+            custom resource.
+        state:
+          type: string
+          description: The state of the AD connector custom resource.
+      additionalProperties: {}
+    systemData:
+      type: object
+      description: Metadata pertaining to creation and last modification of the resource.
+      properties:
+        createdBy:
+          type: string
+          description: The identity that created the resource.
+        createdByType:
+          type: string
+          description: The type of identity that created the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource creation (UTC).
+        lastModifiedBy:
+          type: string
+          description: The identity that last modified the resource.
+        lastModifiedByType:
+          type: string
+          description: The type of identity that last modified the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource last modification (UTC)
+      readOnly: true
+    Resource:
+      type: object
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      properties:
+        id:
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          type: object
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+      x-ms-azure-resource: true
+    ProxyResource:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Fully qualified resource ID for the resource. Ex - /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          type: object
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    BasicLoginInformation:
+      type: object
+      description: Username and password for basic login authentication.
+      properties:
+        username:
+          type: string
+          description: Login username.
+        password:
+          type: string
+          description: Login password.
+          x-ms-mutability:
+          - create
+          - update
+          x-ms-secret: true

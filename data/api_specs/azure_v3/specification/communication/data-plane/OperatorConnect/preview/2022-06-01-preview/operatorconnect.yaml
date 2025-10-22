@@ -1,0 +1,407 @@
+openapi: 3.0.0
+info:
+  title: Operator Connect
+  version: 2022-06-01-preview
+security:
+- Authorization: []
+paths:
+  /operatorconnect/operators:
+    get:
+      tags:
+      - Operator
+      x-ms-pageable:
+        nextLinkName: nextLink
+        itemName: value
+      description: This endpoint gets a list of all operators
+      summary: Get a list of all operators
+      operationId: GetOperators
+      parameters:
+      - in: query
+        name: skip
+        description: An optional parameter for how many entries to skip, for pagination
+          purposes. The default value is 0
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - in: query
+        name: top
+        description: An optional parameter for how many entries to return, for pagination
+          purposes. The default will return the entire list.
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: api-version
+        description: Version of API
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          headers:
+            x-ms-request-id:
+              description: Microsoft request id used for tracing requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfOperators'
+        default:
+          description: Failure
+          headers:
+            x-ms-error-code:
+              description: Error code
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationErrorResponse'
+  /operatorconnect/consents:
+    get:
+      tags:
+      - Consent
+      x-ms-pageable:
+        nextLinkName: nextLink
+        itemName: value
+      description: This endpoint gets a list of all Consents with Operators for the
+        current user
+      summary: Get a list of all Consents with Operators for current user
+      operationId: GetConsents
+      parameters:
+      - in: query
+        name: skip
+        description: An optional parameter for how many entries to skip, for pagination
+          purposes. The default value is 0.
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - in: query
+        name: top
+        description: An optional parameter for how many entries to return, for pagination
+          purposes. The default will return the entire list.
+        schema:
+          type: integer
+          format: int32
+      - in: query
+        name: api-version
+        description: Version of API
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          headers:
+            x-ms-request-id:
+              description: Microsoft request id used for tracing requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListOfConsents'
+        default:
+          description: Failure
+          headers:
+            x-ms-error-code:
+              description: Error code
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationErrorResponse'
+  /operatorconnect/consents/{operatorId}:
+    get:
+      tags:
+      - Consent
+      description: This endpoint gets single Consent with Operator for current user
+      summary: Get single Consent with Operator for current user
+      operationId: GetConsent
+      parameters:
+      - in: path
+        name: operatorId
+        description: The id of Operator with who user has signed consent
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: api-version
+        description: Version of API
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          headers:
+            x-ms-request-id:
+              description: Microsoft request id used for tracing requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Consent'
+        default:
+          description: Failure
+          headers:
+            x-ms-error-code:
+              description: Error code
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationErrorResponse'
+    patch:
+      tags:
+      - Consent
+      operationId: CreateOrUpdateConsent
+      description: This endpoint creates new or updates the existing Consent with
+        Operator
+      summary: Create new or update existing Consent with Operator for current user
+      parameters:
+      - in: query
+        name: api-version
+        description: Version of API
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: operatorId
+        description: The id of the Operator with who user wants to create new or update
+          existing consent
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/CreateOrUpdateConsentRequest'
+        description: The request to send to create new or update existing consent
+          with an operator
+        required: true
+      responses:
+        '200':
+          description: Consent Updated
+          headers:
+            x-ms-request-id:
+              description: Microsoft request id used for tracing requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Consent'
+        '201':
+          description: Consent Created
+          headers:
+            x-ms-request-id:
+              description: Microsoft request id used for tracing requests.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Consent'
+        default:
+          description: Failure
+          headers:
+            x-ms-error-code:
+              description: Error code
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommunicationErrorResponse'
+components:
+  securitySchemes:
+    Authorization:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    ListOfOperators:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Operator'
+        nextLink:
+          type: string
+          description: Represents the URL link to the next page of operators.
+      required:
+      - value
+    ListOfConsents:
+      type: object
+      properties:
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Consent'
+        nextLink:
+          type: string
+          description: Represents the URL link to the next page of consents.
+      required:
+      - value
+    CreateOrUpdateConsentRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/ConsentStatus'
+        consentedBy:
+          $ref: '#/components/schemas/Contact'
+        lastModifiedBy:
+          $ref: '#/components/schemas/Contact'
+        consentedCountries:
+          type: array
+          description: List of 2 character codes of available countries in ISO 3166-1
+            format
+          items:
+            type: string
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        companyName:
+          type: string
+      additionalProperties: false
+    Operator:
+      type: object
+      properties:
+        operatorId:
+          type: string
+          description: Unique GUID that represents the operator record
+        friendlyName:
+          type: string
+          description: Public facing brand name of the operator
+        landingPage:
+          type: string
+          description: URL of the Operator's Operator Connect offerings
+        logoUri:
+          type: string
+          description: URL of the Operator's logo
+        logoThumbnailUri:
+          type: string
+          description: URL of the Operator's thumbnail logo
+        acquiredNumbersCount:
+          type: integer
+          description: Count of phone numbers acquired from the operator
+        offerings:
+          type: array
+          items:
+            $ref: '#/components/schemas/OperatorOffering'
+      additionalProperties: false
+    Consent:
+      type: object
+      properties:
+        operatorId:
+          type: string
+          description: Unique GUID that represents the operator record
+        status:
+          $ref: '#/components/schemas/ConsentStatus'
+        consentedBy:
+          $ref: '#/components/schemas/Contact'
+        consentedOn:
+          type: string
+          description: Date/Time when the consent was provided
+          format: date-time
+        lastModifiedBy:
+          $ref: '#/components/schemas/Contact'
+        lastModifiedOn:
+          type: string
+          description: Date/Time when the consent was last updated
+          format: date-time
+        consentedCountries:
+          type: array
+          description: List of 2 character codes of available countries in ISO 3166-1
+            format
+          items:
+            type: string
+        contacts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+          description: List of contact information
+        companyName:
+          type: string
+          description: User company name
+      additionalProperties: false
+    Contact:
+      type: object
+      properties:
+        fullName:
+          type: string
+          description: Full name of the contact
+        email:
+          type: string
+          description: Email address of the contact
+        phoneNumber:
+          type: string
+          description: Phone number of the contact with a leading + and country code
+      additionalProperties: false
+    ConsentStatus:
+      type: string
+      description: Status of the consent
+      enum:
+      - Active
+      - Suspended
+      - Removed
+    OperatorOffering:
+      type: object
+      properties:
+        offerType:
+          type: string
+          description: The type of offer that operator is advertising
+        availableCountries:
+          type: array
+          description: List of 2 character codes of available countries in ISO 3166-1
+            format
+          items:
+            type: string
+    CommunicationError:
+      description: The Communication Services error.
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: The error code.
+        message:
+          type: string
+          description: The error message.
+        target:
+          type: string
+          readOnly: true
+          description: The error target.
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommunicationError'
+          readOnly: true
+          description: Further details about specific errors that led to this error.
+        innererror:
+          $ref: '#/components/schemas/CommunicationError'
+    CommunicationErrorResponse:
+      description: The Communication Services error.
+      type: object
+      required:
+      - error
+      properties:
+        error:
+          $ref: '#/components/schemas/CommunicationError'

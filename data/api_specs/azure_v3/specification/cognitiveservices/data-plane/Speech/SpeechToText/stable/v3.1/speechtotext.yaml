@@ -1,0 +1,4802 @@
+openapi: 3.0.0
+info:
+  title: Speech Services API v3.1
+  description: Speech Services API v3.1.
+  contact:
+    name: Cognitive Services - Speech Services
+    url: https://docs.microsoft.com/azure/cognitive-services/speech-service/support
+  version: v3.1
+security:
+- api_key: []
+- token: []
+paths:
+  /datasets/locales:
+    get:
+      tags:
+      - 'Custom Speech datasets for model adaptation:'
+      summary: Gets a list of supported locales for datasets.
+      operationId: Datasets_ListSupportedLocales
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DatasetLocales'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /datasets:
+    get:
+      tags:
+      - 'Custom Speech datasets for model adaptation:'
+      summary: Gets a list of datasets for the authenticated subscription.
+      operationId: Datasets_List
+      parameters:
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          datasets.\r\n            - Supported properties: displayName, description,
+          createdDateTime, lastActionDateTime, status, locale, kind.\r\n            -
+          Operators:\r\n              - eq, ne are supported for all properties.\r\n
+          \             - gt, ge, lt, le are supported for createdDateTime and lastActionDateTime.\r\n
+          \             - and, or, not are supported.\r\n            -Example:\r\n
+          \            filter=createdDateTime gt 2022-02-01T11:00:00Z and displayName
+          eq 'My dataset'"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDatasets'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+    post:
+      tags:
+      - 'Custom Speech datasets for model adaptation:'
+      summary: Uploads and creates a new dataset by getting the data from a specified
+        URL or starts waiting for data blocks to be uploaded.
+      operationId: Datasets_Create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Dataset'
+        description: Definition for the new dataset.
+        required: true
+      responses:
+        '201':
+          description: The response contains information about the entity as payload
+            and its location as header.
+          headers:
+            Location:
+              description: The location of the created resource.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /datasets/{id}:
+    get:
+      tags:
+      - 'Custom Speech datasets for model adaptation:'
+      summary: Gets the dataset identified by the given ID.
+      operationId: Datasets_Get
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the dataset.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+      - 'Custom Speech datasets for model adaptation:'
+      summary: Updates the mutable details of the dataset identified by its ID.
+      operationId: Datasets_Update
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the dataset.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatasetUpdate'
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/DatasetUpdate'
+        description: The updated values for the dataset.
+        required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - 'Custom Speech datasets for model adaptation:'
+      summary: Deletes the specified dataset.
+      operationId: Datasets_Delete
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the dataset.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: The dataset was successfully deleted or did not exist.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /datasets/{id}/blocks:
+    get:
+      tags:
+      - 'Custom Speech datasets for model adaptation:'
+      summary: Gets the list of uploaded blocks for this dataset.
+      operationId: Datasets_GetBlocks
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the dataset.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadedBlocks'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      tags:
+      - 'Custom Speech datasets for model adaptation:'
+      summary: Upload a block of data for the dataset. The maximum size of the block
+        is 8MiB.
+      operationId: Datasets_UploadBlock
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the dataset.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: blockid
+        description: A valid Base64 string value that identifies the block. Prior
+          to encoding, the string must be less than or equal to 64 bytes in size.
+          For a given blob, the length of the value specified for the blockid parameter
+          must be the same size for each block. Note that the Base64 string must be
+          URL-encoded.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              format: binary
+              type: string
+        required: true
+      responses:
+        '201':
+          description: The data block was uploaded successfully.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /datasets/upload:
+    post:
+      tags:
+      - 'Custom Speech datasets for model adaptation:'
+      summary: Uploads data and creates a new dataset.
+      operationId: Datasets_Upload
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                project:
+                  description: The optional string representation of the url of a
+                    project. If set, the dataset will be associated with that project.
+                  type: string
+                displayName:
+                  description: The name of this dataset (required).
+                  type: string
+                description:
+                  description: Optional description of this dataset.
+                  type: string
+                locale:
+                  description: The locale of this dataset (required).
+                  type: string
+                kind:
+                  description: The kind of the dataset (required). Possible values
+                    are "Language", "Acoustic", "Pronunciation", "AudioFiles", "LanguageMarkdown".
+                  type: string
+                customProperties:
+                  description: The optional custom properties of this entity. The
+                    maximum allowed key length is 64 characters, the maximum allowed
+                    value length is 256 characters and the count of allowed entries
+                    is 10.
+                  type: string
+                data:
+                  description: For acoustic datasets, a zip file containing the audio
+                    data and a text file containing the transcriptions for the audio
+                    data. For language datasets, a text file containing the language
+                    or pronunciation data. Required in both cases.
+                  type: string
+                  format: binary
+                email:
+                  description: An optional string containing the email address to
+                    send email notifications to in case the operation completes. The
+                    value will be removed after successfully sending the email.
+                  type: string
+              required:
+              - displayName
+              - locale
+              - kind
+      responses:
+        '201':
+          description: The response contains information about the entity as payload
+            and its location as header.
+          headers:
+            Location:
+              description: The location of the created resource.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dataset'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      deprecated: true
+  /datasets/{id}/blocks:commit:
+    post:
+      tags:
+      - 'Custom Speech datasets for model adaptation:'
+      summary: Commit block list to complete the upload of the dataset.
+      operationId: Datasets_CommitBlocks
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the dataset.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CommitBlocksEntry'
+        description: The list of blocks that compile the dataset.
+        required: true
+      responses:
+        '200':
+          description: The block list is accepted and the data import process can
+            continue.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /datasets/{id}/files:
+    get:
+      tags:
+      - 'Custom Speech datasets for model adaptation:'
+      summary: Gets the files of the dataset identified by the given ID.
+      operationId: Datasets_ListFiles
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the dataset.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/sasValidityQueryParameter'
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          files.\r\n            - Supported properties: name, createdDateTime, kind.\r\n
+          \           - Operators:\r\n              - eq, ne are supported for all
+          properties.\r\n              - gt, ge, lt, le are supported for createdDateTime.\r\n
+          \             - and, or, not are supported.\r\n            - Example:\r\n
+          \             filter=name eq 'myaudio.wav' and kind eq 'Audio'"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFiles'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+  /datasets/{id}/files/{fileId}:
+    get:
+      tags:
+      - 'Custom Speech datasets for model adaptation:'
+      summary: Gets one specific file (identified with fileId) from a dataset (identified
+        with id).
+      operationId: Datasets_GetFile
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the dataset.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: path
+        name: fileId
+        description: The identifier of the file.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/sasValidityQueryParameter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /endpoints/locales:
+    get:
+      tags:
+      - 'Custom Speech endpoints:'
+      summary: Gets a list of supported locales for endpoint creations.
+      operationId: Endpoints_ListSupportedLocales
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /endpoints:
+    get:
+      tags:
+      - 'Custom Speech endpoints:'
+      summary: Gets the list of endpoints for the authenticated subscription.
+      operationId: Endpoints_List
+      parameters:
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          endpoints.\r\n            - Supported properties: displayName, description,
+          createdDateTime, lastActionDateTime, status, locale.\r\n            - Operators:\r\n
+          \             - eq, ne are supported for all properties.\r\n              -
+          gt, ge, lt, le are supported for createdDateTime and lastActionDateTime.\r\n
+          \             - and, or, not are supported.\r\n            - Example:\r\n
+          \             filter=locale eq 'en-US'"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEndpoints'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+    post:
+      tags:
+      - 'Custom Speech endpoints:'
+      summary: Creates a new endpoint.
+      operationId: Endpoints_Create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Endpoint'
+        description: The details of the endpoint.
+        required: true
+      responses:
+        '201':
+          description: The response contains information about the entity as payload
+            and its location as header.
+          headers:
+            Location:
+              description: The location of the created resource.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Endpoint'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /endpoints/{id}:
+    get:
+      tags:
+      - 'Custom Speech endpoints:'
+      summary: Gets the endpoint identified by the given ID.
+      operationId: Endpoints_Get
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the endpoint.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Endpoint'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - 'Custom Speech endpoints:'
+      summary: Deletes the endpoint identified by the given ID.
+      operationId: Endpoints_Delete
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the endpoint.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: The model endpoint was successfully deleted.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+      - 'Custom Speech endpoints:'
+      summary: Updates the metadata of the endpoint identified by the given ID.
+      operationId: Endpoints_Update
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the endpoint.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EndpointUpdate'
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/EndpointUpdate'
+        description: The updated values for the endpoint.
+        required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Endpoint'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /endpoints/{id}/files/logs:
+    get:
+      tags:
+      - 'Custom Speech endpoints:'
+      summary: Gets the list of audio and transcription logs that have been stored
+        for a given endpoint.
+      operationId: Endpoints_ListLogs
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the endpoint.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/sasValidityQueryParameter'
+      - in: query
+        name: skipToken
+        description: Token to skip logs that were already retrieved in previous requests.
+          Pagination starts from beginning when not defined.
+        schema:
+          type: string
+      - $ref: '#/components/parameters/topQueryParameter'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFiles'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+    delete:
+      tags:
+      - 'Custom Speech endpoints:'
+      summary: Deletes the specified audio and transcription logs that have been stored
+        for a given endpoint. It deletes all logs before (and including) a specific
+        day.
+      description: The deletion process is done asynchronously and can take up to
+        one day depending on the amount of log files.
+      operationId: Endpoints_DeleteLogs
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the endpoint.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: query
+        name: endDate
+        description: "The end date of the audio logs deletion (specific day, UTC).\r\n
+          \           Expected format: \"yyyy-mm-dd\". For instance, \"2019-09-20\"
+          results in deleting all logs on September 20h, 2019 and before.\r\n            Deletes
+          all existing logs when date is not specified."
+        schema:
+          type: string
+      responses:
+        '202':
+          description: The logs will be deleted.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /endpoints/{id}/files/logs/{logId}:
+    get:
+      tags:
+      - 'Custom Speech endpoints:'
+      summary: Gets a specific audio or transcription log for a given endpoint.
+      operationId: Endpoints_GetLog
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the endpoint.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: path
+        name: logId
+        description: The identifier of the log.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/sasValidityQueryParameter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - 'Custom Speech endpoints:'
+      summary: Deletes one audio or transcription log that have been stored for a
+        given endpoint.
+      operationId: Endpoints_DeleteLog
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the endpoint.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: path
+        name: logId
+        description: The identifier of the log.
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: The log was successfully deleted.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /endpoints/base/{locale}/files/logs:
+    get:
+      tags:
+      - 'Custom Speech endpoints:'
+      summary: Gets the list of audio and transcription logs that have been stored
+        when using the default base model of a given language.
+      operationId: Endpoints_ListBaseModelLogs
+      parameters:
+      - in: path
+        name: locale
+        description: The language used to select the default base model.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/sasValidityQueryParameter'
+      - in: query
+        name: skipToken
+        description: Token to skip logs that were already retrieved in previous requests.
+          Pagination starts from beginning when not defined.
+        schema:
+          type: string
+      - $ref: '#/components/parameters/topQueryParameter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFiles'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+    delete:
+      tags:
+      - 'Custom Speech endpoints:'
+      summary: Deletes the specified audio and transcription logs that have been stored
+        when using the default base model of a given language. It deletes all logs
+        before (and including) a specific day.
+      description: Deletion process is done asynchronously and can take up to one
+        day depending on the amount of log files.
+      operationId: Endpoints_DeleteBaseModelLogs
+      parameters:
+      - in: path
+        name: locale
+        description: The language used to select the default base model.
+        required: true
+        schema:
+          type: string
+      - in: query
+        name: endDate
+        description: "The end date of the audio logs deletion (specific day, UTC).\r\n
+          \           Expected format: \"yyyy-mm-dd\". For instance, \"2019-09-20\"
+          results in deleting all logs on September 20h, 2019 and before.\r\n            Deletes
+          all existing logs when date is not specified."
+        schema:
+          type: string
+      responses:
+        '202':
+          description: The logs will be deleted.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /endpoints/base/{locale}/files/logs/{logId}:
+    get:
+      tags:
+      - 'Custom Speech endpoints:'
+      summary: Gets a specific audio or transcription log for the default base model
+        in a given language.
+      operationId: Endpoints_GetBaseModelLog
+      parameters:
+      - in: path
+        name: locale
+        description: The language used to select the default base model.
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: logId
+        description: The identifier of the log.
+        required: true
+        schema:
+          type: string
+      - $ref: '#/components/parameters/sasValidityQueryParameter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - 'Custom Speech endpoints:'
+      summary: Deletes one audio or transcription log that have been stored when using
+        the default base model of a given language.
+      operationId: Endpoints_DeleteBaseModelLog
+      parameters:
+      - in: path
+        name: locale
+        description: The language used to select the default base model.
+        required: true
+        schema:
+          type: string
+      - in: path
+        name: logId
+        description: The identifier of the log.
+        required: true
+        schema:
+          type: string
+      responses:
+        '204':
+          description: The log was successfully deleted.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /evaluations/locales:
+    get:
+      tags:
+      - 'Custom Speech model evaluations:'
+      summary: Gets a list of supported locales for evaluations.
+      operationId: Evaluations_ListSupportedLocales
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /evaluations:
+    get:
+      tags:
+      - 'Custom Speech model evaluations:'
+      summary: Gets the list of evaluations for the authenticated subscription.
+      operationId: Evaluations_List
+      parameters:
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          evaluations.\r\n            - Supported properties: displayName, description,
+          createdDateTime, lastActionDateTime, status and locale.\r\n            -
+          Operators:\r\n              - eq, ne are supported for all properties.\r\n
+          \             - gt, ge, lt, le are supported for createdDateTime and lastActionDateTime.\r\n
+          \             - and, or, not are supported.\r\n            - Example:\r\n
+          \             filter=displayName eq 'My evaluation'"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEvaluations'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+    post:
+      tags:
+      - 'Custom Speech model evaluations:'
+      summary: Creates a new evaluation.
+      operationId: Evaluations_Create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Evaluation'
+        description: The details of the new evaluation.
+        required: true
+      responses:
+        '201':
+          description: The response contains information about the entity as payload
+            and its location as header.
+          headers:
+            Location:
+              description: The location of the created resource.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evaluation'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /evaluations/{id}/files:
+    get:
+      tags:
+      - 'Custom Speech model evaluations:'
+      summary: Gets the files of the evaluation identified by the given ID.
+      operationId: Evaluations_ListFiles
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the evaluation.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/sasValidityQueryParameter'
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          files.\r\n            - Supported properties: name, createdDateTime, kind.\r\n
+          \           - Operators:\r\n              - eq, ne are supported for all
+          properties.\r\n              - gt, ge, lt, le are supported for createdDateTime.\r\n
+          \             - and, or, not are supported.\r\n            - Example:\r\n
+          \             filter=name eq 'myaudio.wav' and kind eq 'Audio'"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFiles'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+  /evaluations/{id}/files/{fileId}:
+    get:
+      tags:
+      - 'Custom Speech model evaluations:'
+      summary: Gets one specific file (identified with fileId) from an evaluation
+        (identified with id).
+      operationId: Evaluations_GetFile
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the evaluation.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: path
+        name: fileId
+        description: The identifier of the file.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/sasValidityQueryParameter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /evaluations/{id}:
+    get:
+      tags:
+      - 'Custom Speech model evaluations:'
+      summary: Gets the evaluation identified by the given ID.
+      operationId: Evaluations_Get
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the evaluation.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evaluation'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+      - 'Custom Speech model evaluations:'
+      summary: Updates the mutable details of the evaluation identified by its id.
+      operationId: Evaluations_Update
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the evaluation.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvaluationUpdate'
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/EvaluationUpdate'
+        description: The object containing the updated fields of the evaluation.
+        required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Evaluation'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - 'Custom Speech model evaluations:'
+      summary: Deletes the evaluation identified by the given ID.
+      operationId: Evaluations_Delete
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the evaluation.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: The evaluation was successfully deleted or did not exist.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /models/locales:
+    get:
+      tags:
+      - 'Custom Speech models:'
+      summary: Gets a list of supported locales for model adaptation.
+      operationId: Models_ListSupportedLocales
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /models:
+    get:
+      tags:
+      - 'Custom Speech models:'
+      summary: Gets the list of custom models for the authenticated subscription.
+      operationId: Models_ListCustomModels
+      parameters:
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          models.\r\n            - Supported properties: displayName, description,
+          createdDateTime, lastActionDateTime, status, locale.\r\n            - Operators:\r\n
+          \             - eq, ne are supported for all properties.\r\n              -
+          gt, ge, lt, le are supported for createdDateTime and lastActionDateTime.\r\n
+          \             - and, or, not are supported.\r\n            - Example:\r\n
+          \             filter=status eq 'NotStarted' or status eq 'Running'"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCustomModels'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+    post:
+      tags:
+      - 'Custom Speech models:'
+      summary: Creates a new model.
+      operationId: Models_Create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomModel'
+        description: The details of the new model.
+        required: true
+      responses:
+        '201':
+          description: The response contains information about the entity as payload
+            and its location as header.
+          headers:
+            Location:
+              description: The location of the created resource.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomModel'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /models/base:
+    get:
+      tags:
+      - 'Custom Speech models:'
+      summary: Gets the list of base models for the authenticated subscription.
+      operationId: Models_ListBaseModels
+      parameters:
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          base models.\r\n            - Supported properties: displayName, description,
+          createdDateTime, lastActionDateTime, status, locale.\r\n            - Operators:\r\n
+          \             - eq, ne are supported for all properties.\r\n              -
+          gt, ge, lt, le are supported for createdDateTime and lastActionDateTime.\r\n
+          \             - and, or, not are supported.\r\n            - Example:\r\n
+          \             filter=status eq 'NotStarted' or status eq 'Running'"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBaseModels'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+  /models/{id}:
+    get:
+      tags:
+      - 'Custom Speech models:'
+      summary: Gets the model identified by the given ID.
+      operationId: Models_GetCustomModel
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the model.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomModel'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+      - 'Custom Speech models:'
+      summary: Updates the metadata of the model identified by the given ID.
+      operationId: Models_Update
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the model.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelUpdate'
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/ModelUpdate'
+        description: The updated values for the model.
+        required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomModel'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - 'Custom Speech models:'
+      summary: Deletes the model identified by the given ID.
+      operationId: Models_Delete
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the model.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: The model was successfully deleted or did not exist.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /models/base/{id}:
+    get:
+      tags:
+      - 'Custom Speech models:'
+      summary: Gets the base model identified by the given ID.
+      operationId: Models_GetBaseModel
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the base model.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BaseModel'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /models/{id}:copyto:
+    post:
+      tags:
+      - 'Custom Speech models:'
+      summary: Copies a model from one subscription to another.
+      description: "This method can be used to copy a model from one location to another.
+        If the target subscription\r\nkey belongs to a subscription created for another
+        location, the model will be copied to that location.\r\nOnly adapted models
+        are allowed to copy to another subscription."
+      operationId: Models_CopyTo
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the model that will be copied.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelCopy'
+        description: The body contains the subscription key of the target subscription.
+        required: true
+      responses:
+        '201':
+          description: The response contains information about the entity as payload
+            and its location as header.
+          headers:
+            Location:
+              description: The location of the created resource.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomModel'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /models/{id}/manifest:
+    get:
+      tags:
+      - 'Custom Speech models:'
+      summary: Returns an manifest for this model which can be used in an on-premise
+        container.
+      operationId: Models_GetCustomModelManifest
+      parameters:
+      - in: path
+        name: id
+        description: The ID of the model to generate a manifest for.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/sasValidityQueryParameter'
+      responses:
+        '200':
+          description: Successfully generated a model manifest.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelManifest'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /models/base/{id}/manifest:
+    get:
+      tags:
+      - 'Custom Speech models:'
+      summary: Returns an manifest for this base model which can be used in an on-premise
+        container.
+      operationId: Models_GetBaseModelManifest
+      parameters:
+      - in: path
+        name: id
+        description: The ID of the model to generate a manifest for.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/sasValidityQueryParameter'
+      responses:
+        '200':
+          description: Successfully generated a model manifest.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelManifest'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /models/{id}/files:
+    get:
+      tags:
+      - 'Custom Speech models:'
+      summary: Gets the files of the model identified by the given ID.
+      operationId: Models_ListFiles
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the model.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/sasValidityQueryParameter'
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          files.\r\n            - Supported properties: name, createdDateTime, kind.\r\n
+          \           - Operators:\r\n              - eq, ne are supported for all
+          properties.\r\n              - gt, ge, lt, le are supported for createdDateTime.\r\n
+          \             - and, or, not are supported.\r\n            - Example:\r\n
+          \             filter=name eq 'myaudio.wav' and kind eq 'Audio'"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFiles'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+  /models/{id}/files/{fileId}:
+    get:
+      tags:
+      - 'Custom Speech models:'
+      summary: Gets one specific file (identified with fileId) from a model (identified
+        with id).
+      operationId: Models_GetFile
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the model.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: path
+        name: fileId
+        description: The identifier of the file.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/sasValidityQueryParameter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /projects/locales:
+    get:
+      tags:
+      - 'Custom Speech projects:'
+      summary: Gets the list of supported locales.
+      operationId: Projects_ListSupportedLocales
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /projects:
+    get:
+      tags:
+      - 'Custom Speech projects:'
+      summary: Gets the list of projects for the authenticated subscription.
+      operationId: Projects_List
+      parameters:
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          projects.\r\n            - Supported properties: displayName, description,
+          createdDateTime, locale.\r\n            - Operators:\r\n              -
+          eq, ne are supported for all properties.\r\n              - gt, ge, lt,
+          le are supported for createdDateTime.\r\n              - and, or, not are
+          supported.\r\n            - Example:\r\n              filter=displayName
+          eq 'My test'"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedProjects'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+    post:
+      tags:
+      - 'Custom Speech projects:'
+      summary: Creates a new project.
+      operationId: Projects_Create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Project'
+        description: The details of the project.
+        required: true
+      responses:
+        '201':
+          description: The response contains information about the entity as payload
+            and its location as header.
+          headers:
+            Location:
+              description: The location of the created resource.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /projects/{id}:
+    get:
+      tags:
+      - 'Custom Speech projects:'
+      summary: Gets the project identified by the given ID.
+      operationId: Projects_Get
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the project.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+      - 'Custom Speech projects:'
+      summary: Updates the project identified by the given ID.
+      operationId: Projects_Update
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the project.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectUpdate'
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/ProjectUpdate'
+        description: The updated values for the project.
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Project'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - 'Custom Speech projects:'
+      summary: Deletes the project identified by the given ID.
+      operationId: Projects_Delete
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the project.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: The project was successfully deleted or did not exist.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /projects/{id}/evaluations:
+    get:
+      tags:
+      - 'Custom Speech projects:'
+      summary: Gets the list of evaluations for specified project.
+      operationId: Projects_ListEvaluations
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the project.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          evaluations.\r\n            - Supported properties: displayName, description,
+          createdDateTime, lastActionDateTime, status and locale.\r\n            -
+          Operators:\r\n              - eq, ne are supported for all properties.\r\n
+          \             - gt, ge, lt, le are supported for createdDateTime and lastActionDateTime.\r\n
+          \             - and, or, not are supported.\r\n            - Example\r\n
+          \             filter=displayName eq 'My evaluation'"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEvaluations'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+  /projects/{id}/datasets:
+    get:
+      tags:
+      - 'Custom Speech projects:'
+      summary: Gets the list of datasets for specified project.
+      operationId: Projects_ListDatasets
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the project.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          datasets.\r\n            - Supported properties: displayName, description,
+          createdDateTime, lastActionDateTime, status, locale, kind.\r\n            -
+          Operators:\r\n              - eq, ne are supported for all properties.\r\n
+          \             - gt, ge, lt, le are supported for createdDateTime and lastActionDateTime.\r\n
+          \             - and, or, not are supported.\r\n            - Example:\r\n
+          \             filter=createdDateTime gt 2022-02-01T11:00:00Z"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDatasets'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+  /projects/{id}/endpoints:
+    get:
+      tags:
+      - 'Custom Speech projects:'
+      summary: Gets the list of endpoints for specified project.
+      operationId: Projects_ListEndpoints
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the project.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          endpoints.\r\n            - Supported properties: displayName, description,
+          createdDateTime, lastActionDateTime, status, locale.\r\n            - Operators:\r\n
+          \             - eq, ne are supported for all properties.\r\n              -
+          gt, ge, lt, le are supported for createdDateTime and lastActionDateTime.\r\n
+          \             - and, or, not are supported.\r\n            - Example:\r\n
+          \             filter=locale eq 'en-US'"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedEndpoints'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+  /projects/{id}/models:
+    get:
+      tags:
+      - 'Custom Speech projects:'
+      summary: Gets the list of models for specified project.
+      operationId: Projects_ListModels
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the project.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          models.\r\n            - Supported properties: displayName, description,
+          createdDateTime, lastActionDateTime, status, locale.\r\n              -
+          Operators:\r\n                - eq, ne are supported for all properties.\r\n
+          \               - gt, ge, lt, le are supported for createdDateTime and lastActionDateTime.\r\n
+          \               - and, or, not are supported.\r\n            - Example:\r\n
+          \             filter=status eq 'NotStarted' or status eq 'Running'"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCustomModels'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+  /projects/{id}/transcriptions:
+    get:
+      tags:
+      - 'Custom Speech projects:'
+      summary: Gets the list of transcriptions for specified project.
+      operationId: Projects_ListTranscriptions
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the project.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          transcriptions.\r\n            - Supported properties: displayName, description,
+          createdDateTime, lastActionDateTime, status, locale.\r\n            - Operators:\r\n
+          \             - eq, ne are supported for all properties.\r\n              -
+          gt, ge, lt, le are supported for createdDateTime and lastActionDateTime.\r\n
+          \             - and, or, not are supported.\r\n            - Example:\r\n
+          \             filter=createdDateTime gt 2022-02-01T11:00:00Z"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTranscriptions'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+  /transcriptions/locales:
+    get:
+      tags:
+      - 'Custom Speech transcriptions:'
+      summary: Gets a list of supported locales for offline transcriptions.
+      operationId: Transcriptions_ListSupportedLocales
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /transcriptions:
+    get:
+      tags:
+      - 'Custom Speech transcriptions:'
+      summary: Gets a list of transcriptions for the authenticated subscription.
+      operationId: Transcriptions_List
+      parameters:
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          transcriptions.\r\n            - Supported properties: displayName, description,
+          createdDateTime, lastActionDateTime, status, locale.\r\n            - Operators:\r\n
+          \             - eq, ne are supported for all properties.\r\n              -
+          gt, ge, lt, le are supported for createdDateTime and lastActionDateTime.\r\n
+          \             - and, or, not are supported.\r\n            - Example:\r\n
+          \             filter=createdDateTime gt 2022-02-01T11:00:00Z"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTranscriptions'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+    post:
+      tags:
+      - 'Custom Speech transcriptions:'
+      summary: Creates a new transcription.
+      operationId: Transcriptions_Create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Transcription'
+        description: The details of the new transcription.
+        required: true
+      responses:
+        '201':
+          description: The response contains information about the entity as payload
+            and its location as header.
+          headers:
+            Location:
+              description: The location of the created resource.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transcription'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /transcriptions/{id}:
+    get:
+      tags:
+      - 'Custom Speech transcriptions:'
+      summary: Gets the transcription identified by the given ID.
+      operationId: Transcriptions_Get
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the transcription.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transcription'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+      - 'Custom Speech transcriptions:'
+      summary: Updates the mutable details of the transcription identified by its
+        ID.
+      operationId: Transcriptions_Update
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the transcription.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TranscriptionUpdate'
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/TranscriptionUpdate'
+        description: The updated values for the transcription.
+        required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transcription'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - 'Custom Speech transcriptions:'
+      summary: Deletes the specified transcription task.
+      operationId: Transcriptions_Delete
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the transcription.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: The transcription was successfully deleted or did not exist.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /transcriptions/{id}/files:
+    get:
+      tags:
+      - 'Custom Speech transcriptions:'
+      summary: Gets the files of the transcription identified by the given ID.
+      operationId: Transcriptions_ListFiles
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the transcription.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/sasValidityQueryParameter'
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          files.\r\n            - Supported properties: name, createdDateTime, kind.\r\n
+          \           - Operators:\r\n              - eq, ne are supported for all
+          properties.\r\n              - gt, ge, lt, le are supported for createdDateTime.\r\n
+          \             - and, or, not are supported.\r\n            - Example:\r\n
+          \             filter=name eq 'myaudio.wav.json' and kind eq 'Transcription'"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFiles'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+  /transcriptions/{id}/files/{fileId}:
+    get:
+      tags:
+      - 'Custom Speech transcriptions:'
+      summary: Gets one specific file (identified with fileId) from a transcription
+        (identified with id).
+      operationId: Transcriptions_GetFile
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the transcription.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - in: path
+        name: fileId
+        description: The identifier of the file.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - $ref: '#/components/parameters/sasValidityQueryParameter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /webhooks:
+    get:
+      tags:
+      - 'Custom Speech web hooks:'
+      summary: Gets the list of web hooks for the authenticated subscription.
+      operationId: WebHooks_List
+      parameters:
+      - $ref: '#/components/parameters/skipQueryParameter'
+      - $ref: '#/components/parameters/topQueryParameter'
+      - in: query
+        name: filter
+        description: "A filtering expression for selecting a subset of the available
+          hooks.\r\n            Supported properties: displayName, description, createdDateTime,
+          lastActionDateTime, status and webUrl.\r\n            - Operators:\r\n              -
+          eq, ne are supported for all properties.\r\n              - gt, ge, lt,
+          le are supported for createdDateTime and lastActionDateTime.\r\n              -
+          and, or, not are supported.\r\n            - Example:\r\n              filter=displayName
+          eq 'test'"
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedWebHooks'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      x-ms-pageable:
+        itemName: values
+        nextLinkName: '@nextLink'
+    post:
+      tags:
+      - 'Custom Speech web hooks:'
+      summary: Creates a new web hook.
+      description: "If the property secret in the configuration is present and contains
+        a non-empty string, it will be used to create a SHA256 hash of the payload
+        with\r\nthe secret as HMAC key. This hash will be set as X-MicrosoftSpeechServices-Signature
+        header when calling back into the registered URL.\r\n            \r\nWhen
+        calling back into the registered URL, the request will contain a X-MicrosoftSpeechServices-Event
+        header containing one of the registered event\r\ntypes. There will be one
+        request per registered event type.\r\n            \r\nAfter successfully registering
+        the web hook, it will not be usable until a challenge/response is completed.
+        To do this, a request with the event type\r\nchallenge will be made with a
+        query parameter called validationToken. Respond to the challenge with a 200
+        OK containing the value of the validationToken\r\nquery parameter as the response
+        body. When the challenge/response is successfully completed, the web hook
+        will begin receiving events."
+      operationId: WebHooks_Create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebHook'
+        description: The details of the new web hook.
+        required: true
+      responses:
+        '201':
+          description: The response contains information about the entity as payload
+            and its location as header.
+          headers:
+            Location:
+              description: The location of the created resource.
+              schema:
+                type: string
+                format: uri
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebHook'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /webhooks/{id}:
+    get:
+      tags:
+      - 'Custom Speech web hooks:'
+      summary: Gets the web hook identified by the given ID.
+      operationId: WebHooks_Get
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the web hook.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebHook'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    patch:
+      tags:
+      - 'Custom Speech web hooks:'
+      summary: Updates the web hook identified by the given ID.
+      description: "If the property secret in the configuration is omitted or contains
+        an empty string, future callbacks won't contain X-MicrosoftSpeechServices-Signature\r\nheaders.
+        If the property contains a non-empty string, it will be used to create a SHA256
+        hash of the payload with the secret as HMAC key. This hash\r\nwill be set
+        as X-MicrosoftSpeechServices-Signature header when calling back into the registered
+        URL.\r\n            \r\nIf the URL changes,  the web hook will stop receiving
+        events until a\r\nchallenge/response is completed. To do this, a request with
+        the event type challenge will be made with a query parameter called validationToken.\r\nRespond
+        to the challenge with a 200 OK containing the value of the validationToken
+        query parameter as the response body. When the challenge/response\r\nis successfully
+        completed, the web hook will begin receiving events."
+      operationId: WebHooks_Update
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the web hook.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebHookUpdate'
+          application/merge-patch+json:
+            schema:
+              $ref: '#/components/schemas/WebHookUpdate'
+        description: The updated values for the web hook.
+        required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait for a non terminal
+                operation to complete.
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebHook'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+      - 'Custom Speech web hooks:'
+      summary: Deletes the web hook identified by the given ID.
+      operationId: WebHooks_Delete
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the web hook.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '204':
+          description: The web hook was successfully deleted.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /webhooks/{id}:ping:
+    post:
+      tags:
+      - 'Custom Speech web hooks:'
+      summary: Sends a ping event to the registered URL.
+      description: "The request body of the POST request sent to the registered web
+        hook URL is of the same shape as in the GET request for a specific hook.\r\nThe
+        Swagger Schema ID of the model is WebHookV3.\r\n            \r\nThe request
+        will contain a X-MicrosoftSpeechServices-Event header with the value ping.
+        If the web hook was registered with\r\na secret it will contain a X-MicrosoftSpeechServices-Signature
+        header with an SHA256 hash of the payload with\r\nthe secret as HMAC key.
+        The hash is base64 encoded."
+      operationId: WebHooks_Ping
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the web hook to ping.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '202':
+          description: Started trying to send a ping request to the web hook.
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait before accessing
+                the resource created in this operation.
+              schema:
+                type: integer
+                format: int32
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /webhooks/{id}:test:
+    post:
+      tags:
+      - 'Custom Speech web hooks:'
+      summary: Sends a request for each registered event type to the registered URL.
+      description: "The payload will be generated from the last entity that would
+        have invoked the web hook. If no entity is present for none of the registered
+        event types,\r\nthe POST will respond with 204. If a test request can be made,
+        it will respond with 200.\r\nThe request will contain a X-MicrosoftSpeechServices-Event
+        header with the respective registered event type.\r\nIf the web hook was registered
+        with a secret it will contain a X-MicrosoftSpeechServices-Signature header
+        with an SHA256 hash of the payload with\r\nthe secret as HMAC key. The hash
+        is base64 encoded."
+      operationId: WebHooks_Test
+      parameters:
+      - in: path
+        name: id
+        description: The identifier of the web hook to ping.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '202':
+          description: A test request with the last entity is sent to the registered
+            web hook.
+          headers:
+            Retry-After:
+              description: The minimum number of seconds to wait before accessing
+                the resource created in this operation.
+              schema:
+                type: integer
+                format: int32
+        '204':
+          description: No entity could be found for any event type, so no test request
+            is sent to the registered web hook.
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /healthstatus:
+    get:
+      tags:
+      - 'Service Health:'
+      summary: Returns the overall health of the service and optionally of the different
+        subcomponents.
+      operationId: ServiceHealth_Get
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServiceHealth'
+        default:
+          description: An error occurred.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+servers:
+- url: '{endpoint}/speechtotext/v3.1'
+  variables:
+    endpoint:
+      description: 'Supported Cognitive Services endpoints (protocol and hostname,
+        for example: https://westus.api.cognitive.microsoft.com).'
+      x-ms-skip-url-encoding: true
+      x-ms-parameter-location: client
+      default: none
+components:
+  parameters:
+    endpoint:
+      in: path
+      name: endpoint
+      description: 'Supported Cognitive Services endpoints (protocol and hostname,
+        for example: https://westus.api.cognitive.microsoft.com).'
+      required: true
+      x-ms-skip-url-encoding: true
+      x-ms-parameter-location: client
+      schema:
+        type: string
+    skipQueryParameter:
+      in: query
+      name: skip
+      description: Number of datasets that will be skipped.
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+    topQueryParameter:
+      in: query
+      name: top
+      description: Number of datasets that will be included after skipping.
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+    sasValidityQueryParameter:
+      in: query
+      name: sasValidityInSeconds
+      description: 'The duration in seconds that an SAS url should be valid. The default
+        duration is 12 hours. When using BYOS (https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/speech-encryption-of-data-at-rest#bring-your-own-storage-byos-for-customization-and-logging):
+        A value of 0 means that a plain blob URI without SAS token will be generated.'
+      x-ms-parameter-location: method
+      schema:
+        type: integer
+        format: int32
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: Ocp-Apim-Subscription-Key
+      in: header
+      description: Provide your cognitive services account key here.
+    token:
+      type: apiKey
+      name: Authorization
+      in: header
+      description: 'Provide an access token from the JWT returned by the STS of this
+        region. Make sure to add the management scope to the token by adding the following
+        query string to the STS URL: ?scope=speechservicesmanagement'
+  schemas:
+    BaseModel:
+      $ref: '#/components/schemas/SharedModel'
+      type: object
+      properties:
+        links:
+          $ref: '#/components/schemas/BaseModelLinks'
+        properties:
+          $ref: '#/components/schemas/BaseModelProperties'
+      required:
+      - displayName
+      - locale
+      title: BaseModel
+    BaseModelDeprecationDates:
+      title: BaseModelDeprecationDates
+      type: object
+      properties:
+        adaptationDateTime:
+          format: date-time
+          description: The date when adaptation becomes deprecated.
+          type: string
+          readOnly: true
+        transcriptionDateTime:
+          format: date-time
+          description: The date when transcription becomes deprecated.
+          type: string
+          readOnly: true
+    BaseModelFeatures:
+      $ref: '#/components/schemas/SharedModelFeatures'
+      type: object
+      properties:
+        supportsAdaptationsWith:
+          description: Supported dataset kinds to adapt the model.
+          type: array
+          items:
+            $ref: '#/components/schemas/DatasetKind'
+          readOnly: true
+      title: BaseModelFeatures
+      description: Features supported by the model.
+    BaseModelLinks:
+      title: BaseModelLinks
+      type: object
+      properties:
+        manifest:
+          format: uri
+          description: The location to get a manifest for this model to be used in
+            the on-prem container. See operation "Models_GetCustomModelManifest" for
+            more details.
+          type: string
+          readOnly: true
+    BaseModelProperties:
+      title: BaseModelProperties
+      type: object
+      properties:
+        deprecationDates:
+          $ref: '#/components/schemas/BaseModelDeprecationDates'
+        features:
+          $ref: '#/components/schemas/BaseModelFeatures'
+    BlockKind:
+      title: BlockKind
+      description: Type of data block.
+      enum:
+      - Committed
+      - Uncommitted
+      - Latest
+      type: string
+      x-ms-enum:
+        name: BlockKind
+        modelAsString: true
+        values:
+        - value: Committed
+          description: A data block from the committed block list.
+        - value: Uncommitted
+          description: A data block from the uncommitted block list.
+        - value: Latest
+          description: A data block from the uncommitted block list, if present, otherwise
+            from the committed block list.
+    CommitBlocksEntry:
+      title: CommitBlocksEntry
+      description: Entry of the commit block list.
+      type: object
+      properties:
+        kind:
+          $ref: '#/components/schemas/BlockKind'
+        id:
+          type: string
+    Component:
+      title: Component
+      type: object
+      properties:
+        message:
+          description: Additional messages about the current service health.
+          type: string
+          readOnly: true
+        name:
+          description: The name of the component.
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/HealthStatus'
+        type:
+          description: The type of this component.
+          type: string
+          readOnly: true
+    CustomModel:
+      $ref: '#/components/schemas/SharedModel'
+      type: object
+      properties:
+        project:
+          $ref: '#/components/schemas/EntityReference'
+        links:
+          $ref: '#/components/schemas/CustomModelLinks'
+        properties:
+          $ref: '#/components/schemas/CustomModelProperties'
+        text:
+          description: The text used to adapt this language model.
+          type: string
+        baseModel:
+          $ref: '#/components/schemas/EntityReference'
+        datasets:
+          description: Datasets used for adaptation.
+          type: array
+          items:
+            $ref: '#/components/schemas/EntityReference'
+        customProperties:
+          description: "The custom properties of this entity. The maximum allowed
+            key length is 64 characters, the maximum\r\nallowed value length is 256
+            characters and the count of allowed entries is 10."
+          type: object
+          additionalProperties:
+            type: string
+      required:
+      - displayName
+      - locale
+      title: CustomModel
+    CustomModelDeprecationDates:
+      title: CustomModelDeprecationDates
+      type: object
+      properties:
+        transcriptionDateTime:
+          format: date-time
+          description: The date when transcription becomes deprecated.
+          type: string
+          readOnly: true
+    CustomModelFeatures:
+      $ref: '#/components/schemas/SharedModelFeatures'
+      type: object
+      title: CustomModelFeatures
+      description: Features supported by the model.
+    CustomModelLinks:
+      title: CustomModelLinks
+      type: object
+      properties:
+        copyTo:
+          format: uri
+          description: The location to the model copy action. See operation "Models_CopyTo"
+            for more details.
+          type: string
+          readOnly: true
+        files:
+          format: uri
+          description: The location to get all files of this entity. See operation
+            "Models_ListFiles" for more details.
+          type: string
+          readOnly: true
+        manifest:
+          format: uri
+          description: The location to get a manifest for this model to be used in
+            the on-prem container. See operation "Models_GetCustomModelManifest" for
+            more details.
+          type: string
+          readOnly: true
+    CustomModelProperties:
+      title: CustomModelProperties
+      type: object
+      properties:
+        customModelWeightPercent:
+          format: int32
+          description: "The weight of custom model between 1 (1% custom model and
+            99% base model) and 100 (100% custom model and 0% base model).\r\nWhen
+            this property is not set, the service chooses a suitable value (get the
+            model to retrieve the selected weight).\r\nStart without using this property.
+            If needed, choose a larger (or smaller) weight to increase (or decrease)
+            the impact of the custom model."
+          maximum: 100
+          minimum: 1
+          type: integer
+        deprecationDates:
+          $ref: '#/components/schemas/CustomModelDeprecationDates'
+        features:
+          $ref: '#/components/schemas/CustomModelFeatures'
+        email:
+          description: "The email address to send email notifications to in case the
+            operation completes.\r\nThe value will be removed after successfully sending
+            the email."
+          type: string
+        error:
+          $ref: '#/components/schemas/EntityError'
+    Dataset:
+      title: Dataset
+      required:
+      - displayName
+      - kind
+      - locale
+      type: object
+      properties:
+        links:
+          $ref: '#/components/schemas/DatasetLinks'
+        properties:
+          $ref: '#/components/schemas/DatasetProperties'
+        kind:
+          $ref: '#/components/schemas/DatasetKind'
+        self:
+          format: uri
+          description: The location of this entity.
+          type: string
+          readOnly: true
+        displayName:
+          description: The display name of the object.
+          minLength: 1
+          type: string
+        description:
+          description: The description of the object.
+          type: string
+        project:
+          $ref: '#/components/schemas/EntityReference'
+        contentUrl:
+          format: uri
+          description: The URL of the data for the dataset.
+          type: string
+        customProperties:
+          description: "The custom properties of this entity. The maximum allowed
+            key length is 64 characters, the maximum\r\nallowed value length is 256
+            characters and the count of allowed entries is 10."
+          type: object
+          additionalProperties:
+            type: string
+        locale:
+          description: The locale of the contained data.
+          minLength: 1
+          type: string
+        lastActionDateTime:
+          format: date-time
+          description: "The time-stamp when the current status was entered.\r\nThe
+            time stamp is encoded as ISO 8601 date and time format\r\n(\"YYYY-MM-DDThh:mm:ssZ\",
+            see https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)."
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/Status'
+        createdDateTime:
+          format: date-time
+          description: "The time-stamp when the object was created.\r\nThe time stamp
+            is encoded as ISO 8601 date and time format\r\n(\"YYYY-MM-DDThh:mm:ssZ\",
+            see https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)."
+          type: string
+          readOnly: true
+    DatasetKind:
+      title: DatasetKind
+      description: Type of data import.
+      enum:
+      - Language
+      - Acoustic
+      - Pronunciation
+      - AudioFiles
+      - LanguageMarkdown
+      type: string
+      x-ms-enum:
+        name: DatasetKind
+        modelAsString: true
+        values:
+        - value: Language
+          description: A language dataset.
+        - value: Acoustic
+          description: An acoustic dataset.
+        - value: Pronunciation
+          description: A pronunciation dataset.
+        - value: AudioFiles
+          description: An audio files dataset.
+        - value: LanguageMarkdown
+          description: A language markdown dataset.
+    DatasetLinks:
+      title: DatasetLinks
+      type: object
+      properties:
+        files:
+          format: uri
+          description: The location to get all files of this entity. See operation
+            "Datasets_ListFiles" for more details.
+          type: string
+          readOnly: true
+        commitBlocks:
+          format: uri
+          description: The location to commit the list of blocks when uploading a
+            dataset using blocks. See operation "Datasets_CommitBlocks" for more details.
+          type: string
+          readOnly: true
+        listBlocks:
+          format: uri
+          description: The location to list the already uploaded blocks of this entity
+            when uploading a dataset using blocks. See operation "Datasets_GetDatasetBlocks"
+            for more details.
+          type: string
+          readOnly: true
+        uploadBlocks:
+          format: uri
+          description: The location to upload blocks to when uploading a dataset using
+            blocks. See operation "Datasets_UploadBlock" for more details.
+          type: string
+          readOnly: true
+    DatasetLocales:
+      title: DatasetLocales
+      type: object
+      additionalProperties:
+        type: array
+        items:
+          $ref: '#/components/schemas/DatasetKind'
+    DatasetProperties:
+      title: DatasetProperties
+      type: object
+      properties:
+        acceptedLineCount:
+          format: int32
+          description: The number of lines accepted for this data set.
+          type: integer
+          readOnly: true
+        rejectedLineCount:
+          format: int32
+          description: The number of lines rejected for this data set.
+          type: integer
+          readOnly: true
+        duration:
+          description: "The total duration of the datasets if it contains audio files.
+            The duration is encoded as ISO 8601 duration\r\n(\"PnYnMnDTnHnMnS\", see
+            https://en.wikipedia.org/wiki/ISO_8601#Durations)."
+          type: string
+          readOnly: true
+        email:
+          description: "The email address to send email notifications to in case the
+            operation completes.\r\nThe value will be removed after successfully sending
+            the email."
+          type: string
+        error:
+          $ref: '#/components/schemas/EntityError'
+    DatasetUpdate:
+      title: DatasetUpdate
+      type: object
+      properties:
+        project:
+          $ref: '#/components/schemas/EntityReference'
+        displayName:
+          description: The name of the object.
+          type: string
+        description:
+          description: The description of the object.
+          type: string
+        customProperties:
+          description: "The custom properties of this entity. The maximum allowed
+            key length is 64 characters, the maximum\r\nallowed value length is 256
+            characters and the count of allowed entries is 10."
+          type: object
+          additionalProperties:
+            type: string
+    DetailedErrorCode:
+      title: DetailedErrorCode
+      description: Detailed error code enum.
+      enum:
+      - InvalidParameterValue
+      - InvalidRequestBodyFormat
+      - EmptyRequest
+      - MissingInputRecords
+      - InvalidDocument
+      - ModelVersionIncorrect
+      - InvalidDocumentBatch
+      - UnsupportedLanguageCode
+      - DataImportFailed
+      - InUseViolation
+      - InvalidLocale
+      - InvalidBaseModel
+      - InvalidAdaptationMapping
+      - InvalidDataset
+      - InvalidTest
+      - FailedDataset
+      - InvalidModel
+      - InvalidTranscription
+      - InvalidPayload
+      - InvalidParameter
+      - EndpointWithoutLogging
+      - InvalidPermissions
+      - InvalidPrerequisite
+      - InvalidProductId
+      - InvalidSubscription
+      - InvalidProject
+      - InvalidProjectKind
+      - InvalidRecordingsUri
+      - OnlyOneOfUrlsOrContainerOrDataset
+      - ExceededNumberOfRecordingsUris
+      - ModelMismatch
+      - ProjectGenderMismatch
+      - ModelDeprecated
+      - ModelExists
+      - ModelNotDeployable
+      - EndpointNotUpdatable
+      - SingleDefaultEndpoint
+      - EndpointCannotBeDefault
+      - InvalidModelUri
+      - SubscriptionNotFound
+      - QuotaViolation
+      - UnsupportedDelta
+      - UnsupportedFilter
+      - UnsupportedPagination
+      - UnsupportedDynamicConfiguration
+      - UnsupportedOrderBy
+      - NoUtf8WithBom
+      - ModelDeploymentNotCompleteState
+      - SkuLimitsExist
+      - DeployingFailedModel
+      - UnsupportedTimeRange
+      - InvalidLogDate
+      - InvalidLogId
+      - InvalidLogStartTime
+      - InvalidLogEndTime
+      - InvalidTopForLogs
+      - InvalidSkipTokenForLogs
+      - DeleteNotAllowed
+      - Forbidden
+      - DeployNotAllowed
+      - UnexpectedError
+      - InvalidCollection
+      - InvalidCallbackUri
+      - InvalidSasValidityDuration
+      - InaccessibleCustomerStorage
+      - UnsupportedClassBasedAdaptation
+      - InvalidWebHookEventKind
+      - InvalidTimeToLive
+      type: string
+      x-ms-enum:
+        name: DetailedErrorCode
+        modelAsString: true
+        values:
+        - value: InvalidParameterValue
+          description: Invalid parameter value.
+        - value: InvalidRequestBodyFormat
+          description: Invalid request body format.
+        - value: EmptyRequest
+          description: Empty Request.
+        - value: MissingInputRecords
+          description: Missing Input Records.
+        - value: InvalidDocument
+          description: Invalid Document.
+        - value: ModelVersionIncorrect
+          description: Model Version Incorrect.
+        - value: InvalidDocumentBatch
+          description: Invalid Document Batch.
+        - value: UnsupportedLanguageCode
+          description: Unsupported language code.
+        - value: DataImportFailed
+          description: Data import failed.
+        - value: InUseViolation
+          description: In use violation.
+        - value: InvalidLocale
+          description: Invalid locale.
+        - value: InvalidBaseModel
+          description: Invalid base model.
+        - value: InvalidAdaptationMapping
+          description: Invalid adaptation mapping.
+        - value: InvalidDataset
+          description: Invalid dataset.
+        - value: InvalidTest
+          description: Invalid test.
+        - value: FailedDataset
+          description: Failed dataset.
+        - value: InvalidModel
+          description: Invalid model.
+        - value: InvalidTranscription
+          description: Invalid transcription.
+        - value: InvalidPayload
+          description: Invalid payload.
+        - value: InvalidParameter
+          description: Invalid parameter.
+        - value: EndpointWithoutLogging
+          description: Endpoint without logging.
+        - value: InvalidPermissions
+          description: Invalid permissions.
+        - value: InvalidPrerequisite
+          description: Invalid prerequisite.
+        - value: InvalidProductId
+          description: Invalid product id.
+        - value: InvalidSubscription
+          description: Invalid subscription.
+        - value: InvalidProject
+          description: Invalid project.
+        - value: InvalidProjectKind
+          description: Invalid project kind.
+        - value: InvalidRecordingsUri
+          description: Invalid recordings uri.
+        - value: OnlyOneOfUrlsOrContainerOrDataset
+          description: Only one of urls or container or dataset.
+        - value: ExceededNumberOfRecordingsUris
+          description: Exceeded number of recordings uris.
+        - value: ModelMismatch
+          description: Model mismatch.
+        - value: ProjectGenderMismatch
+          description: Project gender mismatch.
+        - value: ModelDeprecated
+          description: Model deprecated.
+        - value: ModelExists
+          description: Model exists.
+        - value: ModelNotDeployable
+          description: Model not deployable.
+        - value: EndpointNotUpdatable
+          description: Endpoint not updatable.
+        - value: SingleDefaultEndpoint
+          description: Single default endpoint.
+        - value: EndpointCannotBeDefault
+          description: Endpoint cannot be default.
+        - value: InvalidModelUri
+          description: Invalid model uri.
+        - value: SubscriptionNotFound
+          description: Subscription not found.
+        - value: QuotaViolation
+          description: Quota violation.
+        - value: UnsupportedDelta
+          description: Unsupported delta.
+        - value: UnsupportedFilter
+          description: Unsupported filter.
+        - value: UnsupportedPagination
+          description: Unsupported pagination.
+        - value: UnsupportedDynamicConfiguration
+          description: Unsupported dynamic configuration.
+        - value: UnsupportedOrderBy
+          description: Unsupported order by.
+        - value: NoUtf8WithBom
+          description: No utf8 with bom.
+        - value: ModelDeploymentNotCompleteState
+          description: Model deployment not complete state.
+        - value: SkuLimitsExist
+          description: Sku limits exist.
+        - value: DeployingFailedModel
+          description: Deploying failed model.
+        - value: UnsupportedTimeRange
+          description: Unsupported time range.
+        - value: InvalidLogDate
+          description: Invalid log date.
+        - value: InvalidLogId
+          description: Invalid log id.
+        - value: InvalidLogStartTime
+          description: Invalid log start time.
+        - value: InvalidLogEndTime
+          description: Invalid log end time.
+        - value: InvalidTopForLogs
+          description: Invalid top for logs.
+        - value: InvalidSkipTokenForLogs
+          description: Invalid skip token for logs.
+        - value: DeleteNotAllowed
+          description: Delete not allowed.
+        - value: Forbidden
+          description: Forbidden.
+        - value: DeployNotAllowed
+          description: Deploy not allowed.
+        - value: UnexpectedError
+          description: Unexpected error.
+        - value: InvalidCollection
+          description: Invalid collection.
+        - value: InvalidCallbackUri
+          description: Invalid callback uri.
+        - value: InvalidSasValidityDuration
+          description: Invalid sas validity duration.
+        - value: InaccessibleCustomerStorage
+          description: Inaccessible customer storage.
+        - value: UnsupportedClassBasedAdaptation
+          description: Unsupported class based adaptation.
+        - value: InvalidWebHookEventKind
+          description: Invalid web hook event kind.
+        - value: InvalidTimeToLive
+          description: Invalid time to live.
+    DiarizationProperties:
+      title: DiarizationProperties
+      required:
+      - speakers
+      type: object
+      properties:
+        speakers:
+          $ref: '#/components/schemas/DiarizationSpeakersProperties'
+    DiarizationSpeakersProperties:
+      title: DiarizationSpeakersProperties
+      type: object
+      properties:
+        minCount:
+          format: int32
+          description: A hint for the minimum number of speakers for diarization.
+            Must be smaller than or equal to the maxSpeakers property.
+          minimum: 1
+          type: integer
+        maxCount:
+          format: int32
+          description: The maximum number of speakers for diarization. Must be less
+            than 36 and larger than or equal to the minSpeakers property.
+          minimum: 1
+          type: integer
+    Endpoint:
+      title: Endpoint
+      required:
+      - displayName
+      - locale
+      type: object
+      properties:
+        project:
+          $ref: '#/components/schemas/EntityReference'
+        links:
+          $ref: '#/components/schemas/EndpointLinks'
+        properties:
+          $ref: '#/components/schemas/EndpointProperties'
+        self:
+          format: uri
+          description: The location of this entity.
+          type: string
+          readOnly: true
+        displayName:
+          description: The display name of the object.
+          minLength: 1
+          type: string
+        description:
+          description: The description of the object.
+          type: string
+        text:
+          description: The text used to adapt a language model for this endpoint.
+          type: string
+        model:
+          $ref: '#/components/schemas/EntityReference'
+        locale:
+          description: The locale of the contained data.
+          minLength: 1
+          type: string
+        customProperties:
+          description: "The custom properties of this entity. The maximum allowed
+            key length is 64 characters, the maximum\r\nallowed value length is 256
+            characters and the count of allowed entries is 10."
+          type: object
+          additionalProperties:
+            type: string
+        lastActionDateTime:
+          format: date-time
+          description: "The time-stamp when the current status was entered.\r\nThe
+            time stamp is encoded as ISO 8601 date and time format\r\n(\"YYYY-MM-DDThh:mm:ssZ\",
+            see https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)."
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/Status'
+        createdDateTime:
+          format: date-time
+          description: "The time-stamp when the object was created.\r\nThe time stamp
+            is encoded as ISO 8601 date and time format\r\n(\"YYYY-MM-DDThh:mm:ssZ\",
+            see https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)."
+          type: string
+          readOnly: true
+    EndpointLinks:
+      title: EndpointLinks
+      type: object
+      properties:
+        restInteractive:
+          format: uri
+          description: The REST endpoint for short requests up to 15 seconds.
+          type: string
+          readOnly: true
+        restConversation:
+          format: uri
+          description: The REST endpoint for requests up to 60 seconds.
+          type: string
+          readOnly: true
+        restDictation:
+          format: uri
+          description: The REST endpoint for requests up to 60 seconds, supporting
+            dictation of punctuation marks.
+          type: string
+          readOnly: true
+        webSocketInteractive:
+          format: uri
+          description: The Speech SDK endpoint for short requests up to 15 seconds
+            with a single final result.
+          type: string
+          readOnly: true
+        webSocketConversation:
+          format: uri
+          description: The Speech SDK endpoint for long requests with multiple final
+            results.
+          type: string
+          readOnly: true
+        webSocketDictation:
+          format: uri
+          description: "The Speech SDK endpoint for long requests with multiple final
+            results, supporting dictation of\r\npunctuation marks."
+          type: string
+          readOnly: true
+        logs:
+          format: uri
+          description: The audio and transcription logs for this endpoint.  See operation
+            "Endpoints_ListLogs" for more details.
+          type: string
+          readOnly: true
+    EndpointProperties:
+      title: EndpointProperties
+      type: object
+      properties:
+        loggingEnabled:
+          description: A value indicating whether content logging (audio & transcriptions)
+            is being used for a deployment.
+          type: boolean
+        timeToLive:
+          description: "How long the endpoint will be kept in the system. Once the
+            endpoint reaches the time to live\r\nafter completion (successful or failed)
+            it will be automatically deleted. Not setting this value or setting\r\nto
+            0 will disable automatic deletion. The longest supported duration is 31
+            days.\r\nThe duration is encoded as ISO 8601 duration (\"PnYnMnDTnHnMnS\",
+            see https://en.wikipedia.org/wiki/ISO_8601#Durations)."
+          type: string
+        email:
+          description: "The email address to send email notifications to in case the
+            operation completes.\r\nThe value will be removed after successfully sending
+            the email."
+          type: string
+        error:
+          $ref: '#/components/schemas/EntityError'
+    EndpointPropertiesUpdate:
+      title: EndpointPropertiesUpdate
+      type: object
+      properties:
+        contentLoggingEnabled:
+          description: "A value indicating whether content logging (audio & transcriptions)\r\nis
+            being used for a deployment."
+          type: boolean
+    EndpointUpdate:
+      title: EndpointUpdate
+      type: object
+      properties:
+        model:
+          $ref: '#/components/schemas/EntityReference'
+        properties:
+          $ref: '#/components/schemas/EndpointPropertiesUpdate'
+        project:
+          $ref: '#/components/schemas/EntityReference'
+        displayName:
+          description: The name of the object.
+          type: string
+        description:
+          description: The description of the object.
+          type: string
+        customProperties:
+          description: "The custom properties of this entity. The maximum allowed
+            key length is 64 characters, the maximum\r\nallowed value length is 256
+            characters and the count of allowed entries is 10."
+          type: object
+          additionalProperties:
+            type: string
+    EntityError:
+      title: EntityError
+      type: object
+      properties:
+        code:
+          description: The code of this error.
+          type: string
+          readOnly: true
+        message:
+          description: The message for this error.
+          type: string
+          readOnly: true
+    EntityReference:
+      title: EntityReference
+      required:
+      - self
+      type: object
+      properties:
+        self:
+          format: uri
+          description: The location of the referenced entity.
+          type: string
+    Error:
+      title: Error
+      description: "New format which conforms to the new Cognitive Services API guidelines
+        which is available at https://microsoft.sharepoint.com/%3Aw%3A/t/CognitiveServicesPMO/EUoytcrjuJdKpeOKIK_QRC8BPtUYQpKBi8JsWyeDMRsWlQ?e=CPq8ow.\r\nThis
+        contains an outer error with error code, message, details, target and an inner
+        error with more descriptive details."
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/ErrorCode'
+        details:
+          description: Additional supportive details regarding the error and/or expected
+            policies.
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+        message:
+          description: High level error message.
+          type: string
+        target:
+          description: "The source of the error.\r\nFor example it would be \"documents\"
+            or \"document id\" in case of invalid document."
+          type: string
+        innerError:
+          $ref: '#/components/schemas/InnerError'
+    ErrorCode:
+      title: ErrorCode
+      description: High level error codes.
+      enum:
+      - InvalidRequest
+      - InvalidArgument
+      - InternalServerError
+      - ServiceUnavailable
+      - NotFound
+      - PipelineError
+      - Conflict
+      - InternalCommunicationFailed
+      - Forbidden
+      - NotAllowed
+      - Unauthorized
+      - UnsupportedMediaType
+      - TooManyRequests
+      - UnprocessableEntity
+      type: string
+      x-ms-enum:
+        name: ErrorCode
+        modelAsString: true
+        values:
+        - value: InvalidRequest
+          description: Representing the invalid request error code.
+        - value: InvalidArgument
+          description: Representing the invalid argument error code.
+        - value: InternalServerError
+          description: Representing the internal server error error code.
+        - value: ServiceUnavailable
+          description: Representing the service unavailable error code.
+        - value: NotFound
+          description: Representing the not found error code.
+        - value: PipelineError
+          description: Representing the pipeline error error code.
+        - value: Conflict
+          description: Representing the conflict error code.
+        - value: InternalCommunicationFailed
+          description: Representing the internal communication failed error code.
+        - value: Forbidden
+          description: Representing the forbidden error code.
+        - value: NotAllowed
+          description: Representing the not allowed error code.
+        - value: Unauthorized
+          description: Representing the unauthorized error code.
+        - value: UnsupportedMediaType
+          description: Representing the unsupported media type error code.
+        - value: TooManyRequests
+          description: Representing the too many requests error code.
+        - value: UnprocessableEntity
+          description: Representing the unprocessable entity error code.
+    Evaluation:
+      title: Evaluation
+      required:
+      - dataset
+      - displayName
+      - locale
+      - model1
+      - model2
+      type: object
+      properties:
+        model1:
+          $ref: '#/components/schemas/EntityReference'
+        model2:
+          $ref: '#/components/schemas/EntityReference'
+        transcription1:
+          $ref: '#/components/schemas/EntityReference'
+        transcription2:
+          $ref: '#/components/schemas/EntityReference'
+        dataset:
+          $ref: '#/components/schemas/EntityReference'
+        links:
+          $ref: '#/components/schemas/EvaluationLinks'
+        properties:
+          $ref: '#/components/schemas/EvaluationProperties'
+        project:
+          $ref: '#/components/schemas/EntityReference'
+        self:
+          format: uri
+          description: The location of this entity.
+          type: string
+          readOnly: true
+        lastActionDateTime:
+          format: date-time
+          description: "The time-stamp when the current status was entered.\r\nThe
+            time stamp is encoded as ISO 8601 date and time format\r\n(\"YYYY-MM-DDThh:mm:ssZ\",
+            see https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)."
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/Status'
+        createdDateTime:
+          format: date-time
+          description: "The time-stamp when the object was created.\r\nThe time stamp
+            is encoded as ISO 8601 date and time format\r\n(\"YYYY-MM-DDThh:mm:ssZ\",
+            see https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)."
+          type: string
+          readOnly: true
+        displayName:
+          description: The display name of the object.
+          minLength: 1
+          type: string
+        description:
+          description: The description of the object.
+          type: string
+        customProperties:
+          description: "The custom properties of this entity. The maximum allowed
+            key length is 64 characters, the maximum\r\nallowed value length is 256
+            characters and the count of allowed entries is 10."
+          type: object
+          additionalProperties:
+            type: string
+        locale:
+          description: The locale of the contained data.
+          minLength: 1
+          type: string
+    EvaluationLinks:
+      title: EvaluationLinks
+      type: object
+      properties:
+        files:
+          format: uri
+          description: The location to get all files of this entity. See operation
+            "Evaluations_ListFiles" for more details.
+          type: string
+          readOnly: true
+    EvaluationProperties:
+      title: EvaluationProperties
+      type: object
+      properties:
+        wordErrorRate2:
+          format: double
+          description: The word error rate of recognition with model2.
+          type: number
+          readOnly: true
+        wordErrorRate1:
+          format: double
+          description: The word error rate of recognition with model1.
+          type: number
+          readOnly: true
+        sentenceErrorRate2:
+          format: double
+          description: The sentence error rate of recognition with model2.
+          type: number
+          readOnly: true
+        sentenceCount2:
+          format: int32
+          description: The number of processed sentences by model2.
+          type: integer
+          readOnly: true
+        wordCount2:
+          format: int32
+          description: The number of processed words by model2.
+          type: integer
+          readOnly: true
+        correctWordCount2:
+          format: int32
+          description: The number of correctly recognized words by model2.
+          type: integer
+          readOnly: true
+        wordSubstitutionCount2:
+          format: int32
+          description: The number of recognized words by model2, that are substitutions.
+          type: integer
+          readOnly: true
+        wordDeletionCount2:
+          format: int32
+          description: The number of recognized words by model2, that are deletions.
+          type: integer
+          readOnly: true
+        wordInsertionCount2:
+          format: int32
+          description: The number of recognized words by model2, that are insertions.
+          type: integer
+          readOnly: true
+        sentenceErrorRate1:
+          format: double
+          description: The sentence error rate of recognition with model1.
+          type: number
+          readOnly: true
+        sentenceCount1:
+          format: int32
+          description: The number of processed sentences by model1.
+          type: integer
+          readOnly: true
+        wordCount1:
+          format: int32
+          description: The number of processed words by model1.
+          type: integer
+          readOnly: true
+        correctWordCount1:
+          format: int32
+          description: The number of correctly recognized words by model1.
+          type: integer
+          readOnly: true
+        wordSubstitutionCount1:
+          format: int32
+          description: The number of recognized words by model1, that are substitutions.
+          type: integer
+          readOnly: true
+        wordDeletionCount1:
+          format: int32
+          description: The number of recognized words by model1, that are deletions.
+          type: integer
+          readOnly: true
+        wordInsertionCount1:
+          format: int32
+          description: The number of recognized words by model1, that are insertions.
+          type: integer
+          readOnly: true
+        email:
+          description: "The email address to send email notifications to in case the
+            operation completes.\r\nThe value will be removed after successfully sending
+            the email."
+          type: string
+        error:
+          $ref: '#/components/schemas/EntityError'
+    EvaluationUpdate:
+      title: EvaluationUpdate
+      type: object
+      properties:
+        project:
+          $ref: '#/components/schemas/EntityReference'
+        displayName:
+          description: The name of the object.
+          type: string
+        description:
+          description: The description of the object.
+          type: string
+        customProperties:
+          description: "The custom properties of this entity. The maximum allowed
+            key length is 64 characters, the maximum\r\nallowed value length is 256
+            characters and the count of allowed entries is 10."
+          type: object
+          additionalProperties:
+            type: string
+    File:
+      title: File
+      type: object
+      properties:
+        kind:
+          $ref: '#/components/schemas/FileKind'
+        links:
+          $ref: '#/components/schemas/FileLinks'
+        createdDateTime:
+          format: date-time
+          description: "The creation time of this file.\r\nThe time stamp is encoded
+            as ISO 8601 date and time format\r\n(see https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)."
+          type: string
+          readOnly: true
+        properties:
+          $ref: '#/components/schemas/FileProperties'
+        name:
+          description: The name of this file.
+          type: string
+          readOnly: true
+        self:
+          format: uri
+          description: The location of this entity.
+          type: string
+          readOnly: true
+    FileKind:
+      title: FileKind
+      description: Type of data.
+      enum:
+      - DatasetReport
+      - Audio
+      - LanguageData
+      - PronunciationData
+      - AcousticDataArchive
+      - AcousticDataTranscriptionV2
+      - Transcription
+      - TranscriptionReport
+      - EvaluationDetails
+      - ModelReport
+      type: string
+      readOnly: true
+      x-ms-enum:
+        name: FileKind
+        modelAsString: true
+        values:
+        - value: DatasetReport
+          description: Type of data is dataset report.
+        - value: Audio
+          description: Type of data is audio.
+        - value: LanguageData
+          description: Type of data is language data.
+        - value: PronunciationData
+          description: Type of data is pronunciation data.
+        - value: AcousticDataArchive
+          description: Type of data is acoustic data archive.
+        - value: AcousticDataTranscriptionV2
+          description: Type of data is acoustic data transcription v2.
+        - value: Transcription
+          description: Type of data is transcription.
+        - value: TranscriptionReport
+          description: Type of data is transcription report.
+        - value: EvaluationDetails
+          description: Type of data is evaluation details.
+        - value: ModelReport
+          description: Type of data is model report.
+    FileLinks:
+      title: FileLinks
+      type: object
+      properties:
+        contentUrl:
+          format: uri
+          description: The url to retrieve the content of this file.
+          type: string
+          readOnly: true
+    FileProperties:
+      title: FileProperties
+      type: object
+      properties:
+        size:
+          format: int64
+          description: The size of the data in bytes.
+          type: integer
+          readOnly: true
+        duration:
+          description: "The duration in case this file is an audio file. The duration
+            is encoded as ISO 8601\r\nduration (\"PnYnMnDTnHnMnS\", see https://en.wikipedia.org/wiki/ISO_8601#Durations)."
+          type: string
+          readOnly: true
+    HealthStatus:
+      title: HealthStatus
+      description: Health status of the service.
+      enum:
+      - Unhealthy
+      - Degraded
+      - Healthy
+      type: string
+      readOnly: true
+      x-ms-enum:
+        name: HealthStatus
+        modelAsString: false
+        values:
+        - value: Unhealthy
+          description: Unhealthy.
+        - value: Degraded
+          description: Degraded.
+        - value: Healthy
+          description: Healthy.
+    InnerError:
+      title: InnerError
+      description: "New Inner Error format which conforms to Cognitive Services API
+        Guidelines which is available at https://microsoft.sharepoint.com/%3Aw%3A/t/CognitiveServicesPMO/EUoytcrjuJdKpeOKIK_QRC8BPtUYQpKBi8JsWyeDMRsWlQ?e=CPq8ow.\r\nThis
+        contains required properties ErrorCode, message and optional properties target,
+        details(key value pair), inner error(this can be nested)."
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/DetailedErrorCode'
+        details:
+          description: Additional supportive details regarding the error and/or expected
+            policies.
+          type: object
+          additionalProperties:
+            type: string
+        message:
+          description: High level error message.
+          type: string
+        target:
+          description: "The source of the error.\r\nFor example it would be \"documents\"
+            or \"document id\" in case of invalid document."
+          type: string
+        innerError:
+          $ref: '#/components/schemas/InnerError'
+    LanguageIdentificationProperties:
+      title: LanguageIdentificationProperties
+      required:
+      - candidateLocales
+      type: object
+      properties:
+        candidateLocales:
+          description: The candidate locales for language identification (example
+            ["en-US", "de-DE", "es-ES"]). A minimum of 2 and a maximum of 10 candidate
+            locales, including the main locale for the transcription, is supported.
+          type: array
+          items:
+            type: string
+        speechModelMapping:
+          description: "An optional mapping of locales to speech model entities. If
+            no model is given for a locale, the default base model is used.\r\nKeys
+            must be locales contained in the candidate locales, values are entities
+            for models of the respective locales."
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/EntityReference'
+    ModelCopy:
+      title: ModelCopy
+      required:
+      - targetSubscriptionKey
+      type: object
+      properties:
+        targetSubscriptionKey:
+          description: The subscription key of the subscription that is the target
+            of the copy operation.
+          minLength: 1
+          type: string
+    ModelFile:
+      title: ModelFile
+      type: object
+      properties:
+        name:
+          description: The name of this file.
+          type: string
+          readOnly: true
+        contentUrl:
+          format: uri
+          description: The url to retrieve the content of this file.
+          type: string
+          readOnly: true
+    ModelManifest:
+      title: ModelManifest
+      required:
+      - model
+      - modelFiles
+      - properties
+      type: object
+      properties:
+        model:
+          $ref: '#/components/schemas/EntityReference'
+        modelFiles:
+          description: The model files of this model.
+          type: array
+          items:
+            $ref: '#/components/schemas/ModelFile'
+        properties:
+          description: The configuration for running this model in a container.
+          type: object
+          additionalProperties:
+            type: object
+    ModelUpdate:
+      title: ModelUpdate
+      type: object
+      properties:
+        project:
+          $ref: '#/components/schemas/EntityReference'
+        displayName:
+          description: The name of the object.
+          type: string
+        description:
+          description: The description of the object.
+          type: string
+        customProperties:
+          description: "The custom properties of this entity. The maximum allowed
+            key length is 64 characters, the maximum\r\nallowed value length is 256
+            characters and the count of allowed entries is 10."
+          type: object
+          additionalProperties:
+            type: string
+    PaginatedBaseModels:
+      title: PaginatedBaseModels
+      type: object
+      properties:
+        values:
+          description: "A list of entities limited by either the passed query parameters
+            'skip' and 'top' or their default values.\r\n            \r\nWhen iterating
+            through a list using pagination and deleting entities in parallel, some
+            entities will be skipped in the results.\r\nIt's recommended to build
+            a list on the client and delete after the fetching of the complete list."
+          type: array
+          items:
+            $ref: '#/components/schemas/BaseModel'
+          readOnly: true
+        '@nextLink':
+          format: uri
+          description: A link to the next set of paginated results if there are more
+            entities available; otherwise null.
+          type: string
+          readOnly: true
+    PaginatedCustomModels:
+      title: PaginatedCustomModels
+      type: object
+      properties:
+        values:
+          description: "A list of entities limited by either the passed query parameters
+            'skip' and 'top' or their default values.\r\n            \r\nWhen iterating
+            through a list using pagination and deleting entities in parallel, some
+            entities will be skipped in the results.\r\nIt's recommended to build
+            a list on the client and delete after the fetching of the complete list."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomModel'
+          readOnly: true
+        '@nextLink':
+          format: uri
+          description: A link to the next set of paginated results if there are more
+            entities available; otherwise null.
+          type: string
+          readOnly: true
+    PaginatedDatasets:
+      title: PaginatedDatasets
+      type: object
+      properties:
+        values:
+          description: "A list of entities limited by either the passed query parameters
+            'skip' and 'top' or their default values.\r\n            \r\nWhen iterating
+            through a list using pagination and deleting entities in parallel, some
+            entities will be skipped in the results.\r\nIt's recommended to build
+            a list on the client and delete after the fetching of the complete list."
+          type: array
+          items:
+            $ref: '#/components/schemas/Dataset'
+          readOnly: true
+        '@nextLink':
+          format: uri
+          description: A link to the next set of paginated results if there are more
+            entities available; otherwise null.
+          type: string
+          readOnly: true
+    PaginatedEndpoints:
+      title: PaginatedEndpoints
+      type: object
+      properties:
+        values:
+          description: "A list of entities limited by either the passed query parameters
+            'skip' and 'top' or their default values.\r\n            \r\nWhen iterating
+            through a list using pagination and deleting entities in parallel, some
+            entities will be skipped in the results.\r\nIt's recommended to build
+            a list on the client and delete after the fetching of the complete list."
+          type: array
+          items:
+            $ref: '#/components/schemas/Endpoint'
+          readOnly: true
+        '@nextLink':
+          format: uri
+          description: A link to the next set of paginated results if there are more
+            entities available; otherwise null.
+          type: string
+          readOnly: true
+    PaginatedEvaluations:
+      title: PaginatedEvaluations
+      type: object
+      properties:
+        values:
+          description: "A list of entities limited by either the passed query parameters
+            'skip' and 'top' or their default values.\r\n            \r\nWhen iterating
+            through a list using pagination and deleting entities in parallel, some
+            entities will be skipped in the results.\r\nIt's recommended to build
+            a list on the client and delete after the fetching of the complete list."
+          type: array
+          items:
+            $ref: '#/components/schemas/Evaluation'
+          readOnly: true
+        '@nextLink':
+          format: uri
+          description: A link to the next set of paginated results if there are more
+            entities available; otherwise null.
+          type: string
+          readOnly: true
+    PaginatedFiles:
+      title: PaginatedFiles
+      type: object
+      properties:
+        values:
+          description: "A list of entities limited by either the passed query parameters
+            'skip' and 'top' or their default values.\r\n            \r\nWhen iterating
+            through a list using pagination and deleting entities in parallel, some
+            entities will be skipped in the results.\r\nIt's recommended to build
+            a list on the client and delete after the fetching of the complete list."
+          type: array
+          items:
+            $ref: '#/components/schemas/File'
+          readOnly: true
+        '@nextLink':
+          format: uri
+          description: A link to the next set of paginated results if there are more
+            entities available; otherwise null.
+          type: string
+          readOnly: true
+    PaginatedProjects:
+      title: PaginatedProjects
+      type: object
+      properties:
+        values:
+          description: "A list of entities limited by either the passed query parameters
+            'skip' and 'top' or their default values.\r\n            \r\nWhen iterating
+            through a list using pagination and deleting entities in parallel, some
+            entities will be skipped in the results.\r\nIt's recommended to build
+            a list on the client and delete after the fetching of the complete list."
+          type: array
+          items:
+            $ref: '#/components/schemas/Project'
+          readOnly: true
+        '@nextLink':
+          format: uri
+          description: A link to the next set of paginated results if there are more
+            entities available; otherwise null.
+          type: string
+          readOnly: true
+    PaginatedTranscriptions:
+      title: PaginatedTranscriptions
+      type: object
+      properties:
+        values:
+          description: "A list of entities limited by either the passed query parameters
+            'skip' and 'top' or their default values.\r\n            \r\nWhen iterating
+            through a list using pagination and deleting entities in parallel, some
+            entities will be skipped in the results.\r\nIt's recommended to build
+            a list on the client and delete after the fetching of the complete list."
+          type: array
+          items:
+            $ref: '#/components/schemas/Transcription'
+          readOnly: true
+        '@nextLink':
+          format: uri
+          description: A link to the next set of paginated results if there are more
+            entities available; otherwise null.
+          type: string
+          readOnly: true
+    PaginatedWebHooks:
+      title: PaginatedWebHooks
+      type: object
+      properties:
+        values:
+          description: "A list of entities limited by either the passed query parameters
+            'skip' and 'top' or their default values.\r\n            \r\nWhen iterating
+            through a list using pagination and deleting entities in parallel, some
+            entities will be skipped in the results.\r\nIt's recommended to build
+            a list on the client and delete after the fetching of the complete list."
+          type: array
+          items:
+            $ref: '#/components/schemas/WebHook'
+          readOnly: true
+        '@nextLink':
+          format: uri
+          description: A link to the next set of paginated results if there are more
+            entities available; otherwise null.
+          type: string
+          readOnly: true
+    ProfanityFilterMode:
+      title: ProfanityFilterMode
+      description: Mode of profanity filtering.
+      enum:
+      - None
+      - Removed
+      - Tags
+      - Masked
+      type: string
+      x-ms-enum:
+        name: ProfanityFilterMode
+        modelAsString: false
+        values:
+        - value: None
+          description: Disable profanity filtering.
+        - value: Removed
+          description: Remove profanity.
+        - value: Tags
+          description: Add "profanity" XML tags&lt;/Profanity&gt;
+        - value: Masked
+          description: Mask the profanity with * except of the first letter, e.g.,
+            f***
+    Project:
+      title: Project
+      required:
+      - displayName
+      - locale
+      type: object
+      properties:
+        links:
+          $ref: '#/components/schemas/ProjectLinks'
+        properties:
+          $ref: '#/components/schemas/ProjectProperties'
+        self:
+          format: uri
+          description: The location of this entity.
+          type: string
+          readOnly: true
+        displayName:
+          description: The display name of the object.
+          minLength: 1
+          type: string
+        description:
+          description: The description of the object.
+          type: string
+        locale:
+          description: The locale of the contained data.
+          minLength: 1
+          type: string
+        customProperties:
+          description: "The custom properties of this entity. The maximum allowed
+            key length is 64 characters, the maximum\r\nallowed value length is 256
+            characters and the count of allowed entries is 10."
+          type: object
+          additionalProperties:
+            type: string
+        createdDateTime:
+          format: date-time
+          description: "The time-stamp when the object was created.\r\nThe time stamp
+            is encoded as ISO 8601 date and time format\r\n(\"YYYY-MM-DDThh:mm:ssZ\",
+            see https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)."
+          type: string
+          readOnly: true
+    ProjectLinks:
+      title: ProjectLinks
+      type: object
+      properties:
+        evaluations:
+          format: uri
+          description: The location to get a list of all evaluations of this project.
+            See operation "Projects_ListEvaluations" for more details.
+          type: string
+          readOnly: true
+        datasets:
+          format: uri
+          description: The location to get a list of all datasets of this project.
+            See operation "Projects_ListDatasets" for more details.
+          type: string
+          readOnly: true
+        models:
+          format: uri
+          description: The location to get a list of all models of this project. See
+            operation "Projects_ListModels" for more details.
+          type: string
+          readOnly: true
+        endpoints:
+          format: uri
+          description: The location to get a list of all endpoints of this project.
+            See operation "Projects_ListEndpoints" for more details.
+          type: string
+          readOnly: true
+        transcriptions:
+          format: uri
+          description: The location to get a list of all transcriptions of this project.
+            See operation "Projects_ListTranscriptions" for more details.
+          type: string
+          readOnly: true
+    ProjectProperties:
+      title: ProjectProperties
+      type: object
+      properties:
+        datasetCount:
+          format: int32
+          description: The number of datasets associated to this project.
+          type: integer
+          readOnly: true
+        evaluationCount:
+          format: int32
+          description: The number of evaluations associated to this project.
+          type: integer
+          readOnly: true
+        modelCount:
+          format: int32
+          description: The number of models associated to this project.
+          type: integer
+          readOnly: true
+        transcriptionCount:
+          format: int32
+          description: The number of transcriptions associated to this project.
+          type: integer
+          readOnly: true
+        endpointCount:
+          format: int32
+          description: The number of endpoints associated to this project.
+          type: integer
+          readOnly: true
+    ProjectUpdate:
+      title: ProjectUpdate
+      type: object
+      properties:
+        displayName:
+          description: The name of the object.
+          type: string
+        description:
+          description: The description of the object.
+          type: string
+        customProperties:
+          description: "The custom properties of this entity. The maximum allowed
+            key length is 64 characters, the maximum\r\nallowed value length is 256
+            characters and the count of allowed entries is 10."
+          type: object
+          additionalProperties:
+            type: string
+    PunctuationMode:
+      title: PunctuationMode
+      description: The mode used for punctuation.
+      enum:
+      - None
+      - Dictated
+      - Automatic
+      - DictatedAndAutomatic
+      type: string
+      x-ms-enum:
+        name: PunctuationMode
+        modelAsString: false
+        values:
+        - value: None
+          description: No punctuation.
+        - value: Dictated
+          description: Dictated punctuation marks only, i.e., explicit punctuation.
+        - value: Automatic
+          description: Automatic punctuation.
+        - value: DictatedAndAutomatic
+          description: Dictated punctuation marks or automatic punctuation.
+    ResponseBlock:
+      title: ResponseBlock
+      description: ResponseBlock.
+      type: object
+      properties:
+        name:
+          description: The name of the block.
+          type: string
+        size:
+          format: int32
+          description: The size of the block.
+          type: integer
+    ServiceHealth:
+      title: ServiceHealth
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/HealthStatus'
+        message:
+          description: Additional messages about the current service health.
+          type: string
+          readOnly: true
+        components:
+          description: Optional subcomponents of this service and their status.
+          type: array
+          items:
+            $ref: '#/components/schemas/Component'
+          readOnly: true
+    SharedModel:
+      title: SharedModel
+      required:
+      - displayName
+      - locale
+      type: object
+      properties:
+        self:
+          format: uri
+          description: The location of this entity.
+          type: string
+          readOnly: true
+        locale:
+          description: The locale of the contained data.
+          minLength: 1
+          type: string
+        displayName:
+          description: The display name of the object.
+          minLength: 1
+          type: string
+        description:
+          description: The description of the object.
+          type: string
+        lastActionDateTime:
+          format: date-time
+          description: "The time-stamp when the current status was entered.\r\nThe
+            time stamp is encoded as ISO 8601 date and time format\r\n(\"YYYY-MM-DDThh:mm:ssZ\",
+            see https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)."
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/Status'
+        createdDateTime:
+          format: date-time
+          description: "The time-stamp when the object was created.\r\nThe time stamp
+            is encoded as ISO 8601 date and time format\r\n(\"YYYY-MM-DDThh:mm:ssZ\",
+            see https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)."
+          type: string
+          readOnly: true
+    SharedModelFeatures:
+      title: SharedModelFeatures
+      description: Features supported by the model.
+      type: object
+      properties:
+        supportsTranscriptions:
+          description: A value indicating whether batch transcription is supported.
+          type: boolean
+          readOnly: true
+        supportsEndpoints:
+          description: A value indicating whether creation of endpoints for live transcription
+            is supported.
+          type: boolean
+          readOnly: true
+        supportsTranscriptionsOnSpeechContainers:
+          description: A value indicating whether this model can be used for transcription
+            on speech container. This feature can be added on existing models when
+            it becomes usable on speech container.
+          type: boolean
+          readOnly: true
+    Status:
+      title: Status
+      description: Describe the current state of the API
+      enum:
+      - NotStarted
+      - Running
+      - Succeeded
+      - Failed
+      type: string
+      readOnly: true
+      x-ms-enum:
+        name: Status
+        modelAsString: false
+        values:
+        - value: NotStarted
+          description: The long running operation has not yet started.
+        - value: Running
+          description: The long running operation is currently processing.
+        - value: Succeeded
+          description: The long running operation has successfully completed.
+        - value: Failed
+          description: The long running operation has failed.
+    Transcription:
+      title: Transcription
+      required:
+      - displayName
+      - locale
+      type: object
+      properties:
+        links:
+          $ref: '#/components/schemas/TranscriptionLinks'
+        properties:
+          $ref: '#/components/schemas/TranscriptionProperties'
+        self:
+          format: uri
+          description: The location of this entity.
+          type: string
+          readOnly: true
+        model:
+          $ref: '#/components/schemas/EntityReference'
+        project:
+          $ref: '#/components/schemas/EntityReference'
+        dataset:
+          $ref: '#/components/schemas/EntityReference'
+        contentUrls:
+          description: "A list of content urls to get audio files to transcribe. Up
+            to 1000 urls are allowed.\r\nThis property will not be returned in a response."
+          type: array
+          items:
+            format: uri
+            type: string
+        contentContainerUrl:
+          format: uri
+          description: "A URL for an Azure blob container that contains the audio
+            files. A container is allowed to have a maximum size of 5GB and a maximum
+            number of 10000 blobs.\r\nThe maximum size for a blob is 2.5GB.\r\nContainer
+            SAS should contain 'r' (read) and 'l' (list) permissions.\r\nThis property
+            will not be returned in a response."
+          type: string
+        locale:
+          description: The locale of the contained data. If Language Identification
+            is used, this locale is used to transcribe speech for which no language
+            could be detected.
+          minLength: 1
+          type: string
+        displayName:
+          description: The display name of the object.
+          minLength: 1
+          type: string
+        description:
+          description: The description of the object.
+          type: string
+        customProperties:
+          description: "The custom properties of this entity. The maximum allowed
+            key length is 64 characters, the maximum\r\nallowed value length is 256
+            characters and the count of allowed entries is 10."
+          type: object
+          additionalProperties:
+            type: string
+        lastActionDateTime:
+          format: date-time
+          description: "The time-stamp when the current status was entered.\r\nThe
+            time stamp is encoded as ISO 8601 date and time format\r\n(\"YYYY-MM-DDThh:mm:ssZ\",
+            see https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)."
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/Status'
+        createdDateTime:
+          format: date-time
+          description: "The time-stamp when the object was created.\r\nThe time stamp
+            is encoded as ISO 8601 date and time format\r\n(\"YYYY-MM-DDThh:mm:ssZ\",
+            see https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)."
+          type: string
+          readOnly: true
+    TranscriptionLinks:
+      title: TranscriptionLinks
+      type: object
+      properties:
+        files:
+          format: uri
+          description: The location to get all files of this entity. See operation
+            "Transcriptions_ListFiles" for more details.
+          type: string
+          readOnly: true
+    TranscriptionProperties:
+      title: TranscriptionProperties
+      type: object
+      properties:
+        diarizationEnabled:
+          description: "A value indicating whether diarization (speaker identification)
+            is requested. The default value\r\nis `false`.\r\nIf this field is set
+            to true and the improved diarization system is configured by specifying\r\n`DiarizationProperties`,
+            the improved diarization system will provide diarization for a configurable\r\nrange
+            of speakers.\r\nIf this field is set to true and the improved diarization
+            system is not enabled (not specifying\r\n`DiarizationProperties`), the
+            basic diarization system will distinguish between up to two speakers.\r\nNo
+            extra charges are applied for the basic diarization.\r\n            \r\nThe
+            basic diarization system is deprecated and will be removed in the next
+            major version of the API.\r\nThis `diarizationEnabled` setting will also
+            be removed."
+          type: boolean
+        wordLevelTimestampsEnabled:
+          description: "A value indicating whether word level timestamps are requested.
+            The default value is\r\n`false`."
+          type: boolean
+        displayFormWordLevelTimestampsEnabled:
+          description: A value indicating whether word level timestamps for the display
+            form are requested. The default value is `false`.
+          type: boolean
+        duration:
+          description: "The duration of the transcription. The duration is encoded
+            as ISO 8601 duration\r\n(\"PnYnMnDTnHnMnS\", see https://en.wikipedia.org/wiki/ISO_8601#Durations)."
+          type: string
+          readOnly: true
+        channels:
+          description: "A collection of the requested channel numbers.\r\nIn the default
+            case, the channels 0 and 1 are considered."
+          type: array
+          items:
+            format: int32
+            type: integer
+        destinationContainerUrl:
+          format: uri
+          description: "The requested destination container.\r\n### Remarks ###\r\nWhen
+            a destination container is used in combination with a `timeToLive`, the
+            metadata of a\r\ntranscription will be deleted normally, but the data
+            stored in the destination container, including\r\ntranscription results,
+            will remain untouched, because no delete permissions are required for
+            this\r\ncontainer.<br />\r\nTo support automatic cleanup, either configure
+            blob lifetimes on the container, or use \"Bring your own Storage (BYOS)\"\r\ninstead
+            of `destinationContainerUrl`, where blobs can be cleaned up."
+          type: string
+        punctuationMode:
+          $ref: '#/components/schemas/PunctuationMode'
+        profanityFilterMode:
+          $ref: '#/components/schemas/ProfanityFilterMode'
+        timeToLive:
+          description: "How long the transcription will be kept in the system after
+            it has completed. Once the\r\ntranscription reaches the time to live after
+            completion (successful or failed) it will be automatically\r\ndeleted.
+            Not setting this value or setting it to 0 will disable automatic deletion.
+            The longest supported\r\nduration is 31 days.\r\nThe duration is encoded
+            as ISO 8601 duration (\"PnYnMnDTnHnMnS\", see https://en.wikipedia.org/wiki/ISO_8601#Durations)."
+          type: string
+        diarization:
+          $ref: '#/components/schemas/DiarizationProperties'
+        languageIdentification:
+          $ref: '#/components/schemas/LanguageIdentificationProperties'
+        email:
+          description: "The email address to send email notifications to in case the
+            operation completes.\r\nThe value will be removed after successfully sending
+            the email."
+          type: string
+        error:
+          $ref: '#/components/schemas/EntityError'
+    TranscriptionUpdate:
+      title: TranscriptionUpdate
+      type: object
+      properties:
+        project:
+          $ref: '#/components/schemas/EntityReference'
+        displayName:
+          description: The name of the object.
+          type: string
+        description:
+          description: The description of the object.
+          type: string
+        customProperties:
+          description: "The custom properties of this entity. The maximum allowed
+            key length is 64 characters, the maximum\r\nallowed value length is 256
+            characters and the count of allowed entries is 10."
+          type: object
+          additionalProperties:
+            type: string
+    UploadedBlocks:
+      title: UploadedBlocks
+      description: List of uploaded blocks.
+      type: object
+      properties:
+        committedBlocks:
+          description: The block description of blocks already committed.
+          type: array
+          items:
+            $ref: '#/components/schemas/ResponseBlock'
+        uncommittedBlocks:
+          description: The block description of blocks not committed to the blob.
+          type: array
+          items:
+            $ref: '#/components/schemas/ResponseBlock'
+    WebHook:
+      title: WebHook
+      required:
+      - displayName
+      - events
+      - webUrl
+      type: object
+      properties:
+        webUrl:
+          format: uri
+          description: The registered URL that will be used to send the POST requests
+            for the registered events to.
+          type: string
+        links:
+          $ref: '#/components/schemas/WebHookLinks'
+        properties:
+          $ref: '#/components/schemas/WebHookProperties'
+        self:
+          format: uri
+          description: The location of this entity.
+          type: string
+          readOnly: true
+        displayName:
+          description: The display name of the object.
+          minLength: 1
+          type: string
+        description:
+          description: The description of the object.
+          type: string
+        events:
+          $ref: '#/components/schemas/WebHookEvents'
+        createdDateTime:
+          format: date-time
+          description: "The time-stamp when the object was created.\r\nThe time stamp
+            is encoded as ISO 8601 date and time format\r\n(\"YYYY-MM-DDThh:mm:ssZ\",
+            see https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)."
+          type: string
+          readOnly: true
+        lastActionDateTime:
+          format: date-time
+          description: "The time-stamp when the current status was entered.\r\nThe
+            time stamp is encoded as ISO 8601 date and time format\r\n(\"YYYY-MM-DDThh:mm:ssZ\",
+            see https://en.wikipedia.org/wiki/ISO_8601#Combined_date_and_time_representations)."
+          type: string
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/Status'
+        customProperties:
+          description: "The custom properties of this entity. The maximum allowed
+            key length is 64 characters, the maximum\r\nallowed value length is 256
+            characters and the count of allowed entries is 10."
+          type: object
+          additionalProperties:
+            type: string
+    WebHookEvents:
+      title: WebHookEvents
+      type: object
+      properties:
+        datasetCreation:
+          type: boolean
+        datasetProcessing:
+          type: boolean
+        datasetCompletion:
+          type: boolean
+        datasetDeletion:
+          type: boolean
+        modelCreation:
+          type: boolean
+        modelProcessing:
+          type: boolean
+        modelCompletion:
+          type: boolean
+        modelDeletion:
+          type: boolean
+        evaluationCreation:
+          type: boolean
+        evaluationProcessing:
+          type: boolean
+        evaluationCompletion:
+          type: boolean
+        evaluationDeletion:
+          type: boolean
+        transcriptionCreation:
+          type: boolean
+        transcriptionProcessing:
+          type: boolean
+        transcriptionCompletion:
+          type: boolean
+        transcriptionDeletion:
+          type: boolean
+        endpointCreation:
+          type: boolean
+        endpointProcessing:
+          type: boolean
+        endpointCompletion:
+          type: boolean
+        endpointDeletion:
+          type: boolean
+        ping:
+          type: boolean
+        challenge:
+          type: boolean
+    WebHookLinks:
+      title: WebHookLinks
+      type: object
+      properties:
+        ping:
+          format: uri
+          description: The URL that can be used to trigger the sending of a ping event
+            to the registered URL of a web hook registration. See operation "WebHooks_Ping"
+            for more details.
+          type: string
+          readOnly: true
+        test:
+          format: uri
+          description: The URL that can be used sending test events to the registered
+            URL of a web hook registration. See operation "WebHooks_Test" for more
+            details.
+          type: string
+          readOnly: true
+    WebHookProperties:
+      title: WebHookProperties
+      type: object
+      properties:
+        error:
+          $ref: '#/components/schemas/EntityError'
+        apiVersion:
+          description: "The API version the web hook was created in. This defines
+            the shape of the payload in the callbacks.\r\nIf the payload type is not
+            supported anymore, because the shape changed and the API version using
+            it is removed (after deprecation),\r\nthe web hook will be disabled."
+          type: string
+          readOnly: true
+        secret:
+          description: "A secret that will be used to create a SHA256 hash of the
+            payload with the secret as HMAC key.\r\nThis hash will be set as X-MicrosoftSpeechServices-Signature
+            header when calling back into the registered URL."
+          type: string
+    WebHookPropertiesUpdate:
+      title: WebHookPropertiesUpdate
+      type: object
+      properties:
+        secret:
+          description: "A secret that will be used to create a SHA256 hash of the
+            payload with the secret as HMAC key.\r\nThis hash will be set as X-MicrosoftSpeechServices-Signature
+            header when calling back into the registered URL."
+          type: string
+    WebHookUpdate:
+      title: WebHookUpdate
+      type: object
+      properties:
+        webUrl:
+          format: uri
+          description: The registered URL that will be used to send the POST requests
+            for the registered events to.
+          type: string
+        properties:
+          $ref: '#/components/schemas/WebHookPropertiesUpdate'
+        events:
+          $ref: '#/components/schemas/WebHookEvents'
+        displayName:
+          description: The name of the object.
+          type: string
+        description:
+          description: The description of the object.
+          type: string
+        customProperties:
+          description: "The custom properties of this entity. The maximum allowed
+            key length is 64 characters, the maximum\r\nallowed value length is 256
+            characters and the count of allowed entries is 10."
+          type: object
+          additionalProperties:
+            type: string

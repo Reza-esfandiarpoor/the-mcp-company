@@ -1,0 +1,1362 @@
+openapi: 3.0.0
+info:
+  title: DataFactoryManagementClient
+  version: 2018-06-01
+paths: {}
+components:
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    Trigger:
+      description: Azure data factory nested object which contains information about
+        creating pipeline run
+      type: object
+      discriminator:
+        propertyName: type
+      properties:
+        type:
+          type: string
+          description: Trigger type.
+        description:
+          description: Trigger description.
+          type: string
+        runtimeState:
+          description: Indicates if trigger is running or not. Updated when Start/Stop
+            APIs are called on the Trigger.
+          readOnly: true
+          type: string
+          enum:
+          - Started
+          - Stopped
+          - Disabled
+          x-ms-enum:
+            name: TriggerRuntimeState
+            modelAsString: true
+        annotations:
+          description: List of tags that can be used for describing the trigger.
+          type: array
+          items:
+            type: object
+          x-ms-identifiers: []
+      additionalProperties:
+        type: object
+      required:
+      - type
+    TriggerRuntimeState:
+      type: string
+      description: Enumerates possible state of Triggers.
+      enum:
+      - Started
+      - Stopped
+      - Disabled
+      x-ms-enum:
+        name: TriggerRuntimeState
+        modelAsString: true
+    MultiplePipelineTrigger:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Trigger type.
+        description:
+          description: Trigger description.
+          type: string
+        runtimeState:
+          description: Indicates if trigger is running or not. Updated when Start/Stop
+            APIs are called on the Trigger.
+          readOnly: true
+          type: string
+          enum:
+          - Started
+          - Stopped
+          - Disabled
+          x-ms-enum:
+            name: TriggerRuntimeState
+            modelAsString: true
+        annotations:
+          description: List of tags that can be used for describing the trigger.
+          type: array
+          items:
+            type: object
+          x-ms-identifiers: []
+        pipelines:
+          type: array
+          items:
+            description: Pipeline that needs to be triggered with the given parameters.
+            properties:
+              pipelineReference:
+                description: Pipeline reference.
+                properties:
+                  type:
+                    type: string
+                    description: Pipeline reference type.
+                    enum:
+                    - PipelineReference
+                  referenceName:
+                    type: string
+                    description: Reference pipeline name.
+                  name:
+                    type: string
+                    description: Reference name.
+                required:
+                - type
+                - referenceName
+              parameters:
+                description: Pipeline parameters.
+                type: object
+                additionalProperties:
+                  type: object
+          description: Pipelines that need to be started.
+          x-ms-identifiers:
+          - /pipelineReference/referenceName
+      required:
+      - type
+      additionalProperties:
+        type: object
+      description: Azure data factory nested object which contains information about
+        creating pipeline run
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: MultiplePipelineTrigger
+    ScheduleTrigger:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Trigger type.
+        description:
+          description: Trigger description.
+          type: string
+        runtimeState:
+          description: Indicates if trigger is running or not. Updated when Start/Stop
+            APIs are called on the Trigger.
+          readOnly: true
+          type: string
+          enum:
+          - Started
+          - Stopped
+          - Disabled
+          x-ms-enum:
+            name: TriggerRuntimeState
+            modelAsString: true
+        annotations:
+          description: List of tags that can be used for describing the trigger.
+          type: array
+          items:
+            type: object
+          x-ms-identifiers: []
+        pipelines:
+          type: array
+          items:
+            description: Pipeline that needs to be triggered with the given parameters.
+            properties:
+              pipelineReference:
+                description: Pipeline reference.
+                properties:
+                  type:
+                    type: string
+                    description: Pipeline reference type.
+                    enum:
+                    - PipelineReference
+                  referenceName:
+                    type: string
+                    description: Reference pipeline name.
+                  name:
+                    type: string
+                    description: Reference name.
+                required:
+                - type
+                - referenceName
+              parameters:
+                description: Pipeline parameters.
+                type: object
+                additionalProperties:
+                  type: object
+          description: Pipelines that need to be started.
+          x-ms-identifiers:
+          - /pipelineReference/referenceName
+        typeProperties:
+          description: Schedule Trigger properties.
+          x-ms-client-flatten: true
+          properties:
+            recurrence:
+              description: Recurrence schedule configuration.
+              type: object
+              properties:
+                frequency:
+                  description: The frequency.
+                  type: string
+                  enum:
+                  - NotSpecified
+                  - Minute
+                  - Hour
+                  - Day
+                  - Week
+                  - Month
+                  - Year
+                  x-ms-enum:
+                    name: RecurrenceFrequency
+                    modelAsString: true
+                interval:
+                  type: integer
+                  format: int32
+                  description: The interval.
+                startTime:
+                  type: string
+                  format: date-time
+                  description: The start time.
+                endTime:
+                  type: string
+                  format: date-time
+                  description: The end time.
+                timeZone:
+                  type: string
+                  description: The time zone.
+                schedule:
+                  description: The recurrence schedule.
+                  type: object
+                  properties:
+                    minutes:
+                      type: array
+                      items:
+                        type: integer
+                        format: int32
+                      description: The minutes.
+                    hours:
+                      type: array
+                      items:
+                        type: integer
+                        format: int32
+                      description: The hours.
+                    weekDays:
+                      type: array
+                      items:
+                        type: string
+                        enum:
+                        - Sunday
+                        - Monday
+                        - Tuesday
+                        - Wednesday
+                        - Thursday
+                        - Friday
+                        - Saturday
+                        x-ms-enum:
+                          name: DaysOfWeek
+                          modelAsString: false
+                      description: The days of the week.
+                    monthDays:
+                      type: array
+                      items:
+                        type: integer
+                        format: int32
+                      description: The month days.
+                    monthlyOccurrences:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          day:
+                            description: The day of the week.
+                            type: string
+                            enum:
+                            - Sunday
+                            - Monday
+                            - Tuesday
+                            - Wednesday
+                            - Thursday
+                            - Friday
+                            - Saturday
+                            x-ms-enum:
+                              name: DayOfWeek
+                              modelAsString: false
+                          occurrence:
+                            type: integer
+                            format: int32
+                            description: The occurrence.
+                        additionalProperties:
+                          type: object
+                        description: The recurrence schedule occurrence.
+                      description: The monthly occurrences.
+                      x-ms-identifiers: []
+                  additionalProperties:
+                    type: object
+              additionalProperties:
+                type: object
+          required:
+          - recurrence
+      required:
+      - type
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: Azure data factory nested object which contains information about
+        creating pipeline run
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: MultiplePipelineTrigger
+    ScheduleTriggerRecurrence:
+      type: object
+      properties:
+        frequency:
+          description: The frequency.
+          type: string
+          enum:
+          - NotSpecified
+          - Minute
+          - Hour
+          - Day
+          - Week
+          - Month
+          - Year
+          x-ms-enum:
+            name: RecurrenceFrequency
+            modelAsString: true
+        interval:
+          type: integer
+          format: int32
+          description: The interval.
+        startTime:
+          type: string
+          format: date-time
+          description: The start time.
+        endTime:
+          type: string
+          format: date-time
+          description: The end time.
+        timeZone:
+          type: string
+          description: The time zone.
+        schedule:
+          description: The recurrence schedule.
+          type: object
+          properties:
+            minutes:
+              type: array
+              items:
+                type: integer
+                format: int32
+              description: The minutes.
+            hours:
+              type: array
+              items:
+                type: integer
+                format: int32
+              description: The hours.
+            weekDays:
+              type: array
+              items:
+                type: string
+                enum:
+                - Sunday
+                - Monday
+                - Tuesday
+                - Wednesday
+                - Thursday
+                - Friday
+                - Saturday
+                x-ms-enum:
+                  name: DaysOfWeek
+                  modelAsString: false
+              description: The days of the week.
+            monthDays:
+              type: array
+              items:
+                type: integer
+                format: int32
+              description: The month days.
+            monthlyOccurrences:
+              type: array
+              items:
+                type: object
+                properties:
+                  day:
+                    description: The day of the week.
+                    type: string
+                    enum:
+                    - Sunday
+                    - Monday
+                    - Tuesday
+                    - Wednesday
+                    - Thursday
+                    - Friday
+                    - Saturday
+                    x-ms-enum:
+                      name: DayOfWeek
+                      modelAsString: false
+                  occurrence:
+                    type: integer
+                    format: int32
+                    description: The occurrence.
+                additionalProperties:
+                  type: object
+                description: The recurrence schedule occurrence.
+              description: The monthly occurrences.
+              x-ms-identifiers: []
+          additionalProperties:
+            type: object
+      additionalProperties:
+        type: object
+      description: The workflow trigger recurrence.
+    RecurrenceFrequency:
+      description: Enumerates possible frequency option for the schedule trigger.
+      type: string
+      enum:
+      - NotSpecified
+      - Minute
+      - Hour
+      - Day
+      - Week
+      - Month
+      - Year
+      x-ms-enum:
+        name: RecurrenceFrequency
+        modelAsString: true
+    RecurrenceSchedule:
+      type: object
+      properties:
+        minutes:
+          type: array
+          items:
+            type: integer
+            format: int32
+          description: The minutes.
+        hours:
+          type: array
+          items:
+            type: integer
+            format: int32
+          description: The hours.
+        weekDays:
+          type: array
+          items:
+            type: string
+            enum:
+            - Sunday
+            - Monday
+            - Tuesday
+            - Wednesday
+            - Thursday
+            - Friday
+            - Saturday
+            x-ms-enum:
+              name: DaysOfWeek
+              modelAsString: false
+          description: The days of the week.
+        monthDays:
+          type: array
+          items:
+            type: integer
+            format: int32
+          description: The month days.
+        monthlyOccurrences:
+          type: array
+          items:
+            type: object
+            properties:
+              day:
+                description: The day of the week.
+                type: string
+                enum:
+                - Sunday
+                - Monday
+                - Tuesday
+                - Wednesday
+                - Thursday
+                - Friday
+                - Saturday
+                x-ms-enum:
+                  name: DayOfWeek
+                  modelAsString: false
+              occurrence:
+                type: integer
+                format: int32
+                description: The occurrence.
+            additionalProperties:
+              type: object
+            description: The recurrence schedule occurrence.
+          description: The monthly occurrences.
+          x-ms-identifiers: []
+      additionalProperties:
+        type: object
+      description: The recurrence schedule.
+    RecurrenceScheduleOccurrence:
+      type: object
+      properties:
+        day:
+          description: The day of the week.
+          type: string
+          enum:
+          - Sunday
+          - Monday
+          - Tuesday
+          - Wednesday
+          - Thursday
+          - Friday
+          - Saturday
+          x-ms-enum:
+            name: DayOfWeek
+            modelAsString: false
+        occurrence:
+          type: integer
+          format: int32
+          description: The occurrence.
+      additionalProperties:
+        type: object
+      description: The recurrence schedule occurrence.
+    DayOfWeek:
+      type: string
+      enum:
+      - Sunday
+      - Monday
+      - Tuesday
+      - Wednesday
+      - Thursday
+      - Friday
+      - Saturday
+      x-ms-enum:
+        name: DayOfWeek
+        modelAsString: false
+      description: The days of the week.
+    BlobTrigger:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Trigger type.
+        description:
+          description: Trigger description.
+          type: string
+        runtimeState:
+          description: Indicates if trigger is running or not. Updated when Start/Stop
+            APIs are called on the Trigger.
+          readOnly: true
+          type: string
+          enum:
+          - Started
+          - Stopped
+          - Disabled
+          x-ms-enum:
+            name: TriggerRuntimeState
+            modelAsString: true
+        annotations:
+          description: List of tags that can be used for describing the trigger.
+          type: array
+          items:
+            type: object
+          x-ms-identifiers: []
+        pipelines:
+          type: array
+          items:
+            description: Pipeline that needs to be triggered with the given parameters.
+            properties:
+              pipelineReference:
+                description: Pipeline reference.
+                properties:
+                  type:
+                    type: string
+                    description: Pipeline reference type.
+                    enum:
+                    - PipelineReference
+                  referenceName:
+                    type: string
+                    description: Reference pipeline name.
+                  name:
+                    type: string
+                    description: Reference name.
+                required:
+                - type
+                - referenceName
+              parameters:
+                description: Pipeline parameters.
+                type: object
+                additionalProperties:
+                  type: object
+          description: Pipelines that need to be started.
+          x-ms-identifiers:
+          - /pipelineReference/referenceName
+        typeProperties:
+          description: Blob Trigger properties.
+          x-ms-client-flatten: true
+          properties:
+            folderPath:
+              description: The path of the container/folder that will trigger the
+                pipeline.
+              type: string
+            maxConcurrency:
+              description: The max number of parallel files to handle when it is triggered.
+              type: integer
+            linkedService:
+              description: The Azure Storage linked service reference.
+              type: object
+              properties:
+                type:
+                  type: string
+                  description: Linked service reference type.
+                  enum:
+                  - LinkedServiceReference
+                  x-ms-enum:
+                    name: Type
+                    modelAsString: true
+                referenceName:
+                  type: string
+                  description: Reference LinkedService name.
+                parameters:
+                  description: Arguments for LinkedService.
+                  type: object
+                  additionalProperties:
+                    type: object
+              required:
+              - type
+              - referenceName
+          required:
+          - folderPath
+          - maxConcurrency
+          - linkedService
+      required:
+      - type
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: Azure data factory nested object which contains information about
+        creating pipeline run
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: MultiplePipelineTrigger
+    BlobEventsTrigger:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Trigger type.
+        description:
+          description: Trigger description.
+          type: string
+        runtimeState:
+          description: Indicates if trigger is running or not. Updated when Start/Stop
+            APIs are called on the Trigger.
+          readOnly: true
+          type: string
+          enum:
+          - Started
+          - Stopped
+          - Disabled
+          x-ms-enum:
+            name: TriggerRuntimeState
+            modelAsString: true
+        annotations:
+          description: List of tags that can be used for describing the trigger.
+          type: array
+          items:
+            type: object
+          x-ms-identifiers: []
+        pipelines:
+          type: array
+          items:
+            description: Pipeline that needs to be triggered with the given parameters.
+            properties:
+              pipelineReference:
+                description: Pipeline reference.
+                properties:
+                  type:
+                    type: string
+                    description: Pipeline reference type.
+                    enum:
+                    - PipelineReference
+                  referenceName:
+                    type: string
+                    description: Reference pipeline name.
+                  name:
+                    type: string
+                    description: Reference name.
+                required:
+                - type
+                - referenceName
+              parameters:
+                description: Pipeline parameters.
+                type: object
+                additionalProperties:
+                  type: object
+          description: Pipelines that need to be started.
+          x-ms-identifiers:
+          - /pipelineReference/referenceName
+        typeProperties:
+          description: Blob Events Trigger properties.
+          x-ms-client-flatten: true
+          properties:
+            blobPathBeginsWith:
+              description: 'The blob path must begin with the pattern provided for
+                trigger to fire. For example, ''/records/blobs/december/'' will only
+                fire the trigger for blobs in the december folder under the records
+                container. At least one of these must be provided: blobPathBeginsWith,
+                blobPathEndsWith.'
+              type: string
+            blobPathEndsWith:
+              description: 'The blob path must end with the pattern provided for trigger
+                to fire. For example, ''december/boxes.csv'' will only fire the trigger
+                for blobs named boxes in a december folder. At least one of these
+                must be provided: blobPathBeginsWith, blobPathEndsWith.'
+              type: string
+            ignoreEmptyBlobs:
+              description: If set to true, blobs with zero bytes will be ignored.
+              type: boolean
+            events:
+              description: The type of events that cause this trigger to fire.
+              type: array
+              items:
+                type: string
+                enum:
+                - Microsoft.Storage.BlobCreated
+                - Microsoft.Storage.BlobDeleted
+                x-ms-enum:
+                  name: BlobEventTypes
+                  modelAsString: true
+            scope:
+              description: The ARM resource ID of the Storage Account.
+              type: string
+          required:
+          - events
+          - scope
+      required:
+      - type
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: Azure data factory nested object which contains information about
+        creating pipeline run
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: MultiplePipelineTrigger
+    BlobEventTypeArray:
+      type: array
+      items:
+        type: string
+        enum:
+        - Microsoft.Storage.BlobCreated
+        - Microsoft.Storage.BlobDeleted
+        x-ms-enum:
+          name: BlobEventTypes
+          modelAsString: true
+      description: Blob event types.
+    CustomEventsTrigger:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Trigger type.
+        description:
+          description: Trigger description.
+          type: string
+        runtimeState:
+          description: Indicates if trigger is running or not. Updated when Start/Stop
+            APIs are called on the Trigger.
+          readOnly: true
+          type: string
+          enum:
+          - Started
+          - Stopped
+          - Disabled
+          x-ms-enum:
+            name: TriggerRuntimeState
+            modelAsString: true
+        annotations:
+          description: List of tags that can be used for describing the trigger.
+          type: array
+          items:
+            type: object
+          x-ms-identifiers: []
+        pipelines:
+          type: array
+          items:
+            description: Pipeline that needs to be triggered with the given parameters.
+            properties:
+              pipelineReference:
+                description: Pipeline reference.
+                properties:
+                  type:
+                    type: string
+                    description: Pipeline reference type.
+                    enum:
+                    - PipelineReference
+                  referenceName:
+                    type: string
+                    description: Reference pipeline name.
+                  name:
+                    type: string
+                    description: Reference name.
+                required:
+                - type
+                - referenceName
+              parameters:
+                description: Pipeline parameters.
+                type: object
+                additionalProperties:
+                  type: object
+          description: Pipelines that need to be started.
+          x-ms-identifiers:
+          - /pipelineReference/referenceName
+        typeProperties:
+          description: Custom Events Trigger properties.
+          x-ms-client-flatten: true
+          properties:
+            subjectBeginsWith:
+              description: 'The event subject must begin with the pattern provided
+                for trigger to fire. At least one of these must be provided: subjectBeginsWith,
+                subjectEndsWith.'
+              type: string
+            subjectEndsWith:
+              description: 'The event subject must end with the pattern provided for
+                trigger to fire. At least one of these must be provided: subjectBeginsWith,
+                subjectEndsWith.'
+              type: string
+            events:
+              description: The list of event types that cause this trigger to fire.
+              type: array
+              items:
+                type: object
+              x-ms-identifiers: []
+            scope:
+              description: The ARM resource ID of the Azure Event Grid Topic.
+              type: string
+          required:
+          - events
+          - scope
+      required:
+      - type
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: Azure data factory nested object which contains information about
+        creating pipeline run
+      discriminator:
+        propertyName: type
+      x-ms-discriminator-value: MultiplePipelineTrigger
+    TumblingWindowTrigger:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Trigger type.
+        description:
+          description: Trigger description.
+          type: string
+        runtimeState:
+          description: Indicates if trigger is running or not. Updated when Start/Stop
+            APIs are called on the Trigger.
+          readOnly: true
+          type: string
+          enum:
+          - Started
+          - Stopped
+          - Disabled
+          x-ms-enum:
+            name: TriggerRuntimeState
+            modelAsString: true
+        annotations:
+          description: List of tags that can be used for describing the trigger.
+          type: array
+          items:
+            type: object
+          x-ms-identifiers: []
+        pipeline:
+          description: Pipeline for which runs are created when an event is fired
+            for trigger window that is ready.
+          properties:
+            pipelineReference:
+              description: Pipeline reference.
+              properties:
+                type:
+                  type: string
+                  description: Pipeline reference type.
+                  enum:
+                  - PipelineReference
+                referenceName:
+                  type: string
+                  description: Reference pipeline name.
+                name:
+                  type: string
+                  description: Reference name.
+              required:
+              - type
+              - referenceName
+            parameters:
+              description: Pipeline parameters.
+              type: object
+              additionalProperties:
+                type: object
+        typeProperties:
+          description: Tumbling Window Trigger properties.
+          x-ms-client-flatten: true
+          properties:
+            frequency:
+              description: The frequency of the time windows.
+              type: string
+              enum:
+              - Minute
+              - Hour
+              - Month
+              x-ms-enum:
+                name: TumblingWindowFrequency
+                modelAsString: true
+            interval:
+              type: integer
+              format: int32
+              description: The interval of the time windows. The minimum interval
+                allowed is 15 Minutes.
+            startTime:
+              type: string
+              format: date-time
+              description: The start time for the time period for the trigger during
+                which events are fired for windows that are ready. Only UTC time is
+                currently supported.
+            endTime:
+              type: string
+              format: date-time
+              description: The end time for the time period for the trigger during
+                which events are fired for windows that are ready. Only UTC time is
+                currently supported.
+            delay:
+              type: object
+              x-ms-format: dfe-string
+              description: 'Specifies how long the trigger waits past due time before
+                triggering new run. It doesn''t alter window start and end time. The
+                default is 0. Type: string (or Expression with resultType string),
+                pattern: ((\d+)\.)?(\d\d):(60|([0-5][0-9])):(60|([0-5][0-9])).'
+            maxConcurrency:
+              description: The max number of parallel time windows (ready for execution)
+                for which a new run is triggered.
+              type: integer
+              minimum: 1
+              maximum: 50
+            retryPolicy:
+              description: Retry policy that will be applied for failed pipeline runs.
+              properties:
+                count:
+                  type: object
+                  x-ms-format: dfe-int
+                  description: 'Maximum ordinary retry attempts. Default is 0. Type:
+                    integer (or Expression with resultType integer), minimum: 0.'
+                intervalInSeconds:
+                  description: Interval between retries in seconds. Default is 30.
+                  type: integer
+                  minimum: 30
+                  maximum: 86400
+            dependsOn:
+              type: array
+              description: Triggers that this trigger depends on. Only tumbling window
+                triggers are supported.
+              items:
+                description: Referenced dependency.
+                type: object
+                discriminator:
+                  propertyName: type
+                properties:
+                  type:
+                    description: The type of dependency reference.
+                    type: string
+                required:
+                - type
+              x-ms-identifiers: []
+          required:
+          - frequency
+          - interval
+          - startTime
+          - maxConcurrency
+      required:
+      - type
+      - pipeline
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: Azure data factory nested object which contains information about
+        creating pipeline run
+      discriminator:
+        propertyName: type
+    TumblingWindowFrequency:
+      description: Enumerates possible frequency option for the tumbling window trigger.
+      type: string
+      enum:
+      - Minute
+      - Hour
+      - Month
+      x-ms-enum:
+        name: TumblingWindowFrequency
+        modelAsString: true
+    RetryPolicy:
+      description: Execution policy for an activity.
+      properties:
+        count:
+          type: object
+          x-ms-format: dfe-int
+          description: 'Maximum ordinary retry attempts. Default is 0. Type: integer
+            (or Expression with resultType integer), minimum: 0.'
+        intervalInSeconds:
+          description: Interval between retries in seconds. Default is 30.
+          type: integer
+          minimum: 30
+          maximum: 86400
+    TriggerReference:
+      description: Trigger reference type.
+      type: object
+      properties:
+        type:
+          description: Trigger reference type.
+          type: string
+          enum:
+          - TriggerReference
+          x-ms-enum:
+            name: TriggerReferenceType
+            modelAsString: true
+        referenceName:
+          description: Reference trigger name.
+          type: string
+      required:
+      - type
+      - referenceName
+    DependencyReference:
+      description: Referenced dependency.
+      type: object
+      discriminator:
+        propertyName: type
+      properties:
+        type:
+          description: The type of dependency reference.
+          type: string
+      required:
+      - type
+    TriggerDependencyReference:
+      type: object
+      properties:
+        type:
+          description: The type of dependency reference.
+          type: string
+        referenceTrigger:
+          description: Referenced trigger.
+          type: object
+          properties:
+            type:
+              description: Trigger reference type.
+              type: string
+              enum:
+              - TriggerReference
+              x-ms-enum:
+                name: TriggerReferenceType
+                modelAsString: true
+            referenceName:
+              description: Reference trigger name.
+              type: string
+          required:
+          - type
+          - referenceName
+      required:
+      - type
+      - referenceTrigger
+      description: Referenced dependency.
+      discriminator:
+        propertyName: type
+    TumblingWindowTriggerDependencyReference:
+      type: object
+      properties:
+        type:
+          description: The type of dependency reference.
+          type: string
+        referenceTrigger:
+          description: Referenced trigger.
+          type: object
+          properties:
+            type:
+              description: Trigger reference type.
+              type: string
+              enum:
+              - TriggerReference
+              x-ms-enum:
+                name: TriggerReferenceType
+                modelAsString: true
+            referenceName:
+              description: Reference trigger name.
+              type: string
+          required:
+          - type
+          - referenceName
+        offset:
+          description: Timespan applied to the start time of a tumbling window when
+            evaluating dependency.
+          type: string
+          pattern: -?((\d+)\.)?(\d\d):(60|([0-5][0-9])):(60|([0-5][0-9]))
+          minLength: 8
+          maxLength: 15
+        size:
+          description: The size of the window when evaluating the dependency. If undefined
+            the frequency of the tumbling window will be used.
+          type: string
+          pattern: ((\d+)\.)?(\d\d):(60|([0-5][0-9])):(60|([0-5][0-9]))
+          minLength: 8
+          maxLength: 15
+      required:
+      - type
+      - referenceTrigger
+      description: Referenced dependency.
+      discriminator:
+        propertyName: type
+    SelfDependencyTumblingWindowTriggerReference:
+      type: object
+      properties:
+        type:
+          description: The type of dependency reference.
+          type: string
+        offset:
+          description: Timespan applied to the start time of a tumbling window when
+            evaluating dependency.
+          type: string
+          pattern: -((\d+)\.)?(\d\d):(60|([0-5][0-9])):(60|([0-5][0-9]))
+          minLength: 8
+          maxLength: 15
+        size:
+          description: The size of the window when evaluating the dependency. If undefined
+            the frequency of the tumbling window will be used.
+          type: string
+          pattern: ((\d+)\.)?(\d\d):(60|([0-5][0-9])):(60|([0-5][0-9]))
+          minLength: 8
+          maxLength: 15
+      required:
+      - type
+      - offset
+      description: Referenced dependency.
+      discriminator:
+        propertyName: type
+    RerunTumblingWindowTrigger:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Trigger type.
+        description:
+          description: Trigger description.
+          type: string
+        runtimeState:
+          description: Indicates if trigger is running or not. Updated when Start/Stop
+            APIs are called on the Trigger.
+          readOnly: true
+          type: string
+          enum:
+          - Started
+          - Stopped
+          - Disabled
+          x-ms-enum:
+            name: TriggerRuntimeState
+            modelAsString: true
+        annotations:
+          description: List of tags that can be used for describing the trigger.
+          type: array
+          items:
+            type: object
+          x-ms-identifiers: []
+        typeProperties:
+          description: Rerun Trigger properties.
+          x-ms-client-flatten: true
+          properties:
+            parentTrigger:
+              type: object
+              description: The parent trigger reference.
+            requestedStartTime:
+              type: string
+              format: date-time
+              description: The start time for the time period for which restatement
+                is initiated. Only UTC time is currently supported.
+            requestedEndTime:
+              type: string
+              format: date-time
+              description: The end time for the time period for which restatement
+                is initiated. Only UTC time is currently supported.
+            rerunConcurrency:
+              description: The max number of parallel time windows (ready for execution)
+                for which a rerun is triggered.
+              type: integer
+              minimum: 1
+              maximum: 50
+          required:
+          - parentTrigger
+          - requestedStartTime
+          - requestedEndTime
+          - rerunConcurrency
+      required:
+      - type
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: Azure data factory nested object which contains information about
+        creating pipeline run
+      discriminator:
+        propertyName: type
+    ChainingTrigger:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Trigger type.
+        description:
+          description: Trigger description.
+          type: string
+        runtimeState:
+          description: Indicates if trigger is running or not. Updated when Start/Stop
+            APIs are called on the Trigger.
+          readOnly: true
+          type: string
+          enum:
+          - Started
+          - Stopped
+          - Disabled
+          x-ms-enum:
+            name: TriggerRuntimeState
+            modelAsString: true
+        annotations:
+          description: List of tags that can be used for describing the trigger.
+          type: array
+          items:
+            type: object
+          x-ms-identifiers: []
+        pipeline:
+          description: Pipeline for which runs are created when all upstream pipelines
+            complete successfully.
+          properties:
+            pipelineReference:
+              description: Pipeline reference.
+              properties:
+                type:
+                  type: string
+                  description: Pipeline reference type.
+                  enum:
+                  - PipelineReference
+                referenceName:
+                  type: string
+                  description: Reference pipeline name.
+                name:
+                  type: string
+                  description: Reference name.
+              required:
+              - type
+              - referenceName
+            parameters:
+              description: Pipeline parameters.
+              type: object
+              additionalProperties:
+                type: object
+        typeProperties:
+          description: Chaining Trigger properties.
+          x-ms-client-flatten: true
+          properties:
+            dependsOn:
+              type: array
+              items:
+                description: Pipeline reference type.
+                properties:
+                  type:
+                    type: string
+                    description: Pipeline reference type.
+                    enum:
+                    - PipelineReference
+                  referenceName:
+                    type: string
+                    description: Reference pipeline name.
+                  name:
+                    type: string
+                    description: Reference name.
+                required:
+                - type
+                - referenceName
+              description: Upstream Pipelines.
+              x-ms-identifiers:
+              - referenceName
+            runDimension:
+              description: Run Dimension property that needs to be emitted by upstream
+                pipelines.
+              type: string
+          required:
+          - runDimension
+          - dependsOn
+      required:
+      - type
+      - pipeline
+      - typeProperties
+      additionalProperties:
+        type: object
+      description: Azure data factory nested object which contains information about
+        creating pipeline run
+      discriminator:
+        propertyName: type
+    PipelineReference:
+      description: Pipeline reference type.
+      properties:
+        type:
+          type: string
+          description: Pipeline reference type.
+          enum:
+          - PipelineReference
+        referenceName:
+          type: string
+          description: Reference pipeline name.
+        name:
+          type: string
+          description: Reference name.
+      required:
+      - type
+      - referenceName
+    ParameterValueSpecification:
+      description: An object mapping parameter names to argument values.
+      type: object
+      additionalProperties:
+        type: object
+    TriggerPipelineReference:
+      description: Pipeline that needs to be triggered with the given parameters.
+      properties:
+        pipelineReference:
+          description: Pipeline reference.
+          properties:
+            type:
+              type: string
+              description: Pipeline reference type.
+              enum:
+              - PipelineReference
+            referenceName:
+              type: string
+              description: Reference pipeline name.
+            name:
+              type: string
+              description: Reference name.
+          required:
+          - type
+          - referenceName
+        parameters:
+          description: Pipeline parameters.
+          type: object
+          additionalProperties:
+            type: object
+    LinkedServiceReference:
+      description: Linked service reference type.
+      type: object
+      properties:
+        type:
+          type: string
+          description: Linked service reference type.
+          enum:
+          - LinkedServiceReference
+          x-ms-enum:
+            name: Type
+            modelAsString: true
+        referenceName:
+          type: string
+          description: Reference LinkedService name.
+        parameters:
+          description: Arguments for LinkedService.
+          type: object
+          additionalProperties:
+            type: object
+      required:
+      - type
+      - referenceName

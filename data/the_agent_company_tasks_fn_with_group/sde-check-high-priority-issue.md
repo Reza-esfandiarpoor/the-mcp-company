@@ -1,0 +1,1 @@
+Find open and high-priority issues on the janusgraph gitlab repo (repo name: 'root/janusgraph') that is created after Aug 1st, 2024, and send them to the working group in rocket chat. Ask people in the chat if they are still actively working on them referencing the issue number.

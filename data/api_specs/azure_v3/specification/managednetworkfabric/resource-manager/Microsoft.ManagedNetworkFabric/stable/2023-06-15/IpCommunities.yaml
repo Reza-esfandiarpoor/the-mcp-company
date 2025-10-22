@@ -1,0 +1,3715 @@
+openapi: 3.0.0
+info:
+  title: Azure Network Fabric Management Service API
+  description: Self service experience for Azure Network Fabric API.
+  version: 2023-06-15
+servers:
+- url: https://management.azure.com
+security:
+- azure_auth:
+  - user_impersonation
+paths:
+  ? /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedNetworkFabric/ipCommunities/{ipCommunityName}
+  : put:
+      tags:
+      - IpCommunities
+      operationId: IpCommunities_Create
+      summary: Create an IP Community.
+      description: Implements an IP Community PUT method.
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - description: Name of the IP Community.
+        in: path
+        name: ipCommunityName
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  format: arm-id
+                  description: Fully qualified resource ID for the resource. E.g.
+                    "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                  readOnly: true
+                name:
+                  type: string
+                  description: The name of the resource
+                  readOnly: true
+                type:
+                  type: string
+                  description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                    or "Microsoft.Storage/storageAccounts"
+                  readOnly: true
+                systemData:
+                  description: Azure Resource Manager metadata containing createdBy
+                    and modifiedBy information.
+                  readOnly: true
+                  type: object
+                  properties:
+                    createdBy:
+                      type: string
+                      description: The identity that created the resource.
+                    createdByType:
+                      type: string
+                      description: The type of identity that created the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    createdAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource creation (UTC).
+                    lastModifiedBy:
+                      type: string
+                      description: The identity that last modified the resource.
+                    lastModifiedByType:
+                      type: string
+                      description: The type of identity that last modified the resource.
+                      enum:
+                      - User
+                      - Application
+                      - ManagedIdentity
+                      - Key
+                      x-ms-enum:
+                        name: createdByType
+                        modelAsString: true
+                    lastModifiedAt:
+                      type: string
+                      format: date-time
+                      description: The timestamp of resource last modification (UTC)
+                tags:
+                  type: object
+                  description: Resource tags.
+                  additionalProperties:
+                    type: string
+                  x-ms-mutability:
+                  - read
+                  - create
+                  - update
+                location:
+                  type: string
+                  description: The geo-location where the resource lives
+                  x-ms-mutability:
+                  - read
+                  - create
+                properties:
+                  type: object
+                  properties:
+                    annotation:
+                      type: string
+                      description: Switch configuration description.
+                    ipCommunityRules:
+                      type: array
+                      description: List of IP Community Rules.
+                      items:
+                        type: object
+                        description: IP Community patchable properties.
+                        properties:
+                          action:
+                            description: 'Action to be taken on the configuration.
+                              Example: Permit | Deny.'
+                            type: string
+                            enum:
+                            - Permit
+                            - Deny
+                            x-ms-enum:
+                              modelAsString: true
+                              name: communityActionTypes
+                          sequenceNumber:
+                            type: integer
+                            format: int64
+                            minimum: 1
+                            maximum: 4294967295
+                            description: Sequence to insert to/delete from existing
+                              route. Prefix lists are evaluated starting with the
+                              lowest sequence number and continue down the list until
+                              a match is made. Once a match is made, the permit or
+                              deny statement is applied to that network and the rest
+                              of the list is ignored.
+                          wellKnownCommunities:
+                            type: array
+                            description: Supported well known Community List.
+                            uniqueItems: true
+                            items:
+                              description: "\n`Internet` - Advertise routes to internet\
+                                \ community.\n `LocalAS` - Advertise routes to only\
+                                \ localAS peers.\n `NoAdvertise` - Don't advertise\
+                                \ routes to any peer.\n`NoExport` - Don't export to\
+                                \ next AS.\n`GShut` - Graceful Shutdown (GSHUT) withdraw\
+                                \ routes before terminating BGP connection.\n"
+                              type: string
+                              minLength: 1
+                              enum:
+                              - Internet
+                              - LocalAS
+                              - NoAdvertise
+                              - NoExport
+                              - GShut
+                              x-ms-enum:
+                                modelAsString: true
+                                name: wellKnownCommunities
+                          communityMembers:
+                            type: array
+                            minItems: 1
+                            description: List the community members of IP Community.
+                            items:
+                              minLength: 1
+                              description: Community member of the IP Community. The
+                                expected formats are AA:NN >> example 65535:65535,
+                                <integer32> >> example 4294967040. The possible values
+                                of AA, NN are 0-65535 and <integer32> are 1-4294967040.
+                              type: string
+                        required:
+                        - action
+                        - sequenceNumber
+                        - communityMembers
+                    configurationState:
+                      description: Configuration state of the resource.
+                      type: string
+                      readOnly: true
+                      enum:
+                      - Succeeded
+                      - Failed
+                      - Rejected
+                      - Accepted
+                      - Provisioned
+                      - ErrorProvisioning
+                      - Deprovisioning
+                      - Deprovisioned
+                      - ErrorDeprovisioning
+                      - DeferredControl
+                      - Provisioning
+                      - PendingCommit
+                      x-ms-enum:
+                        modelAsString: true
+                        name: ConfigurationState
+                    provisioningState:
+                      description: Provisioning state of the resource.
+                      type: string
+                      readOnly: true
+                      enum:
+                      - Accepted
+                      - Succeeded
+                      - Updating
+                      - Deleting
+                      - Failed
+                      - Canceled
+                      x-ms-enum:
+                        name: ProvisioningState
+                        modelAsString: true
+                    administrativeState:
+                      description: Administrative state of the resource.
+                      type: string
+                      enum:
+                      - Enabled
+                      - Disabled
+                      - MAT
+                      - RMA
+                      readOnly: true
+                      x-ms-enum:
+                        modelAsString: true
+                        name: AdministrativeState
+                  description: Common properties for annotated type.
+                  required:
+                  - ipCommunityRules
+                  x-ms-client-flatten: true
+              required:
+              - location
+              - properties
+              title: Resource
+              description: Common fields that are returned in the response for all
+                Azure Resource Manager resources
+              x-ms-azure-resource: true
+        description: Request payload.
+        required: true
+      responses:
+        '200':
+          description: Success.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: arm-id
+                    description: Fully qualified resource ID for the resource. E.g.
+                      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                    readOnly: true
+                  name:
+                    type: string
+                    description: The name of the resource
+                    readOnly: true
+                  type:
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                    readOnly: true
+                  systemData:
+                    description: Azure Resource Manager metadata containing createdBy
+                      and modifiedBy information.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  tags:
+                    type: object
+                    description: Resource tags.
+                    additionalProperties:
+                      type: string
+                    x-ms-mutability:
+                    - read
+                    - create
+                    - update
+                  location:
+                    type: string
+                    description: The geo-location where the resource lives
+                    x-ms-mutability:
+                    - read
+                    - create
+                  properties:
+                    type: object
+                    properties:
+                      annotation:
+                        type: string
+                        description: Switch configuration description.
+                      ipCommunityRules:
+                        type: array
+                        description: List of IP Community Rules.
+                        items:
+                          type: object
+                          description: IP Community patchable properties.
+                          properties:
+                            action:
+                              description: 'Action to be taken on the configuration.
+                                Example: Permit | Deny.'
+                              type: string
+                              enum:
+                              - Permit
+                              - Deny
+                              x-ms-enum:
+                                modelAsString: true
+                                name: communityActionTypes
+                            sequenceNumber:
+                              type: integer
+                              format: int64
+                              minimum: 1
+                              maximum: 4294967295
+                              description: Sequence to insert to/delete from existing
+                                route. Prefix lists are evaluated starting with the
+                                lowest sequence number and continue down the list
+                                until a match is made. Once a match is made, the permit
+                                or deny statement is applied to that network and the
+                                rest of the list is ignored.
+                            wellKnownCommunities:
+                              type: array
+                              description: Supported well known Community List.
+                              uniqueItems: true
+                              items:
+                                description: "\n`Internet` - Advertise routes to internet\
+                                  \ community.\n `LocalAS` - Advertise routes to only\
+                                  \ localAS peers.\n `NoAdvertise` - Don't advertise\
+                                  \ routes to any peer.\n`NoExport` - Don't export\
+                                  \ to next AS.\n`GShut` - Graceful Shutdown (GSHUT)\
+                                  \ withdraw routes before terminating BGP connection.\n"
+                                type: string
+                                minLength: 1
+                                enum:
+                                - Internet
+                                - LocalAS
+                                - NoAdvertise
+                                - NoExport
+                                - GShut
+                                x-ms-enum:
+                                  modelAsString: true
+                                  name: wellKnownCommunities
+                            communityMembers:
+                              type: array
+                              minItems: 1
+                              description: List the community members of IP Community.
+                              items:
+                                minLength: 1
+                                description: Community member of the IP Community.
+                                  The expected formats are AA:NN >> example 65535:65535,
+                                  <integer32> >> example 4294967040. The possible
+                                  values of AA, NN are 0-65535 and <integer32> are
+                                  1-4294967040.
+                                type: string
+                          required:
+                          - action
+                          - sequenceNumber
+                          - communityMembers
+                      configurationState:
+                        description: Configuration state of the resource.
+                        type: string
+                        readOnly: true
+                        enum:
+                        - Succeeded
+                        - Failed
+                        - Rejected
+                        - Accepted
+                        - Provisioned
+                        - ErrorProvisioning
+                        - Deprovisioning
+                        - Deprovisioned
+                        - ErrorDeprovisioning
+                        - DeferredControl
+                        - Provisioning
+                        - PendingCommit
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ConfigurationState
+                      provisioningState:
+                        description: Provisioning state of the resource.
+                        type: string
+                        readOnly: true
+                        enum:
+                        - Accepted
+                        - Succeeded
+                        - Updating
+                        - Deleting
+                        - Failed
+                        - Canceled
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: true
+                      administrativeState:
+                        description: Administrative state of the resource.
+                        type: string
+                        enum:
+                        - Enabled
+                        - Disabled
+                        - MAT
+                        - RMA
+                        readOnly: true
+                        x-ms-enum:
+                          modelAsString: true
+                          name: AdministrativeState
+                    description: Common properties for annotated type.
+                    required:
+                    - ipCommunityRules
+                    x-ms-client-flatten: true
+                required:
+                - location
+                - properties
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        '201':
+          description: Created.
+          headers:
+            Azure-AsyncOperation:
+              description: The URL to retrieve the status of the asynchronous operation.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: arm-id
+                    description: Fully qualified resource ID for the resource. E.g.
+                      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                    readOnly: true
+                  name:
+                    type: string
+                    description: The name of the resource
+                    readOnly: true
+                  type:
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                    readOnly: true
+                  systemData:
+                    description: Azure Resource Manager metadata containing createdBy
+                      and modifiedBy information.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  tags:
+                    type: object
+                    description: Resource tags.
+                    additionalProperties:
+                      type: string
+                    x-ms-mutability:
+                    - read
+                    - create
+                    - update
+                  location:
+                    type: string
+                    description: The geo-location where the resource lives
+                    x-ms-mutability:
+                    - read
+                    - create
+                  properties:
+                    type: object
+                    properties:
+                      annotation:
+                        type: string
+                        description: Switch configuration description.
+                      ipCommunityRules:
+                        type: array
+                        description: List of IP Community Rules.
+                        items:
+                          type: object
+                          description: IP Community patchable properties.
+                          properties:
+                            action:
+                              description: 'Action to be taken on the configuration.
+                                Example: Permit | Deny.'
+                              type: string
+                              enum:
+                              - Permit
+                              - Deny
+                              x-ms-enum:
+                                modelAsString: true
+                                name: communityActionTypes
+                            sequenceNumber:
+                              type: integer
+                              format: int64
+                              minimum: 1
+                              maximum: 4294967295
+                              description: Sequence to insert to/delete from existing
+                                route. Prefix lists are evaluated starting with the
+                                lowest sequence number and continue down the list
+                                until a match is made. Once a match is made, the permit
+                                or deny statement is applied to that network and the
+                                rest of the list is ignored.
+                            wellKnownCommunities:
+                              type: array
+                              description: Supported well known Community List.
+                              uniqueItems: true
+                              items:
+                                description: "\n`Internet` - Advertise routes to internet\
+                                  \ community.\n `LocalAS` - Advertise routes to only\
+                                  \ localAS peers.\n `NoAdvertise` - Don't advertise\
+                                  \ routes to any peer.\n`NoExport` - Don't export\
+                                  \ to next AS.\n`GShut` - Graceful Shutdown (GSHUT)\
+                                  \ withdraw routes before terminating BGP connection.\n"
+                                type: string
+                                minLength: 1
+                                enum:
+                                - Internet
+                                - LocalAS
+                                - NoAdvertise
+                                - NoExport
+                                - GShut
+                                x-ms-enum:
+                                  modelAsString: true
+                                  name: wellKnownCommunities
+                            communityMembers:
+                              type: array
+                              minItems: 1
+                              description: List the community members of IP Community.
+                              items:
+                                minLength: 1
+                                description: Community member of the IP Community.
+                                  The expected formats are AA:NN >> example 65535:65535,
+                                  <integer32> >> example 4294967040. The possible
+                                  values of AA, NN are 0-65535 and <integer32> are
+                                  1-4294967040.
+                                type: string
+                          required:
+                          - action
+                          - sequenceNumber
+                          - communityMembers
+                      configurationState:
+                        description: Configuration state of the resource.
+                        type: string
+                        readOnly: true
+                        enum:
+                        - Succeeded
+                        - Failed
+                        - Rejected
+                        - Accepted
+                        - Provisioned
+                        - ErrorProvisioning
+                        - Deprovisioning
+                        - Deprovisioned
+                        - ErrorDeprovisioning
+                        - DeferredControl
+                        - Provisioning
+                        - PendingCommit
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ConfigurationState
+                      provisioningState:
+                        description: Provisioning state of the resource.
+                        type: string
+                        readOnly: true
+                        enum:
+                        - Accepted
+                        - Succeeded
+                        - Updating
+                        - Deleting
+                        - Failed
+                        - Canceled
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: true
+                      administrativeState:
+                        description: Administrative state of the resource.
+                        type: string
+                        enum:
+                        - Enabled
+                        - Disabled
+                        - MAT
+                        - RMA
+                        readOnly: true
+                        x-ms-enum:
+                          modelAsString: true
+                          name: AdministrativeState
+                    description: Common properties for annotated type.
+                    required:
+                    - ipCommunityRules
+                    x-ms-client-flatten: true
+                required:
+                - location
+                - properties
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: azure-async-operation
+    get:
+      tags:
+      - IpCommunities
+      operationId: IpCommunities_Get
+      summary: Gets an IP Community.
+      description: Implements an IP Community GET method.
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - description: Name of the IP Community.
+        in: path
+        name: ipCommunityName
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: arm-id
+                    description: Fully qualified resource ID for the resource. E.g.
+                      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                    readOnly: true
+                  name:
+                    type: string
+                    description: The name of the resource
+                    readOnly: true
+                  type:
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                    readOnly: true
+                  systemData:
+                    description: Azure Resource Manager metadata containing createdBy
+                      and modifiedBy information.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  tags:
+                    type: object
+                    description: Resource tags.
+                    additionalProperties:
+                      type: string
+                    x-ms-mutability:
+                    - read
+                    - create
+                    - update
+                  location:
+                    type: string
+                    description: The geo-location where the resource lives
+                    x-ms-mutability:
+                    - read
+                    - create
+                  properties:
+                    type: object
+                    properties:
+                      annotation:
+                        type: string
+                        description: Switch configuration description.
+                      ipCommunityRules:
+                        type: array
+                        description: List of IP Community Rules.
+                        items:
+                          type: object
+                          description: IP Community patchable properties.
+                          properties:
+                            action:
+                              description: 'Action to be taken on the configuration.
+                                Example: Permit | Deny.'
+                              type: string
+                              enum:
+                              - Permit
+                              - Deny
+                              x-ms-enum:
+                                modelAsString: true
+                                name: communityActionTypes
+                            sequenceNumber:
+                              type: integer
+                              format: int64
+                              minimum: 1
+                              maximum: 4294967295
+                              description: Sequence to insert to/delete from existing
+                                route. Prefix lists are evaluated starting with the
+                                lowest sequence number and continue down the list
+                                until a match is made. Once a match is made, the permit
+                                or deny statement is applied to that network and the
+                                rest of the list is ignored.
+                            wellKnownCommunities:
+                              type: array
+                              description: Supported well known Community List.
+                              uniqueItems: true
+                              items:
+                                description: "\n`Internet` - Advertise routes to internet\
+                                  \ community.\n `LocalAS` - Advertise routes to only\
+                                  \ localAS peers.\n `NoAdvertise` - Don't advertise\
+                                  \ routes to any peer.\n`NoExport` - Don't export\
+                                  \ to next AS.\n`GShut` - Graceful Shutdown (GSHUT)\
+                                  \ withdraw routes before terminating BGP connection.\n"
+                                type: string
+                                minLength: 1
+                                enum:
+                                - Internet
+                                - LocalAS
+                                - NoAdvertise
+                                - NoExport
+                                - GShut
+                                x-ms-enum:
+                                  modelAsString: true
+                                  name: wellKnownCommunities
+                            communityMembers:
+                              type: array
+                              minItems: 1
+                              description: List the community members of IP Community.
+                              items:
+                                minLength: 1
+                                description: Community member of the IP Community.
+                                  The expected formats are AA:NN >> example 65535:65535,
+                                  <integer32> >> example 4294967040. The possible
+                                  values of AA, NN are 0-65535 and <integer32> are
+                                  1-4294967040.
+                                type: string
+                          required:
+                          - action
+                          - sequenceNumber
+                          - communityMembers
+                      configurationState:
+                        description: Configuration state of the resource.
+                        type: string
+                        readOnly: true
+                        enum:
+                        - Succeeded
+                        - Failed
+                        - Rejected
+                        - Accepted
+                        - Provisioned
+                        - ErrorProvisioning
+                        - Deprovisioning
+                        - Deprovisioned
+                        - ErrorDeprovisioning
+                        - DeferredControl
+                        - Provisioning
+                        - PendingCommit
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ConfigurationState
+                      provisioningState:
+                        description: Provisioning state of the resource.
+                        type: string
+                        readOnly: true
+                        enum:
+                        - Accepted
+                        - Succeeded
+                        - Updating
+                        - Deleting
+                        - Failed
+                        - Canceled
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: true
+                      administrativeState:
+                        description: Administrative state of the resource.
+                        type: string
+                        enum:
+                        - Enabled
+                        - Disabled
+                        - MAT
+                        - RMA
+                        readOnly: true
+                        x-ms-enum:
+                          modelAsString: true
+                          name: AdministrativeState
+                    description: Common properties for annotated type.
+                    required:
+                    - ipCommunityRules
+                    x-ms-client-flatten: true
+                required:
+                - location
+                - properties
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+    patch:
+      tags:
+      - IpCommunities
+      operationId: IpCommunities_Update
+      summary: Updates an IP Community.
+      description: API to update certain properties of the IP Community resource.
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - description: Name of the IP Community.
+        in: path
+        name: ipCommunityName
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tags:
+                  type: object
+                  additionalProperties:
+                    type: string
+                  description: Resource tags
+                properties:
+                  x-ms-client-flatten: true
+                  description: IP Community patchable properties.
+                  type: object
+                  properties:
+                    ipCommunityRules:
+                      type: array
+                      description: List of IP Community Rules.
+                      items:
+                        type: object
+                        description: IP Community patchable properties.
+                        properties:
+                          action:
+                            description: 'Action to be taken on the configuration.
+                              Example: Permit | Deny.'
+                            type: string
+                            enum:
+                            - Permit
+                            - Deny
+                            x-ms-enum:
+                              modelAsString: true
+                              name: communityActionTypes
+                          sequenceNumber:
+                            type: integer
+                            format: int64
+                            minimum: 1
+                            maximum: 4294967295
+                            description: Sequence to insert to/delete from existing
+                              route. Prefix lists are evaluated starting with the
+                              lowest sequence number and continue down the list until
+                              a match is made. Once a match is made, the permit or
+                              deny statement is applied to that network and the rest
+                              of the list is ignored.
+                          wellKnownCommunities:
+                            type: array
+                            description: Supported well known Community List.
+                            uniqueItems: true
+                            items:
+                              description: "\n`Internet` - Advertise routes to internet\
+                                \ community.\n `LocalAS` - Advertise routes to only\
+                                \ localAS peers.\n `NoAdvertise` - Don't advertise\
+                                \ routes to any peer.\n`NoExport` - Don't export to\
+                                \ next AS.\n`GShut` - Graceful Shutdown (GSHUT) withdraw\
+                                \ routes before terminating BGP connection.\n"
+                              type: string
+                              minLength: 1
+                              enum:
+                              - Internet
+                              - LocalAS
+                              - NoAdvertise
+                              - NoExport
+                              - GShut
+                              x-ms-enum:
+                                modelAsString: true
+                                name: wellKnownCommunities
+                          communityMembers:
+                            type: array
+                            minItems: 1
+                            description: List the community members of IP Community.
+                            items:
+                              minLength: 1
+                              description: Community member of the IP Community. The
+                                expected formats are AA:NN >> example 65535:65535,
+                                <integer32> >> example 4294967040. The possible values
+                                of AA, NN are 0-65535 and <integer32> are 1-4294967040.
+                              type: string
+                        required:
+                        - action
+                        - sequenceNumber
+                        - communityMembers
+              description: Base tracked resource type for PATCH updates.
+              x-ms-azure-resource: true
+        description: IP Community properties to update.
+        required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: arm-id
+                    description: Fully qualified resource ID for the resource. E.g.
+                      "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                    readOnly: true
+                  name:
+                    type: string
+                    description: The name of the resource
+                    readOnly: true
+                  type:
+                    type: string
+                    description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                      or "Microsoft.Storage/storageAccounts"
+                    readOnly: true
+                  systemData:
+                    description: Azure Resource Manager metadata containing createdBy
+                      and modifiedBy information.
+                    readOnly: true
+                    type: object
+                    properties:
+                      createdBy:
+                        type: string
+                        description: The identity that created the resource.
+                      createdByType:
+                        type: string
+                        description: The type of identity that created the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource creation (UTC).
+                      lastModifiedBy:
+                        type: string
+                        description: The identity that last modified the resource.
+                      lastModifiedByType:
+                        type: string
+                        description: The type of identity that last modified the resource.
+                        enum:
+                        - User
+                        - Application
+                        - ManagedIdentity
+                        - Key
+                        x-ms-enum:
+                          name: createdByType
+                          modelAsString: true
+                      lastModifiedAt:
+                        type: string
+                        format: date-time
+                        description: The timestamp of resource last modification (UTC)
+                  tags:
+                    type: object
+                    description: Resource tags.
+                    additionalProperties:
+                      type: string
+                    x-ms-mutability:
+                    - read
+                    - create
+                    - update
+                  location:
+                    type: string
+                    description: The geo-location where the resource lives
+                    x-ms-mutability:
+                    - read
+                    - create
+                  properties:
+                    type: object
+                    properties:
+                      annotation:
+                        type: string
+                        description: Switch configuration description.
+                      ipCommunityRules:
+                        type: array
+                        description: List of IP Community Rules.
+                        items:
+                          type: object
+                          description: IP Community patchable properties.
+                          properties:
+                            action:
+                              description: 'Action to be taken on the configuration.
+                                Example: Permit | Deny.'
+                              type: string
+                              enum:
+                              - Permit
+                              - Deny
+                              x-ms-enum:
+                                modelAsString: true
+                                name: communityActionTypes
+                            sequenceNumber:
+                              type: integer
+                              format: int64
+                              minimum: 1
+                              maximum: 4294967295
+                              description: Sequence to insert to/delete from existing
+                                route. Prefix lists are evaluated starting with the
+                                lowest sequence number and continue down the list
+                                until a match is made. Once a match is made, the permit
+                                or deny statement is applied to that network and the
+                                rest of the list is ignored.
+                            wellKnownCommunities:
+                              type: array
+                              description: Supported well known Community List.
+                              uniqueItems: true
+                              items:
+                                description: "\n`Internet` - Advertise routes to internet\
+                                  \ community.\n `LocalAS` - Advertise routes to only\
+                                  \ localAS peers.\n `NoAdvertise` - Don't advertise\
+                                  \ routes to any peer.\n`NoExport` - Don't export\
+                                  \ to next AS.\n`GShut` - Graceful Shutdown (GSHUT)\
+                                  \ withdraw routes before terminating BGP connection.\n"
+                                type: string
+                                minLength: 1
+                                enum:
+                                - Internet
+                                - LocalAS
+                                - NoAdvertise
+                                - NoExport
+                                - GShut
+                                x-ms-enum:
+                                  modelAsString: true
+                                  name: wellKnownCommunities
+                            communityMembers:
+                              type: array
+                              minItems: 1
+                              description: List the community members of IP Community.
+                              items:
+                                minLength: 1
+                                description: Community member of the IP Community.
+                                  The expected formats are AA:NN >> example 65535:65535,
+                                  <integer32> >> example 4294967040. The possible
+                                  values of AA, NN are 0-65535 and <integer32> are
+                                  1-4294967040.
+                                type: string
+                          required:
+                          - action
+                          - sequenceNumber
+                          - communityMembers
+                      configurationState:
+                        description: Configuration state of the resource.
+                        type: string
+                        readOnly: true
+                        enum:
+                        - Succeeded
+                        - Failed
+                        - Rejected
+                        - Accepted
+                        - Provisioned
+                        - ErrorProvisioning
+                        - Deprovisioning
+                        - Deprovisioned
+                        - ErrorDeprovisioning
+                        - DeferredControl
+                        - Provisioning
+                        - PendingCommit
+                        x-ms-enum:
+                          modelAsString: true
+                          name: ConfigurationState
+                      provisioningState:
+                        description: Provisioning state of the resource.
+                        type: string
+                        readOnly: true
+                        enum:
+                        - Accepted
+                        - Succeeded
+                        - Updating
+                        - Deleting
+                        - Failed
+                        - Canceled
+                        x-ms-enum:
+                          name: ProvisioningState
+                          modelAsString: true
+                      administrativeState:
+                        description: Administrative state of the resource.
+                        type: string
+                        enum:
+                        - Enabled
+                        - Disabled
+                        - MAT
+                        - RMA
+                        readOnly: true
+                        x-ms-enum:
+                          modelAsString: true
+                          name: AdministrativeState
+                    description: Common properties for annotated type.
+                    required:
+                    - ipCommunityRules
+                    x-ms-client-flatten: true
+                required:
+                - location
+                - properties
+                title: Resource
+                description: Common fields that are returned in the response for all
+                  Azure Resource Manager resources
+                x-ms-azure-resource: true
+        '202':
+          description: Accepted
+          headers:
+            Location:
+              description: The URL to retrieve the status of the asynchronous operation.
+              schema:
+                type: string
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: location
+    delete:
+      tags:
+      - IpCommunities
+      operationId: IpCommunities_Delete
+      summary: Deletes an IP Community.
+      description: Implements IP Community DELETE method.
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      - description: Name of the IP Community.
+        in: path
+        name: ipCommunityName
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+      responses:
+        '202':
+          description: Accepted
+          headers:
+            Azure-AsyncOperation:
+              description: Tracking URL for long running operation.
+              schema:
+                type: string
+        '204':
+          description: No Content
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-long-running-operation: true
+      x-ms-long-running-operation-options:
+        final-state-via: location
+  /subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/Microsoft.ManagedNetworkFabric/ipCommunities:
+    get:
+      operationId: IpCommunities_ListByResourceGroup
+      summary: List IP Communities by resource group.
+      description: Implements IP Communities list by resource group GET method.
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: resourceGroupName
+        in: path
+        description: The name of the resource group. The name is case insensitive.
+        required: true
+        x-ms-parameter-location: method
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 90
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Lists all IP Communities under the resource group.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of IP Communities.
+                properties:
+                  value:
+                    type: array
+                    description: List of IP Community resources.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: arm-id
+                          description: Fully qualified resource ID for the resource.
+                            E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                          readOnly: true
+                        name:
+                          type: string
+                          description: The name of the resource
+                          readOnly: true
+                        type:
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                          readOnly: true
+                        systemData:
+                          description: Azure Resource Manager metadata containing
+                            createdBy and modifiedBy information.
+                          readOnly: true
+                          type: object
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource last modification
+                                (UTC)
+                        tags:
+                          type: object
+                          description: Resource tags.
+                          additionalProperties:
+                            type: string
+                          x-ms-mutability:
+                          - read
+                          - create
+                          - update
+                        location:
+                          type: string
+                          description: The geo-location where the resource lives
+                          x-ms-mutability:
+                          - read
+                          - create
+                        properties:
+                          type: object
+                          properties:
+                            annotation:
+                              type: string
+                              description: Switch configuration description.
+                            ipCommunityRules:
+                              type: array
+                              description: List of IP Community Rules.
+                              items:
+                                type: object
+                                description: IP Community patchable properties.
+                                properties:
+                                  action:
+                                    description: 'Action to be taken on the configuration.
+                                      Example: Permit | Deny.'
+                                    type: string
+                                    enum:
+                                    - Permit
+                                    - Deny
+                                    x-ms-enum:
+                                      modelAsString: true
+                                      name: communityActionTypes
+                                  sequenceNumber:
+                                    type: integer
+                                    format: int64
+                                    minimum: 1
+                                    maximum: 4294967295
+                                    description: Sequence to insert to/delete from
+                                      existing route. Prefix lists are evaluated starting
+                                      with the lowest sequence number and continue
+                                      down the list until a match is made. Once a
+                                      match is made, the permit or deny statement
+                                      is applied to that network and the rest of the
+                                      list is ignored.
+                                  wellKnownCommunities:
+                                    type: array
+                                    description: Supported well known Community List.
+                                    uniqueItems: true
+                                    items:
+                                      description: "\n`Internet` - Advertise routes\
+                                        \ to internet community.\n `LocalAS` - Advertise\
+                                        \ routes to only localAS peers.\n `NoAdvertise`\
+                                        \ - Don't advertise routes to any peer.\n\
+                                        `NoExport` - Don't export to next AS.\n`GShut`\
+                                        \ - Graceful Shutdown (GSHUT) withdraw routes\
+                                        \ before terminating BGP connection.\n"
+                                      type: string
+                                      minLength: 1
+                                      enum:
+                                      - Internet
+                                      - LocalAS
+                                      - NoAdvertise
+                                      - NoExport
+                                      - GShut
+                                      x-ms-enum:
+                                        modelAsString: true
+                                        name: wellKnownCommunities
+                                  communityMembers:
+                                    type: array
+                                    minItems: 1
+                                    description: List the community members of IP
+                                      Community.
+                                    items:
+                                      minLength: 1
+                                      description: Community member of the IP Community.
+                                        The expected formats are AA:NN >> example
+                                        65535:65535, <integer32> >> example 4294967040.
+                                        The possible values of AA, NN are 0-65535
+                                        and <integer32> are 1-4294967040.
+                                      type: string
+                                required:
+                                - action
+                                - sequenceNumber
+                                - communityMembers
+                            configurationState:
+                              description: Configuration state of the resource.
+                              type: string
+                              readOnly: true
+                              enum:
+                              - Succeeded
+                              - Failed
+                              - Rejected
+                              - Accepted
+                              - Provisioned
+                              - ErrorProvisioning
+                              - Deprovisioning
+                              - Deprovisioned
+                              - ErrorDeprovisioning
+                              - DeferredControl
+                              - Provisioning
+                              - PendingCommit
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ConfigurationState
+                            provisioningState:
+                              description: Provisioning state of the resource.
+                              type: string
+                              readOnly: true
+                              enum:
+                              - Accepted
+                              - Succeeded
+                              - Updating
+                              - Deleting
+                              - Failed
+                              - Canceled
+                              x-ms-enum:
+                                name: ProvisioningState
+                                modelAsString: true
+                            administrativeState:
+                              description: Administrative state of the resource.
+                              type: string
+                              enum:
+                              - Enabled
+                              - Disabled
+                              - MAT
+                              - RMA
+                              readOnly: true
+                              x-ms-enum:
+                                modelAsString: true
+                                name: AdministrativeState
+                          description: Common properties for annotated type.
+                          required:
+                          - ipCommunityRules
+                          x-ms-client-flatten: true
+                      required:
+                      - location
+                      - properties
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                  nextLink:
+                    type: string
+                    description: Url to follow for getting next page of resources.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+  /subscriptions/{subscriptionId}/providers/Microsoft.ManagedNetworkFabric/ipCommunities:
+    get:
+      operationId: IpCommunities_ListBySubscription
+      summary: List IP Communities by subscription.
+      description: Implements IP Communities list by subscription GET method.
+      parameters:
+      - name: subscriptionId
+        in: path
+        description: The ID of the target subscription. The value must be an UUID.
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: api-version
+        in: query
+        description: The API version to use for this operation.
+        required: true
+        schema:
+          type: string
+          minLength: 1
+      responses:
+        '200':
+          description: Lists all IP Communities under the subscription.
+          content:
+            application/json:
+              schema:
+                type: object
+                description: List of IP Communities.
+                properties:
+                  value:
+                    type: array
+                    description: List of IP Community resources.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: arm-id
+                          description: Fully qualified resource ID for the resource.
+                            E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                          readOnly: true
+                        name:
+                          type: string
+                          description: The name of the resource
+                          readOnly: true
+                        type:
+                          type: string
+                          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                            or "Microsoft.Storage/storageAccounts"
+                          readOnly: true
+                        systemData:
+                          description: Azure Resource Manager metadata containing
+                            createdBy and modifiedBy information.
+                          readOnly: true
+                          type: object
+                          properties:
+                            createdBy:
+                              type: string
+                              description: The identity that created the resource.
+                            createdByType:
+                              type: string
+                              description: The type of identity that created the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource creation (UTC).
+                            lastModifiedBy:
+                              type: string
+                              description: The identity that last modified the resource.
+                            lastModifiedByType:
+                              type: string
+                              description: The type of identity that last modified
+                                the resource.
+                              enum:
+                              - User
+                              - Application
+                              - ManagedIdentity
+                              - Key
+                              x-ms-enum:
+                                name: createdByType
+                                modelAsString: true
+                            lastModifiedAt:
+                              type: string
+                              format: date-time
+                              description: The timestamp of resource last modification
+                                (UTC)
+                        tags:
+                          type: object
+                          description: Resource tags.
+                          additionalProperties:
+                            type: string
+                          x-ms-mutability:
+                          - read
+                          - create
+                          - update
+                        location:
+                          type: string
+                          description: The geo-location where the resource lives
+                          x-ms-mutability:
+                          - read
+                          - create
+                        properties:
+                          type: object
+                          properties:
+                            annotation:
+                              type: string
+                              description: Switch configuration description.
+                            ipCommunityRules:
+                              type: array
+                              description: List of IP Community Rules.
+                              items:
+                                type: object
+                                description: IP Community patchable properties.
+                                properties:
+                                  action:
+                                    description: 'Action to be taken on the configuration.
+                                      Example: Permit | Deny.'
+                                    type: string
+                                    enum:
+                                    - Permit
+                                    - Deny
+                                    x-ms-enum:
+                                      modelAsString: true
+                                      name: communityActionTypes
+                                  sequenceNumber:
+                                    type: integer
+                                    format: int64
+                                    minimum: 1
+                                    maximum: 4294967295
+                                    description: Sequence to insert to/delete from
+                                      existing route. Prefix lists are evaluated starting
+                                      with the lowest sequence number and continue
+                                      down the list until a match is made. Once a
+                                      match is made, the permit or deny statement
+                                      is applied to that network and the rest of the
+                                      list is ignored.
+                                  wellKnownCommunities:
+                                    type: array
+                                    description: Supported well known Community List.
+                                    uniqueItems: true
+                                    items:
+                                      description: "\n`Internet` - Advertise routes\
+                                        \ to internet community.\n `LocalAS` - Advertise\
+                                        \ routes to only localAS peers.\n `NoAdvertise`\
+                                        \ - Don't advertise routes to any peer.\n\
+                                        `NoExport` - Don't export to next AS.\n`GShut`\
+                                        \ - Graceful Shutdown (GSHUT) withdraw routes\
+                                        \ before terminating BGP connection.\n"
+                                      type: string
+                                      minLength: 1
+                                      enum:
+                                      - Internet
+                                      - LocalAS
+                                      - NoAdvertise
+                                      - NoExport
+                                      - GShut
+                                      x-ms-enum:
+                                        modelAsString: true
+                                        name: wellKnownCommunities
+                                  communityMembers:
+                                    type: array
+                                    minItems: 1
+                                    description: List the community members of IP
+                                      Community.
+                                    items:
+                                      minLength: 1
+                                      description: Community member of the IP Community.
+                                        The expected formats are AA:NN >> example
+                                        65535:65535, <integer32> >> example 4294967040.
+                                        The possible values of AA, NN are 0-65535
+                                        and <integer32> are 1-4294967040.
+                                      type: string
+                                required:
+                                - action
+                                - sequenceNumber
+                                - communityMembers
+                            configurationState:
+                              description: Configuration state of the resource.
+                              type: string
+                              readOnly: true
+                              enum:
+                              - Succeeded
+                              - Failed
+                              - Rejected
+                              - Accepted
+                              - Provisioned
+                              - ErrorProvisioning
+                              - Deprovisioning
+                              - Deprovisioned
+                              - ErrorDeprovisioning
+                              - DeferredControl
+                              - Provisioning
+                              - PendingCommit
+                              x-ms-enum:
+                                modelAsString: true
+                                name: ConfigurationState
+                            provisioningState:
+                              description: Provisioning state of the resource.
+                              type: string
+                              readOnly: true
+                              enum:
+                              - Accepted
+                              - Succeeded
+                              - Updating
+                              - Deleting
+                              - Failed
+                              - Canceled
+                              x-ms-enum:
+                                name: ProvisioningState
+                                modelAsString: true
+                            administrativeState:
+                              description: Administrative state of the resource.
+                              type: string
+                              enum:
+                              - Enabled
+                              - Disabled
+                              - MAT
+                              - RMA
+                              readOnly: true
+                              x-ms-enum:
+                                modelAsString: true
+                                name: AdministrativeState
+                          description: Common properties for annotated type.
+                          required:
+                          - ipCommunityRules
+                          x-ms-client-flatten: true
+                      required:
+                      - location
+                      - properties
+                      title: Resource
+                      description: Common fields that are returned in the response
+                        for all Azure Resource Manager resources
+                      x-ms-azure-resource: true
+                  nextLink:
+                    type: string
+                    description: Url to follow for getting next page of resources.
+        default:
+          description: Error response describing why the operation failed.
+          content:
+            application/json:
+              schema:
+                type: object
+                title: Error response
+                description: Common error response for all Azure Resource Manager
+                  APIs to return error details for failed operations. (This also follows
+                  the OData error response format.).
+                properties:
+                  error:
+                    description: The error object.
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        description: The error code.
+                        readOnly: true
+                      message:
+                        type: string
+                        description: The error message.
+                        readOnly: true
+                      target:
+                        type: string
+                        description: The error target.
+                        readOnly: true
+                      details:
+                        type: array
+                        description: The error details.
+                        items:
+                          type: object
+                          description: The error detail.
+                          properties:
+                            code:
+                              type: string
+                              description: The error code.
+                              readOnly: true
+                            message:
+                              type: string
+                              description: The error message.
+                              readOnly: true
+                            target:
+                              type: string
+                              description: The error target.
+                              readOnly: true
+                            details:
+                              type: array
+                              description: The error details.
+                              items:
+                                type: object
+                                description: The error detail.
+                                properties:
+                                  code:
+                                    type: string
+                                    description: The error code.
+                                    readOnly: true
+                                  message:
+                                    type: string
+                                    description: The error message.
+                                    readOnly: true
+                                  target:
+                                    type: string
+                                    description: The error target.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers:
+                              - message
+                              - target
+                            additionalInfo:
+                              type: array
+                              description: The error additional info.
+                              items:
+                                type: object
+                                description: The resource management error additional
+                                  info.
+                                properties:
+                                  type:
+                                    type: string
+                                    description: The additional info type.
+                                    readOnly: true
+                                  info:
+                                    type: object
+                                    description: The additional info.
+                                    readOnly: true
+                              readOnly: true
+                              x-ms-identifiers: []
+                        readOnly: true
+                        x-ms-identifiers:
+                        - message
+                        - target
+                      additionalInfo:
+                        type: array
+                        description: The error additional info.
+                        items:
+                          type: object
+                          description: The resource management error additional info.
+                          properties:
+                            type:
+                              type: string
+                              description: The additional info type.
+                              readOnly: true
+                            info:
+                              type: object
+                              description: The additional info.
+                              readOnly: true
+                        readOnly: true
+                        x-ms-identifiers: []
+      x-ms-pageable:
+        nextLinkName: nextLink
+components:
+  parameters:
+    IpCommunityNameParameter:
+      description: Name of the IP Community.
+      in: path
+      name: ipCommunityName
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+    SubscriptionIdParameter:
+      name: subscriptionId
+      in: path
+      description: The ID of the target subscription. The value must be an UUID.
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ResourceGroupNameParameter:
+      name: resourceGroupName
+      in: path
+      description: The name of the resource group. The name is case insensitive.
+      required: true
+      x-ms-parameter-location: method
+      schema:
+        type: string
+        minLength: 1
+        maxLength: 90
+    ApiVersionParameter:
+      name: api-version
+      in: query
+      description: The API version to use for this operation.
+      required: true
+      schema:
+        type: string
+        minLength: 1
+  securitySchemes:
+    azure_auth:
+      type: oauth2
+      description: Azure Active Directory OAuth2 Flow.
+      flows:
+        implicit:
+          authorizationUrl: https://login.microsoftonline.com/common/oauth2/authorize
+          scopes:
+            user_impersonation: impersonate your user account
+  schemas:
+    IpCommunityProperties:
+      type: object
+      properties:
+        annotation:
+          type: string
+          description: Switch configuration description.
+        ipCommunityRules:
+          type: array
+          description: List of IP Community Rules.
+          items:
+            type: object
+            description: IP Community patchable properties.
+            properties:
+              action:
+                description: 'Action to be taken on the configuration. Example: Permit
+                  | Deny.'
+                type: string
+                enum:
+                - Permit
+                - Deny
+                x-ms-enum:
+                  modelAsString: true
+                  name: communityActionTypes
+              sequenceNumber:
+                type: integer
+                format: int64
+                minimum: 1
+                maximum: 4294967295
+                description: Sequence to insert to/delete from existing route. Prefix
+                  lists are evaluated starting with the lowest sequence number and
+                  continue down the list until a match is made. Once a match is made,
+                  the permit or deny statement is applied to that network and the
+                  rest of the list is ignored.
+              wellKnownCommunities:
+                type: array
+                description: Supported well known Community List.
+                uniqueItems: true
+                items:
+                  description: "\n`Internet` - Advertise routes to internet community.\n\
+                    \ `LocalAS` - Advertise routes to only localAS peers.\n `NoAdvertise`\
+                    \ - Don't advertise routes to any peer.\n`NoExport` - Don't export\
+                    \ to next AS.\n`GShut` - Graceful Shutdown (GSHUT) withdraw routes\
+                    \ before terminating BGP connection.\n"
+                  type: string
+                  minLength: 1
+                  enum:
+                  - Internet
+                  - LocalAS
+                  - NoAdvertise
+                  - NoExport
+                  - GShut
+                  x-ms-enum:
+                    modelAsString: true
+                    name: wellKnownCommunities
+              communityMembers:
+                type: array
+                minItems: 1
+                description: List the community members of IP Community.
+                items:
+                  minLength: 1
+                  description: Community member of the IP Community. The expected
+                    formats are AA:NN >> example 65535:65535, <integer32> >> example
+                    4294967040. The possible values of AA, NN are 0-65535 and <integer32>
+                    are 1-4294967040.
+                  type: string
+            required:
+            - action
+            - sequenceNumber
+            - communityMembers
+        configurationState:
+          description: Configuration state of the resource.
+          type: string
+          readOnly: true
+          enum:
+          - Succeeded
+          - Failed
+          - Rejected
+          - Accepted
+          - Provisioned
+          - ErrorProvisioning
+          - Deprovisioning
+          - Deprovisioned
+          - ErrorDeprovisioning
+          - DeferredControl
+          - Provisioning
+          - PendingCommit
+          x-ms-enum:
+            modelAsString: true
+            name: ConfigurationState
+        provisioningState:
+          description: Provisioning state of the resource.
+          type: string
+          readOnly: true
+          enum:
+          - Accepted
+          - Succeeded
+          - Updating
+          - Deleting
+          - Failed
+          - Canceled
+          x-ms-enum:
+            name: ProvisioningState
+            modelAsString: true
+        administrativeState:
+          description: Administrative state of the resource.
+          type: string
+          enum:
+          - Enabled
+          - Disabled
+          - MAT
+          - RMA
+          readOnly: true
+          x-ms-enum:
+            modelAsString: true
+            name: AdministrativeState
+      description: Common properties for annotated type.
+      required:
+      - ipCommunityRules
+    IpCommunity:
+      type: object
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+        tags:
+          type: object
+          description: Resource tags.
+          additionalProperties:
+            type: string
+          x-ms-mutability:
+          - read
+          - create
+          - update
+        location:
+          type: string
+          description: The geo-location where the resource lives
+          x-ms-mutability:
+          - read
+          - create
+        properties:
+          type: object
+          properties:
+            annotation:
+              type: string
+              description: Switch configuration description.
+            ipCommunityRules:
+              type: array
+              description: List of IP Community Rules.
+              items:
+                type: object
+                description: IP Community patchable properties.
+                properties:
+                  action:
+                    description: 'Action to be taken on the configuration. Example:
+                      Permit | Deny.'
+                    type: string
+                    enum:
+                    - Permit
+                    - Deny
+                    x-ms-enum:
+                      modelAsString: true
+                      name: communityActionTypes
+                  sequenceNumber:
+                    type: integer
+                    format: int64
+                    minimum: 1
+                    maximum: 4294967295
+                    description: Sequence to insert to/delete from existing route.
+                      Prefix lists are evaluated starting with the lowest sequence
+                      number and continue down the list until a match is made. Once
+                      a match is made, the permit or deny statement is applied to
+                      that network and the rest of the list is ignored.
+                  wellKnownCommunities:
+                    type: array
+                    description: Supported well known Community List.
+                    uniqueItems: true
+                    items:
+                      description: "\n`Internet` - Advertise routes to internet community.\n\
+                        \ `LocalAS` - Advertise routes to only localAS peers.\n `NoAdvertise`\
+                        \ - Don't advertise routes to any peer.\n`NoExport` - Don't\
+                        \ export to next AS.\n`GShut` - Graceful Shutdown (GSHUT)\
+                        \ withdraw routes before terminating BGP connection.\n"
+                      type: string
+                      minLength: 1
+                      enum:
+                      - Internet
+                      - LocalAS
+                      - NoAdvertise
+                      - NoExport
+                      - GShut
+                      x-ms-enum:
+                        modelAsString: true
+                        name: wellKnownCommunities
+                  communityMembers:
+                    type: array
+                    minItems: 1
+                    description: List the community members of IP Community.
+                    items:
+                      minLength: 1
+                      description: Community member of the IP Community. The expected
+                        formats are AA:NN >> example 65535:65535, <integer32> >> example
+                        4294967040. The possible values of AA, NN are 0-65535 and
+                        <integer32> are 1-4294967040.
+                      type: string
+                required:
+                - action
+                - sequenceNumber
+                - communityMembers
+            configurationState:
+              description: Configuration state of the resource.
+              type: string
+              readOnly: true
+              enum:
+              - Succeeded
+              - Failed
+              - Rejected
+              - Accepted
+              - Provisioned
+              - ErrorProvisioning
+              - Deprovisioning
+              - Deprovisioned
+              - ErrorDeprovisioning
+              - DeferredControl
+              - Provisioning
+              - PendingCommit
+              x-ms-enum:
+                modelAsString: true
+                name: ConfigurationState
+            provisioningState:
+              description: Provisioning state of the resource.
+              type: string
+              readOnly: true
+              enum:
+              - Accepted
+              - Succeeded
+              - Updating
+              - Deleting
+              - Failed
+              - Canceled
+              x-ms-enum:
+                name: ProvisioningState
+                modelAsString: true
+            administrativeState:
+              description: Administrative state of the resource.
+              type: string
+              enum:
+              - Enabled
+              - Disabled
+              - MAT
+              - RMA
+              readOnly: true
+              x-ms-enum:
+                modelAsString: true
+                name: AdministrativeState
+          description: Common properties for annotated type.
+          required:
+          - ipCommunityRules
+          x-ms-client-flatten: true
+      required:
+      - location
+      - properties
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+    IpCommunitiesListResult:
+      type: object
+      description: List of IP Communities.
+      properties:
+        value:
+          type: array
+          description: List of IP Community resources.
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: arm-id
+                description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+                readOnly: true
+              name:
+                type: string
+                description: The name of the resource
+                readOnly: true
+              type:
+                type: string
+                description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+                  or "Microsoft.Storage/storageAccounts"
+                readOnly: true
+              systemData:
+                description: Azure Resource Manager metadata containing createdBy
+                  and modifiedBy information.
+                readOnly: true
+                type: object
+                properties:
+                  createdBy:
+                    type: string
+                    description: The identity that created the resource.
+                  createdByType:
+                    type: string
+                    description: The type of identity that created the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  createdAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource creation (UTC).
+                  lastModifiedBy:
+                    type: string
+                    description: The identity that last modified the resource.
+                  lastModifiedByType:
+                    type: string
+                    description: The type of identity that last modified the resource.
+                    enum:
+                    - User
+                    - Application
+                    - ManagedIdentity
+                    - Key
+                    x-ms-enum:
+                      name: createdByType
+                      modelAsString: true
+                  lastModifiedAt:
+                    type: string
+                    format: date-time
+                    description: The timestamp of resource last modification (UTC)
+              tags:
+                type: object
+                description: Resource tags.
+                additionalProperties:
+                  type: string
+                x-ms-mutability:
+                - read
+                - create
+                - update
+              location:
+                type: string
+                description: The geo-location where the resource lives
+                x-ms-mutability:
+                - read
+                - create
+              properties:
+                type: object
+                properties:
+                  annotation:
+                    type: string
+                    description: Switch configuration description.
+                  ipCommunityRules:
+                    type: array
+                    description: List of IP Community Rules.
+                    items:
+                      type: object
+                      description: IP Community patchable properties.
+                      properties:
+                        action:
+                          description: 'Action to be taken on the configuration. Example:
+                            Permit | Deny.'
+                          type: string
+                          enum:
+                          - Permit
+                          - Deny
+                          x-ms-enum:
+                            modelAsString: true
+                            name: communityActionTypes
+                        sequenceNumber:
+                          type: integer
+                          format: int64
+                          minimum: 1
+                          maximum: 4294967295
+                          description: Sequence to insert to/delete from existing
+                            route. Prefix lists are evaluated starting with the lowest
+                            sequence number and continue down the list until a match
+                            is made. Once a match is made, the permit or deny statement
+                            is applied to that network and the rest of the list is
+                            ignored.
+                        wellKnownCommunities:
+                          type: array
+                          description: Supported well known Community List.
+                          uniqueItems: true
+                          items:
+                            description: "\n`Internet` - Advertise routes to internet\
+                              \ community.\n `LocalAS` - Advertise routes to only\
+                              \ localAS peers.\n `NoAdvertise` - Don't advertise routes\
+                              \ to any peer.\n`NoExport` - Don't export to next AS.\n\
+                              `GShut` - Graceful Shutdown (GSHUT) withdraw routes\
+                              \ before terminating BGP connection.\n"
+                            type: string
+                            minLength: 1
+                            enum:
+                            - Internet
+                            - LocalAS
+                            - NoAdvertise
+                            - NoExport
+                            - GShut
+                            x-ms-enum:
+                              modelAsString: true
+                              name: wellKnownCommunities
+                        communityMembers:
+                          type: array
+                          minItems: 1
+                          description: List the community members of IP Community.
+                          items:
+                            minLength: 1
+                            description: Community member of the IP Community. The
+                              expected formats are AA:NN >> example 65535:65535, <integer32>
+                              >> example 4294967040. The possible values of AA, NN
+                              are 0-65535 and <integer32> are 1-4294967040.
+                            type: string
+                      required:
+                      - action
+                      - sequenceNumber
+                      - communityMembers
+                  configurationState:
+                    description: Configuration state of the resource.
+                    type: string
+                    readOnly: true
+                    enum:
+                    - Succeeded
+                    - Failed
+                    - Rejected
+                    - Accepted
+                    - Provisioned
+                    - ErrorProvisioning
+                    - Deprovisioning
+                    - Deprovisioned
+                    - ErrorDeprovisioning
+                    - DeferredControl
+                    - Provisioning
+                    - PendingCommit
+                    x-ms-enum:
+                      modelAsString: true
+                      name: ConfigurationState
+                  provisioningState:
+                    description: Provisioning state of the resource.
+                    type: string
+                    readOnly: true
+                    enum:
+                    - Accepted
+                    - Succeeded
+                    - Updating
+                    - Deleting
+                    - Failed
+                    - Canceled
+                    x-ms-enum:
+                      name: ProvisioningState
+                      modelAsString: true
+                  administrativeState:
+                    description: Administrative state of the resource.
+                    type: string
+                    enum:
+                    - Enabled
+                    - Disabled
+                    - MAT
+                    - RMA
+                    readOnly: true
+                    x-ms-enum:
+                      modelAsString: true
+                      name: AdministrativeState
+                description: Common properties for annotated type.
+                required:
+                - ipCommunityRules
+                x-ms-client-flatten: true
+            required:
+            - location
+            - properties
+            title: Resource
+            description: Common fields that are returned in the response for all Azure
+              Resource Manager resources
+            x-ms-azure-resource: true
+        nextLink:
+          type: string
+          description: Url to follow for getting next page of resources.
+    IpCommunityPatch:
+      type: object
+      properties:
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Resource tags
+        properties:
+          x-ms-client-flatten: true
+          description: IP Community patchable properties.
+          type: object
+          properties:
+            ipCommunityRules:
+              type: array
+              description: List of IP Community Rules.
+              items:
+                type: object
+                description: IP Community patchable properties.
+                properties:
+                  action:
+                    description: 'Action to be taken on the configuration. Example:
+                      Permit | Deny.'
+                    type: string
+                    enum:
+                    - Permit
+                    - Deny
+                    x-ms-enum:
+                      modelAsString: true
+                      name: communityActionTypes
+                  sequenceNumber:
+                    type: integer
+                    format: int64
+                    minimum: 1
+                    maximum: 4294967295
+                    description: Sequence to insert to/delete from existing route.
+                      Prefix lists are evaluated starting with the lowest sequence
+                      number and continue down the list until a match is made. Once
+                      a match is made, the permit or deny statement is applied to
+                      that network and the rest of the list is ignored.
+                  wellKnownCommunities:
+                    type: array
+                    description: Supported well known Community List.
+                    uniqueItems: true
+                    items:
+                      description: "\n`Internet` - Advertise routes to internet community.\n\
+                        \ `LocalAS` - Advertise routes to only localAS peers.\n `NoAdvertise`\
+                        \ - Don't advertise routes to any peer.\n`NoExport` - Don't\
+                        \ export to next AS.\n`GShut` - Graceful Shutdown (GSHUT)\
+                        \ withdraw routes before terminating BGP connection.\n"
+                      type: string
+                      minLength: 1
+                      enum:
+                      - Internet
+                      - LocalAS
+                      - NoAdvertise
+                      - NoExport
+                      - GShut
+                      x-ms-enum:
+                        modelAsString: true
+                        name: wellKnownCommunities
+                  communityMembers:
+                    type: array
+                    minItems: 1
+                    description: List the community members of IP Community.
+                    items:
+                      minLength: 1
+                      description: Community member of the IP Community. The expected
+                        formats are AA:NN >> example 65535:65535, <integer32> >> example
+                        4294967040. The possible values of AA, NN are 0-65535 and
+                        <integer32> are 1-4294967040.
+                      type: string
+                required:
+                - action
+                - sequenceNumber
+                - communityMembers
+      description: Base tracked resource type for PATCH updates.
+      x-ms-azure-resource: true
+    IpCommunityPatchableProperties:
+      type: object
+      description: IP Community patchable properties.
+      properties:
+        ipCommunityRules:
+          type: array
+          description: List of IP Community Rules.
+          items:
+            type: object
+            description: IP Community patchable properties.
+            properties:
+              action:
+                description: 'Action to be taken on the configuration. Example: Permit
+                  | Deny.'
+                type: string
+                enum:
+                - Permit
+                - Deny
+                x-ms-enum:
+                  modelAsString: true
+                  name: communityActionTypes
+              sequenceNumber:
+                type: integer
+                format: int64
+                minimum: 1
+                maximum: 4294967295
+                description: Sequence to insert to/delete from existing route. Prefix
+                  lists are evaluated starting with the lowest sequence number and
+                  continue down the list until a match is made. Once a match is made,
+                  the permit or deny statement is applied to that network and the
+                  rest of the list is ignored.
+              wellKnownCommunities:
+                type: array
+                description: Supported well known Community List.
+                uniqueItems: true
+                items:
+                  description: "\n`Internet` - Advertise routes to internet community.\n\
+                    \ `LocalAS` - Advertise routes to only localAS peers.\n `NoAdvertise`\
+                    \ - Don't advertise routes to any peer.\n`NoExport` - Don't export\
+                    \ to next AS.\n`GShut` - Graceful Shutdown (GSHUT) withdraw routes\
+                    \ before terminating BGP connection.\n"
+                  type: string
+                  minLength: 1
+                  enum:
+                  - Internet
+                  - LocalAS
+                  - NoAdvertise
+                  - NoExport
+                  - GShut
+                  x-ms-enum:
+                    modelAsString: true
+                    name: wellKnownCommunities
+              communityMembers:
+                type: array
+                minItems: 1
+                description: List the community members of IP Community.
+                items:
+                  minLength: 1
+                  description: Community member of the IP Community. The expected
+                    formats are AA:NN >> example 65535:65535, <integer32> >> example
+                    4294967040. The possible values of AA, NN are 0-65535 and <integer32>
+                    are 1-4294967040.
+                  type: string
+            required:
+            - action
+            - sequenceNumber
+            - communityMembers
+    IpCommunityRule:
+      type: object
+      description: IP Community patchable properties.
+      properties:
+        action:
+          description: 'Action to be taken on the configuration. Example: Permit |
+            Deny.'
+          type: string
+          enum:
+          - Permit
+          - Deny
+          x-ms-enum:
+            modelAsString: true
+            name: communityActionTypes
+        sequenceNumber:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 4294967295
+          description: Sequence to insert to/delete from existing route. Prefix lists
+            are evaluated starting with the lowest sequence number and continue down
+            the list until a match is made. Once a match is made, the permit or deny
+            statement is applied to that network and the rest of the list is ignored.
+        wellKnownCommunities:
+          type: array
+          description: Supported well known Community List.
+          uniqueItems: true
+          items:
+            description: "\n`Internet` - Advertise routes to internet community.\n\
+              \ `LocalAS` - Advertise routes to only localAS peers.\n `NoAdvertise`\
+              \ - Don't advertise routes to any peer.\n`NoExport` - Don't export to\
+              \ next AS.\n`GShut` - Graceful Shutdown (GSHUT) withdraw routes before\
+              \ terminating BGP connection.\n"
+            type: string
+            minLength: 1
+            enum:
+            - Internet
+            - LocalAS
+            - NoAdvertise
+            - NoExport
+            - GShut
+            x-ms-enum:
+              modelAsString: true
+              name: wellKnownCommunities
+        communityMembers:
+          type: array
+          minItems: 1
+          description: List the community members of IP Community.
+          items:
+            minLength: 1
+            description: Community member of the IP Community. The expected formats
+              are AA:NN >> example 65535:65535, <integer32> >> example 4294967040.
+              The possible values of AA, NN are 0-65535 and <integer32> are 1-4294967040.
+            type: string
+      required:
+      - action
+      - sequenceNumber
+      - communityMembers
+    ErrorDetail:
+      type: object
+      description: The error detail.
+      properties:
+        code:
+          type: string
+          description: The error code.
+          readOnly: true
+        message:
+          type: string
+          description: The error message.
+          readOnly: true
+        target:
+          type: string
+          description: The error target.
+          readOnly: true
+        details:
+          type: array
+          description: The error details.
+          items:
+            type: object
+            description: The error detail.
+            properties:
+              code:
+                type: string
+                description: The error code.
+                readOnly: true
+              message:
+                type: string
+                description: The error message.
+                readOnly: true
+              target:
+                type: string
+                description: The error target.
+                readOnly: true
+              details:
+                type: array
+                description: The error details.
+                items:
+                  type: object
+                  description: The error detail.
+                  properties:
+                    code:
+                      type: string
+                      description: The error code.
+                      readOnly: true
+                    message:
+                      type: string
+                      description: The error message.
+                      readOnly: true
+                    target:
+                      type: string
+                      description: The error target.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers:
+                - message
+                - target
+              additionalInfo:
+                type: array
+                description: The error additional info.
+                items:
+                  type: object
+                  description: The resource management error additional info.
+                  properties:
+                    type:
+                      type: string
+                      description: The additional info type.
+                      readOnly: true
+                    info:
+                      type: object
+                      description: The additional info.
+                      readOnly: true
+                readOnly: true
+                x-ms-identifiers: []
+          readOnly: true
+          x-ms-identifiers:
+          - message
+          - target
+        additionalInfo:
+          type: array
+          description: The error additional info.
+          items:
+            type: object
+            description: The resource management error additional info.
+            properties:
+              type:
+                type: string
+                description: The additional info type.
+                readOnly: true
+              info:
+                type: object
+                description: The additional info.
+                readOnly: true
+          readOnly: true
+          x-ms-identifiers: []
+    ErrorAdditionalInfo:
+      type: object
+      description: The resource management error additional info.
+      properties:
+        type:
+          type: string
+          description: The additional info type.
+          readOnly: true
+        info:
+          type: object
+          description: The additional info.
+          readOnly: true
+    ErrorResponse:
+      type: object
+      title: Error response
+      description: Common error response for all Azure Resource Manager APIs to return
+        error details for failed operations. (This also follows the OData error response
+        format.).
+      properties:
+        error:
+          description: The error object.
+          type: object
+          properties:
+            code:
+              type: string
+              description: The error code.
+              readOnly: true
+            message:
+              type: string
+              description: The error message.
+              readOnly: true
+            target:
+              type: string
+              description: The error target.
+              readOnly: true
+            details:
+              type: array
+              description: The error details.
+              items:
+                type: object
+                description: The error detail.
+                properties:
+                  code:
+                    type: string
+                    description: The error code.
+                    readOnly: true
+                  message:
+                    type: string
+                    description: The error message.
+                    readOnly: true
+                  target:
+                    type: string
+                    description: The error target.
+                    readOnly: true
+                  details:
+                    type: array
+                    description: The error details.
+                    items:
+                      type: object
+                      description: The error detail.
+                      properties:
+                        code:
+                          type: string
+                          description: The error code.
+                          readOnly: true
+                        message:
+                          type: string
+                          description: The error message.
+                          readOnly: true
+                        target:
+                          type: string
+                          description: The error target.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers:
+                    - message
+                    - target
+                  additionalInfo:
+                    type: array
+                    description: The error additional info.
+                    items:
+                      type: object
+                      description: The resource management error additional info.
+                      properties:
+                        type:
+                          type: string
+                          description: The additional info type.
+                          readOnly: true
+                        info:
+                          type: object
+                          description: The additional info.
+                          readOnly: true
+                    readOnly: true
+                    x-ms-identifiers: []
+              readOnly: true
+              x-ms-identifiers:
+              - message
+              - target
+            additionalInfo:
+              type: array
+              description: The error additional info.
+              items:
+                type: object
+                description: The resource management error additional info.
+                properties:
+                  type:
+                    type: string
+                    description: The additional info type.
+                    readOnly: true
+                  info:
+                    type: object
+                    description: The additional info.
+                    readOnly: true
+              readOnly: true
+              x-ms-identifiers: []
+    systemData:
+      type: object
+      description: Metadata pertaining to creation and last modification of the resource.
+      properties:
+        createdBy:
+          type: string
+          description: The identity that created the resource.
+        createdByType:
+          type: string
+          description: The type of identity that created the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource creation (UTC).
+        lastModifiedBy:
+          type: string
+          description: The identity that last modified the resource.
+        lastModifiedByType:
+          type: string
+          description: The type of identity that last modified the resource.
+          enum:
+          - User
+          - Application
+          - ManagedIdentity
+          - Key
+          x-ms-enum:
+            name: createdByType
+            modelAsString: true
+        lastModifiedAt:
+          type: string
+          format: date-time
+          description: The timestamp of resource last modification (UTC)
+      readOnly: true
+    Resource:
+      type: object
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+      x-ms-azure-resource: true
+    TrackedResource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: arm-id
+          description: Fully qualified resource ID for the resource. E.g. "/subscriptions/{subscriptionId}/resourceGroups/{resourceGroupName}/providers/{resourceProviderNamespace}/{resourceType}/{resourceName}"
+          readOnly: true
+        name:
+          type: string
+          description: The name of the resource
+          readOnly: true
+        type:
+          type: string
+          description: The type of the resource. E.g. "Microsoft.Compute/virtualMachines"
+            or "Microsoft.Storage/storageAccounts"
+          readOnly: true
+        systemData:
+          description: Azure Resource Manager metadata containing createdBy and modifiedBy
+            information.
+          readOnly: true
+          type: object
+          properties:
+            createdBy:
+              type: string
+              description: The identity that created the resource.
+            createdByType:
+              type: string
+              description: The type of identity that created the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            createdAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource creation (UTC).
+            lastModifiedBy:
+              type: string
+              description: The identity that last modified the resource.
+            lastModifiedByType:
+              type: string
+              description: The type of identity that last modified the resource.
+              enum:
+              - User
+              - Application
+              - ManagedIdentity
+              - Key
+              x-ms-enum:
+                name: createdByType
+                modelAsString: true
+            lastModifiedAt:
+              type: string
+              format: date-time
+              description: The timestamp of resource last modification (UTC)
+        tags:
+          type: object
+          description: Resource tags.
+          additionalProperties:
+            type: string
+          x-ms-mutability:
+          - read
+          - create
+          - update
+        location:
+          type: string
+          description: The geo-location where the resource lives
+          x-ms-mutability:
+          - read
+          - create
+      title: Resource
+      description: Common fields that are returned in the response for all Azure Resource
+        Manager resources
+      x-ms-azure-resource: true
+      required:
+      - location
+    AnnotationResource:
+      type: object
+      description: Switch configuration entries require a description to discern between
+        configuration groups.
+      properties:
+        annotation:
+          type: string
+          description: Switch configuration description.
+    CommunityActionTypes:
+      type: string
+      description: 'community action types. Example: Permit | Deny.'
+      enum:
+      - Permit
+      - Deny
+      x-ms-enum:
+        modelAsString: true
+        name: communityActionTypes
+    ConfigurationState:
+      type: string
+      description: Configuration state for the resource.
+      readOnly: true
+      enum:
+      - Succeeded
+      - Failed
+      - Rejected
+      - Accepted
+      - Provisioned
+      - ErrorProvisioning
+      - Deprovisioning
+      - Deprovisioned
+      - ErrorDeprovisioning
+      - DeferredControl
+      - Provisioning
+      - PendingCommit
+      x-ms-enum:
+        modelAsString: true
+        name: ConfigurationState
+    ProvisioningState:
+      type: string
+      readOnly: true
+      description: The current provisioning state.
+      enum:
+      - Accepted
+      - Succeeded
+      - Updating
+      - Deleting
+      - Failed
+      - Canceled
+      x-ms-enum:
+        name: ProvisioningState
+        modelAsString: true
+    AdministrativeState:
+      type: string
+      description: State defined to represent administrative actions or post actions
+        on a particular resource.
+      enum:
+      - Enabled
+      - Disabled
+      - MAT
+      - RMA
+      readOnly: true
+      x-ms-enum:
+        modelAsString: true
+        name: AdministrativeState
+    TagsUpdate:
+      description: Base tracked resource type for PATCH updates.
+      type: object
+      properties:
+        tags:
+          type: object
+          additionalProperties:
+            type: string
+          description: Resource tags
