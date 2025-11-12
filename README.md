@@ -4,7 +4,7 @@
 
 <br>
 
-<p align="center"><img alt="TheMCPCompany" src="https://huggingface.co/datasets/BatsResearch/themcpcompany_artifacts/resolve/main/tmc.svg"/></p>
+<p align="center"><img alt="TheMCPCompany" src="https://huggingface.co/datasets/BatsResearch/themcpcompany_artifacts/resolve/main/tmc.png"/></p>
 
 ## Running the Agent
 
