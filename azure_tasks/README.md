@@ -1,6 +1,6 @@
 # Azure Tasks
 
-<p align="center"><img alt="Sample Azure task" src="https://huggingface.co/datasets/BatsResearch/themcpcompany_artifacts/resolve/main/azt.svg"/></p>
+<p align="center"><img alt="Sample Azure task" src="https://huggingface.co/datasets/BatsResearch/themcpcompany_artifacts/resolve/main/azt.png"/></p>
 
 To run the Azure tasks, you need to create a free account and a service principle and configure two command line tools.
 Follow the instructions below to set up the environment.
