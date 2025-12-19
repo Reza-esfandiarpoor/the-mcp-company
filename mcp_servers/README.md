@@ -12,7 +12,7 @@ There are two options for running the MCP servers for Plane, GitLab, ownCloud, a
 **Manual**
 
 - Create a virtual environment with `python==3.12`
-- Install the necessary packages: `pip install 'fastmcp==2.11.2' 'PyYAML==6.0.2' 'webdav4==0.10.0'`
+- Install the necessary packages: `pip install 'fastmcp==2.11.2' 'PyYAML==6.0.2' 'webdav4==0.10.0' 'mcp==1.12.3'`
 - Run the MCP servers in the background (e.g., run each command in a TMUX session in the background)
   ```bash
   # Each command is one MCP server and is blocking
