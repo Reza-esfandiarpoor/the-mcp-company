@@ -36,6 +36,8 @@ To run the MCP server for Azure:
 
 **Note**: It takes a while for the server to parse all OpenAPI Specs (up to 10 minutes).
 
+If you just want to get the tool specifications without actually interacting with Azure, just create `azure_tasks/azure_creds.sh` with some default values from [here](../azure_tasks/README.md) and then run `AZURE_TOOL_SPECS_ONLY=true bash mcp_servers/azure_v2/run_azure_mcp.sh`
+
 ## MCP Gateway
 
 First, you need to create the python environment. You can use the same environment from the Azure MCP server setup above if you have created one. Or create a new virtual environment with `python==3.12` and install the requirements: `pip install -r requirements.txt`

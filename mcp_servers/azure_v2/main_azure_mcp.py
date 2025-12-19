@@ -24,7 +24,6 @@ import httpx
 import requests
 import xmltodict
 import yaml
-from azure.identity.aio import EnvironmentCredential
 from fastmcp import Client, FastMCP
 from fastmcp.tools import Tool
 from fastmcp.tools.tool_transform import ArgTransform, forward_raw
@@ -39,6 +38,15 @@ import spec_utils
 start_time = time.time()
 
 DEFAULT_HTTPX_TIMEOUT = 240  # default timeout for the httpx client
+
+if os.environ.get("AZURE_TOOL_SPECS_ONLY", "false").lower() == "true":
+
+    class EnvironmentCredential:
+        def __init__(self, *args, **kwargs) -> None:
+            pass
+
+else:
+    from azure.identity.aio import EnvironmentCredential
 
 
 def get_azure_base_url(endpoint_type: str, acct: str | None = None) -> str:
